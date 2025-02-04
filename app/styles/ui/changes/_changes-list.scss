@@ -60,8 +60,8 @@
       }
 
       > span {
-        display: flex;
-        align-items: center;
+        display: inline-block;
+        margin-top: 5px;
       }
 
       > button {
@@ -97,11 +97,47 @@
     .filter-list-container {
       height: 100%;
     }
+
+    .filter-group {
+      display: flex;
+      flex-grow: 1;
+      flex-direction: column;
+
+      .results-count {
+         padding-top: var(--spacing-half);
+         display: flex;
+         align-items: center;
+         min-width: 0;
+
+         .results {
+          flex-grow: 1;
+          text-align: right;
+         }
+
+         .octicon {
+            margin-right: var(--spacing-half);
+            fill: var(--dialog-warning-color);
+         }
+      }
+    }
   }
 
   .no-changes-in-list {
     text-align: center;
     padding: var(--spacing-double);
+  }
+}
+
+#changes-hidden-message {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-half) var(--spacing);
+  background-color: var(--secondary-button-background);
+  border-top: var(--base-border);
+
+  .octicon {
+    fill: var(--dialog-warning-color);
+    margin-right: var(--spacing-half);
   }
 }
 

@@ -1241,6 +1241,7 @@ export class CommitMessage extends React.Component<
         tooltip={tooltip}
         tooltipDismissable={false}
         onlyShowTooltipWhenOverflowed={buttonEnabled}
+        ariaDescribedBy="changes-hidden-message"
       >
         <>
           {loading}

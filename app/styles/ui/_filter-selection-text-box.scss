@@ -12,6 +12,7 @@
   font-size: var(--font-size);
   font-family: var(--font-family-sans-serif);
   align-items: center;
+  flex-grow: 1;
 
   &.focus-within {
     @include textboxish-focus-styles;

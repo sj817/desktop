@@ -66,6 +66,7 @@ import {
 } from '../lib/filter-selection-text-box'
 import { TooltippedContent } from '../lib/tooltipped-content'
 import { TooltipDirection } from '../lib/tooltip'
+import { LinkButton } from '../lib/link-button'
 
 interface IChangesListItem extends IFilterListItem {
   readonly id: string
@@ -343,7 +344,7 @@ export class FilterChangesList extends React.Component<
       selectedItems: getSelectedItemsFromProps(props),
       focusedRow: null,
       groups,
-      filterToIncludedCommit: true,
+      filterToIncludedCommit: false,
     }
   }
 
@@ -1044,6 +1045,38 @@ export class FilterChangesList extends React.Component<
     }
   }
 
+  private renderChangesHiddenMessage() {
+    const filesSelected = this.props.workingDirectory.files.filter(
+      f => f.selection.getSelectionType() !== DiffSelectionType.None
+    )
+    const fileCount = this.props.workingDirectory.files.length
+
+    if (
+      !this.isCommittingFileHiddenByFilter(
+        this.state.filterText,
+        filesSelected.map(f => f.id),
+        this.state.filteredItems,
+        fileCount
+      ) ||
+      1 === 1
+    ) {
+      return
+    }
+
+    return (
+      <div id="changes-hidden-message">
+        <Octicon symbol={octicons.alert} />
+        <span>
+          There are{' '}
+          <LinkButton onClick={this.showFilesToBeCommitted}>
+            hidden changes
+          </LinkButton>{' '}
+          that will be committed.
+        </span>
+      </div>
+    )
+  }
+
   private renderStashedChanges() {
     if (this.props.stashEntry === null) {
       return null
@@ -1167,6 +1200,34 @@ export class FilterChangesList extends React.Component<
     const disableAllCheckbox =
       files.length === 0 || isCommitting || rebaseConflictState !== null
 
+    const filesSelected = this.props.workingDirectory.files.filter(
+      f => f.selection.getSelectionType() !== DiffSelectionType.None
+    )
+    const fileCount = this.props.workingDirectory.files.length
+
+    const arehiddenFiles = this.isCommittingFileHiddenByFilter(
+      this.state.filterText,
+      filesSelected.map(f => f.id),
+      this.state.filteredItems,
+      fileCount
+    )
+
+    const warningButton = arehiddenFiles ? (
+      <div id="changes-hidden-messaged">
+        <Octicon symbol={octicons.alert} />
+        <LinkButton onClick={this.showFilesToBeCommitted}>
+          Hidden changes
+        </LinkButton>{' '}
+        that will be committed.
+      </div>
+    ) : null
+
+    const resultsCount = (
+      <div className="results-count">
+        {warningButton} <span className="results">{visibleFiles} results </span>
+      </div>
+    )
+
     return (
       <div
         className="header filter-field-row"
@@ -1190,26 +1251,31 @@ export class FilterChangesList extends React.Component<
           />
         </TooltippedContent>
 
-        <FilterSelectionTextBox
-          ref={this.onTextBoxRef}
-          displayClearButton={true}
-          autoFocus={true}
-          placeholder={'Filter'}
-          className="filter-list-filter-field"
-          onValueChanged={this.onFilterTextChanged}
-          onKeyDown={this.onFilterKeyDown}
-          value={this.state.filterText}
-          filterOptions={[
-            {
-              id: 'to-be-committed-files',
-              label: 'Checked',
-              value: this.state.filterToIncludedCommit
-                ? CheckboxValue.On
-                : CheckboxValue.Off,
-            },
-          ]}
-          onFilterOptionChanged={this.onFilterOptionsChanged}
-        />
+        <div className="filter-group">
+          <FilterSelectionTextBox
+            ref={this.onTextBoxRef}
+            displayClearButton={true}
+            autoFocus={true}
+            placeholder={'Filter'}
+            className="filter-list-filter-field"
+            onValueChanged={this.onFilterTextChanged}
+            onKeyDown={this.onFilterKeyDown}
+            value={this.state.filterText}
+            filterOptions={[
+              {
+                id: 'to-be-committed-files',
+                label: 'Checked',
+                value: this.state.filterToIncludedCommit
+                  ? CheckboxValue.On
+                  : CheckboxValue.Off,
+              },
+            ]}
+            onFilterOptionChanged={this.onFilterOptionsChanged}
+          />
+          {this.state.filterText !== '' || this.state.filterToIncludedCommit
+            ? resultsCount
+            : null}
+        </div>
       </div>
     )
   }
@@ -1271,6 +1337,7 @@ export class FilterChangesList extends React.Component<
           />
         </div>
         {this.renderStashedChanges()}
+        {this.renderChangesHiddenMessage()}
         {this.renderCommitMessageForm()}
       </>
     )
