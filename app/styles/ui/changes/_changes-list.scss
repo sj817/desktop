@@ -51,12 +51,17 @@
   &.filtered-changes-list {
     .header {
       display: flex;
-      align-items: center;
+      align-items: top;
       height: auto;
 
       label {
         text-align: right;
         padding: 0 var(--spacing-half);
+      }
+
+      > span {
+        display: flex;
+        align-items: center;
       }
 
       > button {

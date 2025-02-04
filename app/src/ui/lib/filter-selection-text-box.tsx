@@ -5,6 +5,8 @@ import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
 import { Popover, PopoverAnchorPosition, PopoverDecoration } from './popover'
 import { Checkbox, CheckboxValue } from './checkbox'
+import classNames from 'classnames'
+import { FocusContainer } from './focus-container'
 
 export type FilterOption = {
   id: string
@@ -19,6 +21,7 @@ interface IFilterSelectionTextBoxProps extends ITextBoxProps {
 
 interface IFilterSelectionTextBoxState {
   readonly isPopoverOpen: boolean
+  readonly inputFocused: boolean
 }
 
 export class FilterSelectionTextBox extends React.Component<
@@ -32,6 +35,7 @@ export class FilterSelectionTextBox extends React.Component<
     super(props)
     this.state = {
       isPopoverOpen: false,
+      inputFocused: false,
     }
   }
 
@@ -76,6 +80,15 @@ export class FilterSelectionTextBox extends React.Component<
     }
   }
 
+  private getFilterOptionButtonCallback = (filterOption: FilterOption) => {
+    return () => {
+      this.props.onFilterOptionChanged({
+        ...filterOption,
+        value: CheckboxValue.Off,
+      })
+    }
+  }
+
   private renderPopover() {
     const filterOptions = this.props.filterOptions.map(option => {
       return (
@@ -102,22 +115,56 @@ export class FilterSelectionTextBox extends React.Component<
     )
   }
 
+  private onTextBoxFocused = () => {
+    this.setState({ inputFocused: true })
+  }
+
+  private onTextBoxBlur = () => {
+    this.setState({ inputFocused: false })
+  }
+
   public render() {
+    const appliedFilters = this.props.filterOptions
+      .filter(o => o.value === CheckboxValue.On)
+      .map(option => {
+        return (
+          <Button
+            key={option.id}
+            onClick={this.getFilterOptionButtonCallback(option)}
+          >
+            {option.label}
+            <Octicon symbol={octicons.x} />
+          </Button>
+        )
+      })
+
+    const className = classNames('filter-selection-text-box', {
+      'input-focused': this.state.inputFocused,
+    })
+
     return (
-      <div className="filter-selection-text-box">
-        <Button
-          onClick={this.onToggleFilterSelection}
-          ariaLabel="Filter Options"
-          ariaExpanded={this.state.isPopoverOpen}
-        >
-          <span ref={this.filterIconRef}>
-            <Octicon className="prefixed-icon" symbol={octicons.search} />
-          </span>
-          <Octicon className="prefixed-icon" symbol={octicons.triangleDown} />
-        </Button>
-        <TextBox ref={this.textBoxRef} {...this.props} />
-        {this.state.isPopoverOpen && this.renderPopover()}
-      </div>
+      <FocusContainer className={className}>
+        <div className="input-group">
+          <Button
+            onClick={this.onToggleFilterSelection}
+            ariaLabel="Filter Options"
+            ariaExpanded={this.state.isPopoverOpen}
+          >
+            <span ref={this.filterIconRef}>
+              <Octicon className="prefixed-icon" symbol={octicons.search} />
+            </span>
+            <Octicon className="prefixed-icon" symbol={octicons.triangleDown} />
+          </Button>
+          <TextBox
+            ref={this.textBoxRef}
+            {...this.props}
+            onFocus={this.onTextBoxFocused}
+            onBlur={this.onTextBoxBlur}
+          />
+          {this.state.isPopoverOpen && this.renderPopover()}
+        </div>
+        <div className="filter-options-applied">{appliedFilters}</div>
+      </FocusContainer>
     )
   }
 }

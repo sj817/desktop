@@ -343,7 +343,7 @@ export class FilterChangesList extends React.Component<
       selectedItems: getSelectedItemsFromProps(props),
       focusedRow: null,
       groups,
-      filterToIncludedCommit: false,
+      filterToIncludedCommit: true,
     }
   }
 
@@ -1202,7 +1202,7 @@ export class FilterChangesList extends React.Component<
           filterOptions={[
             {
               id: 'to-be-committed-files',
-              label: 'Checked (to be committed)',
+              label: 'Checked',
               value: this.state.filterToIncludedCommit
                 ? CheckboxValue.On
                 : CheckboxValue.Off,
