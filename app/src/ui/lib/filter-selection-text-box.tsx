@@ -132,8 +132,7 @@ export class FilterSelectionTextBox extends React.Component<
             key={option.id}
             onClick={this.getFilterOptionButtonCallback(option)}
           >
-            {option.label}
-            <Octicon symbol={octicons.x} />
+            is:<span>{option.label.toLocaleLowerCase()}</span>
           </Button>
         )
       })
@@ -144,26 +143,24 @@ export class FilterSelectionTextBox extends React.Component<
 
     return (
       <FocusContainer className={className}>
-        <div className="input-group">
-          <Button
-            onClick={this.onToggleFilterSelection}
-            ariaLabel="Filter Options"
-            ariaExpanded={this.state.isPopoverOpen}
-          >
-            <span ref={this.filterIconRef}>
-              <Octicon className="prefixed-icon" symbol={octicons.search} />
-            </span>
-            <Octicon className="prefixed-icon" symbol={octicons.triangleDown} />
-          </Button>
-          <TextBox
-            ref={this.textBoxRef}
-            {...this.props}
-            onFocus={this.onTextBoxFocused}
-            onBlur={this.onTextBoxBlur}
-          />
-          {this.state.isPopoverOpen && this.renderPopover()}
-        </div>
+        <Button
+          onClick={this.onToggleFilterSelection}
+          ariaLabel="Filter Options"
+          ariaExpanded={this.state.isPopoverOpen}
+        >
+          <span ref={this.filterIconRef}>
+            <Octicon className="prefixed-icon" symbol={octicons.search} />
+          </span>
+          <Octicon className="prefixed-icon" symbol={octicons.triangleDown} />
+        </Button>
         <div className="filter-options-applied">{appliedFilters}</div>
+        <TextBox
+          ref={this.textBoxRef}
+          {...this.props}
+          onFocus={this.onTextBoxFocused}
+          onBlur={this.onTextBoxBlur}
+        />
+        {this.state.isPopoverOpen && this.renderPopover()}
       </FocusContainer>
     )
   }
