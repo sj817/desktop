@@ -65,6 +65,11 @@ export enum RebaseResult {
    * Check the logs to find the relevant Git details.
    */
   Error = 'Error',
+
+  /**
+   * The rebase was stopped for amending a commit.
+   */
+  StoppedForAmend = 'StoppedForAmend',
 }
 
 /**
@@ -410,6 +415,11 @@ function parseRebaseResult(result: IGitStringResult): RebaseResult {
   if (result.exitCode === 0) {
     if (result.stdout.trim().match(/^Current branch [^ ]+ is up to date.$/i)) {
       return RebaseResult.AlreadyUpToDate
+    }
+
+    // TODO: handle this in dugite - make RebaseStopForAmend error
+    if (result.stderr.trim().match(/Stopped at [0-9a-f]+\.\.\. /i)) {
+      return RebaseResult.StoppedForAmend
     }
 
     return RebaseResult.CompletedWithoutError
