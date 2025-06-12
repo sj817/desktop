@@ -117,3 +117,8 @@ export const enableCommitMessageGeneration = (account: Account) => {
     account.isCopilotDesktopEnabled
   )
 }
+
+/** Should we enable granular cell diffs? - That is an a11y improvement that
+ * flattens the diff row hierarchy to allow for semantic groupings of the data
+ * in the diff grid. */
+export const enableGranularCellDiffs = () => enableBetaFeatures()

@@ -72,6 +72,8 @@ import { findDOMNode } from 'react-dom'
 import escapeRegExp from 'lodash/escapeRegExp'
 import ReactDOM from 'react-dom'
 import { AriaLiveContainer } from '../accessibility/aria-live-container'
+import { enableGranularCellDiffs } from '../../lib/feature-flag'
+import { SideBySideDiffRowOneCell } from './side-by-side-diff-row-one-cell'
 
 const DefaultRowHeight = 20
 
@@ -893,6 +895,10 @@ export class SideBySideDiff extends React.Component<
 
     const rowSelectableGroupDetails = this.getRowSelectableGroupDetails(index)
 
+    const SideBySideDiffRowComponent = enableGranularCellDiffs()
+      ? SideBySideDiffRow
+      : SideBySideDiffRowOneCell // This is the old component that renders the whole row in one cell, to be deleted when this feature flag is removed
+
     return (
       <CellMeasurer
         cache={listRowsHeightCache}
@@ -901,8 +907,13 @@ export class SideBySideDiff extends React.Component<
         parent={parent}
         rowIndex={index}
       >
-        <div key={key} style={style} role="row" aria-rowindex={index}>
-          <SideBySideDiffRow
+        <div
+          key={key}
+          style={style}
+          role={!enableGranularCellDiffs() ? 'row' : undefined}
+          aria-rowindex={!enableGranularCellDiffs() ? index : undefined}
+        >
+          <SideBySideDiffRowComponent
             row={rowWithTokens}
             lineNumberWidth={lineNumberWidth}
             numRow={index}
