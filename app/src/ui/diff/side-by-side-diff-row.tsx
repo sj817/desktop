@@ -333,7 +333,7 @@ export class SideBySideDiffRow extends React.Component<
     /* N.B. Direct descendant of `role="row"` must be a `role="cell"` for screen reader semantics */
     return (
       <div className={rowClasses} role="row" aria-rowindex={this.props.numRow}>
-        <div role="cell">
+        <div role="cell" aria-colspan={5}>
           {this.renderHunkHeaderGutter(row.hunkIndex, row.expansionType)}
           {this.renderContentFromString(row.content)}
         </div>
