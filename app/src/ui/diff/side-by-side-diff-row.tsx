@@ -19,6 +19,7 @@ import { WhitespaceHintPopover } from './whitespace-hint-popover'
 import { TooltipDirection } from '../lib/tooltip'
 import { Button } from '../lib/button'
 import { diffCheck, diffDash } from '../octicons/diff'
+import { assertNever } from '../../lib/fatal-error'
 
 // This is a custom version of the no-newline octicon that's exactly as
 // tall as it needs to be (8px) which helps with aligning it on the line.
@@ -257,6 +258,99 @@ export class SideBySideDiffRow extends React.Component<
   }
 
   public render() {
+    const { type } = this.props.row
+
+    if (type === DiffRowType.ColumnHeader) {
+      return this.renderColumnHeader()
+    }
+
+    if (type === DiffRowType.Hunk) {
+      return this.renderHunkRow()
+    }
+
+    return this.renderContentRow()
+  }
+
+  private renderColumnHeader = () => {
+    const { showSideBySideDiff } = this.props
+
+    const unifiedDiffColumnHeader = (
+      <>
+        <div role="columnheader">
+          Checkbox for including a group of changes in commit
+        </div>
+        <div role="columnheader">
+          Checkbox for including a single change in commit
+        </div>
+        <div role="columnheader">Old line number</div>
+        <div role="columnheader">New line number</div>
+        <div role="columnheader">Line content</div>
+      </>
+    )
+
+    const sideBySideDiffColumnHeader = (
+      <>
+        <div role="columnheader">Old line number</div>
+        <div role="columnheader">Old line content</div>
+        <div role="columnheader">
+          Checkbox for including a group of changes in commit
+        </div>
+        <div role="columnheader">New line number</div>
+        <div role="columnheader">New line content</div>
+      </>
+    )
+
+    return (
+      <div className="sr-only" role="row">
+        {showSideBySideDiff
+          ? sideBySideDiffColumnHeader
+          : unifiedDiffColumnHeader}
+      </div>
+    )
+  }
+
+  /**
+   * Hunk rows do not follow the same structure as regular diff rows so we
+   * reduce them to one row/cell so they are not be be confused as having
+   * content relational to the provided headers that apply to most of the rows
+   * */
+  private renderHunkRow = () => {
+    const { row, isDiffSelectable } = this.props
+
+    if (row.type !== DiffRowType.Hunk) {
+      // type check
+      return
+    }
+
+    const baseRowClasses = classNames('row', {
+      'has-check-all-control':
+        this.props.showDiffCheckMarks && isDiffSelectable,
+    })
+
+    const rowClasses = classNames('hunk-info', baseRowClasses, {
+      'expandable-both': row.expansionType === DiffHunkExpansionType.Both,
+    })
+    /* N.B. Direct descendant of `role="row"` must be a `role="cell"` for screen reader semantics */
+    return (
+      <div className={rowClasses} role="row" aria-rowindex={this.props.numRow}>
+        <div role="cell">
+          {this.renderHunkHeaderGutter(row.hunkIndex, row.expansionType)}
+          {this.renderContentFromString(row.content)}
+        </div>
+      </div>
+    )
+  }
+
+  /**
+   *  Content Rows follow the grid cell layout establish in the `renderColumnHeader` method
+   *  They include Context, Added, Deleted, and Modified rows.
+   *
+   *  IMPORTANT: Direct descendant of `role="row"` must be a `role="cell"` for
+   *  screen reader semantics, the row/cell html structure is defined in this
+   *  function to keep that readily apparent and not nested in other method
+   *  calls.
+   * */
+  private renderContentRow = () => {
     const {
       row,
       showSideBySideDiff,
@@ -270,213 +364,330 @@ export class SideBySideDiffRow extends React.Component<
     })
     const beforeClasses = classNames('before', ...beforeClassNames)
     const afterClasses = classNames('after', ...afterClassNames)
-    switch (row.type) {
-      case DiffRowType.ColumnHeader: {
-        const rowClasses = classNames('sr-only')
-        if (!showSideBySideDiff) {
-          return (
-            <div className={rowClasses} role="row">
-              <div role="columnheader">
-                Checkbox for group of changes in commit
-              </div>
-              <div role="columnheader">
-                Checkbox including a single change in commit
-              </div>
-              <div role="columnheader">Old line number</div>
-              <div role="columnheader">New line number</div>
-              <div role="columnheader">Line content</div>
-            </div>
-          )
-        }
-        return (
-          <div className={rowClasses} role="row">
-            <div role="columnheader">
-              Checkbox for group of changes in commit
-            </div>
-            <div role="columnheader">
-              Checkbox including a single change in commit
-            </div>
-            <div role="columnheader">Old line number</div>
-            <div role="columnheader">New line number</div>
-            <div role="columnheader">Old Line content</div>
-            <div role="columnheader">New Line content</div>
-          </div>
-        )
-      }
-      case DiffRowType.Hunk: {
-        const rowClasses = classNames('hunk-info', baseRowClasses, {
-          'expandable-both': row.expansionType === DiffHunkExpansionType.Both,
-        })
-        return (
-          <div
-            className={rowClasses}
-            role="row"
-            aria-rowindex={this.props.numRow}
-          >
-            <div role="cell">
-              {this.renderHunkHeaderGutter(row.hunkIndex, row.expansionType)}
-              {this.renderContentFromString(row.content)}
-            </div>
-          </div>
-        )
-      }
+
+    if (
+      ![
+        DiffRowType.Context,
+        DiffRowType.Added,
+        DiffRowType.Deleted,
+        DiffRowType.Modified,
+      ].includes(row.type)
+    ) {
+      return
+    }
+
+    // See renderColumnHeader for more detail of what these cells correspond to:
+    const unifiedDiffCells = (
+      <>
+        <div role="cell" className="before">
+          {/* Columnheader: Group Checkbox Column */}
+          {this.renderGroupCheckBoxCell()}
+        </div>
+        <div role="cell">
+          {/* Columnheader: Change Checkbox Column */}
+          {this.renderUnifiedDiffSingleChangeCheckBoxCell()}
+        </div>
+        <div role="cell">
+          {/* Columnheader: Old line number */}
+          {this.renderUnifiedDiffOldLineNumberCell()}
+          {this.renderWhitespaceHintPopover(DiffColumn.After)}
+        </div>
+        <div role="cell">
+          {' '}
+          {/* Columnheader: New line number */}
+          {this.renderUnifiedDiffNewLineNumberCell()}
+        </div>
+        <div role="cell">
+          {' '}
+          {/* Columnheader: Line content */}
+          {this.renderUnifiedDiffLineContentCell()}
+        </div>
+      </>
+    )
+
+    const sideBySideDiffColumnCells = (
+      <>
+        <div role="cell" className={beforeClasses}>
+          {/* Columnheader: Old line number */}
+          {this.renderSideBySideDiffOldLineNumberCell()}
+          {this.renderWhitespaceHintPopover(DiffColumn.Before)}
+        </div>
+        <div role="cell" className={beforeClasses}>
+          {/* Columnheader: Old Line content */}
+          {this.renderSideBySideDiffOldLineContentCell()}
+        </div>
+
+        <div role="cell">
+          {/* Columnheader: Group Checkbox Column */}
+          {this.renderGroupCheckBoxCell()}
+        </div>
+
+        <div role="cell" className={afterClasses}>
+          {/* Columnheader: New line number */}
+          {this.renderSideBySideDiffNewLineNumberCell()}
+          {this.renderWhitespaceHintPopover(DiffColumn.After)}
+        </div>
+        <div role="cell" className={afterClasses}>
+          {/* Columnheader: New Line content */}
+          {this.renderSideBySideDiffNewLineContentCell()}
+        </div>
+      </>
+    )
+
+    const rowClasses = classNames(row.type.toLowerCase(), baseRowClasses)
+    return (
+      <div className={rowClasses} role="row" aria-rowindex={this.props.numRow}>
+        {showSideBySideDiff ? sideBySideDiffColumnCells : unifiedDiffCells}
+      </div>
+    )
+  }
+
+  private renderGroupCheckBoxCell = () => {
+    const { type } = this.props.row
+    if (type === DiffRowType.Context) {
+      return null
+    }
+
+    // Being a content row, this is either Added, Deleted, or Modified.
+    return this.renderHunkHandle()
+  }
+
+  private renderUnifiedDiffSingleChangeCheckBoxCell = () => {
+    const { row } = this.props
+
+    // Unified Diff Content row can only be Context, Added, or Deleted, and
+    // Context rows don't have checkboxes.
+    if (row.type !== DiffRowType.Added && row.type !== DiffRowType.Deleted) {
+      return null
+    }
+
+    const { lineNumber, isSelected } = row.data
+    const labelIsScreenReaderOnly = true
+
+    if (row.type === DiffRowType.Added) {
+      return this.renderLineNumbers(
+        [undefined, lineNumber],
+        DiffColumn.After,
+        isSelected,
+        labelIsScreenReaderOnly
+      )
+    }
+
+    // Type is DiffRowType.Deleted.
+    return this.renderLineNumbers(
+      [lineNumber, undefined],
+      DiffColumn.Before,
+      isSelected,
+      labelIsScreenReaderOnly
+    )
+  }
+
+  private renderUnifiedDiffOldLineNumberCell = () => {
+    const { row } = this.props
+
+    // This is only for Content Rows on a Unified Diff, so it can only be
+    // Context, Added, or Deleted, and Context rows don't have checkboxes.
+    if (row.type !== DiffRowType.Added && row.type !== DiffRowType.Deleted) {
+      return null
+    }
+
+    const { lineNumber, isSelected } = row.data
+
+    if (row.type === DiffRowType.Added) {
+      return this.renderLineNumberSpan(undefined)
+    }
+
+    // Otherwise, type is DiffRowType.Deleted.
+    return this.renderLineNumberSpan(lineNumber, DiffColumn.Before, isSelected)
+  }
+
+  private renderUnifiedDiffNewLineNumberCell = () => {
+    const { row } = this.props
+
+    // This is only for Content Rows on a Unified Diff, so it can only be
+    // Context, Added, or Deleted, and Context rows don't have checkboxes.
+    if (row.type !== DiffRowType.Added && row.type !== DiffRowType.Deleted) {
+      return null
+    }
+
+    const { lineNumber, isSelected } = row.data
+
+    if (row.type === DiffRowType.Added) {
+      return this.renderLineNumberSpan(lineNumber, DiffColumn.After, isSelected)
+    }
+
+    // Otherwise, type is DiffRowType.Deleted.
+    return this.renderLineNumberSpan(undefined)
+  }
+
+  private renderUnifiedDiffLineContentCell = () => {
+    const { row } = this.props
+
+    // This is only for Content Rows on a Unified Diff, so it can only be
+    // Context, Added, or Deleted.
+    if (
+      row.type !== DiffRowType.Added &&
+      row.type !== DiffRowType.Deleted &&
+      row.type !== DiffRowType.Context
+    ) {
+      return null
+    }
+
+    const type = row.type
+    switch (type) {
+      case DiffRowType.Added:
+        return this.renderContent(row.data, DiffRowPrefix.Added)
+      case DiffRowType.Deleted:
+        return this.renderContent(row.data, DiffRowPrefix.Deleted)
       case DiffRowType.Context:
-        const rowClasses = classNames('context', baseRowClasses)
-        const { beforeLineNumber, afterLineNumber } = row
-        if (!showSideBySideDiff) {
-          return (
-            <div
-              className={rowClasses}
-              role="row"
-              aria-rowindex={this.props.numRow}
-            >
-              <div className="before" role="cell">
-                {this.renderLineNumbers(
-                  [beforeLineNumber, afterLineNumber],
-                  undefined
-                )}
-                {this.renderContentFromString(row.content, row.beforeTokens)}
-              </div>
-            </div>
-          )
-        }
-
-        return (
-          <div
-            className={rowClasses}
-            role="row"
-            aria-rowindex={this.props.numRow}
-          >
-            <div className="before" role="cell">
-              {this.renderLineNumber(beforeLineNumber, DiffColumn.Before)}
-              {this.renderContentFromString(row.content, row.beforeTokens)}
-            </div>
-            <div className="after" role="cell">
-              {this.renderLineNumber(afterLineNumber, DiffColumn.After)}
-              {this.renderContentFromString(row.content, row.afterTokens)}
-            </div>
-          </div>
+        return this.renderContentFromString(row.content, row.beforeTokens)
+      default:
+        return assertNever(
+          row,
+          `Unexpected row type in renderUnifiedDiffLineContentCell: ${type}`
         )
+    }
+  }
 
-      case DiffRowType.Added: {
+  private renderSideBySideDiffOldLineNumberCell = () => {
+    const { row } = this.props
+
+    // This is only for Content Rows on a split Diff, so it can only be
+    // Context, Added, Modified, or Deleted
+    if (
+      row.type !== DiffRowType.Added &&
+      row.type !== DiffRowType.Deleted &&
+      row.type !== DiffRowType.Context &&
+      row.type !== DiffRowType.Modified
+    ) {
+      return null
+    }
+
+    const type = row.type
+    switch (type) {
+      case DiffRowType.Added:
+        return this.renderLineNumber(undefined, DiffColumn.Before)
+      case DiffRowType.Deleted:
         const { lineNumber, isSelected } = row.data
-        const rowClasses = classNames('added', baseRowClasses)
-        if (!showSideBySideDiff) {
-          return (
-            <div
-              className={rowClasses}
-              role="row"
-              aria-rowindex={this.props.numRow}
-            >
-              {this.renderHunkHandle()}
-              <div className={afterClasses} role="cell">
-                {this.renderLineNumbers(
-                  [undefined, lineNumber],
-                  DiffColumn.After,
-                  isSelected
-                )}
-                {this.renderContent(row.data, DiffRowPrefix.Added)}
-                {this.renderWhitespaceHintPopover(DiffColumn.After)}
-              </div>
-            </div>
-          )
-        }
-
-        return (
-          <div
-            className={rowClasses}
-            role="row"
-            aria-rowindex={this.props.numRow}
-          >
-            <div className={beforeClasses} role="cell">
-              {this.renderLineNumber(undefined, DiffColumn.Before)}
-              {this.renderContentFromString('')}
-              {this.renderWhitespaceHintPopover(DiffColumn.Before)}
-            </div>
-            {this.renderHunkHandle()}
-            <div className={afterClasses} role="cell">
-              {this.renderLineNumber(lineNumber, DiffColumn.After, isSelected)}
-              {this.renderContent(row.data, DiffRowPrefix.Added)}
-              {this.renderWhitespaceHintPopover(DiffColumn.After)}
-            </div>
-          </div>
-        )
-      }
-      case DiffRowType.Deleted: {
-        const { lineNumber, isSelected } = row.data
-        const rowClasses = classNames('deleted', baseRowClasses)
-        if (!showSideBySideDiff) {
-          return (
-            <div
-              className={rowClasses}
-              role="row"
-              aria-rowindex={this.props.numRow}
-            >
-              {this.renderHunkHandle()}
-              <div className={beforeClasses} role="cell">
-                {this.renderLineNumbers(
-                  [lineNumber, undefined],
-                  DiffColumn.Before,
-                  isSelected
-                )}
-                {this.renderContent(row.data, DiffRowPrefix.Deleted)}
-                {this.renderWhitespaceHintPopover(DiffColumn.Before)}
-              </div>
-            </div>
-          )
-        }
-
-        return (
-          <div
-            className={rowClasses}
-            role="row"
-            aria-rowindex={this.props.numRow}
-          >
-            <div className={beforeClasses} role="cell">
-              {this.renderLineNumber(lineNumber, DiffColumn.Before, isSelected)}
-              {this.renderContent(row.data, DiffRowPrefix.Deleted)}
-              {this.renderWhitespaceHintPopover(DiffColumn.Before)}
-            </div>
-            {this.renderHunkHandle()}
-            <div className={afterClasses} role="cell">
-              {this.renderLineNumber(undefined, DiffColumn.After)}
-              {this.renderContentFromString('', [])}
-              {this.renderWhitespaceHintPopover(DiffColumn.After)}
-            </div>
-          </div>
-        )
+        return this.renderLineNumber(lineNumber, DiffColumn.Before, isSelected)
+      case DiffRowType.Context: {
+        const { beforeLineNumber } = row
+        return this.renderLineNumber(beforeLineNumber, DiffColumn.Before)
       }
       case DiffRowType.Modified: {
-        const { beforeData: before, afterData: after } = row
-        const rowClasses = classNames('modified', baseRowClasses)
-        return (
-          <div
-            className={rowClasses}
-            role="row"
-            aria-rowindex={this.props.numRow}
-          >
-            <div className={beforeClasses} role="cell">
-              {this.renderLineNumber(
-                before.lineNumber,
-                DiffColumn.Before,
-                before.isSelected
-              )}
-              {this.renderContent(before, DiffRowPrefix.Deleted)}
-              {this.renderWhitespaceHintPopover(DiffColumn.Before)}
-            </div>
-            {this.renderHunkHandle()}
-            <div className={afterClasses} role="cell">
-              {this.renderLineNumber(
-                after.lineNumber,
-                DiffColumn.After,
-                after.isSelected
-              )}
-              {this.renderContent(after, DiffRowPrefix.Added)}
-              {this.renderWhitespaceHintPopover(DiffColumn.After)}
-            </div>
-          </div>
-        )
+        const { lineNumber, isSelected } = row.beforeData
+        return this.renderLineNumber(lineNumber, DiffColumn.Before, isSelected)
       }
+      default:
+        return assertNever(
+          row,
+          `Unexpected row type in renderUnifiedDiffLineContentCell: ${type}`
+        )
+    }
+  }
+
+  private renderSideBySideDiffOldLineContentCell = () => {
+    const { row } = this.props
+
+    // This is only for Content Rows on a split Diff, so it can only be
+    // Context, Added, Modified, or Deleted
+    if (
+      row.type !== DiffRowType.Added &&
+      row.type !== DiffRowType.Deleted &&
+      row.type !== DiffRowType.Context &&
+      row.type !== DiffRowType.Modified
+    ) {
+      return null
+    }
+
+    const type = row.type
+    switch (type) {
+      case DiffRowType.Added:
+        return this.renderContentFromString('')
+      case DiffRowType.Deleted:
+        const { data } = row
+        return this.renderContent(data, DiffRowPrefix.Deleted)
+      case DiffRowType.Context: {
+        const { content, beforeTokens } = row
+        return this.renderContentFromString(content, beforeTokens)
+      }
+      case DiffRowType.Modified: {
+        const { beforeData } = row
+        return this.renderContent(beforeData, DiffRowPrefix.Deleted)
+      }
+      default:
+        return assertNever(
+          row,
+          `Unexpected row type in renderSideBySideDiffOldLineContentCell: ${type}`
+        )
+    }
+  }
+
+  private renderSideBySideDiffNewLineNumberCell = () => {
+    const { row } = this.props
+
+    // This is only for Content Rows on a split Diff, so it can only be
+    // Context, Added, Modified, or Deleted
+    if (
+      row.type !== DiffRowType.Added &&
+      row.type !== DiffRowType.Deleted &&
+      row.type !== DiffRowType.Context &&
+      row.type !== DiffRowType.Modified
+    ) {
+      return null
+    }
+
+    const type = row.type
+    switch (type) {
+      case DiffRowType.Context:
+        return this.renderLineNumber(row.afterLineNumber, DiffColumn.After)
+      case DiffRowType.Added: {
+        const { lineNumber, isSelected } = row.data
+        return this.renderLineNumber(lineNumber, DiffColumn.After, isSelected)
+      }
+      case DiffRowType.Deleted:
+        return this.renderLineNumber(undefined, DiffColumn.After)
+      case DiffRowType.Modified: {
+        const { lineNumber, isSelected } = row.afterData
+        return this.renderLineNumber(lineNumber, DiffColumn.After, isSelected)
+      }
+      default:
+        return assertNever(
+          row,
+          `Unexpected row type in renderUnifiedDiffLineContentCell: ${type}`
+        )
+    }
+  }
+
+  private renderSideBySideDiffNewLineContentCell = () => {
+    const { row } = this.props
+
+    // This is only for Content Rows on a split Diff, so it can only be
+    // Context, Added, Modified, or Deleted
+    if (
+      row.type !== DiffRowType.Added &&
+      row.type !== DiffRowType.Deleted &&
+      row.type !== DiffRowType.Context &&
+      row.type !== DiffRowType.Modified
+    ) {
+      return null
+    }
+
+    const type = row.type
+    switch (type) {
+      case DiffRowType.Context:
+        return this.renderContentFromString(row.content, row.afterTokens)
+      case DiffRowType.Added:
+        return this.renderContent(row.data, DiffRowPrefix.Added)
+      case DiffRowType.Deleted:
+        return this.renderContentFromString('', [])
+      case DiffRowType.Modified:
+        return this.renderContent(row.afterData, DiffRowPrefix.Added)
+      default:
+        return assertNever(
+          row,
+          `Unexpected row type in renderSideBySideDiffOldLineContentCell: ${type}`
+        )
     }
   }
 
@@ -792,7 +1003,15 @@ export class SideBySideDiffRow extends React.Component<
   }
 
   /**
-   * Renders the line number box.
+   * Renders the line number grid cells.
+   *
+   * These are direct descends of the row element and must have the
+   * `role="cell"`.
+   *
+   * Potentially 3 cells
+   * - Checks for a single change (unified diff)
+   * - Old line number (split diff, this includes a checkbox)
+   * - New line number (split diff, this includes a checkbox)
    *
    * @param lineNumbers Array with line numbers to display.
    * @param column      Column to which the line number belongs.
@@ -803,7 +1022,8 @@ export class SideBySideDiffRow extends React.Component<
   private renderLineNumbers(
     lineNumbers: Array<number | undefined>,
     column: DiffColumn | undefined,
-    isSelected?: boolean
+    isSelected?: boolean,
+    labelScreenReaderOnly?: boolean
   ) {
     const wrapperID =
       column === undefined ? undefined : this.getLineNumbersContainerID(column)
@@ -847,21 +1067,39 @@ export class SideBySideDiffRow extends React.Component<
         <label
           htmlFor={checkboxId}
           onContextMenu={this.onContextMenuLineNumber}
+          className={classNames({
+            'sr-only': labelScreenReaderOnly,
+          })}
         >
           {this.renderLineNumberCheck(isSelected)}
-          {lineNumbers.map((lineNumber, index) => (
-            <span key={index}>
-              {lineNumber && <span className="sr-only">Line </span>}
-              {lineNumber}
-              {lineNumber && isSelected !== undefined && (
-                <span className="sr-only">
-                  {column === DiffColumn.After ? ' added' : ' deleted'}
-                </span>
-              )}
-            </span>
-          ))}
+          {lineNumbers.map((lineNumber, index) =>
+            this.renderLineNumberSpan(lineNumber, column, isSelected, index)
+          )}
         </label>
       </div>
+    )
+  }
+
+  private renderLineNumberSpan(
+    lineNumber: number | undefined,
+    column?: DiffColumn,
+    isSelected?: boolean,
+    index?: number
+  ) {
+    if (lineNumber === undefined) {
+      return ''
+    }
+
+    return (
+      <span key={index}>
+        {lineNumber && <span className="sr-only">Line </span>}
+        {lineNumber}
+        {lineNumber && isSelected !== undefined && (
+          <span className="sr-only">
+            {column === DiffColumn.After ? ' added' : ' deleted'}
+          </span>
+        )}
+      </span>
     )
   }
 

@@ -1788,7 +1788,7 @@ const getDiffRows = memoize(function (
   enableDiffExpansion: boolean
 ): ReadonlyArray<SimplifiedDiffRow> {
   const outputRows = new Array<SimplifiedDiffRow>()
-  
+
   outputRows.push({
     type: DiffRowType.ColumnHeader,
   })
