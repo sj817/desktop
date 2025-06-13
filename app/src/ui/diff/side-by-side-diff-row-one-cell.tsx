@@ -411,6 +411,10 @@ export class SideBySideDiffRowOneCell extends React.Component<
           </div>
         )
       }
+      case DiffRowType.ColumnHeader: {
+        // not implemented
+        return null
+      }
     }
   }
 
