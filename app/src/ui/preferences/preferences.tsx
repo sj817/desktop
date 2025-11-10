@@ -78,6 +78,7 @@ interface IPreferencesProps {
   readonly useCustomShell: boolean
   readonly customShell: ICustomIntegration | null
   readonly repositoryIndicatorsEnabled: boolean
+  readonly markdownRichDiffAsDefault: boolean
   readonly onEditGlobalGitConfig: () => void
   readonly underlineLinks: boolean
   readonly showDiffCheckMarks: boolean
@@ -125,6 +126,7 @@ interface IPreferencesState {
    */
   readonly existingLockFilePath?: string
   readonly repositoryIndicatorsEnabled: boolean
+  readonly markdownRichDiffAsDefault: boolean
 
   readonly initiallySelectedTheme: ApplicationTheme
   readonly initiallySelectedTabSize: number
@@ -187,6 +189,7 @@ export class Preferences extends React.Component<
       availableShells: [],
       selectedShell: this.props.selectedShell,
       repositoryIndicatorsEnabled: this.props.repositoryIndicatorsEnabled,
+      markdownRichDiffAsDefault: this.props.markdownRichDiffAsDefault,
       initiallySelectedTheme: this.props.selectedTheme,
       initiallySelectedTabSize: this.props.selectedTabSize,
       isLoadingGitConfig: true,
@@ -525,6 +528,7 @@ export class Preferences extends React.Component<
             optOutOfUsageTracking={this.state.optOutOfUsageTracking}
             useExternalCredentialHelper={this.state.useExternalCredentialHelper}
             repositoryIndicatorsEnabled={this.state.repositoryIndicatorsEnabled}
+            markdownRichDiffAsDefault={this.state.markdownRichDiffAsDefault}
             onUseWindowsOpenSSHChanged={this.onUseWindowsOpenSSHChanged}
             onOptOutofReportingChanged={this.onOptOutofReportingChanged}
             onUseExternalCredentialHelperChanged={
@@ -532,6 +536,9 @@ export class Preferences extends React.Component<
             }
             onRepositoryIndicatorsEnabledChanged={
               this.onRepositoryIndicatorsEnabledChanged
+            }
+            onMarkdownRichDiffAsDefaultChanged={
+              this.onMarkdownRichDiffAsDefaultChanged
             }
           />
         )
@@ -566,6 +573,15 @@ export class Preferences extends React.Component<
     repositoryIndicatorsEnabled: boolean
   ) => {
     this.setState({ repositoryIndicatorsEnabled })
+  }
+
+  private onMarkdownRichDiffAsDefaultChanged = (
+    markdownRichDiffAsDefault: boolean
+  ) => {
+    this.setState({ markdownRichDiffAsDefault })
+    this.props.dispatcher.onMarkdownRichDiffAsDefaultChanged(
+      markdownRichDiffAsDefault
+    )
   }
 
   private onLockFileDeleted = () => {

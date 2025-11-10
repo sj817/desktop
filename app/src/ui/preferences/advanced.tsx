@@ -4,16 +4,19 @@ import { Checkbox, CheckboxValue } from '../lib/checkbox'
 import { LinkButton } from '../lib/link-button'
 import { SamplesURL } from '../../lib/stats'
 import { isWindowsOpenSSHAvailable } from '../../lib/ssh/ssh'
+import { enableMarkdownRichDiff } from '../../lib/feature-flag'
 
 interface IAdvancedPreferencesProps {
   readonly useWindowsOpenSSH: boolean
   readonly optOutOfUsageTracking: boolean
   readonly useExternalCredentialHelper: boolean
   readonly repositoryIndicatorsEnabled: boolean
+  readonly markdownRichDiffAsDefault: boolean
   readonly onUseWindowsOpenSSHChanged: (checked: boolean) => void
   readonly onOptOutofReportingChanged: (checked: boolean) => void
   readonly onUseExternalCredentialHelperChanged: (checked: boolean) => void
   readonly onRepositoryIndicatorsEnabledChanged: (enabled: boolean) => void
+  readonly onMarkdownRichDiffAsDefaultChanged: (enabled: boolean) => void
 }
 
 interface IAdvancedPreferencesState {
@@ -66,6 +69,12 @@ export class Advanced extends React.Component<
     event: React.FormEvent<HTMLInputElement>
   ) => {
     this.props.onRepositoryIndicatorsEnabledChanged(event.currentTarget.checked)
+  }
+
+  private onMarkdownRichDiffAsDefaultChanged = (
+    event: React.FormEvent<HTMLInputElement>
+  ) => {
+    this.props.onMarkdownRichDiffAsDefaultChanged(event.currentTarget.checked)
   }
 
   private onUseWindowsOpenSSHChanged = (
@@ -153,6 +162,31 @@ export class Advanced extends React.Component<
             </p>
           </div>
         </div>
+        {enableMarkdownRichDiff() && (
+          <div className="advanced-section">
+            <h2>Diffs</h2>
+            <Checkbox
+              label="Show markdown rich diff as default"
+              value={
+                this.props.markdownRichDiffAsDefault
+                  ? CheckboxValue.On
+                  : CheckboxValue.Off
+              }
+              onChange={this.onMarkdownRichDiffAsDefaultChanged}
+              ariaDescribedBy="markdown-rich-diff-description"
+            />
+            <div
+              id="markdown-rich-diff-description"
+              className="git-settings-description"
+            >
+              <p>
+                When viewing markdown files, render them as formatted text by
+                default instead of showing the raw code. You can toggle between
+                views using the buttons in the diff header.
+              </p>
+            </div>
+          </div>
+        )}
       </DialogContent>
     )
   }

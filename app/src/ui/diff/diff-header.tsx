@@ -5,6 +5,12 @@ import { IDiff, DiffType } from '../../models/diff'
 import { Octicon, iconForStatus } from '../octicons'
 import { mapStatus } from '../../lib/status'
 import { DiffOptions } from './diff-options'
+import {
+  MarkdownViewToggle,
+  MarkdownViewMode,
+} from './markdown-view-toggle'
+import { isMarkdownFile } from '../../lib/is-markdown-file'
+import { enableMarkdownRichDiff } from '../../lib/feature-flag'
 
 interface IDiffHeaderProps {
   readonly path: string
@@ -25,6 +31,12 @@ interface IDiffHeaderProps {
 
   /** Called when the user opens the diff options popover */
   readonly onDiffOptionsOpened: () => void
+
+  /** The current markdown view mode (only for markdown files). */
+  readonly markdownViewMode?: MarkdownViewMode
+
+  /** Called when the user changes the markdown view mode. */
+  readonly onMarkdownViewModeChanged?: (mode: MarkdownViewMode) => void
 }
 
 /** Displays information about a file */
@@ -37,6 +49,7 @@ export class DiffHeader extends React.Component<IDiffHeaderProps, {}> {
       <div className="header">
         <PathLabel path={this.props.path} status={this.props.status} />
 
+        {this.renderMarkdownViewToggle()}
         {this.renderDiffOptions()}
 
         <Octicon
@@ -45,6 +58,28 @@ export class DiffHeader extends React.Component<IDiffHeaderProps, {}> {
           title={fileStatus}
         />
       </div>
+    )
+  }
+
+  private renderMarkdownViewToggle() {
+    const { path, diff, markdownViewMode, onMarkdownViewModeChanged } =
+      this.props
+
+    if (
+      !enableMarkdownRichDiff() ||
+      !isMarkdownFile(path) ||
+      diff?.kind !== DiffType.Text ||
+      !markdownViewMode ||
+      !onMarkdownViewModeChanged
+    ) {
+      return null
+    }
+
+    return (
+      <MarkdownViewToggle
+        viewMode={markdownViewMode}
+        onViewModeChanged={onMarkdownViewModeChanged}
+      />
     )
   }
 

@@ -299,6 +299,11 @@ import {
   setShowSideBySideDiff,
 } from '../../ui/lib/diff-mode'
 import {
+  MarkdownRichDiffAsDefaultDefault,
+  getMarkdownRichDiffAsDefault,
+  setMarkdownRichDiffAsDefault,
+} from '../../ui/lib/markdown-rich-diff-mode'
+import {
   abortCherryPick,
   cherryPick,
   CherryPickResult,
@@ -553,6 +558,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
   /** Whether or not the spellchecker is enabled for commit summary and description */
   private commitSpellcheckEnabled: boolean = commitSpellcheckEnabledDefault
   private showSideBySideDiff: boolean = ShowSideBySideDiffDefault
+  private markdownRichDiffAsDefault: boolean = MarkdownRichDiffAsDefaultDefault
 
   private uncommittedChangesStrategy = defaultUncommittedChangesStrategy
 
@@ -1086,6 +1092,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       hideWhitespaceInHistoryDiff: this.hideWhitespaceInHistoryDiff,
       hideWhitespaceInPullRequestDiff: this.hideWhitespaceInPullRequestDiff,
       showSideBySideDiff: this.showSideBySideDiff,
+      markdownRichDiffAsDefault: this.markdownRichDiffAsDefault,
       selectedShell: this.selectedShell,
       repositoryFilterText: this.repositoryFilterText,
       resolvedExternalEditor: this.resolvedExternalEditor,
@@ -2301,6 +2308,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       commitSpellcheckEnabledDefault
     )
     this.showSideBySideDiff = getShowSideBySideDiff()
+    this.markdownRichDiffAsDefault = getMarkdownRichDiffAsDefault()
 
     this.selectedTheme = getPersistedThemeName()
     // Make sure the persisted theme is applied
@@ -6092,6 +6100,14 @@ export class AppStore extends TypedBaseStore<IAppState> {
       setShowSideBySideDiff(showSideBySideDiff)
       this.showSideBySideDiff = showSideBySideDiff
       this.statsStore.increment('diffModeChangeCount')
+      this.emitUpdate()
+    }
+  }
+
+  public _setMarkdownRichDiffAsDefault(markdownRichDiffAsDefault: boolean) {
+    if (markdownRichDiffAsDefault !== this.markdownRichDiffAsDefault) {
+      setMarkdownRichDiffAsDefault(markdownRichDiffAsDefault)
+      this.markdownRichDiffAsDefault = markdownRichDiffAsDefault
       this.emitUpdate()
     }
   }

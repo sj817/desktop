@@ -1,0 +1,202 @@
+@import '../mixins';
+
+.markdown-rich-diff {
+  padding: var(--spacing-double);
+  overflow: auto;
+  height: 100%;
+  background-color: var(--background-color);
+
+  .markdown-diff-line {
+    position: relative;
+    margin-bottom: var(--spacing);
+    padding-left: calc(var(--spacing) + 30px);
+    border-left: 4px solid transparent;
+
+    &.markdown-diff-added {
+      border-left-color: var(--color-new);
+    }
+
+    &.markdown-diff-deleted {
+      border-left-color: var(--color-deleted);
+    }
+
+    &.markdown-diff-modified {
+      border-left-color: var(--color-modified);
+    }
+
+    .markdown-diff-indicator {
+      position: absolute;
+      left: var(--spacing);
+      top: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: var(--font-size-sm);
+      font-family: var(--font-family-monospace);
+      user-select: none;
+    }
+
+    &.markdown-diff-added .markdown-diff-indicator {
+      color: var(--color-new);
+    }
+
+    &.markdown-diff-deleted .markdown-diff-indicator {
+      color: var(--color-deleted);
+    }
+
+    &.markdown-diff-modified .markdown-diff-indicator {
+      color: var(--color-modified);
+    }
+
+    .markdown-deleted-content {
+      text-decoration: line-through;
+      opacity: 0.7;
+    }
+  }
+
+  .markdown-body {
+    max-width: 900px;
+    margin: 0;
+    font-size: var(--font-size);
+    line-height: 1.6;
+    color: var(--text-color);
+
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: var(--spacing-double);
+      margin-bottom: var(--spacing);
+      font-weight: 600;
+      line-height: 1.25;
+    }
+
+    h1 {
+      font-size: 2em;
+      border-bottom: 1px solid var(--box-border-color);
+      padding-bottom: var(--spacing-half);
+    }
+
+    h2 {
+      font-size: 1.5em;
+      border-bottom: 1px solid var(--box-border-color);
+      padding-bottom: var(--spacing-half);
+    }
+
+    h3 {
+      font-size: 1.25em;
+    }
+
+    h4 {
+      font-size: 1em;
+    }
+
+    h5 {
+      font-size: 0.875em;
+    }
+
+    h6 {
+      font-size: 0.85em;
+      color: var(--text-secondary-color);
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: var(--spacing);
+    }
+
+    ul, ol {
+      margin-top: 0;
+      margin-bottom: var(--spacing);
+      padding-left: 2em;
+    }
+
+    li {
+      margin-bottom: var(--spacing-half);
+    }
+
+    blockquote {
+      margin: 0 0 var(--spacing) 0;
+      padding: 0 var(--spacing);
+      border-left: 4px solid var(--box-border-color);
+      color: var(--text-secondary-color);
+    }
+
+    code {
+      background: var(--box-alt-background-color);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: var(--font-family-monospace);
+      font-size: 0.9em;
+    }
+
+    pre {
+      background: var(--box-alt-background-color);
+      padding: var(--spacing);
+      border-radius: var(--border-radius);
+      overflow-x: auto;
+      margin-bottom: var(--spacing);
+
+      code {
+        background: none;
+        padding: 0;
+      }
+    }
+
+    a {
+      color: var(--link-button-color);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: var(--spacing);
+
+      th, td {
+        border: 1px solid var(--box-border-color);
+        padding: var(--spacing-half) var(--spacing);
+        text-align: left;
+      }
+
+      th {
+        background-color: var(--box-alt-background-color);
+        font-weight: 600;
+      }
+    }
+
+    hr {
+      height: 0.25em;
+      padding: 0;
+      margin: var(--spacing-double) 0;
+      background-color: var(--box-border-color);
+      border: 0;
+    }
+
+    // Inline diff styling for modified lines
+    .inline-addition {
+      background-color: var(--diff-add-background-color);
+      padding: 2px 0;
+    }
+
+    .inline-deletion {
+      background-color: var(--diff-delete-background-color);
+      text-decoration: line-through;
+      padding: 2px 0;
+    }
+  }
+}
+
+// Define modified color if not already defined
+:root {
+  --color-modified: var(--color-caution, #d4a72c);
+}

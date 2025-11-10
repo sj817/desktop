@@ -150,6 +150,15 @@ interface ISideBySideDiffProps {
 
   /** Called when the user changes the hide whitespace in diffs setting. */
   readonly onHideWhitespaceInDiffChanged: (checked: boolean) => void
+
+  /** The line number to scroll to (when switching views) */
+  readonly scrollToLine: number | null | undefined
+
+  /** Called when the currently visible line changes (for tracking scroll position) */
+  readonly onVisibleLineChanged: (lineNumber: number | null) => void
+
+  /** Called when scrolling to a line is complete */
+  readonly onScrollComplete: () => void
 }
 
 interface ISideBySideDiffState {
@@ -239,6 +248,8 @@ export class SideBySideDiff extends React.Component<
 
   private textSelectionStartRow: number | undefined = undefined
   private textSelectionEndRow: number | undefined = undefined
+  
+  private isScrollingProgrammatically = false
 
   private renderedStartIndex: number = 0
   private renderedStopIndex: number | undefined = undefined
@@ -288,6 +299,64 @@ export class SideBySideDiff extends React.Component<
     document.addEventListener('selectionchange', this.onDocumentSelectionChange)
 
     this.addContextMenuListenerToDiff()
+    
+    // Scroll to the saved line
+    if (this.props.scrollToLine !== null && this.props.scrollToLine !== undefined) {
+      this.scrollToLine(this.props.scrollToLine)
+    }
+  }
+
+
+
+  private scrollToLine(lineNumber: number) {
+    if (!this.virtualListRef.current) {
+      return
+    }
+
+    // Find the row that contains this line number
+    const rows = this.state.diff.hunks.flatMap(hunk => hunk.lines)
+    const rowIndex = rows.findIndex(line => 
+      line.newLineNumber === lineNumber || line.oldLineNumber === lineNumber
+    )
+
+    if (rowIndex !== -1) {
+      this.isScrollingProgrammatically = true
+      
+      setTimeout(() => {
+        this.virtualListRef.current?.scrollToRow(rowIndex)
+        
+        // Reset the flag after scrolling completes
+        setTimeout(() => {
+          this.isScrollingProgrammatically = false
+          this.props.onScrollComplete()
+        }, 100)
+      }, 0)
+    }
+  }
+
+  private handleScroll = (params: { scrollTop: number; clientHeight: number; scrollHeight: number }) => {
+    // Don't report scroll position changes during programmatic scrolling
+    if (this.isScrollingProgrammatically) {
+      return
+    }
+
+    // Find the currently visible line based on scroll position
+    const rows = this.state.diff.hunks.flatMap(hunk => hunk.lines)
+    
+    // Get the visible range
+    if (this.virtualListRef.current) {
+      const list = this.virtualListRef.current as any
+      const overscanStartIndex = list.state?.overscanStartIndex ?? 0
+      
+      // Get the line number from the first visible row
+      if (overscanStartIndex < rows.length) {
+        const visibleLine = rows[overscanStartIndex]
+        const lineNumber = visibleLine.newLineNumber ?? visibleLine.oldLineNumber
+        if (lineNumber !== null) {
+          this.props.onVisibleLineChanged(lineNumber)
+        }
+      }
+    }
   }
 
   private addContextMenuListenerToDiff = () => {
@@ -469,6 +538,16 @@ export class SideBySideDiff extends React.Component<
     if (this.state.lastExpandedHunk !== prevState.lastExpandedHunk) {
       this.focusAfterLastExpandedHunkChange()
     }
+
+    // Scroll to line when switching views (only if we have a new scroll target)
+    if (
+      this.props.scrollToLine !== null &&
+      this.props.scrollToLine !== undefined &&
+      this.props.scrollToLine !== prevProps.scrollToLine &&
+      prevProps.scrollToLine !== undefined
+    ) {
+      this.scrollToLine(this.props.scrollToLine)
+    }
   }
 
   private focusListElement = () => {
@@ -638,6 +717,7 @@ export class SideBySideDiff extends React.Component<
                 rowHeight={this.getRowHeight}
                 rowRenderer={this.renderRow}
                 onRowsRendered={this.onRowsRendered}
+                onScroll={this.handleScroll}
                 ref={this.virtualListRef}
                 overscanIndicesGetter={this.overscanIndicesGetter}
                 // The following properties are passed to the list

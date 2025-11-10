@@ -33,6 +33,9 @@ import { IFileContents } from './syntax-highlighting'
 import { SubmoduleDiff } from './submodule-diff'
 import { Octicon } from '../octicons'
 import * as OcticonSymbol from '../octicons/octicons.generated'
+import { MarkdownRichDiff } from './markdown-rich-diff'
+import { isMarkdownFile } from '../../lib/is-markdown-file'
+import { enableMarkdownRichDiff } from '../../lib/feature-flag'
 
 // image used when no diff is displayed
 const NoDiffImage = encodePathAsUrl(__dirname, 'static/ufo-alert.svg')
@@ -105,6 +108,18 @@ interface IDiffProps {
 
   /** Called when the user changes the hide whitespace in diffs setting. */
   readonly onHideWhitespaceInDiffChanged: (checked: boolean) => void
+
+  /** The current markdown view mode (only for markdown files). */
+  readonly markdownViewMode?: 'code' | 'rich-diff'
+
+  /** The line number to scroll to (when switching views) */
+  readonly scrollToLine: number | null | undefined
+
+  /** Called when the currently visible line changes (for tracking scroll position) */
+  readonly onVisibleLineChanged: (lineNumber: number | null) => void
+
+  /** Called when scrolling to a line is complete */
+  readonly onScrollComplete: () => void
 }
 
 interface IDiffState {
@@ -284,6 +299,24 @@ export class Diff extends React.Component<IDiffProps, IDiffState> {
   }
 
   private renderTextDiff(diff: ITextDiff) {
+    const isMarkdown = isMarkdownFile(this.props.file.path)
+    const shouldShowMarkdownRichDiff =
+      enableMarkdownRichDiff() &&
+      isMarkdown &&
+      this.props.markdownViewMode === 'rich-diff'
+
+    if (shouldShowMarkdownRichDiff) {
+      return (
+        <MarkdownRichDiff
+          diff={diff}
+          fileContents={this.props.fileContents}
+          scrollToLine={this.props.scrollToLine}
+          onVisibleLineChanged={this.props.onVisibleLineChanged}
+          onScrollComplete={this.props.onScrollComplete}
+        />
+      )
+    }
+
     return (
       <SideBySideDiff
         file={this.props.file}
@@ -298,6 +331,9 @@ export class Diff extends React.Component<IDiffProps, IDiffState> {
         }
         onHideWhitespaceInDiffChanged={this.props.onHideWhitespaceInDiffChanged}
         showDiffCheckMarks={this.props.showDiffCheckMarks}
+        scrollToLine={this.props.scrollToLine}
+        onVisibleLineChanged={this.props.onVisibleLineChanged}
+        onScrollComplete={this.props.onScrollComplete}
       />
     )
   }

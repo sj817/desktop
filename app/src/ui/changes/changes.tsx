@@ -11,6 +11,9 @@ import { Repository } from '../../models/repository'
 import { Dispatcher } from '../dispatcher'
 import { SeamlessDiffSwitcher } from '../diff/seamless-diff-switcher'
 import { PopupType } from '../../models/popup'
+import { MarkdownViewMode } from '../diff/markdown-view-toggle'
+import { isMarkdownFile } from '../../lib/is-markdown-file'
+import { getMarkdownRichDiffAsDefault, setMarkdownRichDiffAsDefault } from '../lib/markdown-rich-diff-mode'
 
 interface IChangesProps {
   readonly repository: Repository
@@ -56,7 +59,37 @@ interface IChangesProps {
   readonly onDiffOptionsOpened: () => void
 }
 
-export class Changes extends React.Component<IChangesProps, {}> {
+interface IChangesState {
+  readonly markdownViewMode: MarkdownViewMode
+  readonly scrollToLine: number | null
+}
+
+export class Changes extends React.Component<IChangesProps, IChangesState> {
+  public constructor(props: IChangesProps) {
+    super(props)
+
+    const defaultMode = getMarkdownRichDiffAsDefault()
+      ? MarkdownViewMode.RichDiff
+      : MarkdownViewMode.Code
+
+    this.state = {
+      markdownViewMode: defaultMode,
+      scrollToLine: null,
+    }
+  }
+
+  public componentDidUpdate(prevProps: IChangesProps) {
+    if (prevProps.file.path !== this.props.file.path) {
+      const defaultMode = getMarkdownRichDiffAsDefault()
+        ? MarkdownViewMode.RichDiff
+        : MarkdownViewMode.Code
+
+      this.setState({ 
+        markdownViewMode: defaultMode,
+        scrollToLine: null,
+      })
+    }
+  }
   /**
    * Whether or not it's currently possible to change the line selection
    * of a diff. Changing selection is not possible while a commit is in
@@ -100,6 +133,8 @@ export class Changes extends React.Component<IChangesProps, {}> {
   }
 
   public render() {
+    const isMarkdown = isMarkdownFile(this.props.file.path)
+
     return (
       <div className="diff-container">
         <DiffHeader
@@ -111,6 +146,8 @@ export class Changes extends React.Component<IChangesProps, {}> {
           hideWhitespaceInDiff={this.props.hideWhitespaceInDiff}
           onHideWhitespaceInDiffChanged={this.onHideWhitespaceInDiffChanged}
           onDiffOptionsOpened={this.props.onDiffOptionsOpened}
+          markdownViewMode={isMarkdown ? this.state.markdownViewMode : undefined}
+          onMarkdownViewModeChanged={isMarkdown ? this.onMarkdownViewModeChanged : undefined}
         />
 
         <SeamlessDiffSwitcher
@@ -131,9 +168,37 @@ export class Changes extends React.Component<IChangesProps, {}> {
           onOpenSubmodule={this.props.onOpenSubmodule}
           onChangeImageDiffType={this.props.onChangeImageDiffType}
           onHideWhitespaceInDiffChanged={this.onHideWhitespaceInDiffChanged}
+          markdownViewMode={isMarkdown ? this.state.markdownViewMode : undefined}
+          scrollToLine={this.state.scrollToLine}
+          onVisibleLineChanged={this.onVisibleLineChanged}
+          onScrollComplete={this.onScrollComplete}
         />
       </div>
     )
+  }
+
+  private lastVisibleLine: number | null = null
+
+  private onMarkdownViewModeChanged = (mode: MarkdownViewMode) => {
+    // Save the user's preference for next time
+    const preferRichDiff = mode === MarkdownViewMode.RichDiff
+    setMarkdownRichDiffAsDefault(preferRichDiff)
+
+    // When switching views, use the last visible line as the scroll target
+    this.setState({ 
+      markdownViewMode: mode,
+      scrollToLine: this.lastVisibleLine,
+    })
+  }
+
+  private onVisibleLineChanged = (lineNumber: number | null) => {
+    // Just track the visible line, don't trigger scrolling
+    this.lastVisibleLine = lineNumber
+  }
+
+  private onScrollComplete = () => {
+    // Clear the scroll target after scrolling is complete
+    this.setState({ scrollToLine: null })
   }
 
   private onShowSideBySideDiffChanged = (showSideBySideDiff: boolean) => {

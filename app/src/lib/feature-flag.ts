@@ -120,3 +120,8 @@ export const enableCommitMessageGeneration = (account: Account) => {
 export function enableAccessibleListToolTips(): boolean {
   return enableBetaFeatures()
 }
+
+/** Should we enable the markdown rich diff view? */
+export function enableMarkdownRichDiff(): boolean {
+  return enableDevelopmentFeatures()
+}

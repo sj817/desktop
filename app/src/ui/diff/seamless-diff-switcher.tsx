@@ -112,6 +112,26 @@ interface ISeamlessDiffSwitcherProps {
   // Used in getDerivedStateFromProps, no-unused-prop-types doesn't know that
   // eslint-disable-next-line react/no-unused-prop-types
   readonly onHideWhitespaceInDiffChanged: (checked: boolean) => void
+
+  /** The current markdown view mode (only for markdown files). */
+  // Used in getDerivedStateFromProps, no-unused-prop-types doesn't know that
+  // eslint-disable-next-line react/no-unused-prop-types
+  readonly markdownViewMode?: 'code' | 'rich-diff'
+
+  /** The line number to scroll to (when switching views) */
+  // Used in getDerivedStateFromProps, no-unused-prop-types doesn't know that
+  // eslint-disable-next-line react/no-unused-prop-types
+  readonly scrollToLine?: number | null
+
+  /** Called when the currently visible line changes (for tracking scroll position) */
+  // Used in getDerivedStateFromProps, no-unused-prop-types doesn't know that
+  // eslint-disable-next-line react/no-unused-prop-types
+  readonly onVisibleLineChanged?: (lineNumber: number | null) => void
+
+  /** Called when scrolling to a line is complete */
+  // Used in getDerivedStateFromProps, no-unused-prop-types doesn't know that
+  // eslint-disable-next-line react/no-unused-prop-types
+  readonly onScrollComplete?: () => void
 }
 
 interface ISeamlessDiffSwitcherState {
@@ -340,6 +360,7 @@ export class SeamlessDiffSwitcher extends React.Component<
       onOpenSubmodule,
       onChangeImageDiffType,
       onHideWhitespaceInDiffChanged,
+      markdownViewMode,
     } = this.state.propSnapshot
 
     const className = classNames('seamless-diff-switcher', {
@@ -378,6 +399,10 @@ export class SeamlessDiffSwitcher extends React.Component<
             onHideWhitespaceInDiffChanged={
               isLoadingDiff ? noop : onHideWhitespaceInDiffChanged
             }
+            markdownViewMode={markdownViewMode}
+            scrollToLine={this.props.scrollToLine}
+            onVisibleLineChanged={this.props.onVisibleLineChanged ?? noop}
+            onScrollComplete={this.props.onScrollComplete ?? noop}
           />
         ) : null}
         {loadingIndicator}

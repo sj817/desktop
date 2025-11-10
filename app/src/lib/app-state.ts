@@ -278,6 +278,9 @@ export interface IAppState {
   /** Whether we should show side by side diffs */
   readonly showSideBySideDiff: boolean
 
+  /** Whether markdown files should show rich diff view by default */
+  readonly markdownRichDiffAsDefault: boolean
+
   /** The user's preferred shell. */
   readonly selectedShell: Shell
 
