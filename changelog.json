@@ -1,5 +1,6 @@
 {
   "releases": {
+    "3.5.5-test3": ["[New] Automated test release"],
     "3.5.4": [
       "[Fixed] Update Git LFS to 3.7.1 to address CVE-2025-26625",
       "[Fixed] Check run status icons in the re-run checks dialog have a status tooltip that is accessible by screenreaders - #21191",
