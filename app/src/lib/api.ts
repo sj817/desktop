@@ -1,16 +1,8 @@
 import * as URL from 'url'
 import { Account } from '../models/account'
 
-import {
-  request,
-  parsedResponse,
-  HTTPMethod,
-  APIError,
-  urlWithQueryString,
-  getUserAgent,
-} from './http'
-import { uuid } from './uuid'
-import { GitProtocol } from './remote-parsing'
+import { BypassReasonType } from '../ui/secret-scanning/bypass-push-protection-dialog'
+import { CopilotError } from './copilot-error'
 import {
   getEndpointVersion,
   isDotCom,
@@ -19,12 +11,20 @@ import {
   updateEndpointVersion,
 } from './endpoint-capabilities'
 import {
+  APIError,
+  getUserAgent,
+  HTTPMethod,
+  parsedResponse,
+  request,
+  urlWithQueryString,
+} from './http'
+import { HttpStatusCode } from './http-status-code'
+import { GitProtocol } from './remote-parsing'
+import {
   clearCertificateErrorSuppressionFor,
   suppressCertificateErrorFor,
 } from './suppress-certificate-error'
-import { HttpStatusCode } from './http-status-code'
-import { CopilotError } from './copilot-error'
-import { BypassReasonType } from '../ui/secret-scanning/bypass-push-protection-dialog'
+import { uuid } from './uuid'
 
 const envEndpoint = process.env['DESKTOP_GITHUB_DOTCOM_API_ENDPOINT']
 const envHTMLURL = process.env['DESKTOP_GITHUB_DOTCOM_HTML_URL']

@@ -1,10 +1,10 @@
+import { Disposable, Emitter } from 'event-kit'
+import { onNativeThemeUpdated } from '../main-process-proxy'
 import {
   ApplicableTheme,
   getCurrentlyAppliedTheme,
   supportsSystemThemeChanges,
 } from './application-theme'
-import { Disposable, Emitter } from 'event-kit'
-import { onNativeThemeUpdated } from '../main-process-proxy'
 
 class ThemeChangeMonitor {
   private readonly emitter = new Emitter()

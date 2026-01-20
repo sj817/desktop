@@ -1,13 +1,13 @@
 import * as React from 'react'
+import { AppMenuFoldout, FoldoutType } from '../../lib/app-state'
 import {
   IMenu,
   ISubmenuItem,
   findItemByAccessKey,
   itemIsSelectable,
 } from '../../models/app-menu'
-import { AppMenuBarButton } from './app-menu-bar-button'
 import { Dispatcher } from '../dispatcher'
-import { AppMenuFoldout, FoldoutType } from '../../lib/app-state'
+import { AppMenuBarButton } from './app-menu-bar-button'
 
 /** This is the id used for the windows app menu and used elsewhere
  * to determine if the app menu is is focus */

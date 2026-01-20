@@ -1,6 +1,6 @@
-import { git } from './core'
-import { Repository } from '../../models/repository'
 import { IRemote } from '../../models/remote'
+import { Repository } from '../../models/repository'
+import { git } from './core'
 import { envForRemoteOperation } from './environment'
 
 /**

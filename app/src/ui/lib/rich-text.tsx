@@ -1,13 +1,13 @@
 import * as React from 'react'
 
-import { LinkButton } from './link-button'
-import { Repository } from '../../models/repository'
-import { Tokenizer, TokenType, TokenResult } from '../../lib/text-token-parser'
-import { assertNever } from '../../lib/fatal-error'
 import memoizeOne from 'memoize-one'
+import { Emoji } from '../../lib/emoji'
+import { assertNever } from '../../lib/fatal-error'
+import { Tokenizer, TokenResult, TokenType } from '../../lib/text-token-parser'
+import { Repository } from '../../models/repository'
+import { LinkButton } from './link-button'
 import { createObservableRef } from './observable-ref'
 import { Tooltip } from './tooltip'
-import { Emoji } from '../../lib/emoji'
 
 interface IRichTextProps {
   readonly className?: string

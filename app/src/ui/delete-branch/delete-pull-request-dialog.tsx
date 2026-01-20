@@ -2,13 +2,13 @@ import * as React from 'react'
 
 import { Dispatcher } from '../dispatcher'
 
-import { Repository } from '../../models/repository'
 import { Branch } from '../../models/branch'
 import { PullRequest } from '../../models/pull-request'
+import { Repository } from '../../models/repository'
 
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { LinkButton } from '../lib/link-button'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { LinkButton } from '../lib/link-button'
 
 interface IDeleteBranchProps {
   readonly dispatcher: Dispatcher

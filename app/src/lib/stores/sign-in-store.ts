@@ -1,26 +1,26 @@
 import { Disposable } from 'event-kit'
 import { Account, isDotComAccount } from '../../models/account'
-import { fatalError } from '../fatal-error'
 import {
-  validateURL,
-  InvalidURLErrorName,
   InvalidProtocolErrorName,
+  InvalidURLErrorName,
+  validateURL,
 } from '../../ui/lib/enterprise-validate-url'
+import { fatalError } from '../fatal-error'
 
 import {
   fetchUser,
   getDotComAPIEndpoint,
   getEnterpriseAPIURL,
-  requestOAuthToken,
   getOAuthAuthorizationURL,
+  requestOAuthToken,
 } from '../../lib/api'
 
-import { TypedBaseStore } from './base-store'
-import uuid from 'uuid'
-import { IOAuthAction } from '../parse-app-url'
-import { shell } from '../app-shell'
 import noop from 'lodash/noop'
+import uuid from 'uuid'
+import { shell } from '../app-shell'
+import { IOAuthAction } from '../parse-app-url'
 import { AccountsStore } from './accounts-store'
+import { TypedBaseStore } from './base-store'
 
 /**
  * An enumeration of the possible steps that the sign in

@@ -1,35 +1,35 @@
+import { readdir } from 'fs/promises'
+import memoizeOne from 'memoize-one'
 import * as Path from 'path'
 import * as React from 'react'
-import { Dispatcher } from '../dispatcher'
-import { getDefaultDir, setDefaultDir } from '../lib/default-dir'
+import { API, IAPIRepository, IAPIRepositoryCloneInfo } from '../../lib/api'
+import { FoldoutType } from '../../lib/app-state'
+import { assertNever } from '../../lib/fatal-error'
+import { findAccountForRemoteURL } from '../../lib/find-account'
+import { merge } from '../../lib/merge'
+import {
+  IRepositoryIdentifier,
+  parseRemote,
+  parseRepositoryIdentifier,
+} from '../../lib/remote-parsing'
+import { IAccountRepositories } from '../../lib/stores/api-repositories-store'
 import {
   Account,
   isDotComAccount,
   isEnterpriseAccount,
 } from '../../models/account'
-import { FoldoutType } from '../../lib/app-state'
-import {
-  IRepositoryIdentifier,
-  parseRepositoryIdentifier,
-  parseRemote,
-} from '../../lib/remote-parsing'
-import { findAccountForRemoteURL } from '../../lib/find-account'
-import { API, IAPIRepository, IAPIRepositoryCloneInfo } from '../../lib/api'
-import { Dialog, DialogError, DialogFooter, DialogContent } from '../dialog'
-import { TabBar } from '../tab-bar'
 import { CloneRepositoryTab } from '../../models/clone-repository-tab'
+import { Dialog, DialogContent, DialogError, DialogFooter } from '../dialog'
+import { isTopMostDialog } from '../dialog/is-top-most'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
+import { CallToAction } from '../lib/call-to-action'
+import { getDefaultDir, setDefaultDir } from '../lib/default-dir'
+import { ClickSource } from '../lib/list'
+import { showOpenDialog, showSaveDialog } from '../main-process-proxy'
+import { TabBar } from '../tab-bar'
 import { CloneGenericRepository } from './clone-generic-repository'
 import { CloneGithubRepository } from './clone-github-repository'
-import { assertNever } from '../../lib/fatal-error'
-import { CallToAction } from '../lib/call-to-action'
-import { IAccountRepositories } from '../../lib/stores/api-repositories-store'
-import { merge } from '../../lib/merge'
-import { ClickSource } from '../lib/list'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { showOpenDialog, showSaveDialog } from '../main-process-proxy'
-import { readdir } from 'fs/promises'
-import { isTopMostDialog } from '../dialog/is-top-most'
-import memoizeOne from 'memoize-one'
 
 interface ICloneRepositoryProps {
   readonly dispatcher: Dispatcher

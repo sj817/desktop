@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { PopupManager } from '../../src/lib/popup-manager'
 import { Account } from '../../src/models/account'
 import { Popup, PopupType } from '../../src/models/popup'

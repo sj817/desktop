@@ -1,10 +1,10 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { Repository } from '../../../src/models/repository'
+import { describe, it } from 'node:test'
 import { getChangedFiles, getCommits } from '../../../src/lib/git'
-import { setupFixtureRepository } from '../../helpers/repositories'
+import { Repository } from '../../../src/models/repository'
 import { AppFileStatusKind } from '../../../src/models/status'
 import { setupLocalConfig } from '../../helpers/local-config'
+import { setupFixtureRepository } from '../../helpers/repositories'
 
 describe('git/log', () => {
   describe('getCommits', () => {

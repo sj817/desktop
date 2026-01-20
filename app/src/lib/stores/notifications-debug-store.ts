@@ -6,8 +6,8 @@ import { Dispatcher, defaultErrorHandler } from '../../ui/dispatcher'
 import { API, APICheckConclusion, IAPIComment } from '../api'
 import { showNotification } from '../notifications/show-notification'
 import {
-  isValidNotificationPullRequestReview,
   ValidNotificationPullRequestReview,
+  isValidNotificationPullRequestReview,
 } from '../valid-notification-pull-request-review'
 import { AccountsStore } from './accounts-store'
 import { IDesktopChecksFailedAliveEvent } from './alive-store'

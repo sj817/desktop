@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { DialogFooter, DialogContent, Dialog } from '../dialog'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 
 interface IConfirmExitTutorialProps {

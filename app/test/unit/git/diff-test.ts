@@ -1,42 +1,42 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
-import * as path from 'path'
 import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import * as path from 'path'
 
+import {
+  DiffSelection,
+  DiffSelectionType,
+  DiffType,
+  IImageDiff,
+  ISubmoduleDiff,
+  ITextDiff,
+} from '../../../src/models/diff'
 import { Repository } from '../../../src/models/repository'
 import {
-  WorkingDirectoryFileChange,
   AppFileStatusKind,
   FileChange,
+  WorkingDirectoryFileChange,
 } from '../../../src/models/status'
 import {
-  ITextDiff,
-  IImageDiff,
-  DiffSelectionType,
-  DiffSelection,
-  DiffType,
-  ISubmoduleDiff,
-} from '../../../src/models/diff'
-import {
-  setupFixtureRepository,
   setupEmptyRepository,
+  setupFixtureRepository,
 } from '../../helpers/repositories'
 
 import {
-  getWorkingDirectoryDiff,
-  getWorkingDirectoryImage,
-  getBlobImage,
   getBinaryPaths,
+  getBlobImage,
   getBranchMergeBaseChangedFiles,
   getBranchMergeBaseDiff,
+  getWorkingDirectoryDiff,
+  getWorkingDirectoryImage,
   git,
 } from '../../../src/lib/git'
 import { getStatusOrThrow } from '../../helpers/status'
 
 import { GitError as DugiteError, exec } from 'dugite'
-import { makeCommit, switchTo } from '../../helpers/repository-scaffolding'
 import { writeFile } from 'fs/promises'
 import { join } from 'node:path'
+import { makeCommit, switchTo } from '../../helpers/repository-scaffolding'
 
 async function getTextDiff(
   repo: Repository,

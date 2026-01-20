@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { Dispatcher } from '../dispatcher'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { Account, isEnterpriseAccount } from '../../models/account'
 import { getHTMLURL } from '../../lib/api'
+import { Account, isEnterpriseAccount } from '../../models/account'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
 import { Ref } from '../lib/ref'
 
 interface IInvalidatedTokenProps {

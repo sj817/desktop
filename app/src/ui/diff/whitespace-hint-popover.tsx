@@ -1,11 +1,11 @@
 import * as React from 'react'
+import { OkCancelButtonGroup } from '../dialog'
 import {
   Popover,
   PopoverAnchorPosition,
   PopoverAppearEffect,
   PopoverDecoration,
 } from '../lib/popover'
-import { OkCancelButtonGroup } from '../dialog'
 
 interface IWhitespaceHintPopoverProps {
   readonly anchor: HTMLElement | null

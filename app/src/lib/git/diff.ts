@@ -2,41 +2,41 @@ import * as Path from 'path'
 
 import { getBlobContents } from './show'
 
-import { Repository } from '../../models/repository'
-import {
-  WorkingDirectoryFileChange,
-  FileChange,
-  AppFileStatusKind,
-  SubmoduleStatus,
-  CommittedFileChange,
-} from '../../models/status'
 import {
   DiffType,
-  IRawDiff,
   IDiff,
   IImageDiff,
+  ILargeTextDiff,
   Image,
+  IRawDiff,
   LineEndingsChange,
   parseLineEndingText,
-  ILargeTextDiff,
 } from '../../models/diff'
+import { Repository } from '../../models/repository'
+import {
+  AppFileStatusKind,
+  CommittedFileChange,
+  FileChange,
+  SubmoduleStatus,
+  WorkingDirectoryFileChange,
+} from '../../models/status'
 
-import { DiffParser } from '../diff-parser'
-import { getOldPathOrDefault } from '../get-old-path'
+import { GitError } from 'dugite'
 import { readFile } from 'fs/promises'
+import { isAbsolute } from 'path'
+import { DiffParser } from '../diff-parser'
 import { forceUnwrap } from '../fatal-error'
+import { enableImagePreviewsForDDSFiles } from '../feature-flag'
+import { getOldPathOrDefault } from '../get-old-path'
+import { IStatusEntry } from '../status-parser'
+import { getConfigValue } from './config'
 import { git } from './core'
 import { NullTreeSHA } from './diff-index'
-import { GitError } from 'dugite'
-import { IChangesetData, parseRawLogWithNumstat } from './log'
-import { getConfigValue } from './config'
-import { getMergeBase } from './merge'
-import { IStatusEntry } from '../status-parser'
 import { createLogParser } from './git-delimiter-parser'
-import { enableImagePreviewsForDDSFiles } from '../feature-flag'
+import { IChangesetData, parseRawLogWithNumstat } from './log'
+import { getMergeBase } from './merge'
 import { unstageAll } from './reset'
 import { stageFiles } from './update-index'
-import { isAbsolute } from 'path'
 
 /**
  * V8 has a limit on the size of string it can create (~256MB), and unless we want to

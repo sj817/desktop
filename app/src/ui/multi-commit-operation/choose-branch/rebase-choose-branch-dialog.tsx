@@ -1,4 +1,5 @@
 import React from 'react'
+import { truncateWithEllipsis } from '../../../lib/truncate-with-ellipsis'
 import { Branch } from '../../../models/branch'
 import { ComputedAction } from '../../../models/computed-action'
 import { RebasePreview } from '../../../models/rebase'
@@ -9,7 +10,6 @@ import {
   IBaseChooseBranchDialogProps,
   canStartOperation,
 } from './base-choose-branch-dialog'
-import { truncateWithEllipsis } from '../../../lib/truncate-with-ellipsis'
 
 interface IRebaseChooseBranchDialogState {
   readonly rebasePreview: RebasePreview | null

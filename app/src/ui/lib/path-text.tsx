@@ -1,10 +1,10 @@
-import * as React from 'react'
 import * as Path from 'path'
+import * as React from 'react'
 import { clamp } from '../../lib/clamp'
-import { Tooltip } from './tooltip'
-import { createObservableRef } from './observable-ref'
 import { IMatches } from '../../lib/fuzzy-find'
 import { HighlightText } from './highlight-text'
+import { createObservableRef } from './observable-ref'
+import { Tooltip } from './tooltip'
 
 interface IPathTextProps {
   /**

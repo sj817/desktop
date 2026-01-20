@@ -2,55 +2,55 @@ import '../lib/logging/main/install'
 
 import {
   app,
-  Menu,
   BrowserWindow,
-  shell,
-  session,
-  systemPreferences,
+  Menu,
   nativeTheme,
+  session,
+  shell,
+  systemPreferences,
 } from 'electron'
 import * as Fs from 'fs'
 
+import { fatalError } from '../lib/fatal-error'
+import { parseAppURL } from '../lib/parse-app-url'
+import { shellNeedsPatching, updateEnvironmentForProcess } from '../lib/shell'
 import { AppWindow } from './app-window'
 import { buildDefaultMenu, getAllMenuItems } from './menu'
-import { shellNeedsPatching, updateEnvironmentForProcess } from '../lib/shell'
-import { parseAppURL } from '../lib/parse-app-url'
 import {
   handleSquirrelEvent,
   installWindowsCLI,
   uninstallWindowsCLI,
 } from './squirrel-updater'
-import { fatalError } from '../lib/fatal-error'
 
-import { log as writeLog } from './log'
-import { UNSAFE_openDirectory } from './shell'
-import { reportError } from './exception-reporting'
-import {
-  enableSourceMaps,
-  withSourceMappedStack,
-} from '../lib/source-map-support'
-import { now } from './now'
-import { showUncaughtException } from './show-uncaught-exception'
-import { buildContextMenu } from './menu/build-context-menu'
-import { OrderedWebRequest } from './ordered-webrequest'
-import { installAuthenticatedImageFilter } from './authenticated-image-filter'
-import { installAliveOriginFilter } from './alive-origin-filter'
-import { installSameOriginFilter } from './same-origin-filter'
-import * as ipcMain from './ipc-main'
-import {
-  getArchitecture,
-  isAppRunningUnderARM64Translation,
-} from '../lib/get-architecture'
-import { buildSpellCheckMenu } from './menu/build-spell-check-menu'
-import { getMainGUID, saveGUIDFile } from '../lib/get-main-guid'
 import {
   getNotificationsPermission,
   requestNotificationsPermission,
   showNotification,
 } from 'desktop-notifications'
-import { initializeDesktopNotifications } from './notifications'
 import parseCommandLineArgs from 'minimist'
 import { CLIAction } from '../lib/cli-action'
+import {
+  getArchitecture,
+  isAppRunningUnderARM64Translation,
+} from '../lib/get-architecture'
+import { getMainGUID, saveGUIDFile } from '../lib/get-main-guid'
+import {
+  enableSourceMaps,
+  withSourceMappedStack,
+} from '../lib/source-map-support'
+import { installAliveOriginFilter } from './alive-origin-filter'
+import { installAuthenticatedImageFilter } from './authenticated-image-filter'
+import { reportError } from './exception-reporting'
+import * as ipcMain from './ipc-main'
+import { log as writeLog } from './log'
+import { buildContextMenu } from './menu/build-context-menu'
+import { buildSpellCheckMenu } from './menu/build-spell-check-menu'
+import { initializeDesktopNotifications } from './notifications'
+import { now } from './now'
+import { OrderedWebRequest } from './ordered-webrequest'
+import { installSameOriginFilter } from './same-origin-filter'
+import { UNSAFE_openDirectory } from './shell'
+import { showUncaughtException } from './show-uncaught-exception'
 
 app.setAppLogsPath()
 enableSourceMaps()

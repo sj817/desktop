@@ -1,14 +1,14 @@
 import * as React from 'react'
 
+import { shell } from '../../lib/app-shell'
+import { suggestedExternalEditor } from '../../lib/editors/shared'
 import {
+  DefaultDialogFooter,
   Dialog,
   DialogContent,
   DialogFooter,
-  DefaultDialogFooter,
   OkCancelButtonGroup,
 } from '../dialog'
-import { shell } from '../../lib/app-shell'
-import { suggestedExternalEditor } from '../../lib/editors/shared'
 
 interface IEditorErrorProps {
   /**

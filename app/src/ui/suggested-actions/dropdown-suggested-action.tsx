@@ -1,12 +1,12 @@
+import classNames from 'classnames'
 import * as React from 'react'
+import { sendNonFatalException } from '../../lib/helpers/non-fatal-exception'
+import { MenuIDs } from '../../models/menu-ids'
 import {
   DropdownSelectButton,
   IDropdownSelectButtonOption,
 } from '../dropdown-select-button'
-import { MenuIDs } from '../../models/menu-ids'
 import { executeMenuItemById } from '../main-process-proxy'
-import { sendNonFatalException } from '../../lib/helpers/non-fatal-exception'
-import classNames from 'classnames'
 
 export interface IDropdownSuggestedActionOption
   extends IDropdownSelectButtonOption {

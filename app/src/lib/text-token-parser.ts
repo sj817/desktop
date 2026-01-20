@@ -1,9 +1,9 @@
+import { GitHubRepository } from '../models/github-repository'
 import {
   Repository,
-  isRepositoryWithGitHubRepository,
   getNonForkGitHubRepository,
+  isRepositoryWithGitHubRepository,
 } from '../models/repository'
-import { GitHubRepository } from '../models/github-repository'
 import { getHTMLURL } from './api'
 import { Emoji } from './emoji'
 

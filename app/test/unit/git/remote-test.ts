@@ -1,20 +1,20 @@
-import { describe, it } from 'node:test'
+import { exec } from 'dugite'
 import assert from 'node:assert'
-import { Repository } from '../../../src/models/repository'
+import { describe, it } from 'node:test'
+import { setConfigValue } from '../../../src/lib/git'
 import {
-  getRemotes,
   addRemote,
+  getRemotes,
   removeRemote,
   setRemoteURL,
 } from '../../../src/lib/git/remote'
-import {
-  setupFixtureRepository,
-  setupEmptyRepository,
-  setupEmptyDirectory,
-} from '../../helpers/repositories'
 import { findDefaultRemote } from '../../../src/lib/stores/helpers/find-default-remote'
-import { exec } from 'dugite'
-import { setConfigValue } from '../../../src/lib/git'
+import { Repository } from '../../../src/models/repository'
+import {
+  setupEmptyDirectory,
+  setupEmptyRepository,
+  setupFixtureRepository,
+} from '../../helpers/repositories'
 
 describe('git/remote', () => {
   describe('getRemotes', () => {

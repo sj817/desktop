@@ -1,11 +1,11 @@
 import * as React from 'react'
 
-import { Dispatcher } from '../dispatcher'
-import { Repository } from '../../models/repository'
 import { Branch } from '../../models/branch'
+import { Repository } from '../../models/repository'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { Ref } from '../lib/ref'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
+import { Ref } from '../lib/ref'
 
 interface IDeleteRemoteBranchProps {
   readonly dispatcher: Dispatcher

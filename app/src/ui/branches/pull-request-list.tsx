@@ -1,29 +1,29 @@
 import * as React from 'react'
+import { FoldoutType } from '../../lib/app-state'
+import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
+import { formatRelative } from '../../lib/format-relative'
+import { IMatches } from '../../lib/fuzzy-find'
+import { showContextualMenu } from '../../lib/menu-item'
+import { DragType } from '../../models/drag-drop'
+import { PullRequest } from '../../models/pull-request'
+import {
+  RepositoryWithGitHubRepository,
+  getNonForkGitHubRepository,
+} from '../../models/repository'
+import { AriaLiveContainer } from '../accessibility/aria-live-container'
+import { Dispatcher } from '../dispatcher'
+import { Button } from '../lib/button'
 import {
   IFilterListGroup,
   IFilterListItem,
   SelectionSource,
 } from '../lib/filter-list'
-import { PullRequestListItem } from './pull-request-list-item'
-import { PullRequest } from '../../models/pull-request'
-import { NoPullRequests } from './no-pull-requests'
-import { IMatches } from '../../lib/fuzzy-find'
-import { Dispatcher } from '../dispatcher'
-import {
-  RepositoryWithGitHubRepository,
-  getNonForkGitHubRepository,
-} from '../../models/repository'
-import { Button } from '../lib/button'
-import { Octicon, syncClockwise } from '../octicons'
-import { FoldoutType } from '../../lib/app-state'
-import { startTimer } from '../lib/timing'
-import { DragType } from '../../models/drag-drop'
-import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
-import { formatRelative } from '../../lib/format-relative'
-import { AriaLiveContainer } from '../accessibility/aria-live-container'
 import { SectionFilterList } from '../lib/section-filter-list'
+import { startTimer } from '../lib/timing'
+import { Octicon, syncClockwise } from '../octicons'
+import { NoPullRequests } from './no-pull-requests'
+import { PullRequestListItem } from './pull-request-list-item'
 import { generatePullRequestContextMenuItems } from './pull-request-list-item-context-menu'
-import { showContextualMenu } from '../../lib/menu-item'
 
 interface IPullRequestListItem extends IFilterListItem {
   readonly id: string

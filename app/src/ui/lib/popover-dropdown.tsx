@@ -1,10 +1,10 @@
+import classNames from 'classnames'
 import * as React from 'react'
-import { Button } from './button'
-import { Popover, PopoverAnchorPosition, PopoverDecoration } from './popover'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import classNames from 'classnames'
+import { Button } from './button'
 import { createUniqueId, releaseUniqueId } from './id-pool'
+import { Popover, PopoverAnchorPosition, PopoverDecoration } from './popover'
 
 const maxPopoverContentHeight = 500
 

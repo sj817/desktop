@@ -1,15 +1,15 @@
+import memoizeOne from 'memoize-one'
 import * as React from 'react'
-import { TextBox } from './text-box'
-import { Row } from './row'
+import { getStealthEmailForAccount } from '../../lib/email'
 import {
   Account,
   isDotComAccount,
   isEnterpriseAccount,
 } from '../../models/account'
-import { Select } from './select'
 import { GitEmailNotFoundWarning } from './git-email-not-found-warning'
-import { getStealthEmailForAccount } from '../../lib/email'
-import memoizeOne from 'memoize-one'
+import { Row } from './row'
+import { Select } from './select'
+import { TextBox } from './text-box'
 
 const OtherEmailSelectValue = 'Other'
 

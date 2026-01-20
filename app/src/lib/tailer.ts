@@ -1,5 +1,5 @@
+import { Disposable, Emitter } from 'event-kit'
 import * as Fs from 'fs'
-import { Emitter, Disposable } from 'event-kit'
 
 interface ICurrentFileTailState {
   /** The current read position in the file. */

@@ -1,74 +1,73 @@
-import * as React from 'react'
 import classNames from 'classnames'
-import {
-  AutocompletingTextArea,
-  AutocompletingInput,
-  IAutocompletionProvider,
-  CoAuthorAutocompletionProvider,
-} from '../autocompletion'
-import { CommitIdentity } from '../../models/commit-identity'
-import {
-  DefaultCommitMessage,
-  ICommitMessage,
-} from '../../models/commit-message'
-import { Repository } from '../../models/repository'
-import { Button } from '../lib/button'
-import { Loading } from '../lib/loading'
-import { AuthorInput } from '../lib/author-input/author-input'
-import { FocusContainer } from '../lib/focus-container'
-import { Octicon, OcticonSymbolVariant } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
-import { Author, UnknownAuthor, isKnownAuthor } from '../../models/author'
-import { IMenuItem } from '../../lib/menu-item'
-import { Commit, ICommitContext } from '../../models/commit'
-import { startTimer } from '../lib/timing'
-import { CommitWarning, CommitWarningIcon } from './commit-warning'
-import { LinkButton } from '../lib/link-button'
+import * as React from 'react'
 import { CommitOptions, Foldout, FoldoutType } from '../../lib/app-state'
-import { IAvatarUser, getAvatarUserFromAuthor } from '../../models/avatar'
-import { showContextualMenu } from '../../lib/menu-item'
-import { Account, isEnterpriseAccount } from '../../models/account'
-import {
-  CommitMessageAvatar,
-  CommitMessageAvatarWarningType,
-} from './commit-message-avatar'
 import {
   getStealthEmailForUser,
   isAttributableEmailFor,
   lookupPreferredEmail,
 } from '../../lib/email'
+import { isDotCom } from '../../lib/endpoint-capabilities'
+import { assertNever } from '../../lib/fatal-error'
+import {
+  enableCommitMessageGeneration,
+  enableHooksEnvironment,
+} from '../../lib/feature-flag'
+import { formatCommitMessage } from '../../lib/format-commit-message'
+import { HookProgress } from '../../lib/git'
 import { setGlobalConfigValue } from '../../lib/git/config'
-import { Popup, PopupType } from '../../models/popup'
-import { RepositorySettingsTab } from '../repository-settings/repository-settings'
-import { IdealSummaryLength } from '../../lib/wrap-rich-text-commit-message'
+import { useRepoRulesLogic } from '../../lib/helpers/repo-rules'
 import { isEmptyOrWhitespace } from '../../lib/is-empty-or-whitespace'
-import { TooltipDirection } from '../lib/tooltip'
-import { ToggledtippedContent } from '../lib/toggletipped-content'
+import { IMenuItem, showContextualMenu } from '../../lib/menu-item'
+import { IdealSummaryLength } from '../../lib/wrap-rich-text-commit-message'
+import { Account, isEnterpriseAccount } from '../../models/account'
+import { Author, UnknownAuthor, isKnownAuthor } from '../../models/author'
+import { IAvatarUser, getAvatarUserFromAuthor } from '../../models/avatar'
+import { IAheadBehind } from '../../models/branch'
+import { Commit, ICommitContext } from '../../models/commit'
+import { CommitIdentity } from '../../models/commit-identity'
+import {
+  DefaultCommitMessage,
+  ICommitMessage,
+} from '../../models/commit-message'
+import { Popup, PopupType } from '../../models/popup'
 import { PreferencesTab } from '../../models/preferences'
 import {
   RepoRuleEnforced,
   RepoRulesInfo,
   RepoRulesMetadataFailures,
 } from '../../models/repo-rules'
-import { IAheadBehind } from '../../models/branch'
+import { Repository } from '../../models/repository'
+import { WorkingDirectoryFileChange } from '../../models/status'
+import { AriaLiveContainer } from '../accessibility/aria-live-container'
+import {
+  AutocompletingInput,
+  AutocompletingTextArea,
+  CoAuthorAutocompletionProvider,
+  IAutocompletionProvider,
+} from '../autocompletion'
+import { AuthorInput } from '../lib/author-input/author-input'
+import { Button } from '../lib/button'
+import { FocusContainer } from '../lib/focus-container'
+import { LinkButton } from '../lib/link-button'
+import { Loading } from '../lib/loading'
 import {
   Popover,
   PopoverAnchorPosition,
   PopoverDecoration,
 } from '../lib/popover'
-import { RepoRulesetsForBranchLink } from '../repository-rules/repo-rulesets-for-branch-link'
+import { startTimer } from '../lib/timing'
+import { ToggledtippedContent } from '../lib/toggletipped-content'
+import { TooltipDirection } from '../lib/tooltip'
+import { Octicon, OcticonSymbolVariant } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
 import { RepoRulesMetadataFailureList } from '../repository-rules/repo-rules-failure-list'
-import { formatCommitMessage } from '../../lib/format-commit-message'
-import { useRepoRulesLogic } from '../../lib/helpers/repo-rules'
-import { isDotCom } from '../../lib/endpoint-capabilities'
-import { WorkingDirectoryFileChange } from '../../models/status'
+import { RepoRulesetsForBranchLink } from '../repository-rules/repo-rulesets-for-branch-link'
+import { RepositorySettingsTab } from '../repository-settings/repository-settings'
 import {
-  enableCommitMessageGeneration,
-  enableHooksEnvironment,
-} from '../../lib/feature-flag'
-import { AriaLiveContainer } from '../accessibility/aria-live-container'
-import { HookProgress } from '../../lib/git'
-import { assertNever } from '../../lib/fatal-error'
+  CommitMessageAvatar,
+  CommitMessageAvatarWarningType,
+} from './commit-message-avatar'
+import { CommitWarning, CommitWarningIcon } from './commit-warning'
 
 const addAuthorIcon: OcticonSymbolVariant = {
   w: 18,

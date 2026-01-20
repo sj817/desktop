@@ -1,6 +1,8 @@
 import { Branch } from '../../models/branch'
 import { Commit } from '../../models/commit'
+import { DefaultCommitMessage } from '../../models/commit-message'
 import { PullRequest } from '../../models/pull-request'
+import { RepoRulesInfo } from '../../models/repo-rules'
 import { Repository } from '../../models/repository'
 import {
   WorkingDirectoryFileChange,
@@ -8,23 +10,21 @@ import {
 } from '../../models/status'
 import { TipState } from '../../models/tip'
 import {
+  ChangesSelectionKind,
   HistoryTabMode,
   IBranchesState,
   IChangesState,
+  ICommitSelection,
   ICompareState,
+  IMultiCommitOperationState,
+  IMultiCommitOperationUndoState,
+  IPullRequestState,
   IRepositoryState,
   RepositorySectionTab,
-  ICommitSelection,
-  ChangesSelectionKind,
-  IMultiCommitOperationUndoState,
-  IMultiCommitOperationState,
-  IPullRequestState,
 } from '../app-state'
-import { merge } from '../merge'
-import { DefaultCommitMessage } from '../../models/commit-message'
 import { sendNonFatalException } from '../helpers/non-fatal-exception'
+import { merge } from '../merge'
 import { IStatsStore } from '../stats'
-import { RepoRulesInfo } from '../../models/repo-rules'
 
 export class RepositoryStateCache {
   private readonly repositoryState = new Map<string, IRepositoryState>()

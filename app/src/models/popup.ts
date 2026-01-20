@@ -1,31 +1,31 @@
-import {
-  Repository,
-  RepositoryWithGitHubRepository,
-  RepositoryWithForkedGitHubRepository,
-} from './repository'
-import { PullRequest } from './pull-request'
+import { IAPIComment } from '../lib/api'
+import { IRefCheck } from '../lib/ci-checks/ci-checks'
+import { TerminalOutput, TerminalOutputListener } from '../lib/git'
+import { ValidNotificationPullRequestReview } from '../lib/valid-notification-pull-request-review'
+import { Account } from '../models/account'
+import { UnreachableCommitsTab } from '../ui/history/unreachable-commits-dialog'
+import { RepositorySettingsTab } from '../ui/repository-settings/repository-settings'
+import { BypassReasonType } from '../ui/secret-scanning/bypass-push-protection-dialog'
+import { ISecretScanResult } from '../ui/secret-scanning/push-protection-error-dialog'
+import { Author, UnknownAuthor } from './author'
 import { Branch } from './branch'
+import { Commit, CommitOneLine, ICommitContext } from './commit'
+import { ICommitMessage } from './commit-message'
+import { DiffSelection, ImageDiffType, ITextDiff } from './diff'
+import { GitHubRepository } from './github-repository'
+import { PreferencesTab } from './preferences'
+import { Progress } from './progress'
+import { PullRequest } from './pull-request'
 import { ReleaseNote, ReleaseSummary } from './release-notes'
 import { IRemote } from './remote'
+import {
+  Repository,
+  RepositoryWithForkedGitHubRepository,
+  RepositoryWithGitHubRepository,
+} from './repository'
 import { RetryAction } from './retry-actions'
-import { WorkingDirectoryFileChange } from './status'
-import { PreferencesTab } from './preferences'
-import { Commit, CommitOneLine, ICommitContext } from './commit'
 import { IStashEntry } from './stash-entry'
-import { Account } from '../models/account'
-import { Progress } from './progress'
-import { ITextDiff, DiffSelection, ImageDiffType } from './diff'
-import { RepositorySettingsTab } from '../ui/repository-settings/repository-settings'
-import { ICommitMessage } from './commit-message'
-import { Author, UnknownAuthor } from './author'
-import { IRefCheck } from '../lib/ci-checks/ci-checks'
-import { GitHubRepository } from './github-repository'
-import { ValidNotificationPullRequestReview } from '../lib/valid-notification-pull-request-review'
-import { UnreachableCommitsTab } from '../ui/history/unreachable-commits-dialog'
-import { IAPIComment } from '../lib/api'
-import { ISecretScanResult } from '../ui/secret-scanning/push-protection-error-dialog'
-import { BypassReasonType } from '../ui/secret-scanning/bypass-push-protection-dialog'
-import { TerminalOutput, TerminalOutputListener } from '../lib/git'
+import { WorkingDirectoryFileChange } from './status'
 
 export enum PopupType {
   RenameBranch = 'RenameBranch',

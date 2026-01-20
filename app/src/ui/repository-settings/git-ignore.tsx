@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { DialogContent } from '../dialog'
-import { TextArea } from '../lib/text-area'
 import { LinkButton } from '../lib/link-button'
 import { Ref } from '../lib/ref'
+import { TextArea } from '../lib/text-area'
 
 interface IGitIgnoreProps {
   readonly text: string | null

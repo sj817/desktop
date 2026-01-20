@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { CIStatus } from './ci-status'
-import { GitHubRepository } from '../../models/github-repository'
-import { Dispatcher } from '../dispatcher'
 import { ICombinedRefCheck } from '../../lib/ci-checks/ci-checks'
+import { GitHubRepository } from '../../models/github-repository'
 import { getPullRequestCommitRef } from '../../models/pull-request'
+import { Dispatcher } from '../dispatcher'
 import { Button } from '../lib/button'
+import { CIStatus } from './ci-status'
 
 interface IPullRequestBadgeProps {
   /** The pull request's number. */

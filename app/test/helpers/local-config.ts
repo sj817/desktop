@@ -1,5 +1,5 @@
-import { Repository } from '../../src/models/repository'
 import { exec } from 'dugite'
+import { Repository } from '../../src/models/repository'
 
 export async function setupLocalConfig(
   repository: Repository,

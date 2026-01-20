@@ -1,11 +1,11 @@
+import { assertNever } from '../../lib/fatal-error'
 import {
-  AppFileStatusKind,
   AppFileStatus,
+  AppFileStatusKind,
   isConflictWithMarkers,
 } from '../../models/status'
-import * as octicons from './octicons.generated'
 import { OcticonSymbol } from '../octicons'
-import { assertNever } from '../../lib/fatal-error'
+import * as octicons from './octicons.generated'
 
 /**
  * Converts a given `AppFileStatusKind` value to an Octicon symbol

@@ -1,7 +1,7 @@
 import * as URL from 'url'
-import { getHTMLURL, API } from './api'
-import { parseRemote, parseRepositoryIdentifier } from './remote-parsing'
 import { Account, isDotComAccount } from '../models/account'
+import { API, getHTMLURL } from './api'
+import { parseRemote, parseRepositoryIdentifier } from './remote-parsing'
 
 type RepositoryLookupFunc = (
   account: Account,

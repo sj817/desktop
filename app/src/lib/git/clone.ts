@@ -1,8 +1,8 @@
-import { git, IGitStringExecutionOptions } from './core'
-import { ICloneProgress } from '../../models/progress'
 import { CloneOptions } from '../../models/clone-options'
-import { CloneProgressParser, executionOptionsWithProgress } from '../progress'
+import { ICloneProgress } from '../../models/progress'
 import { getDefaultBranch } from '../helpers/default-branch'
+import { CloneProgressParser, executionOptionsWithProgress } from '../progress'
+import { git, IGitStringExecutionOptions } from './core'
 import { envForRemoteOperation } from './environment'
 
 /**

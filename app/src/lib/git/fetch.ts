@@ -1,10 +1,10 @@
-import { git, IGitStringExecutionOptions } from './core'
-import { Repository } from '../../models/repository'
-import { IFetchProgress } from '../../models/progress'
-import { FetchProgressParser, executionOptionsWithProgress } from '../progress'
-import { enableRecurseSubmodulesFlag } from '../feature-flag'
-import { IRemote } from '../../models/remote'
 import { ITrackingBranch } from '../../models/branch'
+import { IFetchProgress } from '../../models/progress'
+import { IRemote } from '../../models/remote'
+import { Repository } from '../../models/repository'
+import { enableRecurseSubmodulesFlag } from '../feature-flag'
+import { executionOptionsWithProgress, FetchProgressParser } from '../progress'
+import { git, IGitStringExecutionOptions } from './core'
 import { envForRemoteOperation } from './environment'
 
 async function getFetchArgs(

@@ -1,9 +1,9 @@
+import { GitError } from 'dugite'
 import { Branch } from '../../models/branch'
 import { ComputedAction } from '../../models/computed-action'
 import { MergeTreeResult } from '../../models/merge'
 import { Repository } from '../../models/repository'
 import { git, isGitError } from './core'
-import { GitError } from 'dugite'
 
 export async function determineMergeability(
   repository: Repository,

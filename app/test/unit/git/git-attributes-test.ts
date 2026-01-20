@@ -1,10 +1,10 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
 import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import * as Path from 'path'
 
-import { setupEmptyRepository } from '../../helpers/repositories'
 import { writeGitAttributes } from '../../../src/ui/add-repository/git-attributes'
+import { setupEmptyRepository } from '../../helpers/repositories'
 
 describe('git/git-attributes', () => {
   describe('writeGitAttributes', () => {

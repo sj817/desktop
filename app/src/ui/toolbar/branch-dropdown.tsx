@@ -1,35 +1,35 @@
+import classNames from 'classnames'
 import * as React from 'react'
-import { Dispatcher } from '../dispatcher'
-import * as octicons from '../octicons/octicons.generated'
-import { OcticonSymbol, syncClockwise } from '../octicons'
-import {
-  isRepositoryWithGitHubRepository,
-  Repository,
-} from '../../models/repository'
-import { Resizable } from '../resizable'
-import { TipState } from '../../models/tip'
-import { ToolbarDropdown, DropdownState } from './dropdown'
 import {
   FoldoutType,
   IConstrainedValue,
   IRepositoryState,
   isRebaseConflictState,
 } from '../../lib/app-state'
-import { BranchesContainer, PullRequestBadge } from '../branches'
-import { assertNever } from '../../lib/fatal-error'
-import { BranchesTab } from '../../models/branches-tab'
-import { PullRequest } from '../../models/pull-request'
-import classNames from 'classnames'
 import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
-import { DragType } from '../../models/drag-drop'
-import { CICheckRunPopover } from '../check-runs/ci-check-run-popover'
-import { TooltipTarget } from '../lib/tooltip'
-import { BranchType, Branch } from '../../models/branch'
-import { PopupType } from '../../models/popup'
-import { generateBranchContextMenuItems } from '../branches/branch-list-item-context-menu'
-import { showContextualMenu } from '../../lib/menu-item'
 import { Emoji } from '../../lib/emoji'
+import { assertNever } from '../../lib/fatal-error'
 import { enableResizingToolbarButtons } from '../../lib/feature-flag'
+import { showContextualMenu } from '../../lib/menu-item'
+import { Branch, BranchType } from '../../models/branch'
+import { BranchesTab } from '../../models/branches-tab'
+import { DragType } from '../../models/drag-drop'
+import { PopupType } from '../../models/popup'
+import { PullRequest } from '../../models/pull-request'
+import {
+  isRepositoryWithGitHubRepository,
+  Repository,
+} from '../../models/repository'
+import { TipState } from '../../models/tip'
+import { BranchesContainer, PullRequestBadge } from '../branches'
+import { generateBranchContextMenuItems } from '../branches/branch-list-item-context-menu'
+import { CICheckRunPopover } from '../check-runs/ci-check-run-popover'
+import { Dispatcher } from '../dispatcher'
+import { TooltipTarget } from '../lib/tooltip'
+import { OcticonSymbol, syncClockwise } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
+import { Resizable } from '../resizable'
+import { DropdownState, ToolbarDropdown } from './dropdown'
 
 interface IBranchDropdownProps {
   readonly dispatcher: Dispatcher

@@ -1,10 +1,10 @@
 import * as React from 'react'
 
+import { IMatches } from '../../lib/fuzzy-find'
 import { AppFileStatus, AppFileStatusKind } from '../../models/status'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
 import { PathText } from './path-text'
-import { IMatches } from '../../lib/fuzzy-find'
 
 interface IPathLabelProps {
   /** the current path of the file */

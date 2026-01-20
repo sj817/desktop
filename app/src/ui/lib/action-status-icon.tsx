@@ -1,7 +1,7 @@
-import * as React from 'react'
 import classNames from 'classnames'
-import { ComputedAction } from '../../models/computed-action'
+import * as React from 'react'
 import { assertNever } from '../../lib/fatal-error'
+import { ComputedAction } from '../../models/computed-action'
 
 import { Octicon, OcticonSymbol } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'

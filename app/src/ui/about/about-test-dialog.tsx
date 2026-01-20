@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { About } from './about'
 import { getName, getVersion } from '../lib/app-proxy'
 import { IUpdateState, UpdateStatus } from '../lib/update-store'
+import { About } from './about'
 
 interface IAboutTestDialogProps {
   /**

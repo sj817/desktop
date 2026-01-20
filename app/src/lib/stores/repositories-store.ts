@@ -1,33 +1,33 @@
 import {
-  RepositoriesDatabase,
-  IDatabaseGitHubRepository,
-  IDatabaseProtectedBranch,
-  IDatabaseRepository,
-  getOwnerKey,
-} from '../databases/repositories-database'
-import { Owner } from '../../models/owner'
-import {
   GitHubRepository,
   GitHubRepositoryPermission,
 } from '../../models/github-repository'
+import { Owner } from '../../models/owner'
 import {
   Repository,
   RepositoryWithGitHubRepository,
   assertIsRepositoryWithGitHubRepository,
   isRepositoryWithGitHubRepository,
 } from '../../models/repository'
-import { fatalError, assertNonNullable, forceUnwrap } from '../fatal-error'
+import { WorkflowPreferences } from '../../models/workflow-preferences'
 import {
-  IAPIRepository,
+  GitHubAccountType,
   IAPIBranch,
   IAPIFullRepository,
-  GitHubAccountType,
+  IAPIRepository,
 } from '../api'
-import { TypedBaseStore } from './base-store'
-import { WorkflowPreferences } from '../../models/workflow-preferences'
-import { clearTagsToPush } from './helpers/tags-to-push-storage'
-import { IMatchedGitHubRepository } from '../repository-matching'
+import {
+  IDatabaseGitHubRepository,
+  IDatabaseProtectedBranch,
+  IDatabaseRepository,
+  RepositoriesDatabase,
+  getOwnerKey,
+} from '../databases/repositories-database'
 import { shallowEquals } from '../equality'
+import { assertNonNullable, fatalError, forceUnwrap } from '../fatal-error'
+import { IMatchedGitHubRepository } from '../repository-matching'
+import { TypedBaseStore } from './base-store'
+import { clearTagsToPush } from './helpers/tags-to-push-storage'
 
 type AddRepositoryOptions = {
   missing?: boolean

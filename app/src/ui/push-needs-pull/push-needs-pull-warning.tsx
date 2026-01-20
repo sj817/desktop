@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { Dispatcher } from '../dispatcher'
-import { DialogFooter, DialogContent, Dialog } from '../dialog'
 import { FetchType } from '../../models/fetch'
 import { Repository } from '../../models/repository'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
 
 interface IPushNeedsPullWarningProps {
   readonly dispatcher: Dispatcher

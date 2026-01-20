@@ -1,6 +1,12 @@
-import * as React from 'react'
 import classNames from 'classnames'
+import * as React from 'react'
 
+import { assertNever } from '../../lib/fatal-error'
+import {
+  findItemByAccessKey,
+  itemIsSelectable,
+  MenuItem,
+} from '../../models/app-menu'
 import {
   ClickSource,
   findLastSelectableRow,
@@ -10,13 +16,7 @@ import {
   IMouseClickSource,
   SelectionSource,
 } from '../lib/list'
-import {
-  MenuItem,
-  itemIsSelectable,
-  findItemByAccessKey,
-} from '../../models/app-menu'
 import { MenuListItem } from './menu-list-item'
-import { assertNever } from '../../lib/fatal-error'
 
 interface IMenuPaneProps {
   /**

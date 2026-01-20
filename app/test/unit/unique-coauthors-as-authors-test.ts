@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { ITrailer } from '../../src/lib/git'
 import { getUniqueCoauthorsAsAuthors } from '../../src/lib/unique-coauthors-as-authors'
 import { Commit } from '../../src/models/commit'

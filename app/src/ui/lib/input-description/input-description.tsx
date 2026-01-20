@@ -1,9 +1,9 @@
+import classNames from 'classnames'
 import * as React from 'react'
+import { assertNever } from '../../../lib/fatal-error'
+import { AriaLiveContainer } from '../../accessibility/aria-live-container'
 import { Octicon } from '../../octicons'
 import * as octicons from '../../octicons/octicons.generated'
-import classNames from 'classnames'
-import { AriaLiveContainer } from '../../accessibility/aria-live-container'
-import { assertNever } from '../../../lib/fatal-error'
 
 export enum InputDescriptionType {
   Caption,

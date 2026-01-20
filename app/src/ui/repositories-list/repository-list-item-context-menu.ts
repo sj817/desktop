@@ -1,12 +1,12 @@
-import { Repository } from '../../models/repository'
-import { IMenuItem } from '../../lib/menu-item'
-import { Repositoryish } from './group-repositories'
 import { clipboard } from 'electron'
+import { IMenuItem } from '../../lib/menu-item'
+import { Repository } from '../../models/repository'
 import {
-  RevealInFileManagerLabel,
   DefaultEditorLabel,
   DefaultShellLabel,
+  RevealInFileManagerLabel,
 } from '../lib/context-menu'
+import { Repositoryish } from './group-repositories'
 
 interface IRepositoryListItemContextMenuConfig {
   repository: Repositoryish

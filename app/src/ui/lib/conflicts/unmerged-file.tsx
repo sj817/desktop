@@ -1,34 +1,33 @@
+import { join } from 'path'
 import * as React from 'react'
+import { revealInFileManager } from '../../../lib/app-shell'
+import { IMenuItem, showContextualMenu } from '../../../lib/menu-item'
 import {
-  isConflictWithMarkers,
-  isManualConflict,
+  getLabelForManualResolutionOption,
+  getUnmergedStatusEntryDescription,
+  hasUnresolvedConflicts,
+} from '../../../lib/status'
+import { ManualConflictResolution } from '../../../models/manual-conflict-resolution'
+import { Repository } from '../../../models/repository'
+import {
   ConflictedFileStatus,
   ConflictsWithMarkers,
-  ManualConflict,
   GitStatusEntry,
+  isConflictWithMarkers,
+  isManualConflict,
+  ManualConflict,
 } from '../../../models/status'
-import { join } from 'path'
-import { Repository } from '../../../models/repository'
+import { DialogPreferredFocusClassName } from '../../dialog'
 import { Dispatcher } from '../../dispatcher'
-import { showContextualMenu } from '../../../lib/menu-item'
 import { Octicon } from '../../octicons'
 import * as octicons from '../../octicons/octicons.generated'
-import { PathText } from '../path-text'
-import { ManualConflictResolution } from '../../../models/manual-conflict-resolution'
+import { Button } from '../button'
 import {
   OpenWithDefaultProgramLabel,
   RevealInFileManagerLabel,
 } from '../context-menu'
 import { openFile } from '../open-file'
-import { Button } from '../button'
-import { IMenuItem } from '../../../lib/menu-item'
-import {
-  hasUnresolvedConflicts,
-  getUnmergedStatusEntryDescription,
-  getLabelForManualResolutionOption,
-} from '../../../lib/status'
-import { revealInFileManager } from '../../../lib/app-shell'
-import { DialogPreferredFocusClassName } from '../../dialog'
+import { PathText } from '../path-text'
 
 const defaultConflictsResolvedMessage = 'No conflicts remaining'
 

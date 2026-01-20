@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { Repository } from '../../models/repository'
+import { WorkingDirectoryFileChange } from '../../models/status'
 import {
   Dialog,
   DialogContent,
@@ -6,8 +8,6 @@ import {
   OkCancelButtonGroup,
 } from '../dialog'
 import { Dispatcher } from '../dispatcher'
-import { Repository } from '../../models/repository'
-import { WorkingDirectoryFileChange } from '../../models/status'
 import { LinkButton } from '../lib/link-button'
 
 interface IGenerateCommitMessageDisclaimerProps {

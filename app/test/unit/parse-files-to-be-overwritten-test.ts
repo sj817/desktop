@@ -1,12 +1,12 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
-import { setupEmptyRepository } from '../helpers/repositories'
+import { GitError as DugiteError } from 'dugite'
 import { writeFile } from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { join } from 'path'
 import { git } from '../../src/lib/git'
-import { cloneLocalRepository } from '../helpers/repository-scaffolding'
-import { GitError as DugiteError } from 'dugite'
 import { parseFilesToBeOverwritten } from '../../src/ui/lib/parse-files-to-be-overwritten'
+import { setupEmptyRepository } from '../helpers/repositories'
+import { cloneLocalRepository } from '../helpers/repository-scaffolding'
 
 describe('parseFilesToBeOverwritten', () => {
   it('parses files from pull error', async t => {

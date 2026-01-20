@@ -1,23 +1,23 @@
-import { describe, it, beforeEach, afterEach } from 'node:test'
-import assert from 'node:assert'
-import { BranchPruner } from '../../src/lib/stores/helpers/branch-pruner'
-import { Repository } from '../../src/models/repository'
-import { GitStoreCache } from '../../src/lib/stores/git-store-cache'
-import { RepositoriesStore } from '../../src/lib/stores'
-import { RepositoryStateCache } from '../../src/lib/stores/repository-state-cache'
-import { setupFixtureRepository } from '../helpers/repositories'
-import { shell } from '../helpers/test-app-shell'
-import { TestRepositoriesDatabase } from '../helpers/databases'
 import { exec } from 'dugite'
+import * as FSE from 'fs-extra'
+import noop from 'lodash/noop'
+import assert from 'node:assert'
+import { afterEach, beforeEach, describe, it } from 'node:test'
+import * as path from 'path'
+import { offsetFromNow } from '../../src/lib/offset-from'
+import { RepositoriesStore } from '../../src/lib/stores'
+import { GitStoreCache } from '../../src/lib/stores/git-store-cache'
+import { BranchPruner } from '../../src/lib/stores/helpers/branch-pruner'
+import { RepositoryStateCache } from '../../src/lib/stores/repository-state-cache'
+import { Repository } from '../../src/models/repository'
+import { TestRepositoriesDatabase } from '../helpers/databases'
+import { setupFixtureRepository } from '../helpers/repositories'
 import {
   createRepository as createPrunedRepository,
   setupRepository,
 } from '../helpers/repository-builder-branch-pruner'
+import { shell } from '../helpers/test-app-shell'
 import { TestStatsStore } from '../helpers/test-stats-store'
-import { offsetFromNow } from '../../src/lib/offset-from'
-import * as FSE from 'fs-extra'
-import * as path from 'path'
-import noop from 'lodash/noop'
 
 describe('BranchPruner', () => {
   let gitStoreCache: GitStoreCache

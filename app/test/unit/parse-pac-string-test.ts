@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { parsePACString } from '../../src/lib/parse-pac-string'
 
 describe('parsePACString', () => {

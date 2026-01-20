@@ -1,16 +1,16 @@
-import { MenuIDs } from '../models/menu-ids'
-import { merge } from './merge'
 import { IAppState, SelectionType } from '../lib/app-state'
+import { AppMenu, MenuItem } from '../models/app-menu'
+import { CloningRepository } from '../models/cloning-repository'
+import { MenuIDs } from '../models/menu-ids'
 import {
   Repository,
   isRepositoryWithGitHubRepository,
 } from '../models/repository'
-import { CloningRepository } from '../models/cloning-repository'
 import { TipState } from '../models/tip'
 import { updateMenuState as ipcUpdateMenuState } from '../ui/main-process-proxy'
-import { AppMenu, MenuItem } from '../models/app-menu'
-import { hasConflictedFiles } from './status'
 import { findContributionTargetDefaultBranch } from './branch'
+import { merge } from './merge'
+import { hasConflictedFiles } from './status'
 
 export interface IMenuItemState {
   readonly enabled?: boolean

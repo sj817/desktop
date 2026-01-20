@@ -1,8 +1,8 @@
-import { IAPIRepository } from '../../api'
-import { GitStore } from '../git-store'
-import { urlMatchesRemote } from '../../repository-matching'
 import * as URL from 'url'
 import { GitHubRepository } from '../../../models/github-repository'
+import { IAPIRepository } from '../../api'
+import { urlMatchesRemote } from '../../repository-matching'
+import { GitStore } from '../git-store'
 
 export async function updateRemoteUrl(
   gitStore: GitStore,

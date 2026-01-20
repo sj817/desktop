@@ -1,7 +1,7 @@
-import { describe, it, TestContext } from 'node:test'
-import assert from 'node:assert'
 import { exec } from 'dugite'
 import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it, TestContext } from 'node:test'
 import * as Path from 'path'
 
 import { getChangedFiles } from '../../../../src/lib/git'
@@ -12,9 +12,9 @@ import {
   RebaseResult,
 } from '../../../../src/lib/git/rebase'
 import { AppFileStatusKind } from '../../../../src/models/status'
+import { getBranchOrError } from '../../../helpers/git'
 import { createRepository } from '../../../helpers/repository-builder-rebase-test'
 import { getStatusOrThrow } from '../../../helpers/status'
-import { getBranchOrError } from '../../../helpers/git'
 
 const baseBranchName = 'base-branch'
 const featureBranchName = 'this-is-a-feature'

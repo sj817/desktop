@@ -1,10 +1,10 @@
 import * as React from 'react'
 
-import { IAutocompletionProvider } from './index'
-import { GitHubUserStore } from '../../lib/stores'
-import { GitHubRepository } from '../../models/github-repository'
-import { Account } from '../../models/account'
 import { IMentionableUser } from '../../lib/databases/index'
+import { GitHubUserStore } from '../../lib/stores'
+import { Account } from '../../models/account'
+import { GitHubRepository } from '../../models/github-repository'
+import { IAutocompletionProvider } from './index'
 
 /** An autocompletion hit for a user. */
 export type KnownUserHit = {

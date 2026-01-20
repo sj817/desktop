@@ -1,23 +1,23 @@
+import { DiffSelectionType } from '../../../models/diff'
+import { ManualConflictResolution } from '../../../models/manual-conflict-resolution'
 import {
-  WorkingDirectoryStatus,
   WorkingDirectoryFileChange,
+  WorkingDirectoryStatus,
 } from '../../../models/status'
-import { IStatusResult } from '../../git'
 import {
-  IChangesState,
-  ConflictState,
-  MergeConflictState,
-  isMergeConflictState,
-  isRebaseConflictState,
-  RebaseConflictState,
   ChangesSelection,
   ChangesSelectionKind,
+  ConflictState,
+  IChangesState,
+  isMergeConflictState,
+  isRebaseConflictState,
+  MergeConflictState,
+  RebaseConflictState,
 } from '../../app-state'
-import { DiffSelectionType } from '../../../models/diff'
 import { caseInsensitiveCompare } from '../../compare'
-import { IStatsStore } from '../../stats/stats-store'
-import { ManualConflictResolution } from '../../../models/manual-conflict-resolution'
 import { assertNever } from '../../fatal-error'
+import { IStatusResult } from '../../git'
+import { IStatsStore } from '../../stats/stats-store'
 
 /**
  * Internal shape of the return value from this response because the compiler

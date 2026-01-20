@@ -1,5 +1,5 @@
-import { Repository } from '../../../models/repository'
 import { GitHubRepository } from '../../../models/github-repository'
+import { Repository } from '../../../models/repository'
 import { API, getAccountForEndpoint } from '../../api'
 import { fatalError } from '../../fatal-error'
 import { AccountsStore } from '../accounts-store'

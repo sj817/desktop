@@ -1,8 +1,8 @@
-import { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert'
-import { Account } from '../../src/models/account'
+import { beforeEach, describe, it } from 'node:test'
 import { AccountsStore } from '../../src/lib/stores'
-import { InMemoryStore, AsyncInMemoryStore } from '../helpers/stores'
+import { Account } from '../../src/models/account'
+import { AsyncInMemoryStore, InMemoryStore } from '../helpers/stores'
 
 describe('AccountsStore', () => {
   let accountsStore: AccountsStore

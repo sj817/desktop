@@ -1,6 +1,6 @@
-import { describe, it, mock, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert'
-import { timeout, sleep } from '../../src/lib/promise'
+import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { sleep, timeout } from '../../src/lib/promise'
 
 describe('timeout', () => {
   beforeEach(() => mock.timers.enable())

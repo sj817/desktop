@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { WelcomeStep } from './welcome'
-import { LinkButton } from '../lib/link-button'
+import { SamplesURL } from '../../lib/stats'
 import { Dispatcher } from '../dispatcher'
+import { BrowserRedirectMessage } from '../lib/authentication-form'
+import { Button } from '../lib/button'
+import { LinkButton } from '../lib/link-button'
+import { Loading } from '../lib/loading'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { Button } from '../lib/button'
-import { Loading } from '../lib/loading'
-import { BrowserRedirectMessage } from '../lib/authentication-form'
-import { SamplesURL } from '../../lib/stats'
+import { WelcomeStep } from './welcome'
 
 /**
  * The URL to the sign-up page on GitHub.com. Used in conjunction

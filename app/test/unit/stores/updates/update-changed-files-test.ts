@@ -1,11 +1,10 @@
-import { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert'
-import { updateChangedFiles } from '../../../../src/lib/stores/updates/changes-state'
+import { beforeEach, describe, it } from 'node:test'
 import {
-  WorkingDirectoryStatus,
-  WorkingDirectoryFileChange,
-  AppFileStatusKind,
-} from '../../../../src/models/status'
+  ChangesSelectionKind,
+  ChangesWorkingDirectorySelection,
+} from '../../../../src/lib/app-state'
+import { updateChangedFiles } from '../../../../src/lib/stores/updates/changes-state'
 import {
   DiffSelection,
   DiffSelectionType,
@@ -13,13 +12,14 @@ import {
   IBinaryDiff,
 } from '../../../../src/models/diff'
 import {
+  AppFileStatusKind,
+  WorkingDirectoryFileChange,
+  WorkingDirectoryStatus,
+} from '../../../../src/models/status'
+import {
   createState,
   createStatus,
 } from '../../../helpers/changes-state-helper'
-import {
-  ChangesSelectionKind,
-  ChangesWorkingDirectorySelection,
-} from '../../../../src/lib/app-state'
 
 const allSelected = DiffSelection.fromInitialSelection(DiffSelectionType.All)
 const noneSelected = DiffSelection.fromInitialSelection(DiffSelectionType.None)

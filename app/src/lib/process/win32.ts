@@ -1,9 +1,9 @@
 import { spawn as spawnInternal } from 'child_process'
 import {
   HKEY,
-  RegistryValueType,
-  RegistryValue,
   RegistryStringEntry,
+  RegistryValue,
+  RegistryValueType,
   enumerateValues,
   setValue,
 } from 'registry-js'

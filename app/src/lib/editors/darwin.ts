@@ -1,6 +1,6 @@
+import appPath from 'app-path'
 import { pathExists } from '../../ui/lib/path-exists'
 import { IFoundEditor } from './found-editor'
-import appPath from 'app-path'
 
 /** Represents an external editor on macOS */
 interface IDarwinExternalEditor {

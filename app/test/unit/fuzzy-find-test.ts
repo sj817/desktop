@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { match } from '../../src/lib/fuzzy-find'
 import { getText } from '../../src/ui/lib/filter-list'
 describe('fuzzy find', () => {

@@ -1,10 +1,10 @@
-import { Disposable } from 'event-kit'
-import { Tailer } from './tailer'
 import byline from 'byline'
-import { createReadStream } from 'fs'
 import { randomBytes } from 'crypto'
-import { join } from 'path'
+import { Disposable } from 'event-kit'
+import { createReadStream } from 'fs'
 import { tmpdir } from 'os'
+import { join } from 'path'
+import { Tailer } from './tailer'
 
 /**
  * Get a path to a temp file using the given name. Note that the file itself

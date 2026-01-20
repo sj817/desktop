@@ -1,8 +1,8 @@
-import * as Path from 'path'
 import * as FS from 'fs'
+import { writeFile } from 'fs/promises'
+import * as Path from 'path'
 import { Repository } from '../../models/repository'
 import { getConfigValue } from './config'
-import { writeFile } from 'fs/promises'
 
 /**
  * Read the contents of the repository .gitignore.

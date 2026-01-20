@@ -1,22 +1,22 @@
 import * as React from 'react'
-import { Commit } from '../../models/commit'
 import { lookupPreferredEmail } from '../../lib/email'
-import { setGlobalConfigValue } from '../../lib/git/config'
-import { CommitListItem } from '../history/commit-list-item'
-import { Account, isDotComAccount } from '../../models/account'
-import { CommitIdentity } from '../../models/commit-identity'
-import { Form } from '../lib/form'
-import { Button } from '../lib/button'
-import { TextBox } from '../lib/text-box'
-import { Row } from '../lib/row'
 import {
   isConfigFileLockError,
   parseConfigLockFilePathFromError,
 } from '../../lib/git'
+import { setGlobalConfigValue } from '../../lib/git/config'
+import { Account, isDotComAccount } from '../../models/account'
+import { Commit } from '../../models/commit'
+import { CommitIdentity } from '../../models/commit-identity'
+import { CommitListItem } from '../history/commit-list-item'
+import { Button } from '../lib/button'
+import { Form } from '../lib/form'
+import { Row } from '../lib/row'
+import { TextBox } from '../lib/text-box'
 import { ConfigLockFileExists } from './config-lock-file-exists'
+import { GitEmailNotFoundWarning } from './git-email-not-found-warning'
 import { RadioButton } from './radio-button'
 import { Select } from './select'
-import { GitEmailNotFoundWarning } from './git-email-not-found-warning'
 
 interface IConfigureGitUserProps {
   /** The logged-in accounts. */

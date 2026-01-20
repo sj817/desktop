@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { Commit } from '../../models/commit'
 import { Repository } from '../../models/repository'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Dispatcher } from '../dispatcher'
 import { Row } from '../lib/row'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { Commit } from '../../models/commit'
 
 interface IWarningBeforeResetProps {
   readonly dispatcher: Dispatcher

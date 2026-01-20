@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { IAutocompletionProvider } from './index'
 import { compare } from '../../lib/compare'
-import { DefaultMaxHits } from './common'
 import { Emoji } from '../../lib/emoji'
+import { DefaultMaxHits } from './common'
+import { IAutocompletionProvider } from './index'
 
 const sanitizeEmoji = (emoji: string) => emoji.replaceAll(':', '')
 

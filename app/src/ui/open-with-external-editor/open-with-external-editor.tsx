@@ -1,16 +1,16 @@
 import * as React from 'react'
 
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { Row } from '../lib/row'
-import { Select } from '../lib/select'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { CustomIntegrationForm } from '../preferences/custom-integration-form'
 import {
   ICustomIntegration,
   TargetPathArgument,
 } from '../../lib/custom-integration'
 import { getAvailableEditors } from '../../lib/editors/lookup'
 import { enableCustomIntegration } from '../../lib/feature-flag'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Row } from '../lib/row'
+import { Select } from '../lib/select'
+import { CustomIntegrationForm } from '../preferences/custom-integration-form'
 
 const CustomIntegrationValue = 'other'
 

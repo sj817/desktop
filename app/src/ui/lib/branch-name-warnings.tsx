@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { Branch, BranchType } from '../../models/branch'
 
-import { Row } from './row'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
 import { Ref } from './ref'
+import { Row } from './row'
 
 export function renderBranchHasRemoteWarning(branch: Branch) {
   if (branch.upstream != null) {

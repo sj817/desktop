@@ -1,11 +1,11 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { updateConflictState } from '../../../../src/lib/stores/updates/changes-state'
+import { ManualConflictResolution } from '../../../../src/models/manual-conflict-resolution'
 import {
   createState,
   createStatus,
 } from '../../../helpers/changes-state-helper'
-import { ManualConflictResolution } from '../../../../src/models/manual-conflict-resolution'
 import { TestStatsStore } from '../../../helpers/test-stats-store'
 
 describe('updateConflictState', () => {

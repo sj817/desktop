@@ -1,9 +1,9 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import {
-  RepositoriesDatabase,
   IDatabaseGitHubRepository,
   IDatabaseOwner,
+  RepositoriesDatabase,
   getOwnerKey,
 } from '../../src/lib/databases'
 

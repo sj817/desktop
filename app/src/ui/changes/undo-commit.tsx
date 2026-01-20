@@ -1,10 +1,10 @@
 import * as React from 'react'
 
+import { Emoji } from '../../lib/emoji'
 import { Commit } from '../../models/commit'
+import { Button } from '../lib/button'
 import { RichText } from '../lib/rich-text'
 import { RelativeTime } from '../relative-time'
-import { Button } from '../lib/button'
-import { Emoji } from '../../lib/emoji'
 
 interface IUndoCommitProps {
   /** The function to call when the Undo button is clicked. */

@@ -1,9 +1,9 @@
-import { Repository } from '../models/repository'
-import { CloningRepository } from '../models/cloning-repository'
-import { RetryAction, RetryActionType } from '../models/retry-actions'
-import { GitErrorContext } from './git-error-context'
 import { Branch } from '../models/branch'
+import { CloningRepository } from '../models/cloning-repository'
+import { Repository } from '../models/repository'
+import { RetryAction, RetryActionType } from '../models/retry-actions'
 import { WorkingDirectoryFileChange } from '../models/status'
+import { GitErrorContext } from './git-error-context'
 
 export interface IErrorMetadata {
   /** Was the action which caused this error part of a background task? */

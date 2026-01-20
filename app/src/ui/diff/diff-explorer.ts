@@ -1,4 +1,4 @@
-import { DiffLine, DiffHunk, DiffLineType } from '../../models/diff'
+import { DiffHunk, DiffLine, DiffLineType } from '../../models/diff'
 
 /**
  * Indicate the type of changes that are included in the current range.

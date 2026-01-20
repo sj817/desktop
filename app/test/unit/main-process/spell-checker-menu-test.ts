@@ -1,8 +1,8 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import {
-  SpellcheckEnglishLabel,
   getSpellCheckLanguageMenuItemOptions,
+  SpellcheckEnglishLabel,
   SpellcheckSystemLabel,
 } from '../../../src/main-process/menu/build-spell-check-menu'
 import { getAvailableSpellcheckerLanguages } from '../../helpers/menus/available-spellchecker-languages-helper'

@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { validateURL } from '../../src/ui/lib/enterprise-validate-url'
 
 describe('validateURL', () => {

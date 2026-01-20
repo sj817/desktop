@@ -1,5 +1,5 @@
-import { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert'
+import { beforeEach, describe, it } from 'node:test'
 import { GitLFSProgressParser } from '../../../src/lib/progress/lfs'
 
 describe('GitLFSProgressParser', () => {

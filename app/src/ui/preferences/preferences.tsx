@@ -1,52 +1,24 @@
 import * as React from 'react'
-import { Account, isDotComAccount } from '../../models/account'
-import { PreferencesTab } from '../../models/preferences'
-import { Dispatcher } from '../dispatcher'
-import { TabBar, TabBarType } from '../tab-bar'
-import { Accounts } from './accounts'
-import { Advanced } from './advanced'
-import { Git } from './git'
-import { assertNever } from '../../lib/fatal-error'
-import { Dialog, DialogFooter, DialogError } from '../dialog'
-import {
-  getGlobalConfigValue,
-  setGlobalConfigValue,
-} from '../../lib/git/config'
-import { lookupPreferredEmail } from '../../lib/email'
-import { Shell, getAvailableShells } from '../../lib/shells'
-import { getAvailableEditors } from '../../lib/editors/lookup'
-import {
-  gitAuthorNameIsValid,
-  InvalidGitAuthorNameMessage,
-} from '../lib/identifier-rules'
-import { Appearance } from './appearance'
-import { ApplicationTheme } from '../lib/application-theme'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { Integrations } from './integrations'
-import {
-  UncommittedChangesStrategy,
-  defaultUncommittedChangesStrategy,
-} from '../../models/uncommitted-changes-strategy'
-import { Octicon } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
-import {
-  isConfigFileLockError,
-  parseConfigLockFilePathFromError,
-} from '../../lib/git'
-import { ConfigLockFileExists } from '../lib/config-lock-file-exists'
-import {
-  setDefaultBranch,
-  getDefaultBranch,
-} from '../../lib/helpers/default-branch'
-import { Prompts } from './prompts'
-import { Repository } from '../../models/repository'
-import { Notifications } from './notifications'
-import { Accessibility } from './accessibility'
 import {
   ICustomIntegration,
   TargetPathArgument,
   isValidCustomIntegration,
 } from '../../lib/custom-integration'
+import { getAvailableEditors } from '../../lib/editors/lookup'
+import { lookupPreferredEmail } from '../../lib/email'
+import { assertNever } from '../../lib/fatal-error'
+import {
+  isConfigFileLockError,
+  parseConfigLockFilePathFromError,
+} from '../../lib/git'
+import {
+  getGlobalConfigValue,
+  setGlobalConfigValue,
+} from '../../lib/git/config'
+import {
+  getDefaultBranch,
+  setDefaultBranch,
+} from '../../lib/helpers/default-branch'
 import {
   defaultGitHookEnvShell,
   getCacheHooksEnv,
@@ -56,6 +28,34 @@ import {
   setGitHookEnvShell,
   setHooksEnvEnabled,
 } from '../../lib/hooks/config'
+import { Shell, getAvailableShells } from '../../lib/shells'
+import { Account, isDotComAccount } from '../../models/account'
+import { PreferencesTab } from '../../models/preferences'
+import { Repository } from '../../models/repository'
+import {
+  UncommittedChangesStrategy,
+  defaultUncommittedChangesStrategy,
+} from '../../models/uncommitted-changes-strategy'
+import { Dialog, DialogError, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
+import { ApplicationTheme } from '../lib/application-theme'
+import { ConfigLockFileExists } from '../lib/config-lock-file-exists'
+import {
+  InvalidGitAuthorNameMessage,
+  gitAuthorNameIsValid,
+} from '../lib/identifier-rules'
+import { Octicon } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
+import { TabBar, TabBarType } from '../tab-bar'
+import { Accessibility } from './accessibility'
+import { Accounts } from './accounts'
+import { Advanced } from './advanced'
+import { Appearance } from './appearance'
+import { Git } from './git'
+import { Integrations } from './integrations'
+import { Notifications } from './notifications'
+import { Prompts } from './prompts'
 
 interface IPreferencesProps {
   readonly dispatcher: Dispatcher

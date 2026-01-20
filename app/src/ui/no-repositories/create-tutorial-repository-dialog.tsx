@@ -1,12 +1,12 @@
 import * as React from 'react'
 
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { Account } from '../../models/account'
 import { getHTMLURL } from '../../lib/api'
-import { Ref } from '../lib/ref'
-import { LinkButton } from '../lib/link-button'
+import { Account } from '../../models/account'
 import { Progress } from '../../models/progress'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { LinkButton } from '../lib/link-button'
+import { Ref } from '../lib/ref'
 
 interface ICreateTutorialRepositoryDialogProps {
   /**

@@ -1,17 +1,17 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
-import * as path from 'path'
-import * as os from 'os'
-import * as FSE from 'fs-extra'
 import { exec } from 'dugite'
+import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import * as os from 'os'
+import * as path from 'path'
 import { DiffParser } from '../../src/lib/diff-parser'
+import { DiffLineType } from '../../src/models/diff'
+import { DiffType, ITextDiff } from '../../src/models/diff/diff-data'
 import {
   expandTextDiffHunk,
   expandWholeTextDiff,
   getTextDiffWithBottomDummyHunk,
 } from '../../src/ui/diff/text-diff-expansion'
-import { ITextDiff, DiffType } from '../../src/models/diff/diff-data'
-import { DiffLineType } from '../../src/models/diff'
 
 interface ITestDiffInfo {
   readonly textDiff: ITextDiff

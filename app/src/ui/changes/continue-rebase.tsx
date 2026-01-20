@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { Button } from '../lib/button'
-import { Loading } from '../lib/loading'
 import { RebaseConflictState } from '../../lib/app-state'
-import { Dispatcher } from '../dispatcher'
-import { Repository } from '../../models/repository'
-import { WorkingDirectoryStatus } from '../../models/status'
 import { getConflictedFiles } from '../../lib/status'
 import { MultiCommitOperationKind } from '../../models/multi-commit-operation'
+import { Repository } from '../../models/repository'
+import { WorkingDirectoryStatus } from '../../models/status'
+import { Dispatcher } from '../dispatcher'
+import { Button } from '../lib/button'
+import { Loading } from '../lib/loading'
 
 interface IContinueRebaseProps {
   readonly dispatcher: Dispatcher

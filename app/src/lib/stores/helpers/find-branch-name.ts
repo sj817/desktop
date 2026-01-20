@@ -1,6 +1,6 @@
-import { Tip, TipState } from '../../../models/tip'
-import { IRemote } from '../../../models/remote'
 import { GitHubRepository } from '../../../models/github-repository'
+import { IRemote } from '../../../models/remote'
+import { Tip, TipState } from '../../../models/tip'
 import { urlMatchesCloneURL } from '../../repository-matching'
 
 /**

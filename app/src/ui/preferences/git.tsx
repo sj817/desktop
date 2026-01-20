@@ -1,17 +1,17 @@
 import * as React from 'react'
-import { DialogContent } from '../dialog'
-import { RefNameTextBox } from '../lib/ref-name-text-box'
-import { Ref } from '../lib/ref'
-import { LinkButton } from '../lib/link-button'
-import { Account } from '../../models/account'
-import { GitConfigUserForm } from '../lib/git-config-user-form'
-import { TabBar } from '../tab-bar'
-import { Checkbox, CheckboxValue } from '../lib/checkbox'
-import { Select } from '../lib/select'
 import {
   shellFriendlyNames,
   SupportedHooksEnvShell,
 } from '../../lib/hooks/config'
+import { Account } from '../../models/account'
+import { DialogContent } from '../dialog'
+import { Checkbox, CheckboxValue } from '../lib/checkbox'
+import { GitConfigUserForm } from '../lib/git-config-user-form'
+import { LinkButton } from '../lib/link-button'
+import { Ref } from '../lib/ref'
+import { RefNameTextBox } from '../lib/ref-name-text-box'
+import { Select } from '../lib/select'
+import { TabBar } from '../tab-bar'
 
 interface IGitProps {
   readonly name: string

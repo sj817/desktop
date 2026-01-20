@@ -1,9 +1,9 @@
 import { mkdtemp, rm } from 'fs/promises'
+import { TestContext } from 'node:test'
 import { tmpdir } from 'os'
 import { join } from 'path'
-import { TestContext } from 'node:test'
-import { sleep } from '../../src/lib/promise'
 import { isErrnoException } from '../../src/lib/errno-exception'
+import { sleep } from '../../src/lib/promise'
 
 const isBusyError = (e: unknown) => isErrnoException(e) && e.code === 'EBUSY'
 

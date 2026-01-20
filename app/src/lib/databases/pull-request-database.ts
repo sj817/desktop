@@ -1,6 +1,6 @@
 import Dexie from 'dexie'
-import { BaseDatabase } from './base-database'
 import { GitHubRepository } from '../../models/github-repository'
+import { BaseDatabase } from './base-database'
 
 export interface IPullRequestRef {
   /**

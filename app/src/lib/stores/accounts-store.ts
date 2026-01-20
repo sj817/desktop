@@ -1,11 +1,11 @@
-import { IDataStore, ISecureStore } from './stores'
-import { getKeyForAccount } from '../auth'
 import { Account, isDotComAccount } from '../../models/account'
-import { fetchUser, EmailVisibility, getEnterpriseAPIURL } from '../api'
+import { EmailVisibility, fetchUser, getEnterpriseAPIURL } from '../api'
+import { getKeyForAccount } from '../auth'
+import { compare, compareDescending } from '../compare'
+import { isGHE } from '../endpoint-capabilities'
 import { fatalError } from '../fatal-error'
 import { TypedBaseStore } from './base-store'
-import { isGHE } from '../endpoint-capabilities'
-import { compare, compareDescending } from '../compare'
+import { IDataStore, ISecureStore } from './stores'
 
 // Ensure that GitHub.com accounts appear first followed by Enterprise
 // accounts, sorted by the order in which they were added.

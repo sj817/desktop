@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { SegmentedItem } from './segmented-item'
 import { RadioGroup } from '../radio-group'
+import { SegmentedItem } from './segmented-item'
 
 /**
  * An item which is rendered as a choice in the segmented control.

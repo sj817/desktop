@@ -1,10 +1,10 @@
 import { clipboard } from 'electron'
 import React from 'react'
-import * as octicons from './octicons/octicons.generated'
-import { Octicon } from './octicons'
 import { sleep } from '../lib/promise'
-import { Button } from './lib/button'
 import { AriaLiveContainer } from './accessibility/aria-live-container'
+import { Button } from './lib/button'
+import { Octicon } from './octicons'
+import * as octicons from './octicons/octicons.generated'
 
 interface ICopyButtonProps {
   readonly copyContent: string

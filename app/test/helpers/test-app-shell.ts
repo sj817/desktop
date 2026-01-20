@@ -1,7 +1,7 @@
 /* eslint-disable no-sync */
 
-import { IAppShell } from '../../src/lib/app-shell'
 import { promisify } from 'util'
+import { IAppShell } from '../../src/lib/app-shell'
 
 import * as Fs from 'fs'
 

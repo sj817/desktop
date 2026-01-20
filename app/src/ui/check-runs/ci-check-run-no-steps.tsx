@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { encodePathAsUrl } from '../../lib/path'
+import { Button } from '../lib/button'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { Button } from '../lib/button'
-import { encodePathAsUrl } from '../../lib/path'
 
 const PaperStackImage = encodePathAsUrl(__dirname, 'static/paper-stack.svg')
 

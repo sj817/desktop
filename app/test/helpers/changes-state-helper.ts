@@ -1,9 +1,9 @@
-import { IChangesState, ChangesSelectionKind } from '../../src/lib/app-state'
-import { WorkingDirectoryStatus } from '../../src/models/status'
-import { merge } from '../../src/lib/merge'
+import { ChangesSelectionKind, IChangesState } from '../../src/lib/app-state'
 import { IStatusResult } from '../../src/lib/git'
+import { merge } from '../../src/lib/merge'
 import { DefaultCommitMessage } from '../../src/models/commit-message'
 import { RepoRulesInfo } from '../../src/models/repo-rules'
+import { WorkingDirectoryStatus } from '../../src/models/status'
 
 export function createState<K extends keyof IChangesState>(
   pick: Pick<IChangesState, K>

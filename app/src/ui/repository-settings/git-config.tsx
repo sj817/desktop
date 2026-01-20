@@ -1,11 +1,11 @@
-import * as React from 'react'
-import { DialogContent } from '../dialog'
-import { Account } from '../../models/account'
-import { GitConfigUserForm } from '../lib/git-config-user-form'
-import { Row } from '../lib/row'
-import { RadioGroup } from '../lib/radio-group'
-import { assertNever } from '../../lib/fatal-error'
 import memoizeOne from 'memoize-one'
+import * as React from 'react'
+import { assertNever } from '../../lib/fatal-error'
+import { Account } from '../../models/account'
+import { DialogContent } from '../dialog'
+import { GitConfigUserForm } from '../lib/git-config-user-form'
+import { RadioGroup } from '../lib/radio-group'
+import { Row } from '../lib/row'
 
 interface IGitConfigProps {
   readonly account: Account | null

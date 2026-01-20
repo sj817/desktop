@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { Form } from './form'
 import { Button } from './button'
+import { Form } from './form'
 
 /** Text to let the user know their browser will send them back to GH Desktop */
 export const BrowserRedirectMessage =

@@ -1,4 +1,4 @@
-import { RequestResponseChannels, RequestChannels } from './ipc-shared'
+import { RequestChannels, RequestResponseChannels } from './ipc-shared'
 // eslint-disable-next-line no-restricted-imports
 import { ipcRenderer, IpcRendererEvent } from 'electron'
 

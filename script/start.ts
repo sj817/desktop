@@ -6,8 +6,8 @@ import { forceUnwrap as u } from '../app/src/lib/fatal-error'
 
 import configs from '../app/webpack.development'
 
-import { run } from './run'
 import { createServer } from 'http'
+import { run } from './run'
 
 function getPortOrDefault() {
   const port = process.env.PORT

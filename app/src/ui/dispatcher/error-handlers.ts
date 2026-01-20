@@ -14,12 +14,12 @@ import {
 import { ShellError } from '../../lib/shells'
 import { UpstreamAlreadyExistsError } from '../../lib/stores/upstream-already-exists-error'
 
+import { hasWritePermission } from '../../models/github-repository'
 import { PopupType } from '../../models/popup'
 import {
-  Repository,
   isRepositoryWithGitHubRepository,
+  Repository,
 } from '../../models/repository'
-import { hasWritePermission } from '../../models/github-repository'
 import { RetryActionType } from '../../models/retry-actions'
 import { parseFilesToBeOverwritten } from '../lib/parse-files-to-be-overwritten'
 import { pathExists } from '../lib/path-exists'

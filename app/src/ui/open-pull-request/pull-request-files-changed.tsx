@@ -1,15 +1,19 @@
-import * as React from 'react'
+import { clipboard } from 'electron'
 import * as Path from 'path'
+import * as React from 'react'
+import { getDotComAPIEndpoint } from '../../lib/api'
+import { revealInFileManager } from '../../lib/app-shell'
+import { IConstrainedValue } from '../../lib/app-state'
+import { clamp } from '../../lib/clamp'
+import { createCommitURL } from '../../lib/commit-url'
+import { IMenuItem, showContextualMenu } from '../../lib/menu-item'
 import { IDiff, ImageDiffType } from '../../models/diff'
 import { Repository } from '../../models/repository'
 import { CommittedFileChange } from '../../models/status'
+import { DiffOptions } from '../diff/diff-options'
 import { SeamlessDiffSwitcher } from '../diff/seamless-diff-switcher'
 import { Dispatcher } from '../dispatcher'
-import { openFile } from '../lib/open-file'
-import { Resizable } from '../resizable'
 import { FileList } from '../history/file-list'
-import { IMenuItem, showContextualMenu } from '../../lib/menu-item'
-import { pathExists } from '../lib/path-exists'
 import {
   CopyFilePathLabel,
   CopyRelativeFilePathLabel,
@@ -18,13 +22,9 @@ import {
   OpenWithDefaultProgramLabel,
   RevealInFileManagerLabel,
 } from '../lib/context-menu'
-import { revealInFileManager } from '../../lib/app-shell'
-import { clipboard } from 'electron'
-import { IConstrainedValue } from '../../lib/app-state'
-import { clamp } from '../../lib/clamp'
-import { getDotComAPIEndpoint } from '../../lib/api'
-import { createCommitURL } from '../../lib/commit-url'
-import { DiffOptions } from '../diff/diff-options'
+import { openFile } from '../lib/open-file'
+import { pathExists } from '../lib/path-exists'
+import { Resizable } from '../resizable'
 
 interface IPullRequestFilesChangedProps {
   readonly repository: Repository

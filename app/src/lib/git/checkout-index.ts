@@ -1,5 +1,5 @@
-import { git } from './core'
 import { Repository } from '../../models/repository'
+import { git } from './core'
 
 /**
  * Forcefully updates the working directory with information from the index

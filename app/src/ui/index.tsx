@@ -1,80 +1,80 @@
 import '../lib/logging/renderer/install'
 
+import * as Path from 'path'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import * as Path from 'path'
-import { App } from './app'
+import { IAppState, SelectionType } from '../lib/app-state'
 import {
-  Dispatcher,
-  externalEditorErrorHandler,
-  openShellErrorHandler,
-  mergeConflictHandler,
-  lfsAttributeMismatchHandler,
-  defaultErrorHandler,
-  missingRepositoryHandler,
-  backgroundTaskHandler,
-  pushNeedsPullHandler,
-  upstreamAlreadyExistsHandler,
-  rebaseConflictsHandler,
-  localChangesOverwrittenHandler,
-  refusedWorkflowUpdate,
-  samlReauthRequired,
-  insufficientGitHubRepoPermissions,
-  discardChangesHandler,
-  secretScanningPushProtectionErrorHandler,
-} from './dispatcher'
-import {
-  AppStore,
-  GitHubUserStore,
-  CloningRepositoriesStore,
-  IssuesStore,
-  SignInStore,
-  RepositoriesStore,
-  TokenStore,
-  AccountsStore,
-  PullRequestStore,
-} from '../lib/stores'
-import { GitHubUserDatabase } from '../lib/databases'
-import { SelectionType, IAppState } from '../lib/app-state'
-import { StatsDatabase, StatsStore } from '../lib/stats'
-import {
+  GitHubUserDatabase,
   IssuesDatabase,
-  RepositoriesDatabase,
   PullRequestDatabase,
+  RepositoriesDatabase,
 } from '../lib/databases'
-import { shellNeedsPatching, updateEnvironmentForProcess } from '../lib/shell'
-import { installDevGlobals } from './install-globals'
-import { reportUncaughtException, sendErrorReport } from './main-process-proxy'
 import { getOS } from '../lib/get-os'
+import { shellNeedsPatching, updateEnvironmentForProcess } from '../lib/shell'
 import {
   enableSourceMaps,
   withSourceMappedStack,
 } from '../lib/source-map-support'
-import { UiActivityMonitor } from './lib/ui-activity-monitor'
-import { RepositoryStateCache } from '../lib/stores/repository-state-cache'
+import { StatsDatabase, StatsStore } from '../lib/stats'
+import {
+  AccountsStore,
+  AppStore,
+  CloningRepositoriesStore,
+  GitHubUserStore,
+  IssuesStore,
+  PullRequestStore,
+  RepositoriesStore,
+  SignInStore,
+  TokenStore,
+} from '../lib/stores'
 import { ApiRepositoriesStore } from '../lib/stores/api-repositories-store'
 import { CommitStatusStore } from '../lib/stores/commit-status-store'
 import { PullRequestCoordinator } from '../lib/stores/pull-request-coordinator'
+import { RepositoryStateCache } from '../lib/stores/repository-state-cache'
+import { App } from './app'
+import {
+  backgroundTaskHandler,
+  defaultErrorHandler,
+  discardChangesHandler,
+  Dispatcher,
+  externalEditorErrorHandler,
+  insufficientGitHubRepoPermissions,
+  lfsAttributeMismatchHandler,
+  localChangesOverwrittenHandler,
+  mergeConflictHandler,
+  missingRepositoryHandler,
+  openShellErrorHandler,
+  pushNeedsPullHandler,
+  rebaseConflictsHandler,
+  refusedWorkflowUpdate,
+  samlReauthRequired,
+  secretScanningPushProtectionErrorHandler,
+  upstreamAlreadyExistsHandler,
+} from './dispatcher'
+import { installDevGlobals } from './install-globals'
+import { UiActivityMonitor } from './lib/ui-activity-monitor'
+import { reportUncaughtException, sendErrorReport } from './main-process-proxy'
 
-import { sendNonFatalException } from '../lib/helpers/non-fatal-exception'
+import { Grid } from 'react-virtualized'
 import { enableUnhandledRejectionReporting } from '../lib/feature-flag'
+import { migrateRendererGUID } from '../lib/get-renderer-guid'
+import { sendNonFatalException } from '../lib/helpers/non-fatal-exception'
+import * as ipcRenderer from '../lib/ipc-renderer'
+import { initializeRendererNotificationHandler } from '../lib/notifications/notification-handler'
 import { AheadBehindStore } from '../lib/stores/ahead-behind-store'
+import { AliveStore } from '../lib/stores/alive-store'
+import { NotificationsDebugStore } from '../lib/stores/notifications-debug-store'
+import { NotificationsStore } from '../lib/stores/notifications-store'
+import { createAskpassTrampolineHandler } from '../lib/trampoline/trampoline-askpass-handler'
+import { TrampolineCommandIdentifier } from '../lib/trampoline/trampoline-command'
+import { createCredentialHelperTrampolineHandler } from '../lib/trampoline/trampoline-credential-helper'
+import { trampolineServer } from '../lib/trampoline/trampoline-server'
+import { trampolineUIHelper } from '../lib/trampoline/trampoline-ui-helper'
 import {
   ApplicationTheme,
   supportsSystemThemeChanges,
 } from './lib/application-theme'
-import { trampolineUIHelper } from '../lib/trampoline/trampoline-ui-helper'
-import { AliveStore } from '../lib/stores/alive-store'
-import { NotificationsStore } from '../lib/stores/notifications-store'
-import * as ipcRenderer from '../lib/ipc-renderer'
-import { migrateRendererGUID } from '../lib/get-renderer-guid'
-import { initializeRendererNotificationHandler } from '../lib/notifications/notification-handler'
-import { Grid } from 'react-virtualized'
-import { NotificationsDebugStore } from '../lib/stores/notifications-debug-store'
-import { trampolineServer } from '../lib/trampoline/trampoline-server'
-import { TrampolineCommandIdentifier } from '../lib/trampoline/trampoline-command'
-import { createAskpassTrampolineHandler } from '../lib/trampoline/trampoline-askpass-handler'
-import { createCredentialHelperTrampolineHandler } from '../lib/trampoline/trampoline-credential-helper'
 
 if (__DEV__) {
   installDevGlobals()

@@ -1,10 +1,10 @@
-import * as Path from 'path'
 import * as Fs from 'fs'
+import * as Path from 'path'
 import * as React from 'react'
+import { DefaultDialogFooter, Dialog, DialogContent } from '../dialog'
 import { getAppPath } from '../lib/app-proxy'
-import { Loading } from '../lib/loading'
 import { LinkButton } from '../lib/link-button'
-import { Dialog, DialogContent, DefaultDialogFooter } from '../dialog'
+import { Loading } from '../lib/loading'
 
 const WebsiteURL = 'https://desktop.github.com'
 const RepositoryURL = 'https://github.com/desktop/desktop'

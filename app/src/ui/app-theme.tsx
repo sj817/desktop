@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {
   ApplicationTheme,
-  getThemeName,
   getCurrentlyAppliedTheme,
+  getThemeName,
 } from './lib/application-theme'
 
 interface IAppThemeProps {

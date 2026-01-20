@@ -1,20 +1,21 @@
-import { describe, it, TestContext } from 'node:test'
 import assert from 'node:assert'
-import { continueRebase, getStatus } from '../../../../src/lib/git'
+import { describe, it, TestContext } from 'node:test'
 import {
+  continueRebase,
+  getRebaseSnapshot,
+  getStatus,
   rebase,
   RebaseResult,
-  getRebaseSnapshot,
 } from '../../../../src/lib/git'
-import { createRepository as createShortRebaseTest } from '../../../helpers/repository-builder-rebase-test'
-import { createRepository as createLongRebaseTest } from '../../../helpers/repository-builder-long-rebase-test'
-import { getStatusOrThrow } from '../../../helpers/status'
-import { setupEmptyDirectory } from '../../../helpers/repositories'
-import { getBranchOrError } from '../../../helpers/git'
-import { IMultiCommitOperationProgress } from '../../../../src/models/progress'
 import { isConflictedFile } from '../../../../src/lib/status'
 import { ManualConflictResolution } from '../../../../src/models/manual-conflict-resolution'
+import { IMultiCommitOperationProgress } from '../../../../src/models/progress'
 import { Repository } from '../../../../src/models/repository'
+import { getBranchOrError } from '../../../helpers/git'
+import { setupEmptyDirectory } from '../../../helpers/repositories'
+import { createRepository as createLongRebaseTest } from '../../../helpers/repository-builder-long-rebase-test'
+import { createRepository as createShortRebaseTest } from '../../../helpers/repository-builder-rebase-test'
+import { getStatusOrThrow } from '../../../helpers/status'
 
 const baseBranchName = 'base-branch'
 const featureBranchName = 'this-is-a-feature'

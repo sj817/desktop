@@ -1,9 +1,9 @@
-import { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert'
-import { RepositoriesStore } from '../../src/lib/stores/repositories-store'
-import { TestRepositoriesDatabase } from '../helpers/databases'
+import { beforeEach, describe, it } from 'node:test'
 import { IAPIFullRepository, getDotComAPIEndpoint } from '../../src/lib/api'
+import { RepositoriesStore } from '../../src/lib/stores/repositories-store'
 import { assertIsRepositoryWithGitHubRepository } from '../../src/models/repository'
+import { TestRepositoriesDatabase } from '../helpers/databases'
 
 describe('RepositoriesStore', () => {
   let repoDb = new TestRepositoriesDatabase()

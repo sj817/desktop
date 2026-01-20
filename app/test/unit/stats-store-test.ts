@@ -1,10 +1,10 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { TestStatsDatabase } from '../helpers/databases'
 
 import { StatsStore } from '../../src/lib/stats'
-import { TestActivityMonitor } from '../helpers/test-activity-monitor'
 import { fakePost } from '../fake-stats-post'
+import { TestActivityMonitor } from '../helpers/test-activity-monitor'
 
 describe('StatsStore', () => {
   async function createStatsDb() {

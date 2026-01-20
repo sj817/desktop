@@ -1,5 +1,5 @@
-import * as Path from 'path'
 import * as Fs from 'fs'
+import * as Path from 'path'
 import { gt as greaterThan } from 'semver'
 
 import { fetchPR, IAPIPR } from '../pr-api'

@@ -1,25 +1,18 @@
+import memoizeOne from 'memoize-one'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { Grid, AutoSizer, Index } from 'react-virtualized'
+import { AutoSizer, Grid, Index } from 'react-virtualized'
 import { shallowEquals, structuralEquals } from '../../../lib/equality'
+import { sendNonFatalException } from '../../../lib/helpers/non-fatal-exception'
+import { range } from '../../../lib/range'
+import { DragData, DragType } from '../../../models/drag-drop'
 import { FocusContainer } from '../../lib/focus-container'
-import { ListRow } from './list-row'
-import {
-  findNextSelectableRow,
-  SelectionSource,
-  SelectionDirection,
-  IMouseClickSource,
-  IKeyboardSource,
-  ISelectAllSource,
-  findLastSelectableRow,
-} from './section-list-selection'
 import { createUniqueId, releaseUniqueId } from '../../lib/id-pool'
 import {
   InsertionFeedbackType,
   ListItemInsertionOverlay,
 } from './list-item-insertion-overlay'
-import { DragData, DragType } from '../../../models/drag-drop'
-import memoizeOne from 'memoize-one'
+import { ListRow } from './list-row'
 import {
   getTotalRowCount,
   globalIndexToRowIndexPath,
@@ -30,8 +23,15 @@ import {
   rowIndexPathToGlobalIndex,
   rowListIncludesIndexPath,
 } from './list-row-index-path'
-import { range } from '../../../lib/range'
-import { sendNonFatalException } from '../../../lib/helpers/non-fatal-exception'
+import {
+  findLastSelectableRow,
+  findNextSelectableRow,
+  IKeyboardSource,
+  IMouseClickSource,
+  ISelectAllSource,
+  SelectionDirection,
+  SelectionSource,
+} from './section-list-selection'
 
 /**
  * Describe the first argument given to the cellRenderer,

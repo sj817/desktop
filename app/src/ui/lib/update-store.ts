@@ -1,7 +1,9 @@
 const lastSuccessfulCheckKey = 'last-successful-update-check'
 
-import { Emitter, Disposable } from 'event-kit'
+import { Disposable, Emitter } from 'event-kit'
 
+import { ErrorWithMetadata } from '../../lib/error-with-metadata'
+import { parseError } from '../../lib/squirrel-error-parser'
 import {
   checkForUpdates,
   isRunningUnderARM64Translation,
@@ -13,17 +15,15 @@ import {
   quitAndInstallUpdate,
   sendWillQuitSync,
 } from '../main-process-proxy'
-import { ErrorWithMetadata } from '../../lib/error-with-metadata'
-import { parseError } from '../../lib/squirrel-error-parser'
 
-import { ReleaseSummary } from '../../models/release-notes'
-import { generateReleaseSummary } from '../../lib/release-notes'
-import { setNumber, getNumber } from '../../lib/local-storage'
-import { enableUpdateFromEmulatedX64ToARM64 } from '../../lib/feature-flag'
-import { offsetFromNow } from '../../lib/offset-from'
 import { gte, SemVer } from 'semver'
-import { getVersion } from './app-proxy'
+import { enableUpdateFromEmulatedX64ToARM64 } from '../../lib/feature-flag'
 import { getUserAgent } from '../../lib/http'
+import { getNumber, setNumber } from '../../lib/local-storage'
+import { offsetFromNow } from '../../lib/offset-from'
+import { generateReleaseSummary } from '../../lib/release-notes'
+import { ReleaseSummary } from '../../models/release-notes'
+import { getVersion } from './app-proxy'
 
 /** The last version a showcase was seen. */
 export const lastShowCaseVersionSeen = 'version-of-last-showcase'

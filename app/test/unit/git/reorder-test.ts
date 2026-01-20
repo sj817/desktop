@@ -1,7 +1,9 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
+import { exec } from 'dugite'
 import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import * as Path from 'path'
+import { getTempFilePath } from '../../../src/lib/file-system'
 import {
   continueRebase,
   getCommit,
@@ -9,14 +11,12 @@ import {
   getRebaseInternalState,
   RebaseResult,
 } from '../../../src/lib/git'
+import { reorder } from '../../../src/lib/git/reorder'
 import { Commit } from '../../../src/models/commit'
 import { Repository } from '../../../src/models/repository'
 import { setupEmptyRepositoryDefaultMain } from '../../helpers/repositories'
 import { makeCommit } from '../../helpers/repository-scaffolding'
-import { exec } from 'dugite'
 import { getStatusOrThrow } from '../../helpers/status'
-import { getTempFilePath } from '../../../src/lib/file-system'
-import { reorder } from '../../../src/lib/git/reorder'
 
 describe('git/reorder', () => {
   it('moves second commit before the first one', async t => {

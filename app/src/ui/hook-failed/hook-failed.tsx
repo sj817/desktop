@@ -1,9 +1,9 @@
 import * as React from 'react'
 
+import { TerminalOutput } from '../../lib/git'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Terminal } from '../terminal'
-import { TerminalOutput } from '../../lib/git'
 
 interface IHookFailedProps {
   readonly hookName: string

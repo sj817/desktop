@@ -1,4 +1,4 @@
-import { Emitter, Disposable } from 'event-kit'
+import { Disposable, Emitter } from 'event-kit'
 import * as ipcRenderer from '../../lib/ipc-renderer'
 
 /**

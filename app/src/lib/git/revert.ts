@@ -1,16 +1,16 @@
 import { git, IGitStringExecutionOptions } from './core'
 
-import { Repository } from '../../models/repository'
 import { Commit } from '../../models/commit'
 import { IRevertProgress } from '../../models/progress'
+import { Repository } from '../../models/repository'
 
+import { IRemote } from '../../models/remote'
 import { executionOptionsWithProgress } from '../progress/from-process'
 import { RevertProgressParser } from '../progress/revert'
 import {
   envForRemoteOperation,
   getFallbackUrlForProxyResolve,
 } from './environment'
-import { IRemote } from '../../models/remote'
 
 /**
  * Creates a new commit that reverts the changes of a previous commit

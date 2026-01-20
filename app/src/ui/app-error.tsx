@@ -1,22 +1,22 @@
 import * as React from 'react'
 
+import { GitError as DugiteError } from 'dugite'
+import { CopilotError } from '../lib/copilot-error'
+import { ErrorWithMetadata } from '../lib/error-with-metadata'
+import { coerceToString, GitError, isAuthFailureError } from '../lib/git/core'
+import { getFileFromExceedsError } from '../lib/helpers/regex'
+import { Popup, PopupType } from '../models/popup'
+import { RetryAction, RetryActionType } from '../models/retry-actions'
+import { dialogTransitionTimeout } from './app'
 import {
+  DefaultDialogFooter,
   Dialog,
   DialogContent,
   DialogFooter,
-  DefaultDialogFooter,
 } from './dialog'
-import { dialogTransitionTimeout } from './app'
-import { coerceToString, GitError, isAuthFailureError } from '../lib/git/core'
-import { Popup, PopupType } from '../models/popup'
 import { OkCancelButtonGroup } from './dialog/ok-cancel-button-group'
-import { ErrorWithMetadata } from '../lib/error-with-metadata'
-import { RetryActionType, RetryAction } from '../models/retry-actions'
-import { Ref } from './lib/ref'
-import { GitError as DugiteError } from 'dugite'
 import { LinkButton } from './lib/link-button'
-import { getFileFromExceedsError } from '../lib/helpers/regex'
-import { CopilotError } from '../lib/copilot-error'
+import { Ref } from './lib/ref'
 import { Terminal } from './terminal'
 
 interface IAppErrorProps {

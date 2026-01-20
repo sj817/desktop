@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { Repository } from '../../models/repository'
 import { Branch } from '../../models/branch'
+import { Repository } from '../../models/repository'
+import { UncommittedChangesStrategy } from '../../models/uncommitted-changes-strategy'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Dispatcher } from '../dispatcher'
 import { Row } from '../lib/row'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { UncommittedChangesStrategy } from '../../models/uncommitted-changes-strategy'
 
 interface IOverwriteStashProps {
   readonly dispatcher: Dispatcher

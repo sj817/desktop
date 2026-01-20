@@ -6,8 +6,8 @@ import { licenseOverrides } from './license-overrides'
 import _legalEagle from 'legal-eagle'
 const legalEagle = promisify(_legalEagle)
 
-import { getVersion } from '../../app/package-info'
 import { readFile, writeFile } from 'fs/promises'
+import { getVersion } from '../../app/package-info'
 
 const assertValidLicensesIn = async (dir: string) => {
   const summary = await legalEagle({

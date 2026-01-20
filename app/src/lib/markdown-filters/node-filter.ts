@@ -1,19 +1,19 @@
 import memoizeOne from 'memoize-one'
-import { EmojiFilter } from './emoji-filter'
-import { IssueLinkFilter } from './issue-link-filter'
-import { IssueMentionFilter } from './issue-mention-filter'
-import { MentionFilter } from './mention-filter'
-import { VideoLinkFilter } from './video-link-filter'
-import { VideoTagFilter } from './video-tag-filter'
-import { TeamMentionFilter } from './team-mention-filter'
-import { CommitMentionFilter } from './commit-mention-filter'
+import { GitHubRepository } from '../../models/github-repository'
+import { Emoji } from '../emoji'
 import {
   CloseKeywordFilter,
   isIssueClosingContext,
 } from './close-keyword-filter'
+import { CommitMentionFilter } from './commit-mention-filter'
 import { CommitMentionLinkFilter } from './commit-mention-link-filter'
-import { GitHubRepository } from '../../models/github-repository'
-import { Emoji } from '../emoji'
+import { EmojiFilter } from './emoji-filter'
+import { IssueLinkFilter } from './issue-link-filter'
+import { IssueMentionFilter } from './issue-mention-filter'
+import { MentionFilter } from './mention-filter'
+import { TeamMentionFilter } from './team-mention-filter'
+import { VideoLinkFilter } from './video-link-filter'
+import { VideoTagFilter } from './video-tag-filter'
 
 export interface INodeFilter {
   /**

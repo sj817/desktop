@@ -1,42 +1,42 @@
 import * as React from 'react'
 
+import { API, APIRepoRuleType, IAPIRepoRuleset } from '../../lib/api'
+import { getStartPoint } from '../../lib/create-branch'
+import { assertNever } from '../../lib/fatal-error'
+import { getAccountForRepository } from '../../lib/get-account-for-repository'
+import { parseRepoRules, useRepoRulesLogic } from '../../lib/helpers/repo-rules'
+import { Account } from '../../models/account'
+import { Branch, StartPoint } from '../../models/branch'
+import { CommitOneLine } from '../../models/commit'
+import { GitHubRepository } from '../../models/github-repository'
+import { PopupType } from '../../models/popup'
 import {
   Repository,
+  isRepositoryWithForkedGitHubRepository,
   isRepositoryWithGitHubRepository,
 } from '../../models/repository'
-import { Dispatcher } from '../dispatcher'
-import { Branch, StartPoint } from '../../models/branch'
-import { Row } from '../lib/row'
-import { Ref } from '../lib/ref'
-import { LinkButton } from '../lib/link-button'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import {
-  VerticalSegmentedControl,
-  ISegmentedItem,
-} from '../lib/vertical-segmented-control'
-import {
-  TipState,
-  IUnbornRepository,
   IDetachedHead,
+  IUnbornRepository,
   IValidBranch,
+  TipState,
 } from '../../models/tip'
-import { assertNever } from '../../lib/fatal-error'
-import { renderBranchNameExistsOnRemoteWarning } from '../lib/branch-name-warnings'
-import { getStartPoint } from '../../lib/create-branch'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { startTimer } from '../lib/timing'
-import { GitHubRepository } from '../../models/github-repository'
-import { RefNameTextBox } from '../lib/ref-name-text-box'
-import { CommitOneLine } from '../../models/commit'
-import { PopupType } from '../../models/popup'
-import { RepositorySettingsTab } from '../repository-settings/repository-settings'
-import { isRepositoryWithForkedGitHubRepository } from '../../models/repository'
-import { API, APIRepoRuleType, IAPIRepoRuleset } from '../../lib/api'
-import { Account } from '../../models/account'
-import { getAccountForRepository } from '../../lib/get-account-for-repository'
+import { Dispatcher } from '../dispatcher'
+import { renderBranchNameExistsOnRemoteWarning } from '../lib/branch-name-warnings'
 import { InputError } from '../lib/input-description/input-error'
 import { InputWarning } from '../lib/input-description/input-warning'
-import { parseRepoRules, useRepoRulesLogic } from '../../lib/helpers/repo-rules'
+import { LinkButton } from '../lib/link-button'
+import { Ref } from '../lib/ref'
+import { RefNameTextBox } from '../lib/ref-name-text-box'
+import { Row } from '../lib/row'
+import { startTimer } from '../lib/timing'
+import {
+  ISegmentedItem,
+  VerticalSegmentedControl,
+} from '../lib/vertical-segmented-control'
+import { RepositorySettingsTab } from '../repository-settings/repository-settings'
 
 interface ICreateBranchProps {
   readonly repository: Repository

@@ -1,17 +1,17 @@
 import * as React from 'react'
 
+import classNames from 'classnames'
+import { enableAccessibleListToolTips } from '../../lib/feature-flag'
+import { IMatches } from '../../lib/fuzzy-find'
+import { IAheadBehind } from '../../models/branch'
 import { Repository } from '../../models/repository'
+import { HighlightText } from '../lib/highlight-text'
+import { createObservableRef } from '../lib/observable-ref'
+import { Tooltip } from '../lib/tooltip'
+import { TooltippedContent } from '../lib/tooltipped-content'
 import { Octicon, iconForRepository } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
 import { Repositoryish } from './group-repositories'
-import { HighlightText } from '../lib/highlight-text'
-import { IMatches } from '../../lib/fuzzy-find'
-import { IAheadBehind } from '../../models/branch'
-import classNames from 'classnames'
-import { createObservableRef } from '../lib/observable-ref'
-import { Tooltip } from '../lib/tooltip'
-import { enableAccessibleListToolTips } from '../../lib/feature-flag'
-import { TooltippedContent } from '../lib/tooltipped-content'
 
 interface IRepositoryListItemProps {
   readonly repository: Repositoryish

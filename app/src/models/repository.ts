@@ -1,13 +1,13 @@
 import * as Path from 'path'
 
-import { GitHubRepository, ForkedGitHubRepository } from './github-repository'
-import { IAheadBehind } from './branch'
-import {
-  WorkflowPreferences,
-  ForkContributionTarget,
-} from './workflow-preferences'
 import { assertNever, fatalError } from '../lib/fatal-error'
+import { IAheadBehind } from './branch'
 import { createEqualityHash } from './equality-hash'
+import { ForkedGitHubRepository, GitHubRepository } from './github-repository'
+import {
+  ForkContributionTarget,
+  WorkflowPreferences,
+} from './workflow-preferences'
 
 function getBaseName(path: string): string {
   const baseName = Path.basename(path)

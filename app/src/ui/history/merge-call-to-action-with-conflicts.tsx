@@ -1,22 +1,22 @@
 import * as React from 'react'
 
 import { HistoryTabMode } from '../../lib/app-state'
-import { Repository } from '../../models/repository'
 import { Branch } from '../../models/branch'
-import { Dispatcher } from '../dispatcher'
-import { ActionStatusIcon } from '../lib/action-status-icon'
-import { MergeTreeResult } from '../../models/merge'
 import { ComputedAction } from '../../models/computed-action'
-import {
-  DropdownSelectButton,
-  IDropdownSelectButtonOption,
-} from '../dropdown-select-button'
-import { getMergeOptions, updateRebasePreview } from '../lib/update-branch'
+import { MergeTreeResult } from '../../models/merge'
 import {
   MultiCommitOperationKind,
   isIdMultiCommitOperation,
 } from '../../models/multi-commit-operation'
 import { RebasePreview } from '../../models/rebase'
+import { Repository } from '../../models/repository'
+import { Dispatcher } from '../dispatcher'
+import {
+  DropdownSelectButton,
+  IDropdownSelectButtonOption,
+} from '../dropdown-select-button'
+import { ActionStatusIcon } from '../lib/action-status-icon'
+import { getMergeOptions, updateRebasePreview } from '../lib/update-branch'
 
 interface IMergeCallToActionWithConflictsProps {
   readonly repository: Repository

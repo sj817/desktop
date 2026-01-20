@@ -1,21 +1,21 @@
-import { git, IGitStringExecutionOptions } from './core'
-import { Repository } from '../../models/repository'
 import { Branch, BranchType } from '../../models/branch'
+import { CommitOneLine, shortenSHA } from '../../models/commit'
+import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
 import { ICheckoutProgress } from '../../models/progress'
+import { IRemote } from '../../models/remote'
+import { Repository } from '../../models/repository'
+import { WorkingDirectoryFileChange } from '../../models/status'
+import { enableRecurseSubmodulesFlag } from '../feature-flag'
 import {
   CheckoutProgressParser,
   executionOptionsWithProgress,
 } from '../progress'
 import { AuthenticationErrors } from './authentication'
-import { enableRecurseSubmodulesFlag } from '../feature-flag'
+import { git, IGitStringExecutionOptions } from './core'
 import {
   envForRemoteOperation,
   getFallbackUrlForProxyResolve,
 } from './environment'
-import { WorkingDirectoryFileChange } from '../../models/status'
-import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
-import { CommitOneLine, shortenSHA } from '../../models/commit'
-import { IRemote } from '../../models/remote'
 
 export type ProgressCallback = (progress: ICheckoutProgress) => void
 

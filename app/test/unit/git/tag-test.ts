@@ -1,29 +1,29 @@
-import { describe, it, TestContext } from 'node:test'
-import assert from 'node:assert'
-import * as path from 'path'
 import * as FSE from 'fs-extra'
-import { Repository } from '../../../src/models/repository'
+import assert from 'node:assert'
+import { describe, it, TestContext } from 'node:test'
+import * as path from 'path'
+import { assertNonNullable, forceUnwrap } from '../../../src/lib/fatal-error'
 import {
-  getCommit,
-  createTag,
-  getCommits,
-  getAllTags,
-  getRemotes,
-  fetchTagsToPush,
-  push,
+  checkoutBranch,
   createBranch,
   createCommit,
-  checkoutBranch,
+  createTag,
   deleteTag,
+  fetchTagsToPush,
+  getAllTags,
   getBranches,
+  getCommit,
+  getCommits,
+  getRemotes,
+  push,
 } from '../../../src/lib/git'
+import { findDefaultRemote } from '../../../src/lib/stores/helpers/find-default-remote'
+import { Repository } from '../../../src/models/repository'
 import {
   setupFixtureRepository,
   setupLocalForkOfRepository,
 } from '../../helpers/repositories'
-import { findDefaultRemote } from '../../../src/lib/stores/helpers/find-default-remote'
 import { getStatusOrThrow } from '../../helpers/status'
-import { assertNonNullable, forceUnwrap } from '../../../src/lib/fatal-error'
 
 describe('git/tag', () => {
   describe('createTag', () => {

@@ -1,12 +1,12 @@
-import { coerceToString, git, isGitError } from './core'
-import { Repository } from '../../models/repository'
-import { Branch } from '../../models/branch'
-import { formatAsLocalRef } from './refs'
-import { deleteRef } from './update-ref'
 import { GitError as DugiteError } from 'dugite'
+import { Branch } from '../../models/branch'
+import { IRemote } from '../../models/remote'
+import { Repository } from '../../models/repository'
+import { coerceToString, git, isGitError } from './core'
 import { envForRemoteOperation } from './environment'
 import { createForEachRefParser } from './git-delimiter-parser'
-import { IRemote } from '../../models/remote'
+import { formatAsLocalRef } from './refs'
+import { deleteRef } from './update-ref'
 
 /**
  * Create a new branch from the given start point.

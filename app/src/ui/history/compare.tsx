@@ -1,38 +1,38 @@
 import * as React from 'react'
 
-import { Commit, CommitOneLine, ICommitContext } from '../../models/commit'
 import {
-  HistoryTabMode,
-  ICompareState,
-  ICompareBranch,
   ComparisonMode,
+  HistoryTabMode,
+  ICompareBranch,
+  ICompareState,
   IDisplayHistory,
 } from '../../lib/app-state'
-import { CommitList } from './commit-list'
-import { Repository } from '../../models/repository'
-import { Branch } from '../../models/branch'
-import { defaultErrorHandler, Dispatcher } from '../dispatcher'
-import { ThrottledScheduler } from '../lib/throttled-scheduler'
-import { BranchList } from '../branches'
-import { TextBox } from '../lib/text-box'
-import { IBranchListItem } from '../branches/group-branches'
-import { TabBar } from '../tab-bar'
-import { CompareBranchListItem } from './compare-branch-list-item'
-import { FancyTextBox } from '../lib/fancy-text-box'
-import * as octicons from '../octicons/octicons.generated'
-import { SelectionSource } from '../lib/filter-list'
+import { Emoji } from '../../lib/emoji'
 import { IMatches } from '../../lib/fuzzy-find'
-import { Ref } from '../lib/ref'
-import { MergeCallToActionWithConflicts } from './merge-call-to-action-with-conflicts'
+import { doMergeCommitsExistAfterCommit } from '../../lib/git'
+import { getSquashedCommitDescription } from '../../lib/squash/squashed-commit-description'
 import { AheadBehindStore } from '../../lib/stores/ahead-behind-store'
+import { getUniqueCoauthorsAsAuthors } from '../../lib/unique-coauthors-as-authors'
+import { Account } from '../../models/account'
+import { Branch } from '../../models/branch'
+import { Commit, CommitOneLine, ICommitContext } from '../../models/commit'
 import { DragType } from '../../models/drag-drop'
 import { PopupType } from '../../models/popup'
-import { getUniqueCoauthorsAsAuthors } from '../../lib/unique-coauthors-as-authors'
-import { getSquashedCommitDescription } from '../../lib/squash/squashed-commit-description'
-import { doMergeCommitsExistAfterCommit } from '../../lib/git'
+import { Repository } from '../../models/repository'
+import { BranchList } from '../branches'
+import { IBranchListItem } from '../branches/group-branches'
+import { defaultErrorHandler, Dispatcher } from '../dispatcher'
+import { FancyTextBox } from '../lib/fancy-text-box'
+import { SelectionSource } from '../lib/filter-list'
 import { KeyboardInsertionData } from '../lib/list'
-import { Account } from '../../models/account'
-import { Emoji } from '../../lib/emoji'
+import { Ref } from '../lib/ref'
+import { TextBox } from '../lib/text-box'
+import { ThrottledScheduler } from '../lib/throttled-scheduler'
+import * as octicons from '../octicons/octicons.generated'
+import { TabBar } from '../tab-bar'
+import { CommitList } from './commit-list'
+import { CompareBranchListItem } from './compare-branch-list-item'
+import { MergeCallToActionWithConflicts } from './merge-call-to-action-with-conflicts'
 
 interface ICompareSidebarProps {
   readonly repository: Repository

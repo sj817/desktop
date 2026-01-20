@@ -1,5 +1,5 @@
-import { Repository } from '../../models/repository'
 import { IRemote } from '../../models/remote'
+import { Repository } from '../../models/repository'
 
 /**
  * The error thrown when a repository is a fork but its upstream remote isn't

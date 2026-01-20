@@ -1,18 +1,18 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { shell } from '../../helpers/test-app-shell'
+import { describe, it } from 'node:test'
 import {
   setupEmptyRepository,
   setupFixtureRepository,
 } from '../../helpers/repositories'
+import { shell } from '../../helpers/test-app-shell'
 
-import { Repository } from '../../../src/models/repository'
-import { checkoutBranch, getBranches, createBranch } from '../../../src/lib/git'
-import { TipState, IValidBranch } from '../../../src/models/tip'
+import { exec } from 'dugite'
+import { checkoutBranch, createBranch, getBranches } from '../../../src/lib/git'
 import { GitStore } from '../../../src/lib/stores'
 import { Branch, BranchType } from '../../../src/models/branch'
+import { Repository } from '../../../src/models/repository'
+import { IValidBranch, TipState } from '../../../src/models/tip'
 import { getStatusOrThrow } from '../../helpers/status'
-import { exec } from 'dugite'
 import { TestStatsStore } from '../../helpers/test-stats-store'
 
 describe('git/checkout', () => {

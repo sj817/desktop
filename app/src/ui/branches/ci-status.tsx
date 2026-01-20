@@ -1,12 +1,12 @@
+import classNames from 'classnames'
+import { DisposableLike } from 'event-kit'
 import * as React from 'react'
+import { IAPIWorkflowJobStep } from '../../lib/api'
+import { ICombinedRefCheck, IRefCheck } from '../../lib/ci-checks/ci-checks'
+import { GitHubRepository } from '../../models/github-repository'
+import { Dispatcher } from '../dispatcher'
 import { Octicon, OcticonSymbol } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import classNames from 'classnames'
-import { GitHubRepository } from '../../models/github-repository'
-import { DisposableLike } from 'event-kit'
-import { Dispatcher } from '../dispatcher'
-import { ICombinedRefCheck, IRefCheck } from '../../lib/ci-checks/ci-checks'
-import { IAPIWorkflowJobStep } from '../../lib/api'
 
 interface ICIStatusProps {
   /** The classname for the underlying element. */

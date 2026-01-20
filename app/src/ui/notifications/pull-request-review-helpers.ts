@@ -2,8 +2,8 @@ import {
   ValidNotificationPullRequestReview,
   ValidNotificationPullRequestReviewState,
 } from '../../lib/valid-notification-pull-request-review'
-import * as octicons from '../octicons/octicons.generated'
 import { OcticonSymbol } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
 
 /** Returns the user-facing verb for a given review's state. */
 export function getVerbForPullRequestReview(

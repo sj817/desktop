@@ -1,9 +1,9 @@
 import * as Path from 'path'
 
-import { git } from './core'
 import { GitError } from 'dugite'
 import { Repository } from '../../models/repository'
 import { pathExists } from '../../ui/lib/path-exists'
+import { git } from './core'
 
 export enum MergeResult {
   /** The merge completed successfully */

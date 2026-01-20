@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { Loading } from './loading'
-import { Form } from './form'
-import { TextBox } from './text-box'
 import { Button } from './button'
 import { Errors } from './errors'
+import { Form } from './form'
+import { Loading } from './loading'
+import { TextBox } from './text-box'
 
 interface IEnterpriseServerEntryProps {
   /**

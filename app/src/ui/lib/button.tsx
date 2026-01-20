@@ -1,8 +1,8 @@
-import * as React from 'react'
 import classNames from 'classnames'
-import { Tooltip, TooltipDirection } from './tooltip'
-import { createObservableRef } from './observable-ref'
+import * as React from 'react'
 import { AriaHasPopupType } from './aria-types'
+import { createObservableRef } from './observable-ref'
+import { Tooltip, TooltipDirection } from './tooltip'
 
 export interface IButtonProps {
   /**

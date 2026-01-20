@@ -1,17 +1,17 @@
-import * as React from 'react'
 import classnames from 'classnames'
+import * as React from 'react'
 
 import {
+  ClickSource,
   List,
   SelectionSource as ListSelectionSource,
-  findNextSelectableRow,
-  ClickSource,
   SelectionDirection,
+  findNextSelectableRow,
 } from '../lib/list'
-import { TextBox } from '../lib/text-box'
 import { Row } from '../lib/row'
+import { TextBox } from '../lib/text-box'
 
-import { match, IMatch, IMatches } from '../../lib/fuzzy-find'
+import { IMatch, IMatches, match } from '../../lib/fuzzy-find'
 import { AriaLiveContainer } from '../accessibility/aria-live-container'
 
 /** An item in the filter list. */

@@ -1,5 +1,5 @@
-import { ISerializableMenuItem } from '../../lib/menu-item'
 import { Menu, MenuItem } from 'electron'
+import { ISerializableMenuItem } from '../../lib/menu-item'
 
 /**
  * Gets a value indicating whether or not two roles are considered

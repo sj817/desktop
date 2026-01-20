@@ -1,28 +1,28 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
-import * as path from 'path'
-import * as FSE from 'fs-extra'
 import { exec } from 'dugite'
+import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import * as path from 'path'
 
 import { Repository } from '../../../src/models/repository'
 
-import { getStatusOrThrow } from '../../helpers/status'
-import {
-  setupFixtureRepository,
-  setupEmptyRepository,
-  setupEmptyDirectory,
-  setupConflictedRepoWithMultipleFiles,
-} from '../../helpers/repositories'
-import {
-  AppFileStatusKind,
-  UnmergedEntrySummary,
-  GitStatusEntry,
-  isManualConflict,
-} from '../../../src/models/status'
 import { getStatus } from '../../../src/lib/git'
 import { isConflictedFile } from '../../../src/lib/status'
+import {
+  AppFileStatusKind,
+  GitStatusEntry,
+  isManualConflict,
+  UnmergedEntrySummary,
+} from '../../../src/models/status'
 import { setupLocalConfig } from '../../helpers/local-config'
 import { generateString } from '../../helpers/random-data'
+import {
+  setupConflictedRepoWithMultipleFiles,
+  setupEmptyDirectory,
+  setupEmptyRepository,
+  setupFixtureRepository,
+} from '../../helpers/repositories'
+import { getStatusOrThrow } from '../../helpers/status'
 
 describe('git/status', () => {
   describe('getStatus', () => {

@@ -1,5 +1,5 @@
-import { ITokens, IHighlightRequest } from './types'
 import { encodePathAsUrl } from '../../lib/path'
+import { IHighlightRequest, ITokens } from './types'
 
 const highlightWorkers = new Array<Worker>()
 const maxIdlingWorkers = 2

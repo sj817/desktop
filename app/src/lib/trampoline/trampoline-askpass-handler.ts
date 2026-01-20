@@ -1,19 +1,19 @@
+import { parseAddSSHHostPrompt } from '../ssh/ssh'
+import { removeMostRecentSSHCredential } from '../ssh/ssh-credential-storage'
 import {
   getSSHKeyPassphrase,
   setMostRecentSSHKeyPassphrase,
   setSSHKeyPassphrase,
 } from '../ssh/ssh-key-passphrase'
-import { AccountsStore } from '../stores/accounts-store'
-import { TrampolineCommandHandler } from './trampoline-command'
-import { trampolineUIHelper } from './trampoline-ui-helper'
-import { parseAddSSHHostPrompt } from '../ssh/ssh'
 import {
   getSSHUserPassword,
   setMostRecentSSHUserPassword,
   setSSHUserPassword,
 } from '../ssh/ssh-user-password'
-import { removeMostRecentSSHCredential } from '../ssh/ssh-credential-storage'
+import { AccountsStore } from '../stores/accounts-store'
+import { TrampolineCommandHandler } from './trampoline-command'
 import { getIsBackgroundTaskEnvironment } from './trampoline-environment'
+import { trampolineUIHelper } from './trampoline-ui-helper'
 
 async function handleSSHHostAuthenticity(
   operationGUID: string,

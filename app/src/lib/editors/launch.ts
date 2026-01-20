@@ -1,11 +1,11 @@
 import { spawn, SpawnOptions } from 'child_process'
 import { pathExists } from '../../ui/lib/path-exists'
-import { ExternalEditorError, FoundEditor } from './shared'
 import {
   expandTargetPathArgument,
   ICustomIntegration,
   parseCustomIntegrationArguments,
 } from '../custom-integration'
+import { ExternalEditorError, FoundEditor } from './shared'
 
 async function launchEditor(
   editorPath: string,

@@ -1,9 +1,9 @@
-import * as React from 'react'
 import classNames from 'classnames'
-import { RowIndexPath } from './list-row-index-path'
-import { Tooltip } from '../tooltip'
-import { createObservableRef, ObservableRef } from '../observable-ref'
+import * as React from 'react'
 import { enableAccessibleListToolTips } from '../../../lib/feature-flag'
+import { createObservableRef, ObservableRef } from '../observable-ref'
+import { Tooltip } from '../tooltip'
+import { RowIndexPath } from './list-row-index-path'
 
 interface IListRowProps {
   /** whether or not the section to which this row belongs has a header */

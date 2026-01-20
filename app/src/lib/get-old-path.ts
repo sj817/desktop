@@ -1,4 +1,4 @@
-import { FileChange, AppFileStatusKind } from '../models/status'
+import { AppFileStatusKind, FileChange } from '../models/status'
 
 /**
  * Resolve the old path (for a rename or a copied change) or default to the

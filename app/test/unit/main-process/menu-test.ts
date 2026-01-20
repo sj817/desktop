@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { ensureItemIds } from '../../../src/main-process/menu'
 
 describe('main-process menu', () => {

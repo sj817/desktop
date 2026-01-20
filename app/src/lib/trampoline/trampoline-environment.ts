@@ -1,15 +1,15 @@
-import { trampolineServer } from './trampoline-server'
-import { withTrampolineToken } from './trampoline-tokens'
+import { getDesktopAskpassTrampolineFilename } from 'desktop-trampoline'
+import { GitError as DugiteError, exec } from 'dugite'
+import memoizeOne from 'memoize-one'
 import * as Path from 'path'
+import { GitError, getDescriptionForError } from '../git/core'
 import { getSSHEnvironment } from '../ssh/ssh'
 import {
   deleteMostRecentSSHCredential,
   removeMostRecentSSHCredential,
 } from '../ssh/ssh-credential-storage'
-import { GitError as DugiteError, exec } from 'dugite'
-import memoizeOne from 'memoize-one'
-import { GitError, getDescriptionForError } from '../git/core'
-import { getDesktopAskpassTrampolineFilename } from 'desktop-trampoline'
+import { trampolineServer } from './trampoline-server'
+import { withTrampolineToken } from './trampoline-tokens'
 
 const hasRejectedCredentialsForEndpoint = new Map<string, Set<string>>()
 

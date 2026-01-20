@@ -1,4 +1,4 @@
-import { Emitter, Disposable } from 'event-kit'
+import { Disposable, Emitter } from 'event-kit'
 
 export abstract class BaseStore {
   protected readonly emitter = new Emitter()

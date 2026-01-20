@@ -1,8 +1,8 @@
-import { WorkingDirectoryStatus } from '../models/status'
-import { DiffSelectionType } from '../models/diff'
-import { Repository } from '../models/repository'
 import { stat } from 'fs/promises'
 import { join } from 'path'
+import { DiffSelectionType } from '../models/diff'
+import { Repository } from '../models/repository'
+import { WorkingDirectoryStatus } from '../models/status'
 
 const ReceiveLimit = 100 * 1024 * 1024 // 100 MiB
 

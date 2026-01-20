@@ -1,29 +1,28 @@
 /* eslint-disable no-sync */
 
 import * as cp from 'child_process'
-import * as path from 'path'
 import * as electronInstaller from 'electron-winstaller'
-import { getProductName, getCompanyName } from '../app/package-info'
-import {
-  getDistPath,
-  getOSXZipPath,
-  getWindowsIdentifierName,
-  getWindowsStandaloneName,
-  getWindowsInstallerName,
-  shouldMakeDelta,
-  getUpdatesURL,
-  getIconFileName,
-  isPublishable,
-  getBundleSizes,
-  getDistRoot,
-  getDistArchitecture,
-} from './dist-info'
-import { isGitHubActions } from './build-platforms'
 import { existsSync, rmSync, writeFileSync } from 'fs'
-import { getVersion } from '../app/package-info'
 import { rename } from 'fs/promises'
+import * as path from 'path'
 import { join } from 'path'
+import { getCompanyName, getProductName, getVersion } from '../app/package-info'
 import { assertNonNullable } from '../app/src/lib/fatal-error'
+import { isGitHubActions } from './build-platforms'
+import {
+  getBundleSizes,
+  getDistArchitecture,
+  getDistPath,
+  getDistRoot,
+  getIconFileName,
+  getOSXZipPath,
+  getUpdatesURL,
+  getWindowsIdentifierName,
+  getWindowsInstallerName,
+  getWindowsStandaloneName,
+  isPublishable,
+  shouldMakeDelta,
+} from './dist-info'
 
 const distPath = getDistPath()
 const productName = getProductName()

@@ -1,8 +1,8 @@
 import * as React from 'react'
 
-import { ICompareBranch, HistoryTabMode } from '../../lib/app-state'
-import { Repository } from '../../models/repository'
+import { HistoryTabMode, ICompareBranch } from '../../lib/app-state'
 import { Branch } from '../../models/branch'
+import { Repository } from '../../models/repository'
 import { Dispatcher } from '../dispatcher'
 import { Button } from '../lib/button'
 

@@ -1,17 +1,17 @@
+import memoizeOne from 'memoize-one'
 import * as React from 'react'
-import { PopoverDropdown } from './lib/popover-dropdown'
+import { lookupPreferredEmail } from '../lib/email'
+import { IMatches } from '../lib/fuzzy-find'
 import { Account, accountEquals } from '../models/account'
-import { SectionFilterList } from './lib/section-filter-list'
+import { IAvatarUser } from '../models/avatar'
+import { Avatar } from './lib/avatar'
 import {
   IFilterListGroup,
   IFilterListItem,
   SelectionSource,
 } from './lib/filter-list'
-import { IMatches } from '../lib/fuzzy-find'
-import { Avatar } from './lib/avatar'
-import { lookupPreferredEmail } from '../lib/email'
-import { IAvatarUser } from '../models/avatar'
-import memoizeOne from 'memoize-one'
+import { PopoverDropdown } from './lib/popover-dropdown'
+import { SectionFilterList } from './lib/section-filter-list'
 
 interface IAccountPickerProps {
   readonly accounts: ReadonlyArray<Account>

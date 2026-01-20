@@ -1,6 +1,6 @@
-import { git } from './core'
-import { Repository } from '../../models/repository'
 import { CommitIdentity } from '../../models/commit-identity'
+import { Repository } from '../../models/repository'
+import { git } from './core'
 
 /**
  * Gets the author identity, ie the name and email which would

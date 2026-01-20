@@ -1,26 +1,26 @@
-import * as React from 'react'
 import classNames from 'classnames'
+import * as React from 'react'
 
 import { Repository } from '../../models/repository'
 
-import { Diff } from './index'
-import {
-  WorkingDirectoryFileChange,
-  CommittedFileChange,
-} from '../../models/status'
+import noop from 'lodash/noop'
 import {
   DiffSelection,
   DiffType,
   IDiff,
+  ILargeTextDiff,
   ImageDiffType,
   ITextDiff,
-  ILargeTextDiff,
 } from '../../models/diff'
+import {
+  CommittedFileChange,
+  WorkingDirectoryFileChange,
+} from '../../models/status'
 import { Loading } from '../lib/loading'
+import { textDiffEquals } from './diff-helpers'
+import { Diff } from './index'
 import { getFileContents, IFileContents } from './syntax-highlighting'
 import { getTextDiffWithBottomDummyHunk } from './text-diff-expansion'
-import { textDiffEquals } from './diff-helpers'
-import noop from 'lodash/noop'
 
 /**
  * The time (in milliseconds) we allow when loading a diff before

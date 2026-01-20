@@ -1,17 +1,17 @@
+import classNames from 'classnames'
 import * as React from 'react'
+import { IAPIWorkflowJobStep } from '../../lib/api'
 import {
   getCheckRunConclusionAdjective,
   IRefCheck,
 } from '../../lib/ci-checks/ci-checks'
-import { Octicon } from '../octicons'
 import { getClassNameForCheck, getSymbolForCheck } from '../branches/ci-status'
-import classNames from 'classnames'
-import * as octicons from '../octicons/octicons.generated'
-import { TooltippedContent } from '../lib/tooltipped-content'
-import { CICheckRunActionsJobStepList } from './ci-check-run-actions-job-step-list'
-import { IAPIWorkflowJobStep } from '../../lib/api'
-import { TooltipDirection } from '../lib/tooltip'
 import { Button } from '../lib/button'
+import { TooltipDirection } from '../lib/tooltip'
+import { TooltippedContent } from '../lib/tooltipped-content'
+import { Octicon } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
+import { CICheckRunActionsJobStepList } from './ci-check-run-actions-job-step-list'
 import { CICheckRunNoStepItem } from './ci-check-run-no-steps'
 import { CICheckRunStepListHeader } from './ci-check-run-step-list-header'
 

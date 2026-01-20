@@ -1,9 +1,9 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { ITrailer } from '../../src/lib/git'
+import { getSquashedCommitDescription } from '../../src/lib/squash/squashed-commit-description'
 import { Commit } from '../../src/models/commit'
 import { CommitIdentity } from '../../src/models/commit-identity'
-import { getSquashedCommitDescription } from '../../src/lib/squash/squashed-commit-description'
 
 describe('getSquashedCommitDescription', () => {
   const mockCoAuthorTrailers = [

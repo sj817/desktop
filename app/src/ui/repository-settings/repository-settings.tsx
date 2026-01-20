@@ -1,36 +1,36 @@
 import * as React from 'react'
-import { TabBar, TabBarType } from '../tab-bar'
-import { Remote } from './remote'
-import { GitIgnore } from './git-ignore'
 import { assertNever } from '../../lib/fatal-error'
-import { IRemote } from '../../models/remote'
-import { Dispatcher } from '../dispatcher'
-import { PopupType } from '../../models/popup'
-import {
-  Repository,
-  getForkContributionTarget,
-  isRepositoryWithForkedGitHubRepository,
-} from '../../models/repository'
-import { Dialog, DialogError, DialogFooter } from '../dialog'
-import { NoRemote } from './no-remote'
 import { readGitIgnoreAtRoot } from '../../lib/git'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { ForkSettings } from './fork-settings'
-import { ForkContributionTarget } from '../../models/workflow-preferences'
-import { GitConfigLocation, GitConfig } from './git-config'
 import {
   getConfigValue,
   getGlobalConfigValue,
   removeConfigValue,
   setConfigValue,
 } from '../../lib/git/config'
+import { Account } from '../../models/account'
+import { PopupType } from '../../models/popup'
+import { IRemote } from '../../models/remote'
+import {
+  getForkContributionTarget,
+  isRepositoryWithForkedGitHubRepository,
+  Repository,
+} from '../../models/repository'
+import { ForkContributionTarget } from '../../models/workflow-preferences'
+import { Dialog, DialogError, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
 import {
   gitAuthorNameIsValid,
   InvalidGitAuthorNameMessage,
 } from '../lib/identifier-rules'
-import { Account } from '../../models/account'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
+import { TabBar, TabBarType } from '../tab-bar'
+import { ForkSettings } from './fork-settings'
+import { GitConfig, GitConfigLocation } from './git-config'
+import { GitIgnore } from './git-ignore'
+import { NoRemote } from './no-remote'
+import { Remote } from './remote'
 
 interface IRepositorySettingsProps {
   readonly initialSelectedTab?: RepositorySettingsTab

@@ -1,28 +1,28 @@
 import { Disposable, DisposableLike } from 'event-kit'
 
 import {
+  IAPICheckSuite,
+  IAPICreatePushProtectionBypassResponse,
+  IAPIFullRepository,
   IAPIOrganization,
   IAPIPullRequest,
-  IAPIFullRepository,
-  IAPICheckSuite,
   IAPIRepoRuleset,
   getDotComAPIEndpoint,
-  IAPICreatePushProtectionBypassResponse,
 } from '../../lib/api'
 import { shell } from '../../lib/app-shell'
 import {
+  CherryPickConflictState,
+  CommitOptions,
   CompareAction,
   Foldout,
   FoldoutType,
   ICompareFormUpdate,
-  RepositorySectionTab,
-  RebaseConflictState,
-  isRebaseConflictState,
-  isCherryPickConflictState,
-  CherryPickConflictState,
-  MultiCommitOperationConflictState,
   IMultiCommitOperationState,
-  CommitOptions,
+  MultiCommitOperationConflictState,
+  RebaseConflictState,
+  RepositorySectionTab,
+  isCherryPickConflictState,
+  isRebaseConflictState,
 } from '../../lib/app-state'
 import { assertNever, fatalError } from '../../lib/fatal-error'
 import {
@@ -30,10 +30,10 @@ import {
   setGenericUsername,
 } from '../../lib/generic-git-auth'
 import {
-  RebaseResult,
   PushOptions,
-  getCommitsBetweenCommits,
+  RebaseResult,
   getBranches,
+  getCommitsBetweenCommits,
   getRebaseSnapshot,
   getRepositoryType,
 } from '../../lib/git'
@@ -56,13 +56,14 @@ import { getTipSha } from '../../lib/tip'
 import { Account } from '../../models/account'
 import { AppMenu, ExecutableMenuItem } from '../../models/app-menu'
 import { Author, UnknownAuthor } from '../../models/author'
+import { Banner, BannerType } from '../../models/banner'
 import { Branch, IAheadBehind } from '../../models/branch'
 import { BranchesTab } from '../../models/branches-tab'
 import { CloneRepositoryTab } from '../../models/clone-repository-tab'
 import { CloningRepository } from '../../models/cloning-repository'
-import { Commit, ICommitContext, CommitOneLine } from '../../models/commit'
+import { Commit, CommitOneLine, ICommitContext } from '../../models/commit'
 import { ICommitMessage } from '../../models/commit-message'
-import { DiffSelection, ImageDiffType, ITextDiff } from '../../models/diff'
+import { DiffSelection, ITextDiff, ImageDiffType } from '../../models/diff'
 import { FetchType } from '../../models/fetch'
 import { GitHubRepository } from '../../models/github-repository'
 import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
@@ -74,10 +75,10 @@ import {
 import {
   Repository,
   RepositoryWithGitHubRepository,
-  isRepositoryWithGitHubRepository,
   getGitHubHtmlUrl,
-  isRepositoryWithForkedGitHubRepository,
   getNonForkGitHubRepository,
+  isRepositoryWithForkedGitHubRepository,
+  isRepositoryWithGitHubRepository,
 } from '../../models/repository'
 import { RetryAction, RetryActionType } from '../../models/retry-actions'
 import {
@@ -85,31 +86,27 @@ import {
   WorkingDirectoryFileChange,
   WorkingDirectoryStatus,
 } from '../../models/status'
-import { TipState, IValidBranch } from '../../models/tip'
-import { Banner, BannerType } from '../../models/banner'
+import { IValidBranch, TipState } from '../../models/tip'
 
-import { ApplicationTheme } from '../lib/application-theme'
-import { installCLI } from '../lib/install-cli'
-import {
-  executeMenuItem,
-  moveToApplicationsFolder,
-  isWindowFocused,
-  showOpenDialog,
-} from '../main-process-proxy'
+import { isAbsolute } from 'path'
+import { ICombinedRefCheck, IRefCheck } from '../../lib/ci-checks/ci-checks'
+import { CLIAction } from '../../lib/cli-action'
+import { ICustomIntegration } from '../../lib/custom-integration'
+import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
+import { CherryPickResult } from '../../lib/git/cherry-pick'
+import { sendNonFatalException } from '../../lib/helpers/non-fatal-exception'
+import { getMultiCommitOperationChooseBranchStep } from '../../lib/multi-commit-operation'
+import { resolveWithin } from '../../lib/path'
+import { sleep } from '../../lib/promise'
 import {
   CommitStatusStore,
   StatusCallBack,
 } from '../../lib/stores/commit-status-store'
-import { MergeTreeResult } from '../../models/merge'
-import { UncommittedChangesStrategy } from '../../models/uncommitted-changes-strategy'
-import { IStashEntry } from '../../models/stash-entry'
-import { WorkflowPreferences } from '../../models/workflow-preferences'
-import { resolveWithin } from '../../lib/path'
-import { CherryPickResult } from '../../lib/git/cherry-pick'
-import { sleep } from '../../lib/promise'
+import { SignInResult } from '../../lib/stores/sign-in-store'
+import { ValidNotificationPullRequestReviewState } from '../../lib/valid-notification-pull-request-review'
 import { DragElement, DragType } from '../../models/drag-drop'
 import { ILastThankYou } from '../../models/last-thank-you'
-import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
+import { MergeTreeResult } from '../../models/merge'
 import {
   CreateBranchStep,
   MultiCommitOperationDetail,
@@ -117,15 +114,18 @@ import {
   MultiCommitOperationStep,
   MultiCommitOperationStepKind,
 } from '../../models/multi-commit-operation'
-import { getMultiCommitOperationChooseBranchStep } from '../../lib/multi-commit-operation'
-import { ICombinedRefCheck, IRefCheck } from '../../lib/ci-checks/ci-checks'
-import { ValidNotificationPullRequestReviewState } from '../../lib/valid-notification-pull-request-review'
+import { IStashEntry } from '../../models/stash-entry'
+import { UncommittedChangesStrategy } from '../../models/uncommitted-changes-strategy'
+import { WorkflowPreferences } from '../../models/workflow-preferences'
 import { UnreachableCommitsTab } from '../history/unreachable-commits-dialog'
-import { sendNonFatalException } from '../../lib/helpers/non-fatal-exception'
-import { SignInResult } from '../../lib/stores/sign-in-store'
-import { ICustomIntegration } from '../../lib/custom-integration'
-import { isAbsolute } from 'path'
-import { CLIAction } from '../../lib/cli-action'
+import { ApplicationTheme } from '../lib/application-theme'
+import { installCLI } from '../lib/install-cli'
+import {
+  executeMenuItem,
+  isWindowFocused,
+  moveToApplicationsFolder,
+  showOpenDialog,
+} from '../main-process-proxy'
 import { BypassReasonType } from '../secret-scanning/bypass-push-protection-dialog'
 
 /**

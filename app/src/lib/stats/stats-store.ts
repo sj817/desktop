@@ -1,17 +1,34 @@
-import { StatsDatabase, ILaunchStats, IDailyMeasures } from './stats-database'
-import { getVersion } from '../../ui/lib/app-proxy'
-import { hasShownWelcomeFlow } from '../welcome'
+import { Disposable } from 'event-kit'
+import { merge } from '../../lib/merge'
 import {
   Account,
   isDotComAccount,
   isEnterpriseAccount,
 } from '../../models/account'
-import { getOS } from '../get-os'
+import { MultiCommitOperationKind } from '../../models/multi-commit-operation'
 import { Repository } from '../../models/repository'
-import { merge } from '../../lib/merge'
+import { getVersion } from '../../ui/lib/app-proxy'
 import { getPersistedThemeName } from '../../ui/lib/application-theme'
+import { getShowSideBySideDiff } from '../../ui/lib/diff-mode'
 import { IUiActivityMonitor } from '../../ui/lib/ui-activity-monitor'
-import { Disposable } from 'event-kit'
+import {
+  getAppArchitecture,
+  isInApplicationFolder,
+} from '../../ui/main-process-proxy'
+import { assertNever } from '../fatal-error'
+import { Architecture } from '../get-architecture'
+import { getOS } from '../get-os'
+import { getRendererGUID } from '../get-renderer-guid'
+import { PushOptions } from '../git'
+import { getUserAgent } from '../http'
+import {
+  getBoolean,
+  getNumber,
+  getNumberArray,
+  setBoolean,
+  setNumber,
+  setNumberArray,
+} from '../local-storage'
 import {
   showChangesFilterDefault,
   showChangesFilterKey,
@@ -22,26 +39,11 @@ import {
   useCustomEditorKey,
   useCustomShellKey,
 } from '../stores'
-import { assertNever } from '../fatal-error'
-import {
-  getNumber,
-  setNumber,
-  getBoolean,
-  setBoolean,
-  getNumberArray,
-  setNumberArray,
-} from '../local-storage'
-import { PushOptions } from '../git'
-import { getShowSideBySideDiff } from '../../ui/lib/diff-mode'
-import { getAppArchitecture } from '../../ui/main-process-proxy'
-import { Architecture } from '../get-architecture'
-import { MultiCommitOperationKind } from '../../models/multi-commit-operation'
 import { getNotificationsEnabled } from '../stores/notifications-store'
-import { isInApplicationFolder } from '../../ui/main-process-proxy'
-import { getRendererGUID } from '../get-renderer-guid'
-import { ValidNotificationPullRequestReviewState } from '../valid-notification-pull-request-review'
 import { useExternalCredentialHelperKey } from '../trampoline/use-external-credential-helper'
-import { getUserAgent } from '../http'
+import { ValidNotificationPullRequestReviewState } from '../valid-notification-pull-request-review'
+import { hasShownWelcomeFlow } from '../welcome'
+import { IDailyMeasures, ILaunchStats, StatsDatabase } from './stats-database'
 
 type PullRequestReviewStatFieldInfix =
   | 'Approved'

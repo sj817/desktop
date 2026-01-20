@@ -4,18 +4,18 @@
  */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+import classNames from 'classnames'
+import { Options as FocusTrapOptions } from 'focus-trap'
+import FocusTrap from 'focus-trap-react'
 import * as React from 'react'
+import { assertNever } from '../../lib/fatal-error'
+import { enableResizingToolbarButtons } from '../../lib/feature-flag'
+import { AriaHasPopupType } from '../lib/aria-types'
+import { rectEquals } from '../lib/rect'
+import { TooltipTarget } from '../lib/tooltip'
 import { Octicon, OcticonSymbol } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { assertNever } from '../../lib/fatal-error'
 import { ToolbarButton, ToolbarButtonStyle } from './button'
-import { rectEquals } from '../lib/rect'
-import classNames from 'classnames'
-import FocusTrap from 'focus-trap-react'
-import { Options as FocusTrapOptions } from 'focus-trap'
-import { TooltipTarget } from '../lib/tooltip'
-import { AriaHasPopupType } from '../lib/aria-types'
-import { enableResizingToolbarButtons } from '../../lib/feature-flag'
 
 export type DropdownState = 'open' | 'closed'
 

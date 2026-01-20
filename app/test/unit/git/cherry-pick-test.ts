@@ -1,7 +1,7 @@
-import { describe, it, TestContext } from 'node:test'
-import assert from 'node:assert'
 import { exec } from 'dugite'
 import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it, TestContext } from 'node:test'
 import * as Path from 'path'
 import {
   getCommit,

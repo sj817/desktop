@@ -1,11 +1,11 @@
-import { envForAuthentication } from './authentication'
-import { resolveGitProxy } from '../resolve-git-proxy'
-import { getHTMLURL } from '../api'
+import { IRemote } from '../../models/remote'
 import {
   Repository,
   isRepositoryWithGitHubRepository,
 } from '../../models/repository'
-import { IRemote } from '../../models/remote'
+import { getHTMLURL } from '../api'
+import { resolveGitProxy } from '../resolve-git-proxy'
+import { envForAuthentication } from './authentication'
 
 /**
  * For many remote operations it's well known what the primary remote

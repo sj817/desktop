@@ -1,6 +1,7 @@
 import React from 'react'
 import { getAheadBehind, revSymmetricDifference } from '../../../lib/git'
 import { determineMergeability } from '../../../lib/git/merge-tree'
+import { truncateWithEllipsis } from '../../../lib/truncate-with-ellipsis'
 import { Branch } from '../../../models/branch'
 import { ComputedAction } from '../../../models/computed-action'
 import { MergeTreeResult } from '../../../models/merge'
@@ -12,7 +13,6 @@ import {
   IBaseChooseBranchDialogProps,
   canStartOperation,
 } from './base-choose-branch-dialog'
-import { truncateWithEllipsis } from '../../../lib/truncate-with-ellipsis'
 
 interface IMergeChooseBranchDialogState {
   readonly commitCount: number

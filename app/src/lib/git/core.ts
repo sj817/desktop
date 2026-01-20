@@ -1,20 +1,20 @@
 import {
-  exec,
   GitError as DugiteError,
-  parseError,
-  IGitResult as DugiteResult,
   IGitExecutionOptions as DugiteExecutionOptions,
-  parseBadConfigValueErrorInfo,
+  IGitResult as DugiteResult,
+  exec,
   ExecError,
+  parseBadConfigValueErrorInfo,
+  parseError,
 } from 'dugite'
 
-import { assertNever } from '../fatal-error'
-import * as GitPerf from '../../ui/lib/git-perf'
-import * as Path from 'path'
-import { isErrnoException } from '../errno-exception'
-import { withTrampolineEnv } from '../trampoline/trampoline-environment'
 import { kStringMaxLength } from 'buffer'
+import * as Path from 'path'
+import * as GitPerf from '../../ui/lib/git-perf'
+import { isErrnoException } from '../errno-exception'
+import { assertNever } from '../fatal-error'
 import { withHooksEnv } from '../hooks/with-hooks-env'
+import { withTrampolineEnv } from '../trampoline/trampoline-environment'
 
 export const coerceToString = (
   value: string | Buffer,

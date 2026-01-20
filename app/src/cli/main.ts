@@ -1,6 +1,6 @@
-import { join, resolve } from 'path'
-import parse from 'minimist'
 import { execFile, spawn } from 'child_process'
+import parse from 'minimist'
+import { join, resolve } from 'path'
 
 const run = (...args: Array<string>) => {
   function cb(e: unknown | null, stderr?: string) {

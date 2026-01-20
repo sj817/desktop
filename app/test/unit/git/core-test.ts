@@ -1,14 +1,14 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
 import { GitError } from 'dugite'
+import { copy } from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import { join, resolve } from 'path'
 import {
   git,
-  parseConfigLockFilePathFromError,
   IGitResult,
+  parseConfigLockFilePathFromError,
 } from '../../../src/lib/git'
 import { setupFixtureRepository } from '../../helpers/repositories'
-import { join, resolve } from 'path'
-import { copy } from 'fs-extra'
 
 describe('git/core', () => {
   describe('error handling', () => {

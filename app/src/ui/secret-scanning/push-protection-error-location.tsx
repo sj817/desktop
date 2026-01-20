@@ -1,13 +1,13 @@
 import * as React from 'react'
+import { CopyButton } from '../copy-button'
+import { Button } from '../lib/button'
+import { PathText } from '../lib/path-text'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { CopyButton } from '../copy-button'
 import {
   ISecretLocation,
   ISecretScanResult,
 } from './push-protection-error-dialog'
-import { PathText } from '../lib/path-text'
-import { Button } from '../lib/button'
 
 interface IPushProtectionErrorLocationProps {
   readonly secret: ISecretScanResult

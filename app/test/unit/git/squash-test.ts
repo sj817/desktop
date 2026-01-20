@@ -1,7 +1,9 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
+import { exec } from 'dugite'
 import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import * as Path from 'path'
+import { getTempFilePath } from '../../../src/lib/file-system'
 import {
   continueRebase,
   getChangedFiles,
@@ -10,14 +12,12 @@ import {
   getRebaseInternalState,
   RebaseResult,
 } from '../../../src/lib/git'
+import { squash } from '../../../src/lib/git/squash'
 import { Commit } from '../../../src/models/commit'
 import { Repository } from '../../../src/models/repository'
 import { setupEmptyRepositoryDefaultMain } from '../../helpers/repositories'
 import { makeCommit } from '../../helpers/repository-scaffolding'
-import { squash } from '../../../src/lib/git/squash'
-import { exec } from 'dugite'
 import { getStatusOrThrow } from '../../helpers/status'
-import { getTempFilePath } from '../../../src/lib/file-system'
 
 describe('git/cherry-pick', () => {
   it('squashes one commit onto the next (non-conflicting)', async t => {

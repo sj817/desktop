@@ -1,10 +1,10 @@
+import entries from 'lodash/entries'
+import groupBy from 'lodash/groupBy'
 import { IAPIRepository } from '../../lib/api'
+import { caseInsensitiveEquals, compare } from '../../lib/compare'
 import { IFilterListGroup, IFilterListItem } from '../lib/filter-list'
 import { OcticonSymbol } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import entries from 'lodash/entries'
-import groupBy from 'lodash/groupBy'
-import { caseInsensitiveEquals, compare } from '../../lib/compare'
 
 /** The identifier for the "Your Repositories" grouping. */
 export const YourRepositoriesIdentifier = 'your-repositories'

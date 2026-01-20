@@ -1,33 +1,33 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
+import { structuredPatch } from 'diff'
 import { exec } from 'dugite'
-import {
-  setupTwoCommitRepo,
-  setupFixtureRepository,
-} from '../../helpers/repositories'
-import { Repository } from '../../../src/models/repository'
+import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import * as Path from 'path'
 import {
   checkPatch,
-  getWorkingDirectoryDiff,
   discardChangesFromSelection,
+  getWorkingDirectoryDiff,
 } from '../../../src/lib/git'
-import {
-  cloneLocalRepository,
-  makeCommit,
-} from '../../helpers/repository-scaffolding'
-import {
-  WorkingDirectoryFileChange,
-  AppFileStatusKind,
-} from '../../../src/models/status'
 import {
   DiffSelection,
   DiffSelectionType,
   ITextDiff,
 } from '../../../src/models/diff'
+import { Repository } from '../../../src/models/repository'
+import {
+  AppFileStatusKind,
+  WorkingDirectoryFileChange,
+} from '../../../src/models/status'
 import { findInteractiveDiffRange } from '../../../src/ui/diff/diff-explorer'
-import * as FSE from 'fs-extra'
-import * as Path from 'path'
-import { structuredPatch } from 'diff'
+import {
+  setupFixtureRepository,
+  setupTwoCommitRepo,
+} from '../../helpers/repositories'
+import {
+  cloneLocalRepository,
+  makeCommit,
+} from '../../helpers/repository-scaffolding'
 
 describe('git/apply', () => {
   describe('checkPatch()', () => {

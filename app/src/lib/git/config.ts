@@ -1,6 +1,6 @@
-import { git } from './core'
-import { Repository } from '../../models/repository'
 import { normalize } from 'path'
+import { Repository } from '../../models/repository'
+import { git } from './core'
 
 /**
  * Look up a config value by name in the repository.

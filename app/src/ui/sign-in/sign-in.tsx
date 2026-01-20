@@ -1,20 +1,20 @@
 import * as React from 'react'
-import { Dispatcher } from '../dispatcher'
+import { assertNever } from '../../lib/fatal-error'
 import {
+  IAuthenticationState,
+  IEndpointEntryState,
+  IExistingAccountWarning,
   SignInState,
   SignInStep,
-  IEndpointEntryState,
-  IAuthenticationState,
-  IExistingAccountWarning,
 } from '../../lib/stores'
-import { assertNever } from '../../lib/fatal-error'
+import { Dialog, DialogContent, DialogError, DialogFooter } from '../dialog'
+import { Dispatcher } from '../dispatcher'
 import { Row } from '../lib/row'
 import { TextBox } from '../lib/text-box'
-import { Dialog, DialogError, DialogContent, DialogFooter } from '../dialog'
 
+import { getHTMLURL } from '../../lib/api'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Ref } from '../lib/ref'
-import { getHTMLURL } from '../../lib/api'
 
 interface ISignInProps {
   readonly dispatcher: Dispatcher

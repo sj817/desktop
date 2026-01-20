@@ -1,15 +1,15 @@
-import { describe, it } from 'node:test'
+import * as FSE from 'fs-extra'
 import assert from 'node:assert'
-import { Repository } from '../../../src/models/repository'
-import { setupFixtureRepository } from '../../helpers/repositories'
+import { describe, it } from 'node:test'
+import * as Path from 'path'
+import { fastForwardBranches } from '../../../src/lib/git'
 import {
   getBranches,
   getBranchesDifferingFromUpstream,
 } from '../../../src/lib/git/for-each-ref'
 import { Branch } from '../../../src/models/branch'
-import { fastForwardBranches } from '../../../src/lib/git'
-import * as Path from 'path'
-import * as FSE from 'fs-extra'
+import { Repository } from '../../../src/models/repository'
+import { setupFixtureRepository } from '../../helpers/repositories'
 
 function branchWithName(branches: ReadonlyArray<Branch>, name: string) {
   return branches.filter(branch => branch.name === name)[0]

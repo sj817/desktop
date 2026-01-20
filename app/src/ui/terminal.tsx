@@ -1,11 +1,11 @@
 import {
-  ITerminalOptions,
   ITerminalInitOnlyOptions,
+  ITerminalOptions,
   Terminal as XTermTerminal,
 } from '@xterm/xterm'
 import React from 'react'
-import { getMonospaceFontFamily } from './get-monospace-font-family'
 import { TerminalOutput } from '../lib/git'
+import { getMonospaceFontFamily } from './get-monospace-font-family'
 
 export const defaultTerminalOptions: Readonly<ITerminalOptions> = {
   convertEol: true,

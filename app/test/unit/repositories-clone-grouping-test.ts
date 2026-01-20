@@ -1,10 +1,10 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import { IAPIFullRepository, IAPIIdentity } from '../../src/lib/api'
 import {
   groupRepositories,
   YourRepositoriesIdentifier,
 } from '../../src/ui/clone-repository/group-repositories'
-import { IAPIIdentity, IAPIFullRepository } from '../../src/lib/api'
 
 const users = {
   shiftkey: {

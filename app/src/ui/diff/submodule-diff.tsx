@@ -1,13 +1,13 @@
 import React from 'react'
 import { parseRepositoryIdentifier } from '../../lib/remote-parsing'
+import { shortenSHA } from '../../models/commit'
 import { ISubmoduleDiff } from '../../models/diff'
+import { CopyButton } from '../copy-button'
 import { LinkButton } from '../lib/link-button'
+import { Ref } from '../lib/ref'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
 import { SuggestedAction } from '../suggested-actions'
-import { Ref } from '../lib/ref'
-import { CopyButton } from '../copy-button'
-import { shortenSHA } from '../../models/commit'
 
 type SubmoduleItemIcon =
   | {

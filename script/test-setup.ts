@@ -2,8 +2,8 @@
 
 import * as cp from 'child_process'
 import { getProductName } from '../app/package-info'
-import { getDistPath, isPublishable } from './dist-info'
 import { isGitHubActions } from './build-platforms'
+import { getDistPath, isPublishable } from './dist-info'
 
 if (isGitHubActions() && process.platform === 'darwin' && isPublishable()) {
   const archive = `${getDistPath()}/${getProductName()}.app`

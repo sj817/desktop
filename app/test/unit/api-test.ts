@@ -1,7 +1,7 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { getNextPagePathWithIncreasingPageSize } from '../../src/lib/api'
+import { describe, it } from 'node:test'
 import * as URL from 'url'
+import { getNextPagePathWithIncreasingPageSize } from '../../src/lib/api'
 
 interface IPageInfo {
   per_page: number

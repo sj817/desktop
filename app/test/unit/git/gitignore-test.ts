@@ -1,19 +1,19 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
-import * as FSE from 'fs-extra'
-import * as Path from 'path'
 import { exec } from 'dugite'
+import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import * as Path from 'path'
 
-import { setupEmptyRepository } from '../../helpers/repositories'
-import { getStatusOrThrow } from '../../helpers/status'
 import {
-  saveGitIgnore,
-  readGitIgnoreAtRoot,
+  appendIgnoreFile,
   appendIgnoreRule,
   escapeGitSpecialCharacters,
-  appendIgnoreFile,
+  readGitIgnoreAtRoot,
+  saveGitIgnore,
 } from '../../../src/lib/git'
 import { setupLocalConfig } from '../../helpers/local-config'
+import { setupEmptyRepository } from '../../helpers/repositories'
+import { getStatusOrThrow } from '../../helpers/status'
 
 describe('gitignore', () => {
   describe('readGitIgnoreAtRoot', () => {

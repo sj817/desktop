@@ -1,11 +1,11 @@
-import { git, gitRebaseArguments, IGitStringExecutionOptions } from './core'
-import { Repository } from '../../models/repository'
 import { IPullProgress } from '../../models/progress'
-import { PullProgressParser, executionOptionsWithProgress } from '../progress'
-import { enableRecurseSubmodulesFlag } from '../feature-flag'
 import { IRemote } from '../../models/remote'
-import { envForRemoteOperation } from './environment'
+import { Repository } from '../../models/repository'
+import { enableRecurseSubmodulesFlag } from '../feature-flag'
+import { executionOptionsWithProgress, PullProgressParser } from '../progress'
 import { getConfigValue } from './config'
+import { git, gitRebaseArguments, IGitStringExecutionOptions } from './core'
+import { envForRemoteOperation } from './environment'
 
 async function getPullArgs(
   repository: Repository,

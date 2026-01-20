@@ -1,12 +1,12 @@
-import { git } from './core'
 import { GitError } from 'dugite'
-import { Repository } from '../../models/repository'
 import {
   Branch,
   BranchType,
   IBranchTip,
   ITrackingBranch,
 } from '../../models/branch'
+import { Repository } from '../../models/repository'
+import { git } from './core'
 import { createForEachRefParser } from './git-delimiter-parser'
 
 /** Get all the branches. */

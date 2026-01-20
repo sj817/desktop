@@ -1,8 +1,10 @@
-import { focusWindow } from '../../ui/main-process-proxy'
 import { supportsNotifications } from 'desktop-notifications'
-import { showNotification as invokeShowNotification } from '../../ui/main-process-proxy'
-import { notificationCallbacks } from './notification-handler'
+import {
+  focusWindow,
+  showNotification as invokeShowNotification,
+} from '../../ui/main-process-proxy'
 import { DesktopAliveEvent } from '../stores/alive-store'
+import { notificationCallbacks } from './notification-handler'
 
 interface IShowNotificationOptions {
   title: string

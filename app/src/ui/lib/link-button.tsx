@@ -1,8 +1,8 @@
+import classNames from 'classnames'
 import * as React from 'react'
 import { shell } from '../../lib/app-shell'
-import classNames from 'classnames'
-import { Tooltip } from './tooltip'
 import { createObservableRef } from './observable-ref'
+import { Tooltip } from './tooltip'
 
 interface ILinkButtonProps {
   /** A URI to open on click. */

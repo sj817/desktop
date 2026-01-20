@@ -1,6 +1,6 @@
-import { git } from './core'
-import { directoryExists } from '../directory-exists'
 import { resolve } from 'path'
+import { directoryExists } from '../directory-exists'
+import { git } from './core'
 
 export type RepositoryType =
   | { kind: 'bare' }

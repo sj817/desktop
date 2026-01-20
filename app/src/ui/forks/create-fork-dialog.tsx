@@ -1,21 +1,21 @@
 import * as React from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DefaultDialogFooter,
-} from '../dialog'
-import { Dispatcher } from '../dispatcher'
+import { API } from '../../lib/api'
+import { sendNonFatalException } from '../../lib/helpers/non-fatal-exception'
+import { Account } from '../../models/account'
+import { PopupType } from '../../models/popup'
 import {
   RepositoryWithGitHubRepository,
   isRepositoryWithForkedGitHubRepository,
 } from '../../models/repository'
+import {
+  DefaultDialogFooter,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+} from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { sendNonFatalException } from '../../lib/helpers/non-fatal-exception'
-import { Account } from '../../models/account'
-import { API } from '../../lib/api'
+import { Dispatcher } from '../dispatcher'
 import { LinkButton } from '../lib/link-button'
-import { PopupType } from '../../models/popup'
 
 interface ICreateForkDialogProps {
   readonly dispatcher: Dispatcher

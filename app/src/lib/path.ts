@@ -1,5 +1,5 @@
-import * as Path from 'path'
 import { realpath } from 'fs/promises'
+import * as Path from 'path'
 import { pathToFileURL } from 'url'
 
 /**

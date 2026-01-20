@@ -1,7 +1,7 @@
 import { TestContext } from 'node:test'
 import { Repository } from '../../src/models/repository'
 import { setupEmptyRepository } from './repositories'
-import { makeCommit, switchTo, createBranch } from './repository-scaffolding'
+import { createBranch, makeCommit, switchTo } from './repository-scaffolding'
 
 /**
  * Creates a test repository to be used as the branch for testing rebase

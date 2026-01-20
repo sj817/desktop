@@ -1,22 +1,22 @@
+import { Branch } from '../../../models/branch'
 import {
   Repository,
   isRepositoryWithGitHubRepository,
 } from '../../../models/repository'
-import { RepositoriesStore } from '../repositories-store'
-import { Branch } from '../../../models/branch'
-import { GitStoreCache } from '../git-store-cache'
-import {
-  getMergedBranches,
-  getBranchCheckouts,
-  getSymbolicRef,
-  formatAsLocalRef,
-  getBranches,
-  deleteLocalBranch,
-} from '../../git'
 import { fatalError } from '../../fatal-error'
-import { RepositoryStateCache } from '../repository-state-cache'
-import { offsetFromNow } from '../../offset-from'
 import { formatRelative } from '../../format-relative'
+import {
+  deleteLocalBranch,
+  formatAsLocalRef,
+  getBranchCheckouts,
+  getBranches,
+  getMergedBranches,
+  getSymbolicRef,
+} from '../../git'
+import { offsetFromNow } from '../../offset-from'
+import { GitStoreCache } from '../git-store-cache'
+import { RepositoriesStore } from '../repositories-store'
+import { RepositoryStateCache } from '../repository-state-cache'
 
 /** Check if a repo needs to be pruned at least every 4 hours */
 const BackgroundPruneMinimumInterval = 1000 * 60 * 60 * 4

@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { createUniqueId, releaseUniqueId } from './id-pool'
-import uuid from 'uuid'
 import classNames from 'classnames'
+import * as React from 'react'
+import uuid from 'uuid'
+import { createUniqueId, releaseUniqueId } from './id-pool'
 
 /** The possible values for a Checkbox component. */
 export enum CheckboxValue {

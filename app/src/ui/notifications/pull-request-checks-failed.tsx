@@ -1,29 +1,29 @@
 import * as React from 'react'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { Row } from '../lib/row'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { PullRequest, getPullRequestCommitRef } from '../../models/pull-request'
-import { Dispatcher } from '../dispatcher'
-import { CICheckRunList } from '../check-runs/ci-check-run-list'
+import { API, IAPIWorkflowJobStep } from '../../lib/api'
 import {
   IRefCheck,
-  getLatestPRWorkflowRunsLogsForCheckRun,
   getCheckRunActionsWorkflowRuns,
-  isFailure,
   getCheckRunStepURL,
+  getLatestPRWorkflowRunsLogsForCheckRun,
+  isFailure,
 } from '../../lib/ci-checks/ci-checks'
-import { Account } from '../../models/account'
-import { API, IAPIWorkflowJobStep } from '../../lib/api'
-import { Octicon } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
-import { RepositoryWithGitHubRepository } from '../../models/repository'
-import { CICheckRunActionsJobStepList } from '../check-runs/ci-check-run-actions-job-step-list'
-import { encodePathAsUrl } from '../../lib/path'
-import { PopupType } from '../../models/popup'
-import { CICheckReRunButton } from '../check-runs/ci-check-re-run-button'
 import { supportsRerunningIndividualOrFailedChecks } from '../../lib/endpoint-capabilities'
+import { encodePathAsUrl } from '../../lib/path'
+import { Account } from '../../models/account'
+import { PopupType } from '../../models/popup'
+import { PullRequest, getPullRequestCommitRef } from '../../models/pull-request'
+import { RepositoryWithGitHubRepository } from '../../models/repository'
+import { CICheckReRunButton } from '../check-runs/ci-check-re-run-button'
+import { CICheckRunActionsJobStepList } from '../check-runs/ci-check-run-actions-job-step-list'
+import { CICheckRunList } from '../check-runs/ci-check-run-list'
 import { CICheckRunNoStepItem } from '../check-runs/ci-check-run-no-steps'
 import { CICheckRunStepListHeader } from '../check-runs/ci-check-run-step-list-header'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
+import { Row } from '../lib/row'
+import { Octicon } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
 
 const BlankSlateImage = encodePathAsUrl(
   __dirname,

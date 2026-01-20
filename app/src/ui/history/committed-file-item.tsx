@@ -1,11 +1,11 @@
 import * as React from 'react'
 
-import { CommittedFileChange } from '../../models/status'
 import { mapStatus } from '../../lib/status'
+import { CommittedFileChange } from '../../models/status'
 import { PathLabel } from '../lib/path-label'
-import { Octicon, iconForStatus } from '../octicons'
-import { TooltippedContent } from '../lib/tooltipped-content'
 import { TooltipDirection } from '../lib/tooltip'
+import { TooltippedContent } from '../lib/tooltipped-content'
+import { Octicon, iconForStatus } from '../octicons'
 
 interface ICommittedFileItemProps {
   readonly availableWidth: number

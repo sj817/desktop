@@ -1,13 +1,13 @@
 import * as React from 'react'
+import { ICustomIntegration } from '../../lib/custom-integration'
+import { suggestedExternalEditor } from '../../lib/editors/shared'
+import { enableCustomIntegration } from '../../lib/feature-flag'
+import { Shell, parse as parseShell } from '../../lib/shells'
+import { Row } from '../../ui/lib/row'
 import { DialogContent } from '../dialog'
 import { LinkButton } from '../lib/link-button'
-import { Row } from '../../ui/lib/row'
 import { Select } from '../lib/select'
-import { Shell, parse as parseShell } from '../../lib/shells'
-import { suggestedExternalEditor } from '../../lib/editors/shared'
 import { CustomIntegrationForm } from './custom-integration-form'
-import { ICustomIntegration } from '../../lib/custom-integration'
-import { enableCustomIntegration } from '../../lib/feature-flag'
 
 const CustomIntegrationValue = 'other'
 

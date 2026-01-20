@@ -6,10 +6,10 @@ import {
   IMentionableUser,
 } from '../databases/github-user-database'
 
-import { compare } from '../compare'
-import { BaseStore } from './base-store'
-import { getStealthEmailForUser, getLegacyStealthEmailForUser } from '../email'
 import { DefaultMaxHits } from '../../ui/autocompletion/common'
+import { compare } from '../compare'
+import { getLegacyStealthEmailForUser, getStealthEmailForUser } from '../email'
+import { BaseStore } from './base-store'
 
 /** Don't fetch mentionables more often than every 10 minutes */
 const MaxFetchFrequency = 10 * 60 * 1000

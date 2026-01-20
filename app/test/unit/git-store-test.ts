@@ -1,26 +1,26 @@
-import { describe, it, TestContext } from 'node:test'
-import assert from 'node:assert'
-import * as FSE from 'fs-extra'
-import * as Path from 'path'
 import { exec } from 'dugite'
+import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it, TestContext } from 'node:test'
+import * as Path from 'path'
 
-import { shell } from '../helpers/test-app-shell'
+import { getCommit, getRemotes } from '../../src/lib/git'
+import { GitStore } from '../../src/lib/stores'
+import { BranchType } from '../../src/models/branch'
+import { Repository } from '../../src/models/repository'
+import { AppFileStatusKind } from '../../src/models/status'
+import { IValidBranch, TipState } from '../../src/models/tip'
 import {
   setupEmptyRepository,
   setupFixtureRepository,
 } from '../helpers/repositories'
-import { GitStore } from '../../src/lib/stores'
-import { AppFileStatusKind } from '../../src/models/status'
-import { Repository } from '../../src/models/repository'
-import { TipState, IValidBranch } from '../../src/models/tip'
-import { getCommit, getRemotes } from '../../src/lib/git'
-import { getStatusOrThrow } from '../helpers/status'
 import {
+  cloneLocalRepository,
   makeCommit,
   switchTo,
-  cloneLocalRepository,
 } from '../helpers/repository-scaffolding'
-import { BranchType } from '../../src/models/branch'
+import { getStatusOrThrow } from '../helpers/status'
+import { shell } from '../helpers/test-app-shell'
 import { TestStatsStore } from '../helpers/test-stats-store'
 
 describe('GitStore', () => {

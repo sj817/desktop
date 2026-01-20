@@ -1,15 +1,15 @@
+import { Disposable, Emitter } from 'event-kit'
+import { PullRequestStore } from '.'
 import { Account } from '../../models/account'
+import { GitHubRepository } from '../../models/github-repository'
 import { PullRequest } from '../../models/pull-request'
 import {
   RepositoryWithGitHubRepository,
-  isRepositoryWithGitHubRepository,
   getNonForkGitHubRepository,
+  isRepositoryWithGitHubRepository,
 } from '../../models/repository'
-import { PullRequestStore } from '.'
 import { PullRequestUpdater } from './helpers/pull-request-updater'
 import { RepositoriesStore } from './repositories-store'
-import { GitHubRepository } from '../../models/github-repository'
-import { Disposable, Emitter } from 'event-kit'
 
 /**
  * Provides a single point of access for getting pull requests

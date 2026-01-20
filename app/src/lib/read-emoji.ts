@@ -1,7 +1,7 @@
 import * as Fs from 'fs'
 import * as Path from 'path'
-import { encodePathAsUrl } from './path'
 import { Emoji } from './emoji'
+import { encodePathAsUrl } from './path'
 
 /**
  * Type representing the contents of the gemoji json database

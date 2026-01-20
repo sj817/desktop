@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { TooltippedContent } from './lib/tooltipped-content'
 import { formatDate } from '../lib/format-date'
 import { formatRelative } from '../lib/format-relative'
+import { TooltippedContent } from './lib/tooltipped-content'
 
 interface IRelativeTimeProps {
   /**

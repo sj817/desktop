@@ -1,9 +1,9 @@
 import * as common from './webpack.common'
 
-import * as webpack from 'webpack'
-import merge from 'webpack-merge'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import * as webpack from 'webpack'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import merge from 'webpack-merge'
 
 const config: webpack.Configuration = {
   mode: 'production',

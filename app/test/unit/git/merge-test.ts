@@ -1,19 +1,19 @@
-import { describe, it } from 'node:test'
+import { exec } from 'dugite'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import {
   abortMerge,
-  getMergeBase,
   getBranches,
+  getMergeBase,
   merge,
   MergeResult,
 } from '../../../src/lib/git'
+import { Repository } from '../../../src/models/repository'
 import {
+  setupConflictedRepo,
   setupEmptyRepository,
   setupFixtureRepository,
-  setupConflictedRepo,
 } from '../../helpers/repositories'
-import { exec } from 'dugite'
-import { Repository } from '../../../src/models/repository'
 
 describe('git/merge', () => {
   describe('merge', () => {

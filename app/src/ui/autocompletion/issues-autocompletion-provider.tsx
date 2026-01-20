@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { IAutocompletionProvider } from './index'
-import { IssuesStore, IIssueHit } from '../../lib/stores/issues-store'
-import { Dispatcher } from '../dispatcher'
+import { IIssueHit, IssuesStore } from '../../lib/stores/issues-store'
 import { GitHubRepository } from '../../models/github-repository'
+import { Dispatcher } from '../dispatcher'
 import { ThrottledScheduler } from '../lib/throttled-scheduler'
+import { IAutocompletionProvider } from './index'
 
 /** The interval we should use to throttle the issues update. */
 const UpdateIssuesThrottleInterval = 1000 * 60

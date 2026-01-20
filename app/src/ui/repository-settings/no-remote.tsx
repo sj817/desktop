@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { DialogContent } from '../dialog'
-import { LinkButton } from '../lib/link-button'
 import { CallToAction } from '../lib/call-to-action'
+import { LinkButton } from '../lib/link-button'
 
 const HelpURL = 'https://help.github.com/articles/about-remote-repositories/'
 

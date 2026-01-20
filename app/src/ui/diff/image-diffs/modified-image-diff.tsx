@@ -1,13 +1,13 @@
 import * as React from 'react'
 
+import { assertNever } from '../../../lib/fatal-error'
 import { Image, ImageDiffType } from '../../../models/diff'
 import { TabBar, TabBarType } from '../../tab-bar'
-import { TwoUp } from './two-up'
 import { DifferenceBlend } from './difference-blend'
 import { OnionSkin } from './onion-skin'
-import { Swipe } from './swipe'
-import { assertNever } from '../../../lib/fatal-error'
 import { ISize, getMaxFitSize } from './sizing'
+import { Swipe } from './swipe'
+import { TwoUp } from './two-up'
 
 interface IModifiedImageDiffProps {
   readonly previous: Image

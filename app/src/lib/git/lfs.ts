@@ -1,5 +1,5 @@
-import { git } from './core'
 import { Repository } from '../../models/repository'
+import { git } from './core'
 
 /** Install the global LFS filters. */
 export async function installGlobalLFSFilters(force: boolean): Promise<void> {

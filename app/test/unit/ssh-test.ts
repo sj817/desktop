@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { parseAddSSHHostPrompt } from '../../src/lib/ssh/ssh'
 
 describe('SSH', () => {

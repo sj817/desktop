@@ -1,5 +1,5 @@
-import TransportStream from 'winston-transport'
 import { LEVEL, MESSAGE } from 'triple-beam'
+import TransportStream from 'winston-transport'
 
 const logFunctions: Record<string, Console['log']> = {
   error: console.error,

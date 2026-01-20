@@ -1,11 +1,11 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { Emoji } from '../../src/lib/emoji'
 import {
-  Tokenizer,
-  TokenType,
   EmojiMatch,
   HyperlinkMatch,
+  Tokenizer,
+  TokenType,
 } from '../../src/lib/text-token-parser'
 import { Repository } from '../../src/models/repository'
 import { gitHubRepoFixture } from '../helpers/github-repo-builder'

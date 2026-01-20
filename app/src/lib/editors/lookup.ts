@@ -1,8 +1,8 @@
-import { ExternalEditorError } from './shared'
-import { IFoundEditor } from './found-editor'
 import { getAvailableEditors as getAvailableEditorsDarwin } from './darwin'
-import { getAvailableEditors as getAvailableEditorsWindows } from './win32'
+import { IFoundEditor } from './found-editor'
 import { getAvailableEditors as getAvailableEditorsLinux } from './linux'
+import { ExternalEditorError } from './shared'
+import { getAvailableEditors as getAvailableEditorsWindows } from './win32'
 
 let editorCache: ReadonlyArray<IFoundEditor<string>> | null = null
 

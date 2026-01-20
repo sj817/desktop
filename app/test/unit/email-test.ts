@@ -1,14 +1,14 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import {
-  lookupPreferredEmail,
-  isAttributableEmailFor,
-} from '../../src/lib/email'
+import { describe, it } from 'node:test'
 import {
   IAPIEmail,
   getDotComAPIEndpoint,
   getEnterpriseAPIURL,
 } from '../../src/lib/api'
+import {
+  isAttributableEmailFor,
+  lookupPreferredEmail,
+} from '../../src/lib/email'
 import { Account } from '../../src/models/account'
 
 describe('emails', () => {

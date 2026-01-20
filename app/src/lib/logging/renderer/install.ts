@@ -1,6 +1,6 @@
-import { LogLevel } from '../log-level'
-import { formatLogMessage } from '../format-log-message'
 import { sendProxy } from '../../../ui/main-process-proxy'
+import { formatLogMessage } from '../format-log-message'
+import { LogLevel } from '../log-level'
 
 const g = global as any
 const ipcLog = sendProxy('log', 2)

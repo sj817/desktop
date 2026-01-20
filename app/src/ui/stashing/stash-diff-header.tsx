@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { IStashEntry } from '../../models/stash-entry'
-import { Dispatcher } from '../dispatcher'
-import { Repository } from '../../models/repository'
-import { PopupType } from '../../models/popup'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { ErrorWithMetadata } from '../../lib/error-with-metadata'
+import { PopupType } from '../../models/popup'
+import { Repository } from '../../models/repository'
+import { IStashEntry } from '../../models/stash-entry'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
 
 interface IStashDiffHeaderProps {
   readonly stashEntry: IStashEntry

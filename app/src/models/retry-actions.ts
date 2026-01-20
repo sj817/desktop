@@ -1,7 +1,7 @@
-import { Repository } from './repository'
-import { CloneOptions } from './clone-options'
 import { Branch } from './branch'
+import { CloneOptions } from './clone-options'
 import { Commit, CommitOneLine, ICommitContext } from './commit'
+import { Repository } from './repository'
 import { WorkingDirectoryFileChange } from './status'
 
 /** The types of actions that can be retried. */

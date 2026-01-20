@@ -1,14 +1,14 @@
-import { spawn, ChildProcess } from 'child_process'
-import { assertNever } from '../fatal-error'
 import appPath from 'app-path'
-import { parseEnumValue } from '../enum'
-import { FoundShell } from './shared'
+import { ChildProcess, spawn } from 'child_process'
 import {
   expandTargetPathArgument,
   ICustomIntegration,
   parseCustomIntegrationArguments,
   spawnCustomIntegration,
 } from '../custom-integration'
+import { parseEnumValue } from '../enum'
+import { assertNever } from '../fatal-error'
+import { FoundShell } from './shared'
 
 export enum Shell {
   Terminal = 'Terminal',

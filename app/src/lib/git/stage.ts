@@ -1,15 +1,15 @@
+import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
 import { Repository } from '../../models/repository'
 import {
-  WorkingDirectoryFileChange,
-  isConflictedFileStatus,
   GitStatusEntry,
+  WorkingDirectoryFileChange,
   isConflictWithMarkers,
+  isConflictedFileStatus,
 } from '../../models/status'
-import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
 import { assertNever } from '../fatal-error'
-import { removeConflictedFile } from './rm'
-import { checkoutConflictedFile } from './checkout'
 import { addConflictedFile } from './add'
+import { checkoutConflictedFile } from './checkout'
+import { removeConflictedFile } from './rm'
 
 /**
  * Stages a file with the given manual resolution method. Useful for resolving binary conflicts at commit-time.

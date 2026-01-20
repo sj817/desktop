@@ -1,6 +1,6 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
 import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import * as Path from 'path'
 
 import { getGitDescription } from '../../../src/lib/git'

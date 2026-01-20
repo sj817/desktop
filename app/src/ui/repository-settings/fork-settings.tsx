@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { DialogContent } from '../dialog'
-import { ForkContributionTarget } from '../../models/workflow-preferences'
-import { RepositoryWithForkedGitHubRepository } from '../../models/repository'
-import { ForkSettingsDescription } from './fork-contribution-target-description'
-import { RadioGroup } from '../lib/radio-group'
 import { assertNever } from '../../lib/fatal-error'
+import { RepositoryWithForkedGitHubRepository } from '../../models/repository'
+import { ForkContributionTarget } from '../../models/workflow-preferences'
+import { DialogContent } from '../dialog'
+import { RadioGroup } from '../lib/radio-group'
+import { ForkSettingsDescription } from './fork-contribution-target-description'
 
 interface IForkSettingsProps {
   readonly forkContributionTarget: ForkContributionTarget

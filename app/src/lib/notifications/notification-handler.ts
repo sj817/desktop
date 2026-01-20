@@ -1,6 +1,6 @@
 import QuickLRU from 'quick-lru'
-import * as ipcRenderer from '../ipc-renderer'
 import { focusWindow } from '../../ui/main-process-proxy'
+import * as ipcRenderer from '../ipc-renderer'
 import { NotificationsStore } from '../stores/notifications-store'
 
 export const notificationCallbacks = new QuickLRU<string, () => void>({

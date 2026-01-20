@@ -1,5 +1,5 @@
-import * as Path from 'path'
 import { app } from 'electron'
+import * as Path from 'path'
 
 let logDirectoryPath: string | null = null
 

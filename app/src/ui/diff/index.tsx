@@ -3,36 +3,36 @@ import * as React from 'react'
 import { assertNever } from '../../lib/fatal-error'
 import { encodePathAsUrl } from '../../lib/path'
 
-import { Repository } from '../../models/repository'
-import {
-  CommittedFileChange,
-  WorkingDirectoryFileChange,
-  AppFileStatusKind,
-  isManualConflict,
-  isConflictedFileStatus,
-} from '../../models/status'
 import {
   DiffSelection,
   DiffType,
   IDiff,
   IImageDiff,
-  ITextDiff,
   ILargeTextDiff,
   ImageDiffType,
   ISubmoduleDiff,
+  ITextDiff,
 } from '../../models/diff'
-import { Button } from '../lib/button'
+import { Repository } from '../../models/repository'
 import {
-  NewImageDiff,
-  ModifiedImageDiff,
-  DeletedImageDiff,
-} from './image-diffs'
-import { BinaryFile } from './binary-file'
-import { SideBySideDiff } from './side-by-side-diff'
-import { IFileContents } from './syntax-highlighting'
-import { SubmoduleDiff } from './submodule-diff'
+  AppFileStatusKind,
+  CommittedFileChange,
+  isConflictedFileStatus,
+  isManualConflict,
+  WorkingDirectoryFileChange,
+} from '../../models/status'
+import { Button } from '../lib/button'
 import { Octicon } from '../octicons'
 import * as OcticonSymbol from '../octicons/octicons.generated'
+import { BinaryFile } from './binary-file'
+import {
+  DeletedImageDiff,
+  ModifiedImageDiff,
+  NewImageDiff,
+} from './image-diffs'
+import { SideBySideDiff } from './side-by-side-diff'
+import { SubmoduleDiff } from './submodule-diff'
+import { IFileContents } from './syntax-highlighting'
 
 // image used when no diff is displayed
 const NoDiffImage = encodePathAsUrl(__dirname, 'static/ufo-alert.svg')

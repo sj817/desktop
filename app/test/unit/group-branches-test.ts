@@ -1,8 +1,8 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { groupBranches } from '../../src/ui/branches'
+import { describe, it } from 'node:test'
 import { Branch, BranchType } from '../../src/models/branch'
 import { CommitIdentity } from '../../src/models/commit-identity'
+import { groupBranches } from '../../src/ui/branches'
 
 describe('Branches grouping', () => {
   const author = new CommitIdentity('Hubot', 'hubot@github.com', new Date())

@@ -1,6 +1,6 @@
+import assert from 'node:assert'
 import { describe, it } from 'node:test'
 import { findIssueRef, findReleaseNote } from '../parser'
-import assert from 'node:assert'
 
 describe('changelog/parser', () => {
   describe('findIssueRef', () => {

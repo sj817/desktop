@@ -1,19 +1,19 @@
 import * as React from 'react'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { IRefCheck } from '../../lib/ci-checks/ci-checks'
-import { CICheckRunList } from './ci-check-run-list'
-import { GitHubRepository } from '../../models/github-repository'
-import { Dispatcher } from '../dispatcher'
 import {
   APICheckConclusion,
   APICheckStatus,
   IAPICheckSuite,
 } from '../../lib/api'
+import { IRefCheck } from '../../lib/ci-checks/ci-checks'
+import { offsetFromNow } from '../../lib/offset-from'
+import { encodePathAsUrl } from '../../lib/path'
+import { GitHubRepository } from '../../models/github-repository'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
 import { Octicon } from '../octicons'
 import * as octicons from './../octicons/octicons.generated'
-import { encodePathAsUrl } from '../../lib/path'
-import { offsetFromNow } from '../../lib/offset-from'
+import { CICheckRunList } from './ci-check-run-list'
 
 const BlankSlateImage = encodePathAsUrl(
   __dirname,

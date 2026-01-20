@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { LinkButton } from '../lib/link-button'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { LinkButton } from '../lib/link-button'
 
 interface IAttributeMismatchProps {
   /** Called when the dialog should be dismissed. */

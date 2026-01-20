@@ -1,18 +1,18 @@
 import * as Path from 'path'
 
-import { Account } from '../../../models/account'
 import { mkdir, writeFile } from 'fs/promises'
+import { Account } from '../../../models/account'
+import { IRemote } from '../../../models/remote'
+import { pathExists } from '../../../ui/lib/path-exists'
 import { API } from '../../api'
+import { git } from '../../git'
+import { envForRemoteOperation } from '../../git/environment'
+import { getDefaultBranch } from '../../helpers/default-branch'
 import { APIError } from '../../http'
 import {
   executionOptionsWithProgress,
   PushProgressParser,
 } from '../../progress'
-import { git } from '../../git'
-import { IRemote } from '../../../models/remote'
-import { getDefaultBranch } from '../../helpers/default-branch'
-import { envForRemoteOperation } from '../../git/environment'
-import { pathExists } from '../../../ui/lib/path-exists'
 
 const nl = __WIN32__ ? '\r\n' : '\n'
 const InitialReadmeContents =

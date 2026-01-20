@@ -1,33 +1,33 @@
-import { getFilesWithConflictMarkers } from './diff-check'
+import { git } from '.'
+import { fatalError } from '../../lib/fatal-error'
+import { IAheadBehind } from '../../models/branch'
+import { DiffSelection, DiffSelectionType } from '../../models/diff'
+import { RebaseInternalState } from '../../models/rebase'
+import { Repository } from '../../models/repository'
 import {
-  WorkingDirectoryStatus,
-  WorkingDirectoryFileChange,
   AppFileStatus,
+  AppFileStatusKind,
+  ConflictedFileStatus,
   FileEntry,
   GitStatusEntry,
-  AppFileStatusKind,
   UnmergedEntry,
-  ConflictedFileStatus,
   UnmergedEntrySummary,
+  WorkingDirectoryFileChange,
+  WorkingDirectoryStatus,
 } from '../../models/status'
 import {
-  parsePorcelainStatus,
-  mapStatus,
   IStatusEntry,
   IStatusHeader,
-  isStatusHeader,
   isStatusEntry,
+  isStatusHeader,
+  mapStatus,
+  parsePorcelainStatus,
 } from '../status-parser'
-import { DiffSelectionType, DiffSelection } from '../../models/diff'
-import { Repository } from '../../models/repository'
-import { IAheadBehind } from '../../models/branch'
-import { fatalError } from '../../lib/fatal-error'
-import { isMergeHeadSet, isSquashMsgSet } from './merge'
-import { getBinaryPaths } from './diff'
-import { getRebaseInternalState } from './rebase'
-import { RebaseInternalState } from '../../models/rebase'
 import { isCherryPickHeadFound } from './cherry-pick'
-import { git } from '.'
+import { getBinaryPaths } from './diff'
+import { getFilesWithConflictMarkers } from './diff-check'
+import { isMergeHeadSet, isSquashMsgSet } from './merge'
+import { getRebaseInternalState } from './rebase'
 
 /** The encapsulation of the result from 'git status' */
 export interface IStatusResult {

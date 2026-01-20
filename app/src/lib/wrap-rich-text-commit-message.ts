@@ -1,11 +1,11 @@
-import {
-  Tokenizer,
-  TokenType,
-  TokenResult,
-  PlainText,
-  HyperlinkMatch,
-} from './text-token-parser'
 import { assertNever } from './fatal-error'
+import {
+  HyperlinkMatch,
+  PlainText,
+  Tokenizer,
+  TokenResult,
+  TokenType,
+} from './text-token-parser'
 
 export const MaxSummaryLength = 72
 export const IdealSummaryLength = 50

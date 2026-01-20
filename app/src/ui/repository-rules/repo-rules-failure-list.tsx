@@ -4,8 +4,8 @@ import {
   RepoRulesMetadataFailure,
   RepoRulesMetadataFailures,
 } from '../../models/repo-rules'
-import { RepoRulesetsForBranchLink } from './repo-rulesets-for-branch-link'
 import { RepoRulesetLink } from './repo-ruleset-link'
+import { RepoRulesetsForBranchLink } from './repo-rulesets-for-branch-link'
 
 interface IRepoRulesMetadataFailureListProps {
   readonly repository: GitHubRepository

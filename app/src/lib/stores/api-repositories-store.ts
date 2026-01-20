@@ -1,8 +1,8 @@
-import { BaseStore } from './base-store'
-import { AccountsStore } from './accounts-store'
-import { IAPIRepository, API } from '../api'
 import { Account, accountEquals } from '../../models/account'
+import { API, IAPIRepository } from '../api'
 import { merge } from '../merge'
+import { AccountsStore } from './accounts-store'
+import { BaseStore } from './base-store'
 
 /**
  * Attempt to look up an existing account in the account state

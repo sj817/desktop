@@ -1,11 +1,11 @@
 import * as React from 'react'
+import { Emoji } from '../../../lib/emoji'
 import { formatRebaseValue } from '../../../lib/rebase'
-import { RichText } from '../../lib/rich-text'
+import { IMultiCommitOperationProgress } from '../../../models/progress'
 import { Dialog, DialogContent } from '../../dialog'
+import { RichText } from '../../lib/rich-text'
 import { Octicon } from '../../octicons'
 import * as octicons from '../../octicons/octicons.generated'
-import { IMultiCommitOperationProgress } from '../../../models/progress'
-import { Emoji } from '../../../lib/emoji'
 
 interface IProgressDialogProps {
   /**

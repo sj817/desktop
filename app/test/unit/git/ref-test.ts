@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { formatAsLocalRef, getSymbolicRef } from '../../../src/lib/git/refs'
 import { setupEmptyRepository } from '../../helpers/repositories'
 

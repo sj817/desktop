@@ -1,13 +1,13 @@
 import { spawn } from 'child_process'
 import { randomBytes } from 'crypto'
+import { resolveGitBinary } from 'dugite'
 import { createWriteStream } from 'fs'
 import { basename, join, resolve } from 'path'
 import { ProcessProxyConnection as Connection } from 'process-proxy'
 import { pipeline } from 'stream/promises'
 import type { HookProgress, TerminalOutput } from '../git'
-import { resolveGitBinary } from 'dugite'
-import { ShellEnvResult } from './get-shell-env'
 import { shellFriendlyNames } from './config'
+import { ShellEnvResult } from './get-shell-env'
 
 const hooksUsingStdin = ['post-rewrite']
 const ignoredOnFailureHooks = [

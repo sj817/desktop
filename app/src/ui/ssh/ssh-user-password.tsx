@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { Row } from '../lib/row'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Checkbox, CheckboxValue } from '../lib/checkbox'
 import { PasswordTextBox } from '../lib/password-text-box'
+import { Row } from '../lib/row'
 
 interface ISSHUserPasswordProps {
   readonly username: string

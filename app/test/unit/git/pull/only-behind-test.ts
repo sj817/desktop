@@ -1,19 +1,19 @@
-import { describe, it, TestContext } from 'node:test'
 import assert from 'node:assert'
+import { describe, it, TestContext } from 'node:test'
 import {
   fetch,
-  pull,
   getAheadBehind,
+  pull,
   revSymmetricDifference,
 } from '../../../../src/lib/git'
+import { IRemote } from '../../../../src/models/remote'
+import { getRefOrError, getTipOrError } from '../../../helpers/git'
+import { setupLocalConfig } from '../../../helpers/local-config'
 import { createRepository } from '../../../helpers/repository-builder-pull-test'
 import {
   cloneRepository,
   makeCommit,
 } from '../../../helpers/repository-scaffolding'
-import { getTipOrError, getRefOrError } from '../../../helpers/git'
-import { setupLocalConfig } from '../../../helpers/local-config'
-import { IRemote } from '../../../../src/models/remote'
 
 const featureBranch = 'this-is-a-feature'
 const remote: IRemote = { name: 'origin', url: 'file://' }

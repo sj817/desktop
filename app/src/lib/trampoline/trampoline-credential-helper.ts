@@ -1,6 +1,11 @@
-import { AccountsStore } from '../stores'
-import { TrampolineCommandHandler } from './trampoline-command'
+import { IGitAccount } from '../../models/git-account'
+import { getAPIEndpoint, isGitHubHost } from '../api'
+import { isDotCom, isGHE, isGist } from '../endpoint-capabilities'
 import { forceUnwrap } from '../fatal-error'
+import {
+  deleteGenericCredential,
+  setGenericCredential,
+} from '../generic-git-auth'
 import {
   approveCredential,
   fillCredential,
@@ -8,26 +13,21 @@ import {
   parseCredential,
   rejectCredential,
 } from '../git/credential'
+import { AccountsStore } from '../stores'
+import {
+  findGenericTrampolineAccount,
+  findGitHubTrampolineAccount,
+} from './find-account'
+import { TrampolineCommandHandler } from './trampoline-command'
 import {
   getCredentialUrl,
   getIsBackgroundTaskEnvironment,
   getTrampolineEnvironmentPath,
   setHasRejectedCredentialsForEndpoint,
 } from './trampoline-environment'
-import { useExternalCredentialHelper } from './use-external-credential-helper'
-import {
-  findGenericTrampolineAccount,
-  findGitHubTrampolineAccount,
-} from './find-account'
-import { IGitAccount } from '../../models/git-account'
-import {
-  deleteGenericCredential,
-  setGenericCredential,
-} from '../generic-git-auth'
-import { urlWithoutCredentials } from './url-without-credentials'
 import { trampolineUIHelper as ui } from './trampoline-ui-helper'
-import { getAPIEndpoint, isGitHubHost } from '../api'
-import { isDotCom, isGHE, isGist } from '../endpoint-capabilities'
+import { urlWithoutCredentials } from './url-without-credentials'
+import { useExternalCredentialHelper } from './use-external-credential-helper'
 
 type Credential = Map<string, string>
 type Store = AccountsStore

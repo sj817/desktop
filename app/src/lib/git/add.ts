@@ -1,6 +1,6 @@
-import { git } from './core'
 import { Repository } from '../../models/repository'
 import { WorkingDirectoryFileChange } from '../../models/status'
+import { git } from './core'
 
 /**
  * Add a conflicted file to the index.

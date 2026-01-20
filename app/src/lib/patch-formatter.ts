@@ -1,11 +1,11 @@
 import { assertNever } from '../lib/fatal-error'
-import { WorkingDirectoryFileChange, AppFileStatusKind } from '../models/status'
 import {
   DiffLineType,
-  ITextDiff,
   DiffSelection,
   ILargeTextDiff,
+  ITextDiff,
 } from '../models/diff'
+import { AppFileStatusKind, WorkingDirectoryFileChange } from '../models/status'
 
 /**
  * Generates a string matching the format of a GNU unified diff header excluding

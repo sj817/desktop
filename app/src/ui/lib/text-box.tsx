@@ -1,10 +1,10 @@
-import * as React from 'react'
 import classNames from 'classnames'
-import { createUniqueId, releaseUniqueId } from './id-pool'
+import * as React from 'react'
 import { showContextualMenu } from '../../lib/menu-item'
+import { AriaLiveContainer } from '../accessibility/aria-live-container'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { AriaLiveContainer } from '../accessibility/aria-live-container'
+import { createUniqueId, releaseUniqueId } from './id-pool'
 
 export interface ITextBoxProps {
   /** The label for the input field. */

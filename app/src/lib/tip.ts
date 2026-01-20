@@ -1,4 +1,4 @@
-import { TipState, Tip } from '../models/tip'
+import { Tip, TipState } from '../models/tip'
 
 export function getTipSha(tip: Tip) {
   if (tip.kind === TipState.Valid) {

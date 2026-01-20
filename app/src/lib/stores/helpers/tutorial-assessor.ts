@@ -1,7 +1,7 @@
-import { IRepositoryState } from '../../app-state'
-import { TutorialStep } from '../../../models/tutorial-step'
 import { TipState } from '../../../models/tip'
-import { setBoolean, getBoolean } from '../../local-storage'
+import { TutorialStep } from '../../../models/tutorial-step'
+import { IRepositoryState } from '../../app-state'
+import { getBoolean, setBoolean } from '../../local-storage'
 
 const skipInstallEditorKey = 'tutorial-install-editor-skipped'
 const pullRequestStepCompleteKey = 'tutorial-pull-request-step-complete'

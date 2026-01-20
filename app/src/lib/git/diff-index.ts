@@ -1,5 +1,5 @@
-import { git } from './core'
 import { Repository } from '../../models/repository'
+import { git } from './core'
 
 /**
  * Possible statuses of an entry in Git, see the git diff-index

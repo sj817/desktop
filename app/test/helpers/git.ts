@@ -1,7 +1,7 @@
-import { getCommit, getBranches } from '../../src/lib/git'
+import { getBranches, getCommit } from '../../src/lib/git'
+import { Branch } from '../../src/models/branch'
 import { Commit } from '../../src/models/commit'
 import { Repository } from '../../src/models/repository'
-import { Branch } from '../../src/models/branch'
 
 /**
  * Get the tip commit of the current repository

@@ -1,7 +1,7 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { getAbsoluteUrl } from '../../src/lib/http'
+import { describe, it } from 'node:test'
 import { getDotComAPIEndpoint } from '../../src/lib/api'
+import { getAbsoluteUrl } from '../../src/lib/http'
 
 describe('getAbsoluteUrl', () => {
   describe('dotcom endpoint', () => {

@@ -1,5 +1,5 @@
-import * as Path from 'path'
 import * as Fs from 'fs'
+import * as Path from 'path'
 
 import { getProductName, getVersion } from '../app/package-info'
 

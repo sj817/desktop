@@ -1,11 +1,11 @@
-import { git } from './core'
-import { Repository } from '../../models/repository'
 import { DiffSelectionType } from '../../models/diff'
-import { applyPatchToIndex } from './apply'
+import { Repository } from '../../models/repository'
 import {
-  WorkingDirectoryFileChange,
   AppFileStatusKind,
+  WorkingDirectoryFileChange,
 } from '../../models/status'
+import { applyPatchToIndex } from './apply'
+import { git } from './core'
 
 interface IUpdateIndexOptions {
   /**

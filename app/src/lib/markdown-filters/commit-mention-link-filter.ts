@@ -1,8 +1,8 @@
 import escapeRegExp from 'lodash/escapeRegExp'
 import { GitHubRepository } from '../../models/github-repository'
 import { getHTMLURL } from '../api'
-import { INodeFilter } from './node-filter'
 import { isElement } from './is-element'
+import { INodeFilter } from './node-filter'
 
 /**
  * The Commit mention Link filter matches the target and text of an anchor element that

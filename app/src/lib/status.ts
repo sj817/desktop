@@ -1,15 +1,15 @@
+import { ManualConflictResolution } from '../models/manual-conflict-resolution'
 import {
-  AppFileStatusKind,
   AppFileStatus,
+  AppFileStatusKind,
   ConflictedFileStatus,
-  WorkingDirectoryStatus,
-  isConflictWithMarkers,
   GitStatusEntry,
   isConflictedFileStatus,
+  isConflictWithMarkers,
   WorkingDirectoryFileChange,
+  WorkingDirectoryStatus,
 } from '../models/status'
 import { assertNever } from './fatal-error'
-import { ManualConflictResolution } from '../models/manual-conflict-resolution'
 
 /**
  * Convert a given `AppFileStatusKind` value to a human-readable string to be

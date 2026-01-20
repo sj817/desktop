@@ -1,6 +1,6 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
 import { readdir, readFile } from 'fs/promises'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { EOL } from 'os'
 import { join } from 'path'
 import { Writable } from 'stream'

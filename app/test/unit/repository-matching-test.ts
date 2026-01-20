@@ -1,9 +1,9 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import {
   matchGitHubRepository,
-  urlMatchesRemote,
   urlMatchesCloneURL,
+  urlMatchesRemote,
 } from '../../src/lib/repository-matching'
 import { Account } from '../../src/models/account'
 import { GitHubRepository } from '../../src/models/github-repository'

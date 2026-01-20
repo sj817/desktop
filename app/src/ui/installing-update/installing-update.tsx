@@ -1,15 +1,15 @@
 import * as React from 'react'
 
-import { Row } from '../lib/row'
+import { Disposable } from 'event-kit'
 import {
   Dialog,
   DialogContent,
-  OkCancelButtonGroup,
   DialogFooter,
+  OkCancelButtonGroup,
 } from '../dialog'
-import { updateStore, IUpdateState, UpdateStatus } from '../lib/update-store'
-import { Disposable } from 'event-kit'
 import { Dispatcher } from '../dispatcher'
+import { Row } from '../lib/row'
+import { IUpdateState, UpdateStatus, updateStore } from '../lib/update-store'
 
 interface IInstallingUpdateProps {
   /**

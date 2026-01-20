@@ -1,42 +1,42 @@
-import { describe, it, TestContext } from 'node:test'
-import assert from 'node:assert'
-import * as path from 'path'
 import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it, TestContext } from 'node:test'
+import * as path from 'path'
 
-import { Repository } from '../../../src/models/repository'
 import {
   createCommit,
-  getCommits,
-  getCommit,
-  getChangedFiles,
-  getWorkingDirectoryDiff,
   createMergeCommit,
+  getChangedFiles,
+  getCommit,
+  getCommits,
+  getWorkingDirectoryDiff,
 } from '../../../src/lib/git'
+import { Repository } from '../../../src/models/repository'
 
 import {
-  setupFixtureRepository,
-  setupEmptyRepository,
   setupConflictedRepo,
   setupConflictedRepoWithMultipleFiles,
+  setupEmptyRepository,
+  setupFixtureRepository,
 } from '../../helpers/repositories'
 
 import { exec } from 'dugite'
+import { isConflictedFile } from '../../../src/lib/status'
 import {
-  WorkingDirectoryFileChange,
+  DiffSelection,
+  DiffSelectionType,
+  DiffType,
+  ITextDiff,
+} from '../../../src/models/diff'
+import { ManualConflictResolution } from '../../../src/models/manual-conflict-resolution'
+import {
   AppFileStatusKind,
-  UnmergedEntrySummary,
   GitStatusEntry,
   isManualConflict,
+  UnmergedEntrySummary,
+  WorkingDirectoryFileChange,
 } from '../../../src/models/status'
-import {
-  DiffSelectionType,
-  DiffSelection,
-  ITextDiff,
-  DiffType,
-} from '../../../src/models/diff'
 import { getStatusOrThrow } from '../../helpers/status'
-import { ManualConflictResolution } from '../../../src/models/manual-conflict-resolution'
-import { isConflictedFile } from '../../../src/lib/status'
 
 async function getTextDiff(
   repo: Repository,

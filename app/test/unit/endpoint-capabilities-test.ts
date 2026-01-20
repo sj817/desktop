@@ -1,11 +1,11 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import { parse, SemVer } from 'semver'
+import { getDotComAPIEndpoint } from '../../src/lib/api'
 import {
   endpointSatisfies,
   VersionConstraint,
 } from '../../src/lib/endpoint-capabilities'
-import { SemVer, parse } from 'semver'
-import { getDotComAPIEndpoint } from '../../src/lib/api'
 import { forceUnwrap } from '../../src/lib/fatal-error'
 
 describe('endpoint-capabilities', () => {

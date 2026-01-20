@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { encodePathAsUrl } from '../../lib/path'
-import { Button } from '../lib/button'
 import { KeyboardShortcut } from '../keyboard-shortcut/keyboard-shortcut'
+import { Button } from '../lib/button'
 
 const BlankSlateImage = encodePathAsUrl(
   __dirname,

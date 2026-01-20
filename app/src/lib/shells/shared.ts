@@ -1,11 +1,11 @@
 import { ChildProcess } from 'child_process'
 
-import * as Darwin from './darwin'
-import * as Win32 from './win32'
-import * as Linux from './linux'
-import { ShellError } from './error'
 import { pathExists } from '../../ui/lib/path-exists'
 import { ICustomIntegration } from '../custom-integration'
+import * as Darwin from './darwin'
+import { ShellError } from './error'
+import * as Linux from './linux'
+import * as Win32 from './win32'
 
 export type Shell = Darwin.Shell | Win32.Shell | Linux.Shell
 

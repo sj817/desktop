@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { Readable } from 'stream'
 import { createTailStream } from '../../../src/lib/git/create-tail-stream'
 

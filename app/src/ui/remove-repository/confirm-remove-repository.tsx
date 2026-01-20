@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { Checkbox, CheckboxValue } from '../lib/checkbox'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { Ref } from '../lib/ref'
 import { Repository } from '../../models/repository'
-import { TrashNameLabel } from '../lib/context-menu'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Checkbox, CheckboxValue } from '../lib/checkbox'
+import { TrashNameLabel } from '../lib/context-menu'
+import { Ref } from '../lib/ref'
 
 interface IConfirmRemoveRepositoryProps {
   /** The repository to be removed */

@@ -1,5 +1,5 @@
-import { git } from './core'
 import { Repository } from '../../models/repository'
+import { git } from './core'
 
 /**
  * Get the `limit` most recently checked out branches.

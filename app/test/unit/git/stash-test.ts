@@ -1,26 +1,26 @@
-import { describe, it, TestContext } from 'node:test'
-import assert from 'node:assert'
-import * as FSE from 'fs-extra'
-import * as path from 'path'
-import { Repository } from '../../../src/models/repository'
-import { setupEmptyRepository } from '../../helpers/repositories'
 import { exec } from 'dugite'
+import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { join } from 'node:path'
+import { describe, it, TestContext } from 'node:test'
+import * as path from 'path'
 import {
-  createDesktopStashMessage,
   createDesktopStashEntry,
-  getLastDesktopStashEntryForBranch,
+  createDesktopStashMessage,
   dropDesktopStashEntry,
-  popStashEntry,
+  getLastDesktopStashEntryForBranch,
   getStashes,
+  popStashEntry,
 } from '../../../src/lib/git/stash'
-import { getStatusOrThrow } from '../../helpers/status'
-import { AppFileStatusKind } from '../../../src/models/status'
+import { Repository } from '../../../src/models/repository'
 import {
   IStashEntry,
   StashedChangesLoadStates,
 } from '../../../src/models/stash-entry'
+import { AppFileStatusKind } from '../../../src/models/status'
 import { generateString } from '../../helpers/random-data'
-import { join } from 'node:path'
+import { setupEmptyRepository } from '../../helpers/repositories'
+import { getStatusOrThrow } from '../../helpers/status'
 
 describe('git/stash', () => {
   describe('getStash', () => {

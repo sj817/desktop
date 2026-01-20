@@ -1,19 +1,19 @@
 import * as React from 'react'
+import { getHTMLURL } from '../../lib/api'
+import { lookupPreferredEmail } from '../../lib/email'
+import { assertNever } from '../../lib/fatal-error'
+import { enableMultipleEnterpriseAccounts } from '../../lib/feature-flag'
 import {
   Account,
   isDotComAccount,
   isEnterpriseAccount,
 } from '../../models/account'
 import { IAvatarUser } from '../../models/avatar'
-import { lookupPreferredEmail } from '../../lib/email'
-import { assertNever } from '../../lib/fatal-error'
-import { Button } from '../lib/button'
-import { Row } from '../lib/row'
 import { DialogContent, DialogPreferredFocusClassName } from '../dialog'
 import { Avatar } from '../lib/avatar'
+import { Button } from '../lib/button'
 import { CallToAction } from '../lib/call-to-action'
-import { enableMultipleEnterpriseAccounts } from '../../lib/feature-flag'
-import { getHTMLURL } from '../../lib/api'
+import { Row } from '../lib/row'
 
 interface IAccountsProps {
   readonly accounts: ReadonlyArray<Account>

@@ -1,9 +1,9 @@
-import { GitStore } from './stores'
-import { Repository } from '../models/repository'
 import { Account } from '../models/account'
-import { getAccountForRepository } from './get-account-for-repository'
+import { Repository } from '../models/repository'
 import { API } from './api'
+import { getAccountForRepository } from './get-account-for-repository'
 import { matchGitHubRepository } from './repository-matching'
+import { GitStore } from './stores'
 
 /**
  * Use the GitHub API to find the last push date for a repository, favouring

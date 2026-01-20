@@ -1,8 +1,8 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { groupRepositories } from '../../src/ui/repositories-list/group-repositories'
-import { Repository, ILocalRepositoryState } from '../../src/models/repository'
+import { describe, it } from 'node:test'
 import { CloningRepository } from '../../src/models/cloning-repository'
+import { ILocalRepositoryState, Repository } from '../../src/models/repository'
+import { groupRepositories } from '../../src/ui/repositories-list/group-repositories'
 import { gitHubRepoFixture } from '../helpers/github-repo-builder'
 
 describe('repository list grouping', () => {

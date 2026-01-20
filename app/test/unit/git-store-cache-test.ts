@@ -1,10 +1,10 @@
-import { describe, it } from 'node:test'
+import noop from 'lodash/noop'
 import assert from 'node:assert'
-import { Repository } from '../../src/models/repository'
+import { describe, it } from 'node:test'
 import { GitStoreCache } from '../../src/lib/stores/git-store-cache'
+import { Repository } from '../../src/models/repository'
 import { shell } from '../helpers/test-app-shell'
 import { TestStatsStore } from '../helpers/test-stats-store'
-import noop from 'lodash/noop'
 
 describe('GitStoreCache', () => {
   it('returns same instance of GitStore', () => {

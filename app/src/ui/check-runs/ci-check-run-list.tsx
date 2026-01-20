@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import * as React from 'react'
 import { IAPIWorkflowJobStep } from '../../lib/api'
 import {
@@ -6,9 +7,8 @@ import {
   IRefCheck,
   isFailure,
 } from '../../lib/ci-checks/ci-checks'
-import { CICheckRunListItem } from './ci-check-run-list-item'
 import { FocusContainer } from '../lib/focus-container'
-import classNames from 'classnames'
+import { CICheckRunListItem } from './ci-check-run-list-item'
 
 interface ICICheckRunListProps {
   /** List of check runs to display */

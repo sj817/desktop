@@ -1,5 +1,5 @@
-import { describe, it, beforeEach, afterEach, mock } from 'node:test'
 import assert from 'node:assert'
+import { afterEach, beforeEach, describe, it, mock } from 'node:test'
 import { promiseWithMinimumTimeout } from '../../src/lib/promise'
 
 describe('promiseWithMinimumTimeout', () => {

@@ -1,34 +1,34 @@
 import {
+  BrowserWindow,
   Menu,
   app,
-  dialog,
-  BrowserWindow,
   autoUpdater,
+  dialog,
   nativeTheme,
 } from 'electron'
+import windowStateKeeper from 'electron-window-state'
+import { Disposable, Emitter } from 'event-kit'
+import * as path from 'path'
 import { shell } from '../lib/app-shell'
-import { Emitter, Disposable } from 'event-kit'
+import { CLIAction } from '../lib/cli-action'
+import { getUpdaterGUID } from '../lib/get-updater-guid'
+import { URLActionType } from '../lib/parse-app-url'
 import { encodePathAsUrl } from '../lib/path'
+import { ILaunchStats } from '../lib/stats'
 import {
   getWindowState,
   registerWindowStateChangedEvents,
 } from '../lib/window-state'
-import { MenuEvent } from './menu'
-import { URLActionType } from '../lib/parse-app-url'
-import { ILaunchStats } from '../lib/stats'
 import { menuFromElectronMenu } from '../models/app-menu'
-import { now } from './now'
-import * as path from 'path'
-import windowStateKeeper from 'electron-window-state'
 import * as ipcMain from './ipc-main'
 import * as ipcWebContents from './ipc-webcontents'
+import { MenuEvent } from './menu'
 import {
   installNotificationCallback,
   terminateDesktopNotifications,
 } from './notifications'
+import { now } from './now'
 import { addTrustedIPCSender } from './trusted-ipc-sender'
-import { getUpdaterGUID } from '../lib/get-updater-guid'
-import { CLIAction } from '../lib/cli-action'
 
 export class AppWindow {
   private window: Electron.BrowserWindow

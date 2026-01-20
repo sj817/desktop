@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { SignInResult } from '../../lib/stores'
+import { RepositoryWithGitHubRepository } from '../../models/repository'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Dispatcher } from '../dispatcher'
 import { Ref } from '../lib/ref'
-import { RepositoryWithGitHubRepository } from '../../models/repository'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { SignInResult } from '../../lib/stores'
 
 const okButtonText = __DARWIN__ ? 'Continue in Browser' : 'Continue in browser'
 

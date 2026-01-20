@@ -1,22 +1,22 @@
-import * as React from 'react'
-import { Account } from '../../models/account'
-import { IFilterListGroup } from '../lib/filter-list'
-import { IAPIRepository } from '../../lib/api'
-import {
-  ICloneableRepositoryListItem,
-  groupRepositories,
-  YourRepositoriesIdentifier,
-} from './group-repositories'
 import memoizeOne from 'memoize-one'
-import { Button } from '../lib/button'
+import * as React from 'react'
+import { IAPIRepository } from '../../lib/api'
 import { IMatches } from '../../lib/fuzzy-find'
-import { Octicon, syncClockwise } from '../octicons'
+import { Account } from '../../models/account'
+import { Button } from '../lib/button'
+import { IFilterListGroup } from '../lib/filter-list'
 import { HighlightText } from '../lib/highlight-text'
-import { ClickSource } from '../lib/list'
 import { LinkButton } from '../lib/link-button'
+import { ClickSource } from '../lib/list'
 import { Ref } from '../lib/ref'
 import { SectionFilterList } from '../lib/section-filter-list'
 import { TooltippedContent } from '../lib/tooltipped-content'
+import { Octicon, syncClockwise } from '../octicons'
+import {
+  groupRepositories,
+  ICloneableRepositoryListItem,
+  YourRepositoriesIdentifier,
+} from './group-repositories'
 
 interface ICloneableRepositoryFilterListProps {
   /** The account to clone from. */

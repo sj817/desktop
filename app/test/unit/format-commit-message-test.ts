@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { formatCommitMessage } from '../../src/lib/format-commit-message'
 import { setupEmptyRepository } from '../helpers/repositories'
 

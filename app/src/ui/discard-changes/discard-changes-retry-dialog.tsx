@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { RetryAction } from '../../models/retry-actions'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Dispatcher } from '../dispatcher'
-import { TrashNameLabel } from '../lib/context-menu'
-import { RetryAction } from '../../models/retry-actions'
 import { Checkbox, CheckboxValue } from '../lib/checkbox'
+import { TrashNameLabel } from '../lib/context-menu'
 
 interface IDiscardChangesRetryDialogProps {
   readonly dispatcher: Dispatcher

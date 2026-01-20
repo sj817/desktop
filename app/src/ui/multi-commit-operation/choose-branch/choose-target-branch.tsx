@@ -1,20 +1,20 @@
 import * as React from 'react'
-import { Branch } from '../../../models/branch'
 import { IMatches } from '../../../lib/fuzzy-find'
+import { Branch } from '../../../models/branch'
+import { Repository } from '../../../models/repository'
+import {
+  BranchList,
+  IBranchListItem,
+  renderDefaultBranch,
+} from '../../branches'
+import { getDefaultAriaLabelForBranch } from '../../branches/branch-renderer'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   OkCancelButtonGroup,
 } from '../../dialog'
-import {
-  BranchList,
-  IBranchListItem,
-  renderDefaultBranch,
-} from '../../branches'
 import { ClickSource } from '../../lib/list'
-import { getDefaultAriaLabelForBranch } from '../../branches/branch-renderer'
-import { Repository } from '../../../models/repository'
 
 interface IChooseTargetBranchDialogProps {
   readonly repository: Repository

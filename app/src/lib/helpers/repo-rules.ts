@@ -1,10 +1,15 @@
 import { RE2JS } from 're2js'
+import { Account } from '../../models/account'
 import {
-  RepoRulesInfo,
   IRepoRulesMetadataRule,
-  RepoRulesMetadataMatcher,
   RepoRuleEnforced,
+  RepoRulesInfo,
+  RepoRulesMetadataMatcher,
 } from '../../models/repo-rules'
+import {
+  Repository,
+  isRepositoryWithGitHubRepository,
+} from '../../models/repository'
 import {
   APIRepoRuleMetadataOperator,
   APIRepoRuleType,
@@ -13,11 +18,6 @@ import {
   IAPIRepoRuleset,
 } from '../api'
 import { supportsRepoRules } from '../endpoint-capabilities'
-import { Account } from '../../models/account'
-import {
-  Repository,
-  isRepositoryWithGitHubRepository,
-} from '../../models/repository'
 import { getBooleanConfigValue } from '../git'
 
 /**

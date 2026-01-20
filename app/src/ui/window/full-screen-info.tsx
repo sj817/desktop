@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { TransitionGroup, CSSTransition } from 'react-transition-group'
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import { WindowState } from '../../lib/window-state'
 import { KeyboardShortcut } from '../keyboard-shortcut/keyboard-shortcut'
 

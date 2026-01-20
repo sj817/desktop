@@ -1,13 +1,13 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { getStartPoint } from '../../src/lib/create-branch'
-import { TipState, IValidBranch, IDetachedHead } from '../../src/models/tip'
 import {
-  BranchType,
-  StartPoint,
-  IBranchTip,
   Branch,
+  BranchType,
+  IBranchTip,
+  StartPoint,
 } from '../../src/models/branch'
+import { IDetachedHead, IValidBranch, TipState } from '../../src/models/tip'
 
 const stubTip: IBranchTip = {
   sha: 'deadbeef',

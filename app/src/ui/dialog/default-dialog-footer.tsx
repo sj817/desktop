@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { OkCancelButtonGroup } from './ok-cancel-button-group'
 import { DialogFooter } from './footer'
+import { OkCancelButtonGroup } from './ok-cancel-button-group'
 
 interface IDefaultDialogFooterProps {
   /** An optional text/label for the submit button, defaults to "Close" */

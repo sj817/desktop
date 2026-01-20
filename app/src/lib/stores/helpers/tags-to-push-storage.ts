@@ -1,5 +1,5 @@
-import { setStringArray, getStringArray } from '../../local-storage'
 import { Repository } from '../../../models/repository'
+import { getStringArray, setStringArray } from '../../local-storage'
 
 /**
  * Store in localStorage the tags to push for the given repository

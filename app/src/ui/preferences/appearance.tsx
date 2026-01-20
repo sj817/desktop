@@ -1,15 +1,15 @@
 import * as React from 'react'
-import {
-  ApplicationTheme,
-  supportsSystemThemeChanges,
-  getCurrentlyAppliedTheme,
-} from '../lib/application-theme'
-import { Row } from '../lib/row'
-import { DialogContent } from '../dialog'
-import { RadioGroup } from '../lib/radio-group'
-import { Select } from '../lib/select'
 import { encodePathAsUrl } from '../../lib/path'
 import { tabSizeDefault } from '../../lib/stores/app-store'
+import { DialogContent } from '../dialog'
+import {
+  ApplicationTheme,
+  getCurrentlyAppliedTheme,
+  supportsSystemThemeChanges,
+} from '../lib/application-theme'
+import { RadioGroup } from '../lib/radio-group'
+import { Row } from '../lib/row'
+import { Select } from '../lib/select'
 
 interface IAppearanceProps {
   readonly selectedTheme: ApplicationTheme

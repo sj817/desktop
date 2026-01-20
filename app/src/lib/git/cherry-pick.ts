@@ -1,31 +1,31 @@
-import * as Path from 'path'
+import byline from 'byline'
+import { ChildProcess } from 'child_process'
 import { GitError } from 'dugite'
+import { readFile } from 'fs/promises'
+import * as Path from 'path'
+import { getCommit } from '.'
+import { ICherryPickSnapshot } from '../../models/cherry-pick'
+import { CommitOneLine } from '../../models/commit'
+import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
+import { IMultiCommitOperationProgress } from '../../models/progress'
 import { Repository } from '../../models/repository'
 import {
   AppFileStatusKind,
   WorkingDirectoryFileChange,
 } from '../../models/status'
+import { pathExists } from '../../ui/lib/path-exists'
+import { round } from '../../ui/lib/round'
+import { merge } from '../merge'
 import {
   git,
   IGitExecutionOptions,
   IGitResult,
   IGitStringExecutionOptions,
 } from './core'
+import { getCommitsInRange, revRange } from './rev-list'
+import { stageManualConflictResolution } from './stage'
 import { getStatus } from './status'
 import { stageFiles } from './update-index'
-import { getCommitsInRange, revRange } from './rev-list'
-import { CommitOneLine } from '../../models/commit'
-import { merge } from '../merge'
-import { ChildProcess } from 'child_process'
-import { round } from '../../ui/lib/round'
-import byline from 'byline'
-import { ICherryPickSnapshot } from '../../models/cherry-pick'
-import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
-import { stageManualConflictResolution } from './stage'
-import { getCommit } from '.'
-import { IMultiCommitOperationProgress } from '../../models/progress'
-import { readFile } from 'fs/promises'
-import { pathExists } from '../../ui/lib/path-exists'
 
 /** The app-specific results from attempting to cherry pick commits*/
 export enum CherryPickResult {

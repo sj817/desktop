@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { ICommonImageDiffProperties } from './modified-image-diff'
 import { ImageContainer } from './image-container'
+import { ICommonImageDiffProperties } from './modified-image-diff'
 
 interface IOnionSkinState {
   readonly crossfade: number

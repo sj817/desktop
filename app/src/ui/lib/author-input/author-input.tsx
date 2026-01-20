@@ -1,19 +1,19 @@
-import * as React from 'react'
 import classNames from 'classnames'
-import {
-  UserAutocompletionProvider,
-  AutocompletingInput,
-  UserHit,
-  KnownUserHit,
-} from '../../autocompletion'
+import memoizeOne from 'memoize-one'
+import * as React from 'react'
+import { getLegacyStealthEmailForUser } from '../../../lib/email'
 import {
   Author,
   isKnownAuthor,
   KnownAuthor,
   UnknownAuthor,
 } from '../../../models/author'
-import { getLegacyStealthEmailForUser } from '../../../lib/email'
-import memoizeOne from 'memoize-one'
+import {
+  AutocompletingInput,
+  KnownUserHit,
+  UserAutocompletionProvider,
+  UserHit,
+} from '../../autocompletion'
 import { FocusContainer } from '../focus-container'
 import { AuthorHandle } from './author-handle'
 import { getFullTextForAuthor } from './author-text'

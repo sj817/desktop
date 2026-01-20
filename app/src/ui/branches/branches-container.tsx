@@ -1,43 +1,43 @@
 import * as React from 'react'
 
+import { Branch } from '../../models/branch'
+import { BranchesTab } from '../../models/branches-tab'
+import { PopupType } from '../../models/popup'
 import { PullRequest } from '../../models/pull-request'
 import {
   Repository,
   isRepositoryWithGitHubRepository,
 } from '../../models/repository'
-import { Branch } from '../../models/branch'
-import { BranchesTab } from '../../models/branches-tab'
-import { PopupType } from '../../models/popup'
 
-import { Dispatcher } from '../dispatcher'
 import { FoldoutType } from '../../lib/app-state'
 import { assertNever } from '../../lib/fatal-error'
+import { Dispatcher } from '../dispatcher'
 
 import { TabBar } from '../tab-bar'
 
+import { Button } from '../lib/button'
 import { Row } from '../lib/row'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { Button } from '../lib/button'
 
-import { BranchList } from './branch-list'
-import { PullRequestList } from './pull-request-list'
-import { IBranchListItem } from './group-branches'
-import {
-  getDefaultAriaLabelForBranch,
-  renderDefaultBranch,
-} from './branch-renderer'
-import { IMatches } from '../../lib/fuzzy-find'
-import { startTimer } from '../lib/timing'
+import classNames from 'classnames'
 import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
-import { DragType, DropTargetType } from '../../models/drag-drop'
+import { Emoji } from '../../lib/emoji'
 import {
   enablePullRequestQuickView,
   enableResizingToolbarButtons,
 } from '../../lib/feature-flag'
+import { IMatches } from '../../lib/fuzzy-find'
+import { DragType, DropTargetType } from '../../models/drag-drop'
+import { startTimer } from '../lib/timing'
 import { PullRequestQuickView } from '../pull-request-quick-view'
-import { Emoji } from '../../lib/emoji'
-import classNames from 'classnames'
+import { BranchList } from './branch-list'
+import {
+  getDefaultAriaLabelForBranch,
+  renderDefaultBranch,
+} from './branch-renderer'
+import { IBranchListItem } from './group-branches'
+import { PullRequestList } from './pull-request-list'
 
 interface IBranchesContainerProps {
   readonly dispatcher: Dispatcher

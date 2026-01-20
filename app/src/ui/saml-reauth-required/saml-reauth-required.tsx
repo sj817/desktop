@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { Dispatcher } from '../dispatcher'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { RetryAction } from '../../models/retry-actions'
 import { SignInResult } from '../../lib/stores'
+import { RetryAction } from '../../models/retry-actions'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
 
 const okButtonText = __DARWIN__ ? 'Continue in Browser' : 'Continue in browser'
 

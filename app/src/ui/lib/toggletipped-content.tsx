@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { ITooltipProps, Tooltip } from './tooltip'
-import { createObservableRef } from './observable-ref'
 import classNames from 'classnames'
+import * as React from 'react'
 import { AriaLiveContainer } from '../accessibility/aria-live-container'
+import { createObservableRef } from './observable-ref'
+import { ITooltipProps, Tooltip } from './tooltip'
 
 /**
  * IToggledtippedContentProps is a superset of ITooltipProps but does not

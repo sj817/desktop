@@ -1,25 +1,25 @@
+import memoizeOne from 'memoize-one'
 import * as React from 'react'
-import { PublishRepository } from './publish-repository'
-import { Dispatcher } from '../dispatcher'
+import { assertNever, fatalError } from '../../lib/fatal-error'
+import { getGitDescription } from '../../lib/git'
 import {
   Account,
   isDotComAccount,
   isEnterpriseAccount,
 } from '../../models/account'
-import { Repository } from '../../models/repository'
-import { Dialog, DialogFooter, DialogContent, DialogError } from '../dialog'
-import { TabBar } from '../tab-bar'
-import { assertNever, fatalError } from '../../lib/fatal-error'
-import { CallToAction } from '../lib/call-to-action'
-import { getGitDescription } from '../../lib/git'
 import {
   IDotcomPublicationSettings,
   IEnterprisePublicationSettings,
-  RepositoryPublicationSettings,
   PublishSettingsType,
+  RepositoryPublicationSettings,
 } from '../../models/publish-settings'
+import { Repository } from '../../models/repository'
+import { Dialog, DialogContent, DialogError, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import memoizeOne from 'memoize-one'
+import { Dispatcher } from '../dispatcher'
+import { CallToAction } from '../lib/call-to-action'
+import { TabBar } from '../tab-bar'
+import { PublishRepository } from './publish-repository'
 
 enum PublishTab {
   DotCom = 0,

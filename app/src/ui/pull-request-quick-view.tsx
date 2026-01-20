@@ -1,5 +1,7 @@
+import classNames from 'classnames'
 import * as React from 'react'
 import { clamp } from '../lib/clamp'
+import { Emoji } from '../lib/emoji'
 import { PullRequest } from '../models/pull-request'
 import { PullRequestBadge } from './branches'
 import { Dispatcher } from './dispatcher'
@@ -7,8 +9,6 @@ import { Button } from './lib/button'
 import { SandboxedMarkdown } from './lib/sandboxed-markdown'
 import { Octicon } from './octicons'
 import * as octicons from './octicons/octicons.generated'
-import classNames from 'classnames'
-import { Emoji } from '../lib/emoji'
 
 /**
  * The max height of the visible quick view card is 556 (500 for scrollable

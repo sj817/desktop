@@ -9,7 +9,7 @@ import {
   StringStream,
 } from 'codemirror/addon/runmode/runmode.node.js'
 
-import { ITokens, IHighlightRequest } from '../lib/highlighter/types'
+import { IHighlightRequest, ITokens } from '../lib/highlighter/types'
 
 /**
  * A mode definition object is used to map a certain file

@@ -2,15 +2,15 @@ import * as React from 'react'
 
 import { IMatches } from '../../lib/fuzzy-find'
 
+import classNames from 'classnames'
+import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
+import { enableAccessibleListToolTips } from '../../lib/feature-flag'
+import { DragType, DropTargetType } from '../../models/drag-drop'
+import { HighlightText } from '../lib/highlight-text'
+import { TooltippedContent } from '../lib/tooltipped-content'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { HighlightText } from '../lib/highlight-text'
-import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
-import { DragType, DropTargetType } from '../../models/drag-drop'
 import { RelativeTime } from '../relative-time'
-import classNames from 'classnames'
-import { TooltippedContent } from '../lib/tooltipped-content'
-import { enableAccessibleListToolTips } from '../../lib/feature-flag'
 
 interface IBranchListItemProps {
   /** The name of the branch */

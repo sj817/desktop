@@ -1,15 +1,15 @@
-import { stat, access } from 'fs/promises'
-import { constants } from 'fs'
 import { execFile as execFileSync, ProcessEnvOptions } from 'child_process'
-import { promisify } from 'util'
-import {
-  getDesktopAskpassTrampolinePath,
-  getDesktopCredentialHelperTrampolinePath,
-} from '../index'
-import split2 from 'split2'
+import { constants } from 'fs'
+import { access, stat } from 'fs/promises'
 import { createServer } from 'net'
 import assert from 'node:assert'
 import { describe, it } from 'node:test'
+import split2 from 'split2'
+import { promisify } from 'util'
+import {
+    getDesktopAskpassTrampolinePath,
+    getDesktopCredentialHelperTrampolinePath,
+} from '../index'
 
 const askPassTrampolinePath = getDesktopAskpassTrampolinePath()
 const helperTrampolinePath = getDesktopCredentialHelperTrampolinePath()

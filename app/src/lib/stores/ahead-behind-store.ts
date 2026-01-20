@@ -1,9 +1,9 @@
+import { Disposable, DisposableLike } from 'event-kit'
 import pLimit from 'p-limit'
 import QuickLRU from 'quick-lru'
-import { DisposableLike, Disposable } from 'event-kit'
 import { IAheadBehind } from '../../models/branch'
-import { revSymmetricDifference, getAheadBehind } from '../git'
 import { Repository } from '../../models/repository'
+import { getAheadBehind, revSymmetricDifference } from '../git'
 
 export type AheadBehindCallback = (aheadBehind: IAheadBehind) => void
 

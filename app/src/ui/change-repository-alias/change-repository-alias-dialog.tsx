@@ -1,9 +1,9 @@
 import * as React from 'react'
 
-import { Dispatcher } from '../dispatcher'
 import { nameOf, Repository } from '../../models/repository'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
 import { TextBox } from '../lib/text-box'
 
 interface IChangeRepositoryAliasProps {

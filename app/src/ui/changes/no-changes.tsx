@@ -1,36 +1,38 @@
 import * as React from 'react'
 
-import { encodePathAsUrl } from '../../lib/path'
-import { Repository } from '../../models/repository'
-import { LinkButton } from '../lib/link-button'
-import { MenuIDs } from '../../models/menu-ids'
-import { IMenu, MenuItem } from '../../models/app-menu'
 import memoizeOne from 'memoize-one'
-import { getPlatformSpecificNameOrSymbolForModifier } from '../../lib/menu-item'
-import { MenuBackedSuggestedAction } from '../suggested-actions'
 import { IRepositoryState } from '../../lib/app-state'
-import { TipState, IValidBranch } from '../../models/tip'
-import { Ref } from '../lib/ref'
-import { IAheadBehind } from '../../models/branch'
-import { IRemote } from '../../models/remote'
+import { getPlatformSpecificNameOrSymbolForModifier } from '../../lib/menu-item'
+import { encodePathAsUrl } from '../../lib/path'
 import {
   ForcePushBranchState,
   getCurrentBranchForcePushState,
 } from '../../lib/rebase'
-import { StashedChangesLoadStates } from '../../models/stash-entry'
-import { Dispatcher } from '../dispatcher'
-import { SuggestedActionGroup } from '../suggested-actions'
-import { PreferencesTab } from '../../models/preferences'
+import { IMenu, MenuItem } from '../../models/app-menu'
+import { IAheadBehind } from '../../models/branch'
+import { MenuIDs } from '../../models/menu-ids'
 import { PopupType } from '../../models/popup'
-import {
-  DropdownSuggestedAction,
-  IDropdownSuggestedActionOption,
-} from '../suggested-actions/dropdown-suggested-action'
+import { PreferencesTab } from '../../models/preferences'
 import {
   PullRequestSuggestedNextAction,
   isIdPullRequestSuggestedNextAction,
 } from '../../models/pull-request'
+import { IRemote } from '../../models/remote'
+import { Repository } from '../../models/repository'
+import { StashedChangesLoadStates } from '../../models/stash-entry'
+import { IValidBranch, TipState } from '../../models/tip'
+import { Dispatcher } from '../dispatcher'
 import { KeyboardShortcut } from '../keyboard-shortcut/keyboard-shortcut'
+import { LinkButton } from '../lib/link-button'
+import { Ref } from '../lib/ref'
+import {
+  MenuBackedSuggestedAction,
+  SuggestedActionGroup,
+} from '../suggested-actions'
+import {
+  DropdownSuggestedAction,
+  IDropdownSuggestedActionOption,
+} from '../suggested-actions/dropdown-suggested-action'
 
 function formatMenuItemLabel(text: string) {
   if (__WIN32__ || __LINUX__) {

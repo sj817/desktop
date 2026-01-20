@@ -1,6 +1,6 @@
-import { revRange } from './rev-list'
-import { Repository } from '../../models/repository'
 import { git } from '.'
+import { Repository } from '../../models/repository'
+import { revRange } from './rev-list'
 
 /**
  * Generate a patch representing the changes associated with a range of commits

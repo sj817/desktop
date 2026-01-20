@@ -1,22 +1,22 @@
+import noop from 'lodash/noop'
 import * as React from 'react'
-import { Dispatcher } from '../dispatcher'
+import { CommitOptions, Foldout } from '../../lib/app-state'
+import { Account } from '../../models/account'
+import { Author, UnknownAuthor } from '../../models/author'
+import { IAheadBehind } from '../../models/branch'
+import { ICommitContext } from '../../models/commit'
+import { CommitIdentity } from '../../models/commit-identity'
+import { ICommitMessage } from '../../models/commit-message'
+import { Popup } from '../../models/popup'
+import { RepoRulesInfo } from '../../models/repo-rules'
 import {
   isRepositoryWithGitHubRepository,
   Repository,
 } from '../../models/repository'
-import { Dialog, DialogContent } from '../dialog'
-import { ICommitContext } from '../../models/commit'
-import { CommitIdentity } from '../../models/commit-identity'
-import { ICommitMessage } from '../../models/commit-message'
 import { IAutocompletionProvider } from '../autocompletion'
-import { Author, UnknownAuthor } from '../../models/author'
 import { CommitMessage } from '../changes/commit-message'
-import noop from 'lodash/noop'
-import { Popup } from '../../models/popup'
-import { CommitOptions, Foldout } from '../../lib/app-state'
-import { Account } from '../../models/account'
-import { RepoRulesInfo } from '../../models/repo-rules'
-import { IAheadBehind } from '../../models/branch'
+import { Dialog, DialogContent } from '../dialog'
+import { Dispatcher } from '../dispatcher'
 
 interface ICommitMessageDialogProps {
   /**

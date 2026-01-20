@@ -1,14 +1,14 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
-import * as path from 'path'
 import { readFile, writeFile } from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import * as path from 'path'
 
-import { Repository } from '../../../src/models/repository'
+import { checkoutBranch, getBranches } from '../../../src/lib/git'
 import {
   listSubmodules,
   resetSubmodulePaths,
 } from '../../../src/lib/git/submodule'
-import { checkoutBranch, getBranches } from '../../../src/lib/git'
+import { Repository } from '../../../src/models/repository'
 import { setupFixtureRepository } from '../../helpers/repositories'
 
 describe('git/submodule', () => {

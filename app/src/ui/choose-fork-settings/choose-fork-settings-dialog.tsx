@@ -4,12 +4,12 @@ import {
   RepositoryWithForkedGitHubRepository,
   getForkContributionTarget,
 } from '../../models/repository'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { Dispatcher } from '../dispatcher'
 import { Row } from '../lib/row'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
 
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { ForkContributionTarget } from '../../models/workflow-preferences'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { VerticalSegmentedControl } from '../lib/vertical-segmented-control'
 import { ForkSettingsDescription } from '../repository-settings/fork-contribution-target-description'
 

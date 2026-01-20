@@ -1,9 +1,9 @@
+import classNames from 'classnames'
 import * as React from 'react'
+import { formatBytes } from '../../lib/bytes'
 import { ImageContainer } from './image-container'
 import { ICommonImageDiffProperties } from './modified-image-diff'
 import { ISize } from './sizing'
-import { formatBytes } from '../../lib/bytes'
-import classNames from 'classnames'
 
 function percentDiff(previous: number, current: number) {
   return `${Math.abs(Math.round((current / previous) * 100))}%`

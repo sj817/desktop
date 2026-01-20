@@ -1,8 +1,8 @@
-import * as React from 'react'
 import classNames from 'classnames'
-import { Avatar } from './avatar'
-import { IAvatarUser } from '../../models/avatar'
+import * as React from 'react'
 import { Account } from '../../models/account'
+import { IAvatarUser } from '../../models/avatar'
+import { Avatar } from './avatar'
 
 /**
  * The maximum number of avatars to stack before hiding

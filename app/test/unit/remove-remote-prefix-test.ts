@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { removeRemotePrefix } from '../../src/lib/remove-remote-prefix'
 
 describe('removeRemotePrefix', () => {

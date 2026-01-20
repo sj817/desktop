@@ -1,10 +1,10 @@
 import * as React from 'react'
 
 import { sanitizedRefName } from '../../lib/sanitize-ref-name'
-import { TextBox } from './text-box'
-import { Ref } from './ref'
-import { InputWarning } from './input-description/input-warning'
 import { InputError } from './input-description/input-error'
+import { InputWarning } from './input-description/input-warning'
+import { Ref } from './ref'
+import { TextBox } from './text-box'
 
 interface IRefNameProps {
   /**

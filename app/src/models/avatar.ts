@@ -1,9 +1,9 @@
+import { parseStealthEmail } from '../lib/email'
+import { isWebFlowCommitter } from '../lib/web-flow-committer'
 import { Commit } from './commit'
 import { CommitIdentity } from './commit-identity'
 import { GitAuthor } from './git-author'
 import { GitHubRepository } from './github-repository'
-import { isWebFlowCommitter } from '../lib/web-flow-committer'
-import { parseStealthEmail } from '../lib/email'
 
 /** The minimum properties we need in order to display a user's avatar. */
 export interface IAvatarUser {

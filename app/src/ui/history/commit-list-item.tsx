@@ -4,28 +4,28 @@
  * cherry-picking.
  */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+import classNames from 'classnames'
 import * as React from 'react'
-import { Commit } from '../../models/commit'
-import { GitHubRepository } from '../../models/github-repository'
-import { IAvatarUser, getAvatarUsersForCommit } from '../../models/avatar'
-import { RichText } from '../lib/rich-text'
-import { RelativeTime } from '../relative-time'
-import { CommitAttribution } from '../lib/commit-attribution'
-import { AvatarStack } from '../lib/avatar-stack'
-import { Octicon } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
-import { Draggable } from '../lib/draggable'
 import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
+import { Emoji } from '../../lib/emoji'
+import { enableAccessibleListToolTips } from '../../lib/feature-flag'
+import { Account } from '../../models/account'
+import { IAvatarUser, getAvatarUsersForCommit } from '../../models/avatar'
+import { Commit } from '../../models/commit'
 import {
   DragType,
   DropTargetSelector,
   DropTargetType,
 } from '../../models/drag-drop'
-import classNames from 'classnames'
-import { Account } from '../../models/account'
-import { Emoji } from '../../lib/emoji'
-import { enableAccessibleListToolTips } from '../../lib/feature-flag'
+import { GitHubRepository } from '../../models/github-repository'
+import { AvatarStack } from '../lib/avatar-stack'
+import { CommitAttribution } from '../lib/commit-attribution'
+import { Draggable } from '../lib/draggable'
+import { RichText } from '../lib/rich-text'
 import { TooltippedContent } from '../lib/tooltipped-content'
+import { Octicon } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
+import { RelativeTime } from '../relative-time'
 
 interface ICommitProps {
   readonly gitHubRepository: GitHubRepository | null

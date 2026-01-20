@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { WelcomeStep } from './welcome'
 import { Account } from '../../models/account'
-import { ConfigureGitUser } from '../lib/configure-git-user'
 import { Button } from '../lib/button'
+import { ConfigureGitUser } from '../lib/configure-git-user'
+import { WelcomeStep } from './welcome'
 
 interface IConfigureGitProps {
   readonly accounts: ReadonlyArray<Account>

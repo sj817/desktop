@@ -1,8 +1,8 @@
+import { Disposable, Emitter } from 'event-kit'
 import {
-  UiActivityKind,
   IUiActivityMonitor,
+  UiActivityKind,
 } from '../../src/ui/lib/ui-activity-monitor'
-import { Emitter, Disposable } from 'event-kit'
 
 export class TestActivityMonitor implements IUiActivityMonitor {
   private readonly emitter = new Emitter()

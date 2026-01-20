@@ -1,11 +1,11 @@
 import { createWriteStream, WriteStream } from 'fs'
+import { readdir, unlink } from 'fs/promises'
+import escapeRegExp from 'lodash/escapeRegExp'
+import { EOL } from 'os'
 import { join } from 'path'
 import { MESSAGE } from 'triple-beam'
-import TransportStream, { TransportStreamOptions } from 'winston-transport'
-import { EOL } from 'os'
-import { readdir, unlink } from 'fs/promises'
 import { promisify } from 'util'
-import escapeRegExp from 'lodash/escapeRegExp'
+import TransportStream, { TransportStreamOptions } from 'winston-transport'
 
 type DesktopFileTransportOptions = TransportStreamOptions & {
   readonly logDirectory: string

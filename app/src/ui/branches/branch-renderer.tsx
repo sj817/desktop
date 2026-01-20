@@ -2,10 +2,10 @@ import * as React from 'react'
 
 import { Branch } from '../../models/branch'
 
-import { IBranchListItem } from './group-branches'
-import { BranchListItem } from './branch-list-item'
 import { IMatches } from '../../lib/fuzzy-find'
 import { getRelativeTimeInfoFromDate } from '../relative-time'
+import { BranchListItem } from './branch-list-item'
+import { IBranchListItem } from './group-branches'
 
 export function renderDefaultBranch(
   item: IBranchListItem,

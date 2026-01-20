@@ -1,5 +1,5 @@
-import * as Path from 'path'
 import { readFile, writeFile } from 'fs/promises'
+import * as Path from 'path'
 
 const GitDescriptionPath = '.git/description'
 

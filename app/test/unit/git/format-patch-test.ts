@@ -1,16 +1,16 @@
-import { describe, it, TestContext } from 'node:test'
+import { exec } from 'dugite'
 import assert from 'node:assert'
-import {
-  setupTwoCommitRepo,
-  setupFixtureRepository,
-} from '../../helpers/repositories'
-import { Repository } from '../../../src/models/repository'
+import { describe, it, TestContext } from 'node:test'
 import { formatPatch } from '../../../src/lib/git'
+import { Repository } from '../../../src/models/repository'
+import {
+  setupFixtureRepository,
+  setupTwoCommitRepo,
+} from '../../helpers/repositories'
 import {
   cloneLocalRepository,
   makeCommit,
 } from '../../helpers/repository-scaffolding'
-import { exec } from 'dugite'
 
 describe('formatPatch', () => {
   describe('in a repo with commits', () => {

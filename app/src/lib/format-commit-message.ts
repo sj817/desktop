@@ -1,6 +1,6 @@
-import { mergeTrailers } from './git/interpret-trailers'
-import { Repository } from '../models/repository'
 import { ICommitContext } from '../models/commit'
+import { Repository } from '../models/repository'
+import { mergeTrailers } from './git/interpret-trailers'
 
 /**
  * Formats a summary and a description into a git-friendly

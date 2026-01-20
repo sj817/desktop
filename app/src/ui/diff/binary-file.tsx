@@ -1,5 +1,5 @@
-import * as React from 'react'
 import * as Path from 'path'
+import * as React from 'react'
 
 import { Repository } from '../../models/repository'
 

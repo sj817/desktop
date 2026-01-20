@@ -1,14 +1,14 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { wrapRichTextCommitMessage } from '../../src/lib/wrap-rich-text-commit-message'
+import { describe, it } from 'node:test'
+import { Emoji } from '../../src/lib/emoji'
 import {
+  HyperlinkMatch,
   TokenType,
   Tokenizer,
-  HyperlinkMatch,
 } from '../../src/lib/text-token-parser'
-import { gitHubRepoFixture } from '../helpers/github-repo-builder'
+import { wrapRichTextCommitMessage } from '../../src/lib/wrap-rich-text-commit-message'
 import { Repository } from '../../src/models/repository'
-import { Emoji } from '../../src/lib/emoji'
+import { gitHubRepoFixture } from '../helpers/github-repo-builder'
 
 describe('wrapRichTextCommitMessage', () => {
   const emojis = new Map<string, Emoji>()

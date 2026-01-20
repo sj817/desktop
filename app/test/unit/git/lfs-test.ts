@@ -1,19 +1,19 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
-import * as Path from 'path'
 import { writeFile } from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import * as Path from 'path'
 
-import {
-  setupFixtureRepository,
-  setupEmptyRepository,
-} from '../../helpers/repositories'
-import { Repository } from '../../../src/models/repository'
 import { exec } from 'dugite'
 import {
-  isUsingLFS,
-  isTrackedByLFS,
   filesNotTrackedByLFS,
+  isTrackedByLFS,
+  isUsingLFS,
 } from '../../../src/lib/git/lfs'
+import { Repository } from '../../../src/models/repository'
+import {
+  setupEmptyRepository,
+  setupFixtureRepository,
+} from '../../helpers/repositories'
 
 describe('git-lfs', () => {
   describe('isUsingLFS', () => {

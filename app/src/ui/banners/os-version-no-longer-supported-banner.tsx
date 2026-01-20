@@ -1,9 +1,9 @@
 import * as React from 'react'
+import { setNumber } from '../../lib/local-storage'
+import { LinkButton } from '../lib/link-button'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
 import { Banner } from './banner'
-import { LinkButton } from '../lib/link-button'
-import { setNumber } from '../../lib/local-storage'
 
 export const UnsupportedOSBannerDismissedAtKey =
   'unsupported-os-banner-dismissed-at'

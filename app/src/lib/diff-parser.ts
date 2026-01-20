@@ -1,13 +1,13 @@
+import { assertNever } from '../lib/fatal-error'
 import {
-  IRawDiff,
   DiffHunk,
   DiffHunkHeader,
   DiffLine,
   DiffLineType,
+  IRawDiff,
 } from '../models/diff'
-import { assertNever } from '../lib/fatal-error'
-import { getHunkHeaderExpansionType } from '../ui/diff/text-diff-expansion'
 import { getLargestLineNumber } from '../ui/diff/diff-helpers'
+import { getHunkHeaderExpansionType } from '../ui/diff/text-diff-expansion'
 
 // https://en.wikipedia.org/wiki/Diff_utility
 //

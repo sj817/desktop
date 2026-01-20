@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { shell } from '../../lib/app-shell'
+import { PopupType } from '../../models/popup'
 import { Dispatcher } from '../dispatcher/index'
 import { LinkButton } from '../lib/link-button'
 import {
@@ -8,14 +10,12 @@ import {
 } from '../lib/update-store'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { PopupType } from '../../models/popup'
-import { shell } from '../../lib/app-shell'
 
+import { Emoji } from '../../lib/emoji'
 import { ReleaseSummary } from '../../models/release-notes'
-import { Banner } from './banner'
 import { ReleaseNotesUri } from '../lib/releases'
 import { RichText } from '../lib/rich-text'
-import { Emoji } from '../../lib/emoji'
+import { Banner } from './banner'
 
 interface IUpdateAvailableProps {
   readonly dispatcher: Dispatcher

@@ -1,17 +1,17 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
-import * as path from 'path'
 import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import * as path from 'path'
 
-import { Repository } from '../../../src/models/repository'
-import { getRepositoryType } from '../../../src/lib/git/rev-parse'
-import { git } from '../../../src/lib/git/core'
-import {
-  setupFixtureRepository,
-  setupEmptyRepository,
-} from '../../helpers/repositories'
 import { exec } from 'dugite'
 import { writeFile } from 'fs-extra'
+import { git } from '../../../src/lib/git/core'
+import { getRepositoryType } from '../../../src/lib/git/rev-parse'
+import { Repository } from '../../../src/models/repository'
+import {
+  setupEmptyRepository,
+  setupFixtureRepository,
+} from '../../helpers/repositories'
 import { createTempDirectory } from '../../helpers/temp'
 
 describe('git/rev-parse', () => {

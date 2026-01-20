@@ -1,10 +1,10 @@
 import { pathExists } from 'fs-extra'
 import { join } from 'path'
 import which from 'which'
-import { bash, cmd, powershell } from './shell-escape'
-import { SupportedHooksEnvShell } from './config'
 import { assertNever } from '../fatal-error'
 import { findGitBash as findGitBashInRegistry } from '../shells/win32'
+import { SupportedHooksEnvShell } from './config'
+import { bash, cmd, powershell } from './shell-escape'
 
 type Shell = {
   shell: string

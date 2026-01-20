@@ -1,43 +1,43 @@
-import * as React from 'react'
 import { clipboard } from 'electron'
 import * as Path from 'path'
+import * as React from 'react'
 
-import { Repository } from '../../models/repository'
-import { CommittedFileChange } from '../../models/status'
 import { Commit } from '../../models/commit'
 import { IDiff, ImageDiffType } from '../../models/diff'
+import { Repository } from '../../models/repository'
+import { CommittedFileChange } from '../../models/status'
 
-import { encodePathAsUrl } from '../../lib/path'
 import { revealInFileManager } from '../../lib/app-shell'
+import { encodePathAsUrl } from '../../lib/path'
 
-import { openFile } from '../lib/open-file'
 import {
-  isSafeFileExtension,
   CopyFilePathLabel,
-  DefaultEditorLabel,
-  RevealInFileManagerLabel,
-  OpenWithDefaultProgramLabel,
   CopyRelativeFilePathLabel,
+  DefaultEditorLabel,
+  isSafeFileExtension,
+  OpenWithDefaultProgramLabel,
+  RevealInFileManagerLabel,
 } from '../lib/context-menu'
+import { openFile } from '../lib/open-file'
 import { ThrottledScheduler } from '../lib/throttled-scheduler'
 
+import { showContextualMenu } from '../../lib/menu-item'
 import { Dispatcher } from '../dispatcher'
 import { Resizable } from '../resizable'
-import { showContextualMenu } from '../../lib/menu-item'
 
-import { FileList } from './file-list'
-import { SeamlessDiffSwitcher } from '../diff/seamless-diff-switcher'
 import { getDotComAPIEndpoint } from '../../lib/api'
-import { IMenuItem } from '../../lib/menu-item'
-import { IChangesetData } from '../../lib/git'
 import { IConstrainedValue } from '../../lib/app-state'
 import { clamp } from '../../lib/clamp'
-import { pathExists } from '../lib/path-exists'
-import { UnreachableCommitsTab } from './unreachable-commits-dialog'
-import { ExpandableCommitSummary } from './expandable-commit-summary'
-import { DiffHeader } from '../diff/diff-header'
-import { Account } from '../../models/account'
 import { Emoji } from '../../lib/emoji'
+import { IChangesetData } from '../../lib/git'
+import { IMenuItem } from '../../lib/menu-item'
+import { Account } from '../../models/account'
+import { DiffHeader } from '../diff/diff-header'
+import { SeamlessDiffSwitcher } from '../diff/seamless-diff-switcher'
+import { pathExists } from '../lib/path-exists'
+import { ExpandableCommitSummary } from './expandable-commit-summary'
+import { FileList } from './file-list'
+import { UnreachableCommitsTab } from './unreachable-commits-dialog'
 
 interface ISelectedCommitsProps {
   readonly repository: Repository

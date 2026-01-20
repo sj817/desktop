@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { assertNever } from '../../lib/fatal-error'
 import { MultiCommitOperationKind } from '../../models/multi-commit-operation'
-import { Squash } from './squash'
 import { IMultiCommitOperationProps } from './base-multi-commit-operation'
-import { Merge } from './merge'
-import { Reorder } from './reorder'
 import { CherryPick } from './cherry-pick'
+import { Merge } from './merge'
 import { Rebase } from './rebase'
+import { Reorder } from './reorder'
+import { Squash } from './squash'
 
 /** A component for managing the views of a multi commit operation. */
 export class MultiCommitOperation extends React.Component<IMultiCommitOperationProps> {

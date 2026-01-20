@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { encodePathAsUrl } from '../../lib/path'
-import { Ref } from '../lib/ref'
 import { LinkButton } from '../lib/link-button'
+import { Ref } from '../lib/ref'
 
 const BlankSlateImage = encodePathAsUrl(
   __dirname,

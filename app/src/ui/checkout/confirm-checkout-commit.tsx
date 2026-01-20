@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { Repository } from '../../models/repository'
-import { Dispatcher } from '../dispatcher'
-import { Row } from '../lib/row'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { Checkbox, CheckboxValue } from '../lib/checkbox'
 import { CommitOneLine } from '../../models/commit'
+import { Repository } from '../../models/repository'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
+import { Checkbox, CheckboxValue } from '../lib/checkbox'
+import { Row } from '../lib/row'
 
 interface IConfirmCheckoutCommitProps {
   readonly dispatcher: Dispatcher

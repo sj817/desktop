@@ -1,23 +1,23 @@
-import * as React from 'react'
 import { join } from 'path'
-import { LinkButton } from '../lib/link-button'
-import { Button } from '../lib/button'
-import { Repository } from '../../models/repository'
-import { Dispatcher } from '../dispatcher'
-import { Octicon } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
-import {
-  ValidTutorialStep,
-  TutorialStep,
-  orderedTutorialSteps,
-} from '../../models/tutorial-step'
+import * as React from 'react'
+import { suggestedExternalEditor } from '../../lib/editors/shared'
 import { encodePathAsUrl } from '../../lib/path'
 import { PopupType } from '../../models/popup'
 import { PreferencesTab } from '../../models/preferences'
-import { Ref } from '../lib/ref'
-import { suggestedExternalEditor } from '../../lib/editors/shared'
-import { TutorialStepInstructions } from './tutorial-step-instruction'
+import { Repository } from '../../models/repository'
+import {
+  TutorialStep,
+  ValidTutorialStep,
+  orderedTutorialSteps,
+} from '../../models/tutorial-step'
+import { Dispatcher } from '../dispatcher'
 import { KeyboardShortcut } from '../keyboard-shortcut/keyboard-shortcut'
+import { Button } from '../lib/button'
+import { LinkButton } from '../lib/link-button'
+import { Ref } from '../lib/ref'
+import { Octicon } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
+import { TutorialStepInstructions } from './tutorial-step-instruction'
 
 const TutorialPanelImage = encodePathAsUrl(
   __dirname,

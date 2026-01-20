@@ -1,6 +1,8 @@
-import * as React from 'react'
-import { WindowState } from '../../lib/window-state'
 import classNames from 'classnames'
+import * as React from 'react'
+import * as ipcRenderer from '../../lib/ipc-renderer'
+import { WindowState } from '../../lib/window-state'
+import { Button } from '../lib/button'
 import {
   closeWindow,
   getCurrentWindowState,
@@ -8,8 +10,6 @@ import {
   minimizeWindow,
   restoreWindow,
 } from '../main-process-proxy'
-import * as ipcRenderer from '../../lib/ipc-renderer'
-import { Button } from '../lib/button'
 
 // These paths are all drawn to a 10x10 view box and replicate the symbols
 // seen on Windows 10 window controls.

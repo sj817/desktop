@@ -1,10 +1,10 @@
 import * as React from 'react'
+import Confetti from 'react-confetti'
 import { DesktopFakeRepository } from '../../lib/desktop-fake-repository'
+import { Emoji } from '../../lib/emoji'
 import { ReleaseNote } from '../../models/release-notes'
 import { Dialog, DialogContent } from '../dialog'
 import { RichText } from '../lib/rich-text'
-import Confetti from 'react-confetti'
-import { Emoji } from '../../lib/emoji'
 
 interface IThankYouProps {
   readonly onDismissed: () => void

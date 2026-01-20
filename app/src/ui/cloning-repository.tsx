@@ -2,10 +2,10 @@ import * as React from 'react'
 
 import { CloningRepository } from '../models/cloning-repository'
 import { ICloneProgress } from '../models/progress'
+import { TooltippedContent } from './lib/tooltipped-content'
 import { Octicon } from './octicons'
 import * as octicons from './octicons/octicons.generated'
 import { UiView } from './ui-view'
-import { TooltippedContent } from './lib/tooltipped-content'
 
 interface ICloningRepositoryProps {
   readonly repository: CloningRepository

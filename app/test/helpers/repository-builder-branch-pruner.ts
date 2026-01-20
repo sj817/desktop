@@ -1,16 +1,16 @@
-import { setupEmptyRepository } from './repositories'
-import { makeCommit, switchTo } from './repository-scaffolding'
 import { exec } from 'dugite'
-import { RepositoriesStore, GitStore } from '../../src/lib/stores'
+import { TestContext } from 'node:test'
+import { IAPIFullRepository, getDotComAPIEndpoint } from '../../src/lib/api'
+import { GitStore, RepositoriesStore } from '../../src/lib/stores'
 import { RepositoryStateCache } from '../../src/lib/stores/repository-state-cache'
 import {
   Repository,
   isRepositoryWithGitHubRepository,
 } from '../../src/models/repository'
-import { IAPIFullRepository, getDotComAPIEndpoint } from '../../src/lib/api'
+import { setupEmptyRepository } from './repositories'
+import { makeCommit, switchTo } from './repository-scaffolding'
 import { shell } from './test-app-shell'
 import { TestStatsStore } from './test-stats-store'
-import { TestContext } from 'node:test'
 
 export async function createRepository(t: TestContext) {
   const repo = await setupEmptyRepository(t)

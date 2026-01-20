@@ -1,5 +1,5 @@
-import { Repository } from '../models/repository'
 import { Account } from '../models/account'
+import { Repository } from '../models/repository'
 import { getAccountForEndpoint } from './api'
 
 /** Get the authenticated account for the repository. */

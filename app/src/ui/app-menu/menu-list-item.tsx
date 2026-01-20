@@ -1,11 +1,11 @@
-import * as React from 'react'
 import classNames from 'classnames'
+import * as React from 'react'
 
-import { Octicon } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
+import { getPlatformSpecificNameOrSymbolForModifier } from '../../lib/menu-item'
 import { MenuItem } from '../../models/app-menu'
 import { AccessText } from '../lib/access-text'
-import { getPlatformSpecificNameOrSymbolForModifier } from '../../lib/menu-item'
+import { Octicon } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
 
 interface IMenuListItemProps {
   readonly item: MenuItem

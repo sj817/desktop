@@ -1,10 +1,7 @@
-import * as React from 'react'
 import memoizeOne from 'memoize-one'
-import { WindowState } from '../../lib/window-state'
-import { WindowControls } from './window-controls'
-import { Octicon } from '../octicons/octicon'
-import * as octicons from '../octicons/octicons.generated'
+import * as React from 'react'
 import { isMacOSBigSurOrLater, isMacOSTahoeOrLater } from '../../lib/get-os'
+import { WindowState } from '../../lib/window-state'
 import {
   getAppleActionOnDoubleClick,
   isWindowMaximized,
@@ -12,6 +9,9 @@ import {
   minimizeWindow,
   restoreWindow,
 } from '../main-process-proxy'
+import { Octicon } from '../octicons/octicon'
+import * as octicons from '../octicons/octicons.generated'
+import { WindowControls } from './window-controls'
 
 /** Get the height (in pixels) of the title bar depending on the platform */
 export function getTitleBarHeight() {

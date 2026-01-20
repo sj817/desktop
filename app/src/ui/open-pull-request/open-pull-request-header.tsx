@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { IChangesetData } from '../../lib/git'
 import { Branch } from '../../models/branch'
+import { Repository } from '../../models/repository'
 import { BranchSelect } from '../branches/branch-select'
 import { DialogHeader } from '../dialog/header'
 import { Ref } from '../lib/ref'
-import { Repository } from '../../models/repository'
-import { IChangesetData } from '../../lib/git'
 
 export const OpenPullRequestDialogId = 'Dialog_Open_Pull_Request'
 

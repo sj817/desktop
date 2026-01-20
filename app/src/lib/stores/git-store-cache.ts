@@ -1,7 +1,7 @@
-import { GitStore } from './git-store'
 import { Repository } from '../../models/repository'
 import { IAppShell } from '../app-shell'
 import { IStatsStore } from '../stats'
+import { GitStore } from './git-store'
 
 export class GitStoreCache {
   /** GitStores keyed by their hash. */

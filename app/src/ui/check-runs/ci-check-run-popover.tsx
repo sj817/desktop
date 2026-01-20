@@ -1,39 +1,39 @@
-import * as React from 'react'
-import { GitHubRepository } from '../../models/github-repository'
 import { DisposableLike } from 'event-kit'
-import { Dispatcher } from '../dispatcher'
-import {
-  getCheckRunConclusionAdjective,
-  ICombinedRefCheck,
-  IRefCheck,
-  getCheckRunStepURL,
-  getCheckStatusCountMap,
-  FailingCheckConclusions,
-} from '../../lib/ci-checks/ci-checks'
-import { Octicon, syncClockwise } from '../octicons'
+import groupBy from 'lodash/groupBy'
+import * as React from 'react'
 import {
   APICheckConclusion,
   APICheckStatus,
   IAPIWorkflowJobStep,
 } from '../../lib/api'
 import {
-  Popover,
-  PopoverAnchorPosition,
-  PopoverDecoration,
-} from '../lib/popover'
-import { CICheckRunList } from './ci-check-run-list'
-import { encodePathAsUrl } from '../../lib/path'
-import { PopupType } from '../../models/popup'
-import * as octicons from '../octicons/octicons.generated'
-import { Donut } from '../donut'
+  FailingCheckConclusions,
+  getCheckRunConclusionAdjective,
+  getCheckRunStepURL,
+  getCheckStatusCountMap,
+  ICombinedRefCheck,
+  IRefCheck,
+} from '../../lib/ci-checks/ci-checks'
 import {
   supportsRerunningChecks,
   supportsRerunningIndividualOrFailedChecks,
 } from '../../lib/endpoint-capabilities'
-import { getPullRequestCommitRef } from '../../models/pull-request'
-import { CICheckReRunButton } from './ci-check-re-run-button'
-import groupBy from 'lodash/groupBy'
+import { encodePathAsUrl } from '../../lib/path'
 import { toSentence } from '../../lib/to_sentence'
+import { GitHubRepository } from '../../models/github-repository'
+import { PopupType } from '../../models/popup'
+import { getPullRequestCommitRef } from '../../models/pull-request'
+import { Dispatcher } from '../dispatcher'
+import { Donut } from '../donut'
+import {
+  Popover,
+  PopoverAnchorPosition,
+  PopoverDecoration,
+} from '../lib/popover'
+import { Octicon, syncClockwise } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
+import { CICheckReRunButton } from './ci-check-re-run-button'
+import { CICheckRunList } from './ci-check-run-list'
 
 const BlankSlateImage = encodePathAsUrl(
   __dirname,

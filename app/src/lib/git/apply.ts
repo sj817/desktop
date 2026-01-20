@@ -1,14 +1,14 @@
 import { GitError as DugiteError } from 'dugite'
-import { git } from './core'
-import {
-  WorkingDirectoryFileChange,
-  AppFileStatusKind,
-} from '../../models/status'
-import { DiffType, ITextDiff, DiffSelection } from '../../models/diff'
+import { DiffSelection, DiffType, ITextDiff } from '../../models/diff'
 import { Repository, WorkingTree } from '../../models/repository'
-import { getWorkingDirectoryDiff } from './diff'
-import { formatPatch, formatPatchToDiscardChanges } from '../patch-formatter'
+import {
+  AppFileStatusKind,
+  WorkingDirectoryFileChange,
+} from '../../models/status'
 import { assertNever } from '../fatal-error'
+import { formatPatch, formatPatchToDiscardChanges } from '../patch-formatter'
+import { git } from './core'
+import { getWorkingDirectoryDiff } from './diff'
 
 export async function applyPatchToIndex(
   repository: Repository,

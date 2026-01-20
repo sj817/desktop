@@ -1,9 +1,9 @@
-import { IssuesDatabase, IIssue } from '../databases/issues-database'
-import { API, IAPIIssue } from '../api'
 import { Account } from '../../models/account'
 import { GitHubRepository } from '../../models/github-repository'
-import { compare, compareDescending } from '../compare'
 import { DefaultMaxHits } from '../../ui/autocompletion/common'
+import { API, IAPIIssue } from '../api'
+import { compare, compareDescending } from '../compare'
+import { IIssue, IssuesDatabase } from '../databases/issues-database'
 
 /** An autocompletion hit for an issue. */
 export interface IIssueHit {

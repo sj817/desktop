@@ -1,24 +1,24 @@
+import classNames from 'classnames'
 import React from 'react'
-import { Select } from '../lib/select'
+import { getConfigValue } from '../../lib/git/config'
+import { Account } from '../../models/account'
+import { IAvatarUser } from '../../models/avatar'
+import { RepoRulesMetadataFailures } from '../../models/repo-rules'
+import { Repository } from '../../models/repository'
+import { OkCancelButtonGroup } from '../dialog'
+import { Avatar } from '../lib/avatar'
 import { Button } from '../lib/button'
-import { Row } from '../lib/row'
+import { LinkButton } from '../lib/link-button'
 import {
   Popover,
   PopoverAnchorPosition,
   PopoverDecoration,
 } from '../lib/popover'
-import { IAvatarUser } from '../../models/avatar'
-import { Avatar } from '../lib/avatar'
+import { Row } from '../lib/row'
+import { Select } from '../lib/select'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { LinkButton } from '../lib/link-button'
-import { OkCancelButtonGroup } from '../dialog'
-import { getConfigValue } from '../../lib/git/config'
-import { Repository } from '../../models/repository'
-import classNames from 'classnames'
-import { RepoRulesMetadataFailures } from '../../models/repo-rules'
 import { RepoRulesMetadataFailureList } from '../repository-rules/repo-rules-failure-list'
-import { Account } from '../../models/account'
 
 export type CommitMessageAvatarWarningType =
   | 'none'

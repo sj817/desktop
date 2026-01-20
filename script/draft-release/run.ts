@@ -1,4 +1,4 @@
-import { sort as semverSort, SemVer } from 'semver'
+import { SemVer, sort as semverSort } from 'semver'
 
 import { getLogLines } from '../changelog/git'
 import {
@@ -6,16 +6,16 @@ import {
   getChangelogEntriesSince,
 } from '../changelog/parser'
 
+import { execSync } from 'child_process'
 import { Channel } from './channel'
 import { getNextVersionNumber } from './version'
-import { execSync } from 'child_process'
 
 import { writeFileSync } from 'fs'
+import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { format } from 'prettier'
 import { assertNever, forceUnwrap } from '../../app/src/lib/fatal-error'
 import { sh } from '../sh'
-import { readFile } from 'fs/promises'
 
 const changelogPath = join(__dirname, '..', '..', 'changelog.json')
 

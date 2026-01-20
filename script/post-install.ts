@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
-import * as Path from 'path'
 import { spawnSync, SpawnSyncOptions } from 'child_process'
+import * as Path from 'path'
 
 import glob from 'glob'
 import { forceUnwrap } from '../app/src/lib/fatal-error'

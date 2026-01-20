@@ -1,16 +1,16 @@
 import {
-  WebRequest,
-  OnBeforeRequestListenerDetails,
-  CallbackResponse,
-  OnBeforeSendHeadersListenerDetails,
   BeforeSendResponse,
+  CallbackResponse,
+  HeadersReceivedResponse,
+  OnBeforeRedirectListenerDetails,
+  OnBeforeRequestListenerDetails,
+  OnBeforeSendHeadersListenerDetails,
   OnCompletedListenerDetails,
   OnErrorOccurredListenerDetails,
-  OnResponseStartedListenerDetails,
   OnHeadersReceivedListenerDetails,
-  HeadersReceivedResponse,
+  OnResponseStartedListenerDetails,
   OnSendHeadersListenerDetails,
-  OnBeforeRedirectListenerDetails,
+  WebRequest,
 } from 'electron/main'
 
 type SyncListener<TDetails> = (details: TDetails) => void

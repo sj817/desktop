@@ -1,35 +1,35 @@
-import * as Path from 'path'
+import byline from 'byline'
 import { ChildProcess } from 'child_process'
 import { GitError } from 'dugite'
-import byline from 'byline'
+import * as Path from 'path'
 
-import { Repository } from '../../models/repository'
-import { RebaseInternalState, RebaseProgressOptions } from '../../models/rebase'
-import { IMultiCommitOperationProgress } from '../../models/progress'
-import {
-  WorkingDirectoryFileChange,
-  AppFileStatusKind,
-} from '../../models/status'
-import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
 import { Commit, CommitOneLine } from '../../models/commit'
+import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
+import { IMultiCommitOperationProgress } from '../../models/progress'
+import { RebaseInternalState, RebaseProgressOptions } from '../../models/rebase'
+import { Repository } from '../../models/repository'
+import {
+  AppFileStatusKind,
+  WorkingDirectoryFileChange,
+} from '../../models/status'
 
 import { merge } from '../merge'
 import { formatRebaseValue } from '../rebase'
 
+import { readFile } from 'fs/promises'
+import { Branch } from '../../models/branch'
+import { pathExists } from '../../ui/lib/path-exists'
 import {
   git,
-  IGitExecutionOptions,
   gitRebaseArguments,
+  IGitExecutionOptions,
   IGitStringExecutionOptions,
   IGitStringResult,
 } from './core'
-import { stageManualConflictResolution } from './stage'
-import { stageFiles } from './update-index'
-import { getStatus } from './status'
 import { getCommitsBetweenCommits } from './rev-list'
-import { Branch } from '../../models/branch'
-import { readFile } from 'fs/promises'
-import { pathExists } from '../../ui/lib/path-exists'
+import { stageManualConflictResolution } from './stage'
+import { getStatus } from './status'
+import { stageFiles } from './update-index'
 
 /** The app-specific results from attempting to rebase a repository */
 export enum RebaseResult {

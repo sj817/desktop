@@ -1,16 +1,16 @@
 import * as React from 'react'
+import { assertNever } from '../../lib/fatal-error'
+import { Repository } from '../../models/repository'
+import { RetryAction, RetryActionType } from '../../models/retry-actions'
 import {
+  DefaultDialogFooter,
   Dialog,
   DialogContent,
   DialogFooter,
-  DefaultDialogFooter,
 } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { Repository } from '../../models/repository'
-import { RetryAction, RetryActionType } from '../../models/retry-actions'
 import { Dispatcher } from '../dispatcher'
 import { PathText } from '../lib/path-text'
-import { assertNever } from '../../lib/fatal-error'
 
 interface ILocalChangesOverwrittenDialogProps {
   readonly repository: Repository

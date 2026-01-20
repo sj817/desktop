@@ -1,14 +1,14 @@
-import { spawn, ChildProcess } from 'child_process'
-import { assertNever } from '../fatal-error'
-import { parseEnumValue } from '../enum'
+import { ChildProcess, spawn } from 'child_process'
 import { pathExists } from '../../ui/lib/path-exists'
-import { FoundShell } from './shared'
 import {
   expandTargetPathArgument,
   ICustomIntegration,
   parseCustomIntegrationArguments,
   spawnCustomIntegration,
 } from '../custom-integration'
+import { parseEnumValue } from '../enum'
+import { assertNever } from '../fatal-error'
+import { FoundShell } from './shared'
 
 export enum Shell {
   Gnome = 'GNOME Terminal',

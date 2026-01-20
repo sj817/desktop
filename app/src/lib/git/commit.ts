@@ -1,3 +1,6 @@
+import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
+import { Repository } from '../../models/repository'
+import { WorkingDirectoryFileChange } from '../../models/status'
 import {
   git,
   HookProgress,
@@ -5,12 +8,9 @@ import {
   TerminalOutput,
   TerminalOutputCallback,
 } from './core'
-import { stageFiles } from './update-index'
-import { Repository } from '../../models/repository'
-import { WorkingDirectoryFileChange } from '../../models/status'
 import { unstageAll } from './reset'
-import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
 import { stageManualConflictResolution } from './stage'
+import { stageFiles } from './update-index'
 
 /**
  * @param repository repository to execute merge in

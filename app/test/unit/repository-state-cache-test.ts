@@ -1,16 +1,16 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { RepositoryStateCache } from '../../src/lib/stores/repository-state-cache'
-import { Repository } from '../../src/models/repository'
-import { PullRequest } from '../../src/models/pull-request'
-import { GitHubRepository } from '../../src/models/github-repository'
-import {
-  WorkingDirectoryStatus,
-  WorkingDirectoryFileChange,
-  AppFileStatusKind,
-} from '../../src/models/status'
-import { DiffSelection, DiffSelectionType } from '../../src/models/diff'
+import { describe, it } from 'node:test'
 import { HistoryTabMode, IDisplayHistory } from '../../src/lib/app-state'
+import { RepositoryStateCache } from '../../src/lib/stores/repository-state-cache'
+import { DiffSelection, DiffSelectionType } from '../../src/models/diff'
+import { GitHubRepository } from '../../src/models/github-repository'
+import { PullRequest } from '../../src/models/pull-request'
+import { Repository } from '../../src/models/repository'
+import {
+  AppFileStatusKind,
+  WorkingDirectoryFileChange,
+  WorkingDirectoryStatus,
+} from '../../src/models/status'
 import { gitHubRepoFixture } from '../helpers/github-repo-builder'
 import { TestStatsStore } from '../helpers/test-stats-store'
 

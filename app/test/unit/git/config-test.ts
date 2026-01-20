@@ -1,20 +1,20 @@
-import { describe, it, TestContext } from 'node:test'
-import assert from 'node:assert'
 import { exec } from 'dugite'
+import assert from 'node:assert'
+import { describe, it, TestContext } from 'node:test'
 import * as Path from 'path'
 
-import { Repository } from '../../../src/models/repository'
 import {
   getConfigValue,
+  getGlobalBooleanConfigValue,
   getGlobalConfigPath,
   getGlobalConfigValue,
-  setGlobalConfigValue,
-  getGlobalBooleanConfigValue,
   git,
+  setGlobalConfigValue,
 } from '../../../src/lib/git'
+import { Repository } from '../../../src/models/repository'
 
-import { setupFixtureRepository } from '../../helpers/repositories'
 import { realpath } from 'fs/promises'
+import { setupFixtureRepository } from '../../helpers/repositories'
 import { createTempDirectory } from '../../helpers/temp'
 
 describe('git/config', () => {

@@ -1,5 +1,4 @@
-import { getPath } from '../main-process-proxy'
-import { getAppPathProxy } from '../main-process-proxy'
+import { getAppPathProxy, getPath } from '../main-process-proxy'
 
 let path: string | null = null
 let documentsPath: string | null = null

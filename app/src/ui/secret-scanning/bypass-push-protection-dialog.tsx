@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { ISecretScanResult } from './push-protection-error-dialog'
 import { VerticalSegmentedControl } from '../lib/vertical-segmented-control'
+import { ISecretScanResult } from './push-protection-error-dialog'
 
 export enum BypassReason {
   FalsePositive = 'false_positive',

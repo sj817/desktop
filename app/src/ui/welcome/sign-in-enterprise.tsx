@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { WelcomeStep } from './welcome'
+import { SignInState } from '../../lib/stores'
+import { Dispatcher } from '../dispatcher'
 import { Button } from '../lib/button'
 import { SignIn } from '../lib/sign-in'
-import { Dispatcher } from '../dispatcher'
-import { SignInState } from '../../lib/stores'
+import { WelcomeStep } from './welcome'
 
 interface ISignInEnterpriseProps {
   readonly dispatcher: Dispatcher

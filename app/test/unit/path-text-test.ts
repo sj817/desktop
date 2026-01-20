@@ -1,6 +1,6 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { truncateMid, truncatePath, extract } from '../../src/ui/lib/path-text'
+import { describe, it } from 'node:test'
+import { extract, truncateMid, truncatePath } from '../../src/ui/lib/path-text'
 
 describe('PathText', () => {
   describe('truncateMid', () => {

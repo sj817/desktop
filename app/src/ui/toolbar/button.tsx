@@ -1,13 +1,13 @@
-import * as React from 'react'
-import { Octicon, OcticonSymbol } from '../octicons'
 import classNames from 'classnames'
-import { assertNever } from '../../lib/fatal-error'
-import { Button } from '../lib/button'
+import * as React from 'react'
 import { clamp } from '../../lib/clamp'
+import { assertNever } from '../../lib/fatal-error'
+import { enableResizingToolbarButtons } from '../../lib/feature-flag'
+import { AriaHasPopupType } from '../lib/aria-types'
+import { Button } from '../lib/button'
 import { createObservableRef } from '../lib/observable-ref'
 import { Tooltip, TooltipDirection, TooltipTarget } from '../lib/tooltip'
-import { AriaHasPopupType } from '../lib/aria-types'
-import { enableResizingToolbarButtons } from '../../lib/feature-flag'
+import { Octicon, OcticonSymbol } from '../octicons'
 
 /** The button style. */
 export enum ToolbarButtonStyle {

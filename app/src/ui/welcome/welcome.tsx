@@ -1,16 +1,16 @@
-import * as React from 'react'
 import classNames from 'classnames'
+import * as React from 'react'
 
-import { Dispatcher } from '../dispatcher'
-import { encodePathAsUrl } from '../../lib/path'
-import { Account } from '../../models/account'
-import { SignInState, SignInStep } from '../../lib/stores'
 import { assertNever } from '../../lib/fatal-error'
-import { Start } from './start'
-import { SignInEnterprise } from './sign-in-enterprise'
-import { ConfigureGit } from './configure-git'
-import { UiView } from '../ui-view'
 import { getGlobalConfigValue } from '../../lib/git'
+import { encodePathAsUrl } from '../../lib/path'
+import { SignInState, SignInStep } from '../../lib/stores'
+import { Account } from '../../models/account'
+import { Dispatcher } from '../dispatcher'
+import { UiView } from '../ui-view'
+import { ConfigureGit } from './configure-git'
+import { SignInEnterprise } from './sign-in-enterprise'
+import { Start } from './start'
 
 /** The steps along the Welcome flow. */
 export enum WelcomeStep {

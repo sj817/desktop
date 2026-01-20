@@ -8,9 +8,9 @@ import {
 } from '../models/release-notes'
 import { getVersion } from '../ui/lib/app-proxy'
 import { formatDate } from './format-date'
+import { getUserAgent } from './http'
 import { offsetFromNow } from './offset-from'
 import { encodePathAsUrl } from './path'
-import { getUserAgent } from './http'
 
 // expects a release note entry to contain a header and then some text
 // example:

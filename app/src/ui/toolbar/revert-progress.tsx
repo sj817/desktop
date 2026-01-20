@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { IRevertProgress } from '../../models/progress'
-import { ToolbarButton, ToolbarButtonStyle } from './button'
-import { syncClockwise } from '../octicons'
-import { enableResizingToolbarButtons } from '../../lib/feature-flag'
-import { Resizable } from '../resizable'
 import { IConstrainedValue } from '../../lib/app-state'
+import { enableResizingToolbarButtons } from '../../lib/feature-flag'
+import { IRevertProgress } from '../../models/progress'
 import { Dispatcher } from '../dispatcher'
+import { syncClockwise } from '../octicons'
+import { Resizable } from '../resizable'
+import { ToolbarButton, ToolbarButtonStyle } from './button'
 
 interface IRevertProgressProps {
   /** Progress information associated with the current operation */

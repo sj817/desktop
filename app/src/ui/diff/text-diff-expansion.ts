@@ -1,3 +1,4 @@
+import { HiddenBidiCharsRegex } from '../../lib/diff-parser'
 import {
   DiffHunk,
   DiffHunkExpansionType,
@@ -7,7 +8,6 @@ import {
   ITextDiff,
 } from '../../models/diff'
 import { getLargestLineNumber } from './diff-helpers'
-import { HiddenBidiCharsRegex } from '../../lib/diff-parser'
 
 /** How many new lines will be added to a diff hunk by default. */
 export const DefaultDiffExpansionStep = 20

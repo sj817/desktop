@@ -1,8 +1,8 @@
 import { GitError } from 'dugite'
-import { git } from './core'
-import { Repository } from '../../models/repository'
 import { Branch, BranchType, IAheadBehind } from '../../models/branch'
 import { CommitOneLine } from '../../models/commit'
+import { Repository } from '../../models/repository'
+import { git } from './core'
 
 /**
  * Convert two refs into the Git range syntax representing the set of commits

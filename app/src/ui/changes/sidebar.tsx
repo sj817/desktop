@@ -1,40 +1,40 @@
 import * as Path from 'path'
 import * as React from 'react'
 
-import { ChangesList } from './changes-list'
-import { DiffSelectionType } from '../../models/diff'
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import {
-  IChangesState,
-  RebaseConflictState,
-  isRebaseConflictState,
   ChangesSelectionKind,
   CommitOptions,
+  IChangesState,
+  isRebaseConflictState,
+  RebaseConflictState,
 } from '../../lib/app-state'
-import { Repository } from '../../models/repository'
-import { Dispatcher } from '../dispatcher'
-import { IssuesStore, GitHubUserStore } from '../../lib/stores'
-import { CommitIdentity } from '../../models/commit-identity'
+import { Emoji } from '../../lib/emoji'
+import { enableFilteredChangesList } from '../../lib/feature-flag'
+import { getAccountForRepository } from '../../lib/get-account-for-repository'
+import { HookProgress } from '../../lib/git'
+import { filesNotTrackedByLFS } from '../../lib/git/lfs'
+import { getLargeFilePaths } from '../../lib/large-files'
+import { hasUnresolvedConflicts, isConflictedFile } from '../../lib/status'
+import { GitHubUserStore, IssuesStore } from '../../lib/stores'
+import { Account } from '../../models/account'
+import { IAheadBehind } from '../../models/branch'
 import { Commit, ICommitContext } from '../../models/commit'
-import { UndoCommit } from './undo-commit'
+import { CommitIdentity } from '../../models/commit-identity'
+import { DiffSelectionType } from '../../models/diff'
+import { PopupType } from '../../models/popup'
+import { Repository } from '../../models/repository'
+import { WorkingDirectoryFileChange } from '../../models/status'
 import {
   buildAutocompletionProviders,
   IAutocompletionProvider,
 } from '../autocompletion'
+import { Dispatcher } from '../dispatcher'
 import { ClickSource } from '../lib/list'
-import { WorkingDirectoryFileChange } from '../../models/status'
-import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { openFile } from '../lib/open-file'
-import { Account } from '../../models/account'
-import { PopupType } from '../../models/popup'
-import { filesNotTrackedByLFS } from '../../lib/git/lfs'
-import { getLargeFilePaths } from '../../lib/large-files'
-import { isConflictedFile, hasUnresolvedConflicts } from '../../lib/status'
-import { getAccountForRepository } from '../../lib/get-account-for-repository'
-import { IAheadBehind } from '../../models/branch'
-import { Emoji } from '../../lib/emoji'
-import { enableFilteredChangesList } from '../../lib/feature-flag'
+import { ChangesList } from './changes-list'
 import { FilterChangesList } from './filter-changes-list'
-import { HookProgress } from '../../lib/git'
+import { UndoCommit } from './undo-commit'
 
 /**
  * The timeout for the animation of the enter/leave animation for Undo.

@@ -1,15 +1,15 @@
 import * as React from 'react'
 
-import { Account } from '../../models/account'
-import { DialogContent } from '../dialog'
-import { TextBox } from '../lib/text-box'
-import { Row } from '../lib/row'
-import { Button } from '../lib/button'
 import { IAPIRepository } from '../../lib/api'
-import { CloneableRepositoryFilterList } from './cloneable-repository-filter-list'
-import { ClickSource } from '../lib/list'
 import { enableMultipleEnterpriseAccounts } from '../../lib/feature-flag'
+import { Account } from '../../models/account'
 import { AccountPicker } from '../account-picker'
+import { DialogContent } from '../dialog'
+import { Button } from '../lib/button'
+import { ClickSource } from '../lib/list'
+import { Row } from '../lib/row'
+import { TextBox } from '../lib/text-box'
+import { CloneableRepositoryFilterList } from './cloneable-repository-filter-list'
 
 interface ICloneGithubRepositoryProps {
   /** The account to clone from. */

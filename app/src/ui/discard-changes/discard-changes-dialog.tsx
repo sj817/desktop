@@ -1,13 +1,13 @@
 import * as React from 'react'
 
 import { Repository } from '../../models/repository'
-import { Dispatcher } from '../dispatcher'
 import { WorkingDirectoryFileChange } from '../../models/status'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { PathText } from '../lib/path-text'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
 import { Checkbox, CheckboxValue } from '../lib/checkbox'
 import { TrashNameLabel } from '../lib/context-menu'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { PathText } from '../lib/path-text'
 
 interface IDiscardChangesProps {
   readonly repository: Repository

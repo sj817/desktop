@@ -1,10 +1,10 @@
-import { git, IGitStringExecutionOptions } from './core'
-import { Repository } from '../../models/repository'
-import { IPushProgress } from '../../models/progress'
-import { PushProgressParser, executionOptionsWithProgress } from '../progress'
-import { IRemote } from '../../models/remote'
-import { envForRemoteOperation } from './environment'
 import { Branch } from '../../models/branch'
+import { IPushProgress } from '../../models/progress'
+import { IRemote } from '../../models/remote'
+import { Repository } from '../../models/repository'
+import { executionOptionsWithProgress, PushProgressParser } from '../progress'
+import { git, IGitStringExecutionOptions } from './core'
+import { envForRemoteOperation } from './environment'
 
 export type PushOptions = {
   /**

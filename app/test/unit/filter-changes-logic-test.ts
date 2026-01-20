@@ -1,16 +1,17 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { AppFileStatusKind } from '../../src/models/status'
-import { DiffSelectionType } from '../../src/models/diff'
-import { WorkingDirectoryFileChange } from '../../src/models/status'
-import { DiffSelection } from '../../src/models/diff'
+import { describe, it } from 'node:test'
+import { IFileListFilterState } from '../../src/lib/app-state'
+import { DiffSelection, DiffSelectionType } from '../../src/models/diff'
+import {
+  AppFileStatusKind,
+  WorkingDirectoryFileChange,
+} from '../../src/models/status'
+import { IChangesListItem } from '../../src/ui/changes/filter-changes-list'
 import {
   applyFilterOptions,
-  isCommittingFileHiddenByFilter,
   getNoResultsMessage,
+  isCommittingFileHiddenByFilter,
 } from '../../src/ui/changes/filter-changes-logic'
-import { IFileListFilterState } from '../../src/lib/app-state'
-import { IChangesListItem } from '../../src/ui/changes/filter-changes-list'
 
 // Helper function to create a test file
 function createTestFile(

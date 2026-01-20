@@ -5,9 +5,9 @@
  * and generates the TypeScript class containing just what Desktop needs.
  */
 
+import * as cp from 'child_process'
 import * as fs from 'fs'
 import * as Path from 'path'
-import * as cp from 'child_process'
 import { check } from 'reserved-words'
 import toCamelCase from 'to-camel-case'
 

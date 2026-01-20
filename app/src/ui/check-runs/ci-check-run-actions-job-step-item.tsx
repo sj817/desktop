@@ -1,19 +1,19 @@
-import * as React from 'react'
-import { Octicon } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
 import classNames from 'classnames'
-import {
-  getClassNameForCheck,
-  getSymbolForLogStep,
-} from '../branches/ci-status'
+import * as React from 'react'
 import { IAPIWorkflowJobStep } from '../../lib/api'
 import {
   getFormattedCheckRunDuration,
   getFormattedCheckRunLongDuration,
 } from '../../lib/ci-checks/ci-checks'
-import { TooltippedContent } from '../lib/tooltipped-content'
-import { TooltipDirection } from '../lib/tooltip'
+import {
+  getClassNameForCheck,
+  getSymbolForLogStep,
+} from '../branches/ci-status'
 import { Button } from '../lib/button'
+import { TooltipDirection } from '../lib/tooltip'
+import { TooltippedContent } from '../lib/tooltipped-content'
+import { Octicon } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
 
 interface ICICheckRunActionsJobStepListItemProps {
   readonly step: IAPIWorkflowJobStep

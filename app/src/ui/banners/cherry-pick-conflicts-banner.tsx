@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { LinkButton } from '../lib/link-button'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
 import { Banner } from './banner'
-import { LinkButton } from '../lib/link-button'
 
 interface ICherryPickConflictsBannerProps {
   /** branch the user is rebasing into */

@@ -1,10 +1,11 @@
 import * as React from 'react'
-import { IConstrainedValue, IPullRequestState } from '../../lib/app-state'
 import { getDotComAPIEndpoint } from '../../lib/api'
+import { IConstrainedValue, IPullRequestState } from '../../lib/app-state'
 import { Branch } from '../../models/branch'
+import { ComputedAction } from '../../models/computed-action'
 import { ImageDiffType } from '../../models/diff'
 import { Repository } from '../../models/repository'
-import { DialogFooter, OkCancelButtonGroup, Dialog } from '../dialog'
+import { Dialog, DialogFooter, OkCancelButtonGroup } from '../dialog'
 import { Dispatcher } from '../dispatcher'
 import { Ref } from '../lib/ref'
 import { Octicon } from '../octicons'
@@ -15,7 +16,6 @@ import {
 } from './open-pull-request-header'
 import { PullRequestFilesChanged } from './pull-request-files-changed'
 import { PullRequestMergeStatus } from './pull-request-merge-status'
-import { ComputedAction } from '../../models/computed-action'
 
 interface IOpenPullRequestDialogProps {
   readonly repository: Repository

@@ -1,18 +1,18 @@
-import { spawn, ChildProcess } from 'child_process'
+import { ChildProcess, spawn } from 'child_process'
 import * as Path from 'path'
 import { enumerateValues, HKEY, RegistryValueType } from 'registry-js'
-import { assertNever } from '../fatal-error'
-import { enableWSLDetection } from '../feature-flag'
-import { findGitOnPath } from '../is-git-on-path'
-import { parseEnumValue } from '../enum'
 import { pathExists } from '../../ui/lib/path-exists'
-import { FoundShell } from './shared'
 import {
   expandTargetPathArgument,
   ICustomIntegration,
   parseCustomIntegrationArguments,
   spawnCustomIntegration,
 } from '../custom-integration'
+import { parseEnumValue } from '../enum'
+import { assertNever } from '../fatal-error'
+import { enableWSLDetection } from '../feature-flag'
+import { findGitOnPath } from '../is-git-on-path'
+import { FoundShell } from './shared'
 
 export enum Shell {
   Cmd = 'Command Prompt',

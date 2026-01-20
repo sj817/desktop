@@ -1,10 +1,10 @@
+import { mkdir } from 'fs/promises'
+import noop from 'lodash/noop'
+import memoizeOne from 'memoize-one'
 import * as winston from 'winston'
 import { getLogDirectoryPath } from '../lib/logging/get-log-path'
 import { LogLevel } from '../lib/logging/log-level'
-import noop from 'lodash/noop'
 import { DesktopConsoleTransport } from './desktop-console-transport'
-import memoizeOne from 'memoize-one'
-import { mkdir } from 'fs/promises'
 import { DesktopFileTransport } from './desktop-file-transport'
 
 /**

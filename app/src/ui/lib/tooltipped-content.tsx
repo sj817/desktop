@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { ITooltipProps, Tooltip } from './tooltip'
 import { createObservableRef } from './observable-ref'
+import { ITooltipProps, Tooltip } from './tooltip'
 
 /**
  * ITooltippedContentProps is a superset of ITooltipProps but does not

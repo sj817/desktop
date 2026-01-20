@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { Checkbox, CheckboxValue } from '../lib/checkbox'
-import { Octicon } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
-import { RadioButton } from '../lib/radio-button'
+import { createObservableRef } from '../lib/observable-ref'
 import {
   Popover,
   PopoverAnchorPosition,
   PopoverDecoration,
 } from '../lib/popover'
+import { RadioButton } from '../lib/radio-button'
 import { Tooltip, TooltipDirection } from '../lib/tooltip'
-import { createObservableRef } from '../lib/observable-ref'
+import { Octicon } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
 
 interface IDiffOptionsProps {
   readonly isInteractiveDiff: boolean

@@ -1,8 +1,8 @@
-import { git } from './core'
 import { GitError } from 'dugite'
+import { git } from './core'
 
-import { Repository } from '../../models/repository'
 import { IRemote } from '../../models/remote'
+import { Repository } from '../../models/repository'
 import { envForRemoteOperation } from './environment'
 import { getSymbolicRef } from './refs'
 

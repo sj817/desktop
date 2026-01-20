@@ -1,15 +1,15 @@
 import * as React from 'react'
 
-import { UiView } from './ui-view'
-import { Dispatcher } from './dispatcher'
 import { Repository } from '../models/repository'
+import { Dispatcher } from './dispatcher'
+import { UiView } from './ui-view'
 
-import { Button } from './lib/button'
-import { Row } from './lib/row'
-import { LinkButton } from './lib/link-button'
 import { addSafeDirectory, getRepositoryType } from '../lib/git'
-import { Ref } from './lib/ref'
+import { Button } from './lib/button'
+import { LinkButton } from './lib/link-button'
 import { Loading } from './lib/loading'
+import { Ref } from './lib/ref'
+import { Row } from './lib/row'
 
 interface IMissingRepositoryProps {
   readonly dispatcher: Dispatcher

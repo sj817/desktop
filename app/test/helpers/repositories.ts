@@ -1,15 +1,15 @@
-import * as Path from 'path'
-import * as FSE from 'fs-extra'
-import { createTempDirectory } from './temp'
-import klawSync, { Item } from 'klaw-sync'
-import { Repository } from '../../src/models/repository'
 import { exec } from 'dugite'
-import { makeCommit, switchTo } from './repository-scaffolding'
+import * as FSE from 'fs-extra'
 import { writeFile } from 'fs-extra'
-import { DefaultGitDescription, git } from '../../src/lib/git'
-import { TestContext } from 'node:test'
 import { mkdir } from 'fs/promises'
+import klawSync, { Item } from 'klaw-sync'
+import { TestContext } from 'node:test'
+import * as Path from 'path'
 import { join } from 'path'
+import { DefaultGitDescription, git } from '../../src/lib/git'
+import { Repository } from '../../src/models/repository'
+import { makeCommit, switchTo } from './repository-scaffolding'
+import { createTempDirectory } from './temp'
 
 /**
  * Set up the named fixture repository to be used in a test.

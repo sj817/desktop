@@ -1,9 +1,9 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
-import { encodePathAsUrl, resolveWithin } from '../../src/lib/path'
-import { resolve, basename, join } from 'path'
 import { promises } from 'fs'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { tmpdir } from 'os'
+import { basename, join, resolve } from 'path'
+import { encodePathAsUrl, resolveWithin } from '../../src/lib/path'
 
 const { rmdir, mkdtemp, symlink, unlink } = promises
 

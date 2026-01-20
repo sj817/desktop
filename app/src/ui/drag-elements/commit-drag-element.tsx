@@ -2,15 +2,15 @@ import classNames from 'classnames'
 import { Disposable } from 'event-kit'
 import * as React from 'react'
 import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
+import { Emoji } from '../../lib/emoji'
 import { assertNever } from '../../lib/fatal-error'
+import { Account } from '../../models/account'
 import { Commit } from '../../models/commit'
 import { DragType, DropTarget, DropTargetType } from '../../models/drag-drop'
 import { GitHubRepository } from '../../models/github-repository'
 import { CommitListItem } from '../history/commit-list-item'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { Account } from '../../models/account'
-import { Emoji } from '../../lib/emoji'
 
 interface ICommitDragElementProps {
   readonly commit: Commit

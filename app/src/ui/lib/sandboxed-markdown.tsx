@@ -1,18 +1,18 @@
-import * as React from 'react'
+import DOMPurify from 'dompurify'
+import { readFile } from 'fs/promises'
+import debounce from 'lodash/debounce'
+import { marked } from 'marked'
 import * as Path from 'path'
+import * as React from 'react'
+import { Emoji } from '../../lib/emoji'
 import {
   buildCustomMarkDownNodeFilterPipe,
   MarkdownContext,
 } from '../../lib/markdown-filters/node-filter'
 import { GitHubRepository } from '../../models/github-repository'
-import { readFile } from 'fs/promises'
-import { Tooltip } from './tooltip'
-import { createObservableRef } from './observable-ref'
 import { getObjectId } from './object-id'
-import debounce from 'lodash/debounce'
-import { Emoji } from '../../lib/emoji'
-import { marked } from 'marked'
-import DOMPurify from 'dompurify'
+import { createObservableRef } from './observable-ref'
+import { Tooltip } from './tooltip'
 
 interface ISandboxedMarkdownProps {
   /** A string of unparsed markdown to display */

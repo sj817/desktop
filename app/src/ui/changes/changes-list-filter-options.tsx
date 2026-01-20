@@ -1,22 +1,22 @@
+import classNames from 'classnames'
+import memoizeOne from 'memoize-one'
 import * as React from 'react'
+import { IFileListFilterState } from '../../lib/app-state'
+import { WorkingDirectoryStatus } from '../../models/status'
+import { Button } from '../lib/button'
+import { Checkbox, CheckboxValue } from '../lib/checkbox'
 import {
   Popover,
   PopoverAnchorPosition,
   PopoverDecoration,
 } from '../lib/popover'
+import { Octicon } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
+import { IChangesListItem } from './filter-changes-list'
 import {
   countActiveFilterOptions,
   hasActiveFilters,
 } from './filter-changes-logic'
-import { Octicon } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
-import { IFileListFilterState } from '../../lib/app-state'
-import { Checkbox, CheckboxValue } from '../lib/checkbox'
-import memoizeOne from 'memoize-one'
-import { Button } from '../lib/button'
-import classNames from 'classnames'
-import { IChangesListItem } from './filter-changes-list'
-import { WorkingDirectoryStatus } from '../../models/status'
 
 interface IChangesListFilterOptionsProps {
   readonly fileListFilter: IFileListFilterState

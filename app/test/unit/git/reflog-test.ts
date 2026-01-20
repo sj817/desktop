@@ -1,17 +1,17 @@
-import { describe, it } from 'node:test'
+import { exec } from 'dugite'
 import assert from 'node:assert'
-import { Repository } from '../../../src/models/repository'
+import { describe, it } from 'node:test'
 import {
+  checkoutBranch,
+  createBranch,
+  getBranchCheckouts,
   getBranches,
   getRecentBranches,
-  createBranch,
-  checkoutBranch,
   renameBranch,
-  getBranchCheckouts,
 } from '../../../src/lib/git'
-import { setupFixtureRepository } from '../../helpers/repositories'
-import { exec } from 'dugite'
 import { offsetFromNow } from '../../../src/lib/offset-from'
+import { Repository } from '../../../src/models/repository'
+import { setupFixtureRepository } from '../../helpers/repositories'
 
 async function createAndCheckout(
   repository: Repository,

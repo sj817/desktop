@@ -1,14 +1,14 @@
 import * as React from 'react'
 
 import { Repository } from '../../models/repository'
+import { Dialog, DialogContent, DialogError, DialogFooter } from '../dialog'
 import { Dispatcher } from '../dispatcher'
-import { Dialog, DialogError, DialogContent, DialogFooter } from '../dialog'
 
+import { enablePreviousTagSuggestions } from '../../lib/feature-flag'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { startTimer } from '../lib/timing'
 import { Ref } from '../lib/ref'
 import { RefNameTextBox } from '../lib/ref-name-text-box'
-import { enablePreviousTagSuggestions } from '../../lib/feature-flag'
+import { startTimer } from '../lib/timing'
 
 interface ICreateTagProps {
   readonly repository: Repository

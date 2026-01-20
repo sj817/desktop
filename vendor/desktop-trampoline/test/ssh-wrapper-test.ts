@@ -1,10 +1,10 @@
-import { stat, access } from 'fs/promises'
-import { constants } from 'fs'
 import { execFile } from 'child_process'
-import { promisify } from 'util'
-import { getSSHWrapperPath } from '../index'
+import { constants } from 'fs'
+import { access, stat } from 'fs/promises'
 import assert from 'node:assert'
 import { describe, it } from 'node:test'
+import { promisify } from 'util'
+import { getSSHWrapperPath } from '../index'
 
 const sshWrapperPath = getSSHWrapperPath()
 const run = promisify(execFile)

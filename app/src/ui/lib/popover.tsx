@@ -1,12 +1,3 @@
-import * as React from 'react'
-import FocusTrap from 'focus-trap-react'
-import { Options as FocusTrapOptions } from 'focus-trap'
-import classNames from 'classnames'
-import {
-  ComputePositionReturn,
-  autoUpdate,
-  computePosition,
-} from '@floating-ui/react-dom'
 import {
   arrow,
   flip,
@@ -16,6 +7,15 @@ import {
   Side,
   size,
 } from '@floating-ui/core'
+import {
+  autoUpdate,
+  computePosition,
+  ComputePositionReturn,
+} from '@floating-ui/react-dom'
+import classNames from 'classnames'
+import { Options as FocusTrapOptions } from 'focus-trap'
+import FocusTrap from 'focus-trap-react'
+import * as React from 'react'
 import { assertNever } from '../../lib/fatal-error'
 import { isMacOSSequoia, isMacOSSonoma, isMacOSVentura } from '../../lib/get-os'
 

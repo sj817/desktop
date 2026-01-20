@@ -1,6 +1,6 @@
-import { git } from './core'
 import { Repository } from '../../models/repository'
 import { getConfigValue } from './config'
+import { git } from './core'
 
 /**
  * A representation of a Git commit message trailer.

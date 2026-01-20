@@ -1,9 +1,9 @@
 import * as React from 'react'
 
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { PathText } from '../lib/path-text'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { UnknownAuthor } from '../../models/author'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { PathText } from '../lib/path-text'
 
 interface IUnknownAuthorsProps {
   readonly authors: ReadonlyArray<UnknownAuthor>

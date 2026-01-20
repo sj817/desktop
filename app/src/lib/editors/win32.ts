@@ -9,8 +9,8 @@ import {
 } from 'registry-js'
 import { pathExists } from '../../ui/lib/path-exists'
 
-import { IFoundEditor } from './found-editor'
 import memoizeOne from 'memoize-one'
+import { IFoundEditor } from './found-editor'
 
 interface IWindowsAppInformation {
   displayName: string

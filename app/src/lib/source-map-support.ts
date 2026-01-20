@@ -1,5 +1,5 @@
-import * as Path from 'path'
 import * as Fs from 'fs'
+import * as Path from 'path'
 import sourceMapSupport from 'source-map-support'
 import { fileURLToPath } from 'url'
 

@@ -1,20 +1,20 @@
+import noop from 'lodash/noop'
 import * as React from 'react'
-import { IAvatarUser } from '../../models/avatar'
-import { Octicon, OcticonSymbolVariant } from '../octicons'
 import { API, getDotComAPIEndpoint, getHTMLURL } from '../../lib/api'
-import { TooltippedContent } from './tooltipped-content'
-import { TooltipDirection } from './tooltip'
+import { parseStealthEmail } from '../../lib/email'
 import {
   isGHE,
   isGHES,
   supportsAvatarsAPI,
 } from '../../lib/endpoint-capabilities'
-import { Account } from '../../models/account'
-import { parseStealthEmail } from '../../lib/email'
-import noop from 'lodash/noop'
-import { offsetFrom } from '../../lib/offset-from'
-import { ExpiringOperationCache } from './expiring-operation-cache'
 import { forceUnwrap } from '../../lib/fatal-error'
+import { offsetFrom } from '../../lib/offset-from'
+import { Account } from '../../models/account'
+import { IAvatarUser } from '../../models/avatar'
+import { Octicon, OcticonSymbolVariant } from '../octicons'
+import { ExpiringOperationCache } from './expiring-operation-cache'
+import { TooltipDirection } from './tooltip'
+import { TooltippedContent } from './tooltipped-content'
 
 const avatarTokenCache = new ExpiringOperationCache<
   { endpoint: string; accounts: ReadonlyArray<Account> },

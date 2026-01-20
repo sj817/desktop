@@ -1,6 +1,6 @@
-import * as octicons from '../octicons/octicons.generated'
-import { Repository } from '../../models/repository'
 import { CloningRepository } from '../../models/cloning-repository'
+import { Repository } from '../../models/repository'
+import * as octicons from '../octicons/octicons.generated'
 
 /**
  * Determine the octicon to display for a given repository.

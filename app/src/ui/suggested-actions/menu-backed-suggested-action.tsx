@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { SuggestedAction } from './suggested-action'
 import { MenuIDs } from '../../models/menu-ids'
 import { executeMenuItemById } from '../main-process-proxy'
+import { SuggestedAction } from './suggested-action'
 
 interface IMenuBackedSuggestedActionProps {
   /**

@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { sanitizedRepositoryName } from '../../src/ui/add-repository/sanitized-repository-name'
 
 describe('sanitizedRepositoryName', () => {

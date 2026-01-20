@@ -1,24 +1,24 @@
 import * as React from 'react'
 
+import classNames from 'classnames'
+import { shallowEquals, structuralEquals } from '../../lib/equality'
+import { ILineTokens } from '../../lib/highlighter/types'
+import { DiffHunkExpansionType, DiffSelectionType } from '../../models/diff'
+import { Button } from '../lib/button'
+import { PopoverAnchorPosition } from '../lib/popover'
+import { TooltipDirection } from '../lib/tooltip'
+import { Octicon, OcticonSymbolVariant } from '../octicons'
+import { diffCheck, diffDash } from '../octicons/diff'
+import * as octicons from '../octicons/octicons.generated'
 import {
-  syntaxHighlightLine,
+  DiffColumn,
   DiffRow,
   DiffRowType,
   IDiffRowData,
-  DiffColumn,
   isRowChanged,
+  syntaxHighlightLine,
 } from './diff-helpers'
-import { ILineTokens } from '../../lib/highlighter/types'
-import classNames from 'classnames'
-import { Octicon, OcticonSymbolVariant } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
-import { shallowEquals, structuralEquals } from '../../lib/equality'
-import { DiffHunkExpansionType, DiffSelectionType } from '../../models/diff'
-import { PopoverAnchorPosition } from '../lib/popover'
 import { WhitespaceHintPopover } from './whitespace-hint-popover'
-import { TooltipDirection } from '../lib/tooltip'
-import { Button } from '../lib/button'
-import { diffCheck, diffDash } from '../octicons/diff'
 
 // This is a custom version of the no-newline octicon that's exactly as
 // tall as it needs to be (8px) which helps with aligning it on the line.

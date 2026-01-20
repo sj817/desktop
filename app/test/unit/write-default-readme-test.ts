@@ -1,6 +1,6 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
 import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import * as path from 'path'
 
 import { writeDefaultReadme } from '../../src/ui/add-repository/write-default-readme'

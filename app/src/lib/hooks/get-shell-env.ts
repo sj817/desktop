@@ -1,7 +1,7 @@
-import { join } from 'path'
-import { getShell } from './get-shell'
 import { spawn } from 'child_process'
+import { join } from 'path'
 import { SupportedHooksEnvShell } from './config'
+import { getShell } from './get-shell'
 
 export type ShellEnvResult =
   | {

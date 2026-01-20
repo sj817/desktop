@@ -1,8 +1,8 @@
-import { supportsNotifications } from './notification-support'
-import { notificationCallback } from './notification-callback'
-import { DesktopNotificationPermission } from './notification-permission'
-import { INotificationOptions } from './notification-options'
 import { v4 as uuidv4 } from 'uuid'
+import { notificationCallback } from './notification-callback'
+import { INotificationOptions } from './notification-options'
+import { DesktopNotificationPermission } from './notification-permission'
+import { supportsNotifications } from './notification-support'
 
 // The native binary will be loaded lazily to avoid any possible crash at start
 // time, which are harder to trace.

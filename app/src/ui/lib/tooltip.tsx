@@ -1,10 +1,10 @@
+import classNames from 'classnames'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { ObservableRef } from './observable-ref'
-import { createUniqueId, releaseUniqueId } from './id-pool'
-import classNames from 'classnames'
 import { assertNever } from '../../lib/fatal-error'
-import { rectEquals, rectContains, offsetRect } from './rect'
+import { createUniqueId, releaseUniqueId } from './id-pool'
+import { ObservableRef } from './observable-ref'
+import { offsetRect, rectContains, rectEquals } from './rect'
 
 export enum TooltipDirection {
   NORTH = 'n',

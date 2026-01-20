@@ -1,12 +1,12 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import * as path from 'path'
 
-import { Repository } from '../../../src/models/repository'
-import { reset, resetPaths, GitResetMode } from '../../../src/lib/git/reset'
-import { getStatusOrThrow } from '../../helpers/status'
-import { setupFixtureRepository } from '../../helpers/repositories'
 import { exec } from 'dugite'
+import { GitResetMode, reset, resetPaths } from '../../../src/lib/git/reset'
+import { Repository } from '../../../src/models/repository'
+import { setupFixtureRepository } from '../../helpers/repositories'
+import { getStatusOrThrow } from '../../helpers/status'
 
 import * as FSE from 'fs-extra'
 

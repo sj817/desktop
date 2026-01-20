@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { PathLabel } from '../lib/path-label'
-import { AppFileStatus } from '../../models/status'
-import { IDiff, DiffType } from '../../models/diff'
-import { Octicon, iconForStatus } from '../octicons'
 import { mapStatus } from '../../lib/status'
+import { DiffType, IDiff } from '../../models/diff'
+import { AppFileStatus } from '../../models/status'
+import { PathLabel } from '../lib/path-label'
+import { Octicon, iconForStatus } from '../octicons'
 import { DiffOptions } from './diff-options'
 
 interface IDiffHeaderProps {

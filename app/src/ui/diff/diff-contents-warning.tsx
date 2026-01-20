@@ -1,8 +1,8 @@
 import React from 'react'
+import { ITextDiff, LineEndingsChange } from '../../models/diff'
+import { LinkButton } from '../lib/link-button'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { LinkButton } from '../lib/link-button'
-import { ITextDiff, LineEndingsChange } from '../../models/diff'
 
 enum DiffContentsWarningType {
   UnicodeBidiCharacters,

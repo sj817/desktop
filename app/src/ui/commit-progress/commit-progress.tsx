@@ -1,8 +1,8 @@
 import * as React from 'react'
 
+import { TerminalOutputListener } from '../../lib/git'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { TerminalOutputListener } from '../../lib/git'
 import { Terminal } from '../terminal'
 interface ICommitProgressProps {
   readonly subscribeToCommitOutput: TerminalOutputListener

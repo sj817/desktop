@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { gitAuthorNameIsValid } from '../../src/ui/lib/identifier-rules'
 
 describe('Identifier rules', () => {

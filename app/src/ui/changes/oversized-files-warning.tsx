@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { LinkButton } from '../lib/link-button'
-import { PathText } from '../lib/path-text'
-import { Dispatcher } from '../dispatcher'
-import { Repository } from '../../models/repository'
 import { ICommitContext } from '../../models/commit'
 import { DefaultCommitMessage } from '../../models/commit-message'
+import { Repository } from '../../models/repository'
+import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
+import { LinkButton } from '../lib/link-button'
+import { PathText } from '../lib/path-text'
 
 const GitLFSWebsiteURL =
   'https://help.github.com/articles/versioning-large-files/'

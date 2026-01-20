@@ -1,11 +1,11 @@
 import * as React from 'react'
 
-import { Dispatcher } from '../dispatcher'
-import { Repository } from '../../models/repository'
 import { Branch } from '../../models/branch'
+import { Repository } from '../../models/repository'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { renderBranchHasRemoteWarning } from '../lib/branch-name-warnings'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
+import { renderBranchHasRemoteWarning } from '../lib/branch-name-warnings'
 import { RefNameTextBox } from '../lib/ref-name-text-box'
 
 interface IRenameBranchProps {

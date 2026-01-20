@@ -1,6 +1,6 @@
+import { getDotComAPIEndpoint } from '../../src/lib/api'
 import { GitHubRepository } from '../../src/models/github-repository'
 import { Owner } from '../../src/models/owner'
-import { getDotComAPIEndpoint } from '../../src/lib/api'
 
 let id_counter = 0
 

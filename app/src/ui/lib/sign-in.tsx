@@ -1,17 +1,17 @@
 import * as React from 'react'
-import { AuthenticationForm } from './authentication-form'
+import { getHTMLURL } from '../../lib/api'
 import { assertNever } from '../../lib/fatal-error'
-import { EnterpriseServerEntry } from '../lib/enterprise-server-entry'
-import { Dispatcher } from '../dispatcher'
 import {
+  IAuthenticationState,
+  IEndpointEntryState,
+  IExistingAccountWarning,
   SignInState,
   SignInStep,
-  IEndpointEntryState,
-  IAuthenticationState,
-  IExistingAccountWarning,
 } from '../../lib/stores'
+import { Dispatcher } from '../dispatcher'
+import { EnterpriseServerEntry } from '../lib/enterprise-server-entry'
+import { AuthenticationForm } from './authentication-form'
 import { Ref } from './ref'
-import { getHTMLURL } from '../../lib/api'
 
 interface ISignInProps {
   readonly signInState: SignInState

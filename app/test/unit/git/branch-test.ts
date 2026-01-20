@@ -1,31 +1,31 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { shell } from '../../helpers/test-app-shell'
+import { describe, it } from 'node:test'
 import {
   setupEmptyRepository,
   setupFixtureRepository,
   setupLocalForkOfRepository,
 } from '../../helpers/repositories'
+import { shell } from '../../helpers/test-app-shell'
 
-import { Repository } from '../../../src/models/repository'
-import {
-  TipState,
-  IDetachedHead,
-  IValidBranch,
-  IUnbornRepository,
-} from '../../../src/models/tip'
-import { GitStore } from '../../../src/lib/stores'
 import { exec } from 'dugite'
+import { assertNonNullable } from '../../../src/lib/fatal-error'
 import {
-  getBranchesPointedAt,
-  createBranch,
-  getBranches,
-  git,
   checkoutBranch,
+  createBranch,
   deleteLocalBranch,
   deleteRemoteBranch,
+  getBranches,
+  getBranchesPointedAt,
+  git,
 } from '../../../src/lib/git'
-import { assertNonNullable } from '../../../src/lib/fatal-error'
+import { GitStore } from '../../../src/lib/stores'
+import { Repository } from '../../../src/models/repository'
+import {
+  IDetachedHead,
+  IUnbornRepository,
+  IValidBranch,
+  TipState,
+} from '../../../src/models/tip'
 import { TestStatsStore } from '../../helpers/test-stats-store'
 
 describe('git/branch', () => {

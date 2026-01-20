@@ -1,5 +1,5 @@
-import { IAPIEmail } from './api'
 import { Account } from '../models/account'
+import { IAPIEmail } from './api'
 import { isGHES } from './endpoint-capabilities'
 
 /**

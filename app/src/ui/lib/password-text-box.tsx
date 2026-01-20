@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { ITextBoxProps, TextBox } from './text-box'
-import { Button } from './button'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
+import { Button } from './button'
+import { ITextBoxProps, TextBox } from './text-box'
 
 interface IPasswordTextBoxState {
   /**

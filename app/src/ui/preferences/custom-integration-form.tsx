@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { TextBox } from '../lib/text-box'
-import { Button } from '../lib/button'
-import { showOpenDialog } from '../main-process-proxy'
-import { InputError } from '../lib/input-description/input-error'
 import {
   checkTargetPathArgument,
-  validateCustomIntegrationPath,
   parseCustomIntegrationArguments,
   TargetPathArgument,
+  validateCustomIntegrationPath,
 } from '../../lib/custom-integration'
+import { Button } from '../lib/button'
+import { InputError } from '../lib/input-description/input-error'
+import { TextBox } from '../lib/text-box'
+import { showOpenDialog } from '../main-process-proxy'
 
 interface ICustomIntegrationFormProps {
   /** ID used to prefix the IDs of some child elements */

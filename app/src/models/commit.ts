@@ -1,5 +1,5 @@
-import { CommitIdentity } from './commit-identity'
 import { ITrailer, isCoAuthoredByTrailer } from '../lib/git/interpret-trailers'
+import { CommitIdentity } from './commit-identity'
 import { GitAuthor } from './git-author'
 
 /** Shortens a given SHA. */

@@ -1,6 +1,6 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
 import { createReadStream } from 'fs'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { Readable } from 'stream'
 import { createTerminalStream } from '../../../src/lib/create-terminal-stream'
 import { getFixturePath } from '../../helpers/fixture'

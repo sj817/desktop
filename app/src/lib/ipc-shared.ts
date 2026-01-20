@@ -1,22 +1,24 @@
-import { IMenuItemState } from './menu-update'
-import { MenuIDs } from '../models/menu-ids'
-import { ISerializableMenuItem } from './menu-item'
-import { MenuLabelsEvent } from '../models/menu-labels'
-import { MenuEvent } from '../main-process/menu'
-import { LogLevel } from './logging/log-level'
+import {
+  DesktopNotificationPermission,
+  NotificationCallback,
+} from 'desktop-notifications'
 import { ICrashDetails } from '../crash/shared'
-import { WindowState } from './window-state'
+import { MenuEvent } from '../main-process/menu'
 import { IMenu } from '../models/app-menu'
-import { ILaunchStats } from './stats'
-import { URLActionType } from './parse-app-url'
-import { Architecture } from './get-architecture'
-import { EndpointToken } from './endpoint-token'
+import { MenuIDs } from '../models/menu-ids'
+import { MenuLabelsEvent } from '../models/menu-labels'
 import { PathType } from '../ui/lib/app-proxy'
 import { ThemeSource } from '../ui/lib/theme-source'
-import { DesktopNotificationPermission } from 'desktop-notifications'
-import { NotificationCallback } from 'desktop-notifications'
-import { DesktopAliveEvent } from './stores/alive-store'
 import { CLIAction } from './cli-action'
+import { EndpointToken } from './endpoint-token'
+import { Architecture } from './get-architecture'
+import { LogLevel } from './logging/log-level'
+import { ISerializableMenuItem } from './menu-item'
+import { IMenuItemState } from './menu-update'
+import { URLActionType } from './parse-app-url'
+import { ILaunchStats } from './stats'
+import { DesktopAliveEvent } from './stores/alive-store'
+import { WindowState } from './window-state'
 
 /**
  * Defines the simplex IPC channel names we use from the renderer

@@ -1,42 +1,42 @@
-import * as React from 'react'
 import * as Path from 'path'
+import * as React from 'react'
 
-import { Dispatcher } from '../dispatcher'
+import { mkdir } from 'fs/promises'
+import { join } from 'path'
+import { FoldoutType } from '../../lib/app-state'
+import { directoryExists } from '../../lib/directory-exists'
+import { CreateRepositoryError } from '../../lib/error-with-metadata'
+import { enableReadmeOverwriteWarning } from '../../lib/feature-flag'
 import {
-  initGitRepository,
   createCommit,
-  getStatus,
   getAuthorIdentity,
   getRepositoryType,
+  getStatus,
+  initGitRepository,
   RepositoryType,
 } from '../../lib/git'
-import { TextBox } from '../lib/text-box'
-import { Button } from '../lib/button'
-import { Row } from '../lib/row'
-import { Checkbox, CheckboxValue } from '../lib/checkbox'
-import { writeDefaultReadme } from './write-default-readme'
-import { Select } from '../lib/select'
 import { writeGitDescription } from '../../lib/git/description'
-import { getGitIgnoreNames, writeGitIgnore } from './gitignores'
-import { ILicense, getLicenses, writeLicense } from './licenses'
-import { writeGitAttributes } from './git-attributes'
-import { getDefaultDir, setDefaultDir } from '../lib/default-dir'
-import { Dialog, DialogContent, DialogFooter, DialogError } from '../dialog'
-import { LinkButton } from '../lib/link-button'
 import { PopupType } from '../../models/popup'
-import { Ref } from '../lib/ref'
-import { enableReadmeOverwriteWarning } from '../../lib/feature-flag'
-import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { showOpenDialog } from '../main-process-proxy'
-import { pathExists } from '../lib/path-exists'
-import { mkdir } from 'fs/promises'
-import { directoryExists } from '../../lib/directory-exists'
-import { FoldoutType } from '../../lib/app-state'
-import { join } from 'path'
+import { Dialog, DialogContent, DialogError, DialogFooter } from '../dialog'
 import { isTopMostDialog } from '../dialog/is-top-most'
+import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import { Dispatcher } from '../dispatcher'
+import { Button } from '../lib/button'
+import { Checkbox, CheckboxValue } from '../lib/checkbox'
+import { getDefaultDir, setDefaultDir } from '../lib/default-dir'
 import { InputError } from '../lib/input-description/input-error'
 import { InputWarning } from '../lib/input-description/input-warning'
-import { CreateRepositoryError } from '../../lib/error-with-metadata'
+import { LinkButton } from '../lib/link-button'
+import { pathExists } from '../lib/path-exists'
+import { Ref } from '../lib/ref'
+import { Row } from '../lib/row'
+import { Select } from '../lib/select'
+import { TextBox } from '../lib/text-box'
+import { showOpenDialog } from '../main-process-proxy'
+import { writeGitAttributes } from './git-attributes'
+import { getGitIgnoreNames, writeGitIgnore } from './gitignores'
+import { getLicenses, ILicense, writeLicense } from './licenses'
+import { writeDefaultReadme } from './write-default-readme'
 
 /** URL used to provide information about submodules to the user. */
 const submoduleDocsUrl = 'https://gh.io/git-submodules'

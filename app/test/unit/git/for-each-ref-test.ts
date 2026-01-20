@@ -1,16 +1,16 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { Repository } from '../../../src/models/repository'
-import {
-  setupFixtureRepository,
-  setupEmptyRepository,
-  setupEmptyDirectory,
-} from '../../helpers/repositories'
+import { describe, it } from 'node:test'
 import {
   getBranches,
   getBranchesDifferingFromUpstream,
 } from '../../../src/lib/git/for-each-ref'
 import { BranchType } from '../../../src/models/branch'
+import { Repository } from '../../../src/models/repository'
+import {
+  setupEmptyDirectory,
+  setupEmptyRepository,
+  setupFixtureRepository,
+} from '../../helpers/repositories'
 
 describe('git/for-each-ref', () => {
   describe('getBranches', () => {

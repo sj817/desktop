@@ -1,23 +1,23 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
-import * as Path from 'path'
 import * as FSE from 'fs-extra'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import * as Path from 'path'
 
-import { Repository } from '../../src/models/repository'
-import {
-  WorkingDirectoryFileChange,
-  FileChange,
-  AppFileStatusKind,
-} from '../../src/models/status'
+import { DiffParser } from '../../src/lib/diff-parser'
+import { convertDiff, getWorkingDirectoryDiff } from '../../src/lib/git'
+import { formatPatch } from '../../src/lib/patch-formatter'
 import {
   DiffSelection,
   DiffSelectionType,
-  ITextDiff,
   DiffType,
+  ITextDiff,
 } from '../../src/models/diff'
-import { DiffParser } from '../../src/lib/diff-parser'
-import { formatPatch } from '../../src/lib/patch-formatter'
-import { getWorkingDirectoryDiff, convertDiff } from '../../src/lib/git'
+import { Repository } from '../../src/models/repository'
+import {
+  AppFileStatusKind,
+  FileChange,
+  WorkingDirectoryFileChange,
+} from '../../src/models/status'
 import { setupFixtureRepository } from '../helpers/repositories'
 
 async function parseDiff(diff: string): Promise<ITextDiff> {

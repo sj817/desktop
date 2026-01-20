@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { assertNever } from '../../lib/fatal-error'
+import { enableFilteredChangesList } from '../../lib/feature-flag'
 import { UncommittedChangesStrategy } from '../../models/uncommitted-changes-strategy'
 import { DialogContent } from '../dialog'
 import { Checkbox, CheckboxValue } from '../lib/checkbox'
 import { RadioGroup } from '../lib/radio-group'
-import { assertNever } from '../../lib/fatal-error'
-import { enableFilteredChangesList } from '../../lib/feature-flag'
 
 interface IPromptsPreferencesProps {
   readonly confirmRepositoryRemoval: boolean

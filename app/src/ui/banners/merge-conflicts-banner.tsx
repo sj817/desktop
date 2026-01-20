@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { Popup } from '../../models/popup'
+import { Dispatcher } from '../dispatcher'
+import { LinkButton } from '../lib/link-button'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
 import { Banner } from './banner'
-import { Dispatcher } from '../dispatcher'
-import { Popup } from '../../models/popup'
-import { LinkButton } from '../lib/link-button'
 
 interface IMergeConflictsBannerProps {
   readonly dispatcher: Dispatcher

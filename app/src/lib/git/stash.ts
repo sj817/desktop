@@ -1,5 +1,5 @@
 import { GitError as DugiteError } from 'dugite'
-import { coerceToString, git, GitError } from './core'
+import { Branch } from '../../models/branch'
 import { Repository } from '../../models/repository'
 import {
   IStashEntry,
@@ -7,13 +7,13 @@ import {
   StashedFileChanges,
 } from '../../models/stash-entry'
 import {
-  WorkingDirectoryFileChange,
   CommittedFileChange,
+  WorkingDirectoryFileChange,
 } from '../../models/status'
+import { coerceToString, git, GitError } from './core'
+import { createLogParser } from './git-delimiter-parser'
 import { parseRawLogWithNumstat } from './log'
 import { stageFiles } from './update-index'
-import { Branch } from '../../models/branch'
-import { createLogParser } from './git-delimiter-parser'
 
 export const DesktopStashEntryMarker = '!!GitHub_Desktop'
 

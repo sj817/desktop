@@ -1,77 +1,75 @@
 import * as React from 'react'
 
+import classNames from 'classnames'
+import escapeRegExp from 'lodash/escapeRegExp'
+import memoize from 'memoize-one'
+import ReactDOM, { findDOMNode } from 'react-dom'
 import {
-  ITextDiff,
-  DiffLineType,
-  DiffHunk,
-  DiffLine,
-  DiffSelection,
-  DiffHunkExpansionType,
-  DiffSelectionType,
-} from '../../models/diff'
-import {
-  getLineFilters,
-  highlightContents,
-  IFileContents,
-} from './syntax-highlighting'
-import { ITokens, ILineTokens, IToken } from '../../lib/highlighter/types'
+  AutoSizer,
+  CellMeasurer,
+  CellMeasurerCache,
+  defaultOverscanIndicesGetter,
+  List,
+  ListRowProps,
+  OverscanIndicesGetterParams,
+} from 'react-virtualized'
 import {
   assertNever,
   assertNonNullable,
   forceUnwrap,
 } from '../../lib/fatal-error'
-import classNames from 'classnames'
+import { ILineTokens, IToken, ITokens } from '../../lib/highlighter/types'
+import { IMenuItem, showContextualMenu } from '../../lib/menu-item'
 import {
-  List,
-  AutoSizer,
-  CellMeasurerCache,
-  CellMeasurer,
-  ListRowProps,
-  OverscanIndicesGetterParams,
-  defaultOverscanIndicesGetter,
-} from 'react-virtualized'
+  DiffHunk,
+  DiffHunkExpansionType,
+  DiffLine,
+  DiffLineType,
+  DiffSelection,
+  DiffSelectionType,
+  ITextDiff,
+} from '../../models/diff'
+import { AriaLiveContainer } from '../accessibility/aria-live-container'
+import { DiffContentsWarning } from './diff-contents-warning'
+import {
+  DiffRangeType,
+  findInteractiveOriginalDiffRange,
+} from './diff-explorer'
+import {
+  canSelect,
+  ChangedFile,
+  DiffColumn,
+  DiffRow,
+  DiffRowType,
+  getDiffTokens,
+  getFirstAndLastClassesSideBySide,
+  getLineWidthFromDigitCount,
+  getNumberOfDigits,
+  IDiffRowData,
+  isRowChanged,
+  MaxIntraLineDiffStringLength,
+  SimplifiedDiffRow,
+  SimplifiedDiffRowData,
+  textDiffEquals,
+} from './diff-helpers'
+import { DiffSearchInput } from './diff-search-input'
+import { getTokens } from './get-tokens'
 import {
   CheckBoxIdentifier,
   IRowSelectableGroup,
   IRowSelectableGroupStaticData,
   SideBySideDiffRow,
 } from './side-by-side-diff-row'
-import memoize from 'memoize-one'
 import {
-  findInteractiveOriginalDiffRange,
-  DiffRangeType,
-} from './diff-explorer'
+  getLineFilters,
+  highlightContents,
+  IFileContents,
+} from './syntax-highlighting'
 import {
-  ChangedFile,
-  DiffRow,
-  DiffRowType,
-  canSelect,
-  getDiffTokens,
-  SimplifiedDiffRowData,
-  SimplifiedDiffRow,
-  IDiffRowData,
-  DiffColumn,
-  getLineWidthFromDigitCount,
-  getNumberOfDigits,
-  MaxIntraLineDiffStringLength,
-  getFirstAndLastClassesSideBySide,
-  textDiffEquals,
-  isRowChanged,
-} from './diff-helpers'
-import { showContextualMenu } from '../../lib/menu-item'
-import { getTokens } from './get-tokens'
-import { DiffSearchInput } from './diff-search-input'
-import {
-  expandTextDiffHunk,
   DiffExpansionKind,
+  expandTextDiffHunk,
   expandWholeTextDiff,
 } from './text-diff-expansion'
-import { IMenuItem } from '../../lib/menu-item'
-import { DiffContentsWarning } from './diff-contents-warning'
-import { findDOMNode } from 'react-dom'
-import escapeRegExp from 'lodash/escapeRegExp'
-import ReactDOM from 'react-dom'
-import { AriaLiveContainer } from '../accessibility/aria-live-container'
 
 const DefaultRowHeight = 20
 

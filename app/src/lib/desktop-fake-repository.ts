@@ -1,7 +1,7 @@
-import { Repository } from '../models/repository'
-import { getDotComAPIEndpoint } from './api'
 import { GitHubRepository } from '../models/github-repository'
 import { Owner } from '../models/owner'
+import { Repository } from '../models/repository'
+import { getDotComAPIEndpoint } from './api'
 
 // HACK: This is needed because the `Rich`Text` component needs to know what
 // repo to link issues against. Used when we can't rely on the repo info we keep

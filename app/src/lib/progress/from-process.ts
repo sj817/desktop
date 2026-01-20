@@ -1,13 +1,13 @@
+import byline from 'byline'
 import { ChildProcess } from 'child_process'
 import * as Fs from 'fs'
 import * as Path from 'path'
-import byline from 'byline'
 
-import { GitProgressParser, IGitProgress, IGitOutput } from './git'
+import { tailByLine } from '../file-system'
 import { IGitExecutionOptions } from '../git/core'
 import { merge } from '../merge'
+import { GitProgressParser, IGitOutput, IGitProgress } from './git'
 import { GitLFSProgressParser, createLFSProgressFile } from './lfs'
-import { tailByLine } from '../file-system'
 
 /**
  * Merges an instance of IGitExecutionOptions with a process callback provided

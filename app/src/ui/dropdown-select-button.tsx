@@ -1,11 +1,11 @@
 import classNames from 'classnames'
 import React from 'react'
+import { ICheckboxMenuItem, MenuItem } from '../models/app-menu'
+import { MenuPane } from './app-menu'
 import { Button } from './lib/button'
+import { ClickSource, SelectionSource } from './lib/list'
 import { Octicon } from './octicons'
 import * as octicons from './octicons/octicons.generated'
-import { MenuPane } from './app-menu'
-import { ICheckboxMenuItem, MenuItem } from '../models/app-menu'
-import { ClickSource, SelectionSource } from './lib/list'
 
 export interface IDropdownSelectButtonOption {
   /** The select option header label. */

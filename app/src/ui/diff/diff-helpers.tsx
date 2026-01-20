@@ -1,15 +1,15 @@
 import * as React from 'react'
 
-import { ILineTokens } from '../../lib/highlighter/types'
 import classNames from 'classnames'
-import { relativeChanges } from './changed-range'
 import { mapKeysEqual } from '../../lib/equality'
-import {
-  WorkingDirectoryFileChange,
-  CommittedFileChange,
-} from '../../models/status'
-import { DiffHunk, DiffHunkExpansionType } from '../../models/diff/raw-diff'
+import { ILineTokens } from '../../lib/highlighter/types'
 import { DiffLineType, ILargeTextDiff, ITextDiff } from '../../models/diff'
+import { DiffHunk, DiffHunkExpansionType } from '../../models/diff/raw-diff'
+import {
+  CommittedFileChange,
+  WorkingDirectoryFileChange,
+} from '../../models/status'
+import { relativeChanges } from './changed-range'
 
 /**
  * DiffRowType defines the different types of

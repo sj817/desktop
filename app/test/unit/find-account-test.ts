@@ -1,8 +1,8 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import { Account } from '../../src/models/account'
-import { findAccountForRemoteURL } from '../../src/lib/find-account'
+import { describe, it } from 'node:test'
 import { getDotComAPIEndpoint, getEnterpriseAPIURL } from '../../src/lib/api'
+import { findAccountForRemoteURL } from '../../src/lib/find-account'
+import { Account } from '../../src/models/account'
 
 describe('findAccountForRemoteURL', () => {
   const mockCanAccessRepository = (

@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { ICommonImageDiffProperties } from './modified-image-diff'
 import { ImageContainer } from './image-container'
+import { ICommonImageDiffProperties } from './modified-image-diff'
 
 /** How much bigger the slider should be than the images. */
 const SliderOverflow = 14

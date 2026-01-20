@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { TextBox } from '../lib/text-box'
-import { Button } from '../lib/button'
-import { Row } from '../lib/row'
 import { DialogContent } from '../dialog'
+import { Button } from '../lib/button'
 import { Ref } from '../lib/ref'
+import { Row } from '../lib/row'
+import { TextBox } from '../lib/text-box'
 
 interface ICloneGenericRepositoryProps {
   /** The URL to clone. */

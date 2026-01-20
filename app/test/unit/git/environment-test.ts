@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { envForProxy } from '../../../src/lib/git/environment'
 
 describe('git/environmnent', () => {

@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { Account, isDotComAccount } from '../../models/account'
-import { LinkButton } from './link-button'
 import { isAttributableEmailFor } from '../../lib/email'
+import { Account, isDotComAccount } from '../../models/account'
+import { AriaLiveContainer } from '../accessibility/aria-live-container'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { AriaLiveContainer } from '../accessibility/aria-live-container'
+import { LinkButton } from './link-button'
 
 interface IGitEmailNotFoundWarningProps {
   /** The account the commit should be attributed to. */

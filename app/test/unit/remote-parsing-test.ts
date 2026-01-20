@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert'
+import { describe, it } from 'node:test'
 import { parseRemote } from '../../src/lib/remote-parsing'
 
 describe('URL remote parsing', () => {

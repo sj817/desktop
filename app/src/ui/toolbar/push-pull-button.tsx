@@ -1,10 +1,10 @@
 import * as React from 'react'
 
+import { IAheadBehind } from '../../models/branch'
+import { FetchType } from '../../models/fetch'
 import { Progress } from '../../models/progress'
 import { Repository } from '../../models/repository'
-import { IAheadBehind } from '../../models/branch'
 import { TipState } from '../../models/tip'
-import { FetchType } from '../../models/fetch'
 import { Resizable } from '../resizable'
 
 import { Dispatcher } from '../dispatcher'
@@ -17,19 +17,19 @@ import {
 import * as octicons from '../octicons/octicons.generated'
 import { RelativeTime } from '../relative-time'
 
-import { ToolbarButton, ToolbarButtonStyle } from './button'
 import classNames from 'classnames'
+import { FoldoutType, IConstrainedValue } from '../../lib/app-state'
+import { enableResizingToolbarButtons } from '../../lib/feature-flag'
+import { ForcePushBranchState } from '../../lib/rebase'
+import { AriaLiveContainer } from '../accessibility/aria-live-container'
+import { ToolbarButton, ToolbarButtonStyle } from './button'
 import {
   DropdownState,
   IToolbarDropdownProps,
   ToolbarDropdown,
   ToolbarDropdownStyle,
 } from './dropdown'
-import { FoldoutType, IConstrainedValue } from '../../lib/app-state'
-import { ForcePushBranchState } from '../../lib/rebase'
 import { PushPullButtonDropDown } from './push-pull-button-dropdown'
-import { AriaLiveContainer } from '../accessibility/aria-live-container'
-import { enableResizingToolbarButtons } from '../../lib/feature-flag'
 
 export const DropdownItemClassName = 'push-pull-dropdown-item'
 

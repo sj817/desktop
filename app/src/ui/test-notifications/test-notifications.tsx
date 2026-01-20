@@ -1,4 +1,10 @@
 import classNames from 'classnames'
+import {
+  getNotificationSettingsUrl,
+  getNotificationsPermission,
+  requestNotificationsPermission,
+  supportsNotificationsPermissionRequest,
+} from 'desktop-notifications'
 import React from 'react'
 import { getHTMLURL, IAPIComment } from '../../lib/api'
 import { assertNever } from '../../lib/fatal-error'
@@ -17,19 +23,13 @@ import {
 } from '../dialog'
 import { Dispatcher } from '../dispatcher'
 import { Button } from '../lib/button'
+import { LinkButton } from '../lib/link-button'
 import { RowIndexPath } from '../lib/list/list-row-index-path'
 import { SectionList } from '../lib/list/section-list'
 import { Loading } from '../lib/loading'
 import { getPullRequestReviewStateIcon } from '../notifications/pull-request-review-helpers'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import {
-  getNotificationSettingsUrl,
-  getNotificationsPermission,
-  requestNotificationsPermission,
-  supportsNotificationsPermissionRequest,
-} from 'desktop-notifications'
-import { LinkButton } from '../lib/link-button'
 
 enum TestNotificationType {
   PullRequestReview,

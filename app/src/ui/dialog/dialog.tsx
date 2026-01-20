@@ -1,11 +1,11 @@
-import * as React from 'react'
 import classNames from 'classnames'
-import { DialogHeader } from './header'
-import { createUniqueId, releaseUniqueId } from '../lib/id-pool'
-import { getTitleBarHeight } from '../window/title-bar'
-import { isTopMostDialog } from './is-top-most'
+import * as React from 'react'
 import { isMacOSSonomaOrLater, isMacOSVentura } from '../../lib/get-os'
+import { createUniqueId, releaseUniqueId } from '../lib/id-pool'
 import { sendDialogDidOpen } from '../main-process-proxy'
+import { getTitleBarHeight } from '../window/title-bar'
+import { DialogHeader } from './header'
+import { isTopMostDialog } from './is-top-most'
 
 /**
  * Class name used for elements that should be focused initially when a dialog

@@ -1,14 +1,14 @@
-import * as URL from 'url'
 import * as Path from 'path'
+import * as URL from 'url'
 
-import { CloningRepository } from '../models/cloning-repository'
-import { Repository } from '../models/repository'
 import { Account } from '../models/account'
-import { IRemote } from '../models/remote'
-import { getHTMLURL } from './api'
-import { parseRemote, parseRepositoryIdentifier } from './remote-parsing'
-import { caseInsensitiveEquals } from './compare'
+import { CloningRepository } from '../models/cloning-repository'
 import { GitHubRepository } from '../models/github-repository'
+import { IRemote } from '../models/remote'
+import { Repository } from '../models/repository'
+import { getHTMLURL } from './api'
+import { caseInsensitiveEquals } from './compare'
+import { parseRemote, parseRepositoryIdentifier } from './remote-parsing'
 
 export interface IMatchedGitHubRepository {
   /**

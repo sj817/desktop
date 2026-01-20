@@ -1,6 +1,6 @@
-import { IMultiCommitOperationProgress } from './progress'
-import { ComputedAction } from './computed-action'
 import { CommitOneLine } from './commit'
+import { ComputedAction } from './computed-action'
+import { IMultiCommitOperationProgress } from './progress'
 
 /**
  * Rebase internal state used to track how and where the rebase is applied to

@@ -1,27 +1,27 @@
 import * as React from 'react'
-import { Branch } from '../../../models/branch'
-import { Repository } from '../../../models/repository'
+import { assertNever } from '../../../lib/fatal-error'
 import { IMatches } from '../../../lib/fuzzy-find'
-import { Dialog, DialogContent, DialogFooter } from '../../dialog'
+import { Branch } from '../../../models/branch'
+import { ComputedAction } from '../../../models/computed-action'
+import {
+  MultiCommitOperationKind,
+  isIdMultiCommitOperation,
+} from '../../../models/multi-commit-operation'
+import { Repository } from '../../../models/repository'
 import {
   BranchList,
   IBranchListItem,
   renderDefaultBranch,
 } from '../../branches'
+import { getDefaultAriaLabelForBranch } from '../../branches/branch-renderer'
+import { Dialog, DialogContent, DialogFooter } from '../../dialog'
 import { Dispatcher } from '../../dispatcher'
-import { ClickSource } from '../../lib/list'
 import {
   DropdownSelectButton,
   IDropdownSelectButtonOption,
 } from '../../dropdown-select-button'
-import {
-  MultiCommitOperationKind,
-  isIdMultiCommitOperation,
-} from '../../../models/multi-commit-operation'
-import { assertNever } from '../../../lib/fatal-error'
+import { ClickSource } from '../../lib/list'
 import { getMergeOptions } from '../../lib/update-branch'
-import { getDefaultAriaLabelForBranch } from '../../branches/branch-renderer'
-import { ComputedAction } from '../../../models/computed-action'
 
 export function canStartOperation(
   selectedBranch: Branch | null,

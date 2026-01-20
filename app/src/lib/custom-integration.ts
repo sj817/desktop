@@ -1,9 +1,9 @@
-import { parseCommandLineArgv } from 'windows-argv-parser'
+import { exec, spawn, SpawnOptions } from 'child_process'
+import * as fs from 'fs'
+import { access, lstat } from 'fs/promises'
 import stringArgv from 'string-argv'
 import { promisify } from 'util'
-import { exec, spawn, SpawnOptions } from 'child_process'
-import { access, lstat } from 'fs/promises'
-import * as fs from 'fs'
+import { parseCommandLineArgv } from 'windows-argv-parser'
 
 const execAsync = promisify(exec)
 

@@ -4,26 +4,26 @@ import { Branch, BranchType } from '../../models/branch'
 
 import { assertNever } from '../../lib/fatal-error'
 
-import { SelectionSource } from '../lib/filter-list'
 import { IMatches } from '../../lib/fuzzy-find'
 import { Button } from '../lib/button'
+import { SelectionSource } from '../lib/filter-list'
 import { TextBox } from '../lib/text-box'
 
-import {
-  groupBranches,
-  IBranchListItem,
-  BranchGroupIdentifier,
-} from './group-branches'
-import { NoBranches } from './no-branches'
-import { SelectionDirection, ClickSource } from '../lib/list'
-import { generateBranchContextMenuItems } from './branch-list-item-context-menu'
-import { showContextualMenu } from '../../lib/menu-item'
-import { SectionFilterList } from '../lib/section-filter-list'
 import memoizeOne from 'memoize-one'
-import { getAuthors } from '../../lib/git/log'
-import { Repository } from '../../models/repository'
 import uuid from 'uuid'
 import { formatDate } from '../../lib/format-date'
+import { getAuthors } from '../../lib/git/log'
+import { showContextualMenu } from '../../lib/menu-item'
+import { Repository } from '../../models/repository'
+import { ClickSource, SelectionDirection } from '../lib/list'
+import { SectionFilterList } from '../lib/section-filter-list'
+import { generateBranchContextMenuItems } from './branch-list-item-context-menu'
+import {
+  BranchGroupIdentifier,
+  groupBranches,
+  IBranchListItem,
+} from './group-branches'
+import { NoBranches } from './no-branches'
 
 const RowHeight = 30
 

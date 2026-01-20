@@ -1,11 +1,11 @@
 import * as React from 'react'
+import { IAPICreatePushProtectionBypassResponse } from '../../lib/api'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { LinkButton } from '../lib/link-button'
-import { PushProtectionErrorLocation } from './push-protection-error-location'
-import { IAPICreatePushProtectionBypassResponse } from '../../lib/api'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
+import { PushProtectionErrorLocation } from './push-protection-error-location'
 
 /** Represents the location of a detected secret detected on push  */
 export interface ISecretLocation {

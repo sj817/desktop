@@ -1,16 +1,16 @@
 import * as React from 'react'
-import { DiffHeader } from '../diff/diff-header'
 import {
   DiffSelection,
   IDiff,
   ImageDiffType,
   ITextDiff,
 } from '../../models/diff'
-import { WorkingDirectoryFileChange } from '../../models/status'
-import { Repository } from '../../models/repository'
-import { Dispatcher } from '../dispatcher'
-import { SeamlessDiffSwitcher } from '../diff/seamless-diff-switcher'
 import { PopupType } from '../../models/popup'
+import { Repository } from '../../models/repository'
+import { WorkingDirectoryFileChange } from '../../models/status'
+import { DiffHeader } from '../diff/diff-header'
+import { SeamlessDiffSwitcher } from '../diff/seamless-diff-switcher'
+import { Dispatcher } from '../dispatcher'
 
 interface IChangesProps {
   readonly repository: Repository

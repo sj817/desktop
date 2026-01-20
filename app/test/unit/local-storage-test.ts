@@ -1,10 +1,10 @@
-import { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert'
+import { beforeEach, describe, it } from 'node:test'
 import {
-  setBoolean,
   getBoolean,
-  setNumber,
   getNumber,
+  setBoolean,
+  setNumber,
 } from '../../src/lib/local-storage'
 
 describe('local storage', () => {

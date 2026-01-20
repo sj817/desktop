@@ -1,6 +1,6 @@
-import * as OS from 'os'
 import { compare } from 'compare-versions'
 import memoizeOne from 'memoize-one'
+import * as OS from 'os'
 
 function getSystemVersionSafe() {
   if (__DARWIN__) {

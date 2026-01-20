@@ -1,7 +1,7 @@
 import { exec } from 'dugite'
 import * as FSE from 'fs-extra'
-import * as Path from 'path'
 import { TestContext } from 'node:test'
+import * as Path from 'path'
 
 import { Repository } from '../../src/models/repository'
 import { createTempDirectory } from './temp'

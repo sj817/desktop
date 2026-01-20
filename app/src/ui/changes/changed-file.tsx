@@ -1,14 +1,14 @@
 import * as React from 'react'
 
-import { PathLabel } from '../lib/path-label'
-import { Octicon, iconForStatus } from '../octicons'
-import { Checkbox, CheckboxValue } from '../lib/checkbox'
+import { IMatches } from '../../lib/fuzzy-find'
 import { mapStatus } from '../../lib/status'
 import { WorkingDirectoryFileChange } from '../../models/status'
+import { AriaLiveContainer } from '../accessibility/aria-live-container'
+import { Checkbox, CheckboxValue } from '../lib/checkbox'
+import { PathLabel } from '../lib/path-label'
 import { TooltipDirection } from '../lib/tooltip'
 import { TooltippedContent } from '../lib/tooltipped-content'
-import { AriaLiveContainer } from '../accessibility/aria-live-container'
-import { IMatches } from '../../lib/fuzzy-find'
+import { Octicon, iconForStatus } from '../octicons'
 
 interface IChangedFileProps {
   readonly file: WorkingDirectoryFileChange

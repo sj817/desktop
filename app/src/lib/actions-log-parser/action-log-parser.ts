@@ -36,12 +36,12 @@ import {
   unsetValue,
 } from './actions-log-parser-objects'
 import {
+  _ansiEscapeCodeRegex,
   BrightClassPostfix,
   ESC,
   TimestampLength,
   TimestampRegex,
   UrlRegex,
-  _ansiEscapeCodeRegex,
 } from './actions-logs-ansii'
 
 export function getText(text: string) {

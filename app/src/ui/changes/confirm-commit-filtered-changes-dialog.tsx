@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { Row } from '../lib/row'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Checkbox, CheckboxValue } from '../lib/checkbox'
 import { LinkButton } from '../lib/link-button'
+import { Row } from '../lib/row'
 
 interface IConfirmCommitFilteredChangesProps {
   readonly onCommitAnyway: () => void

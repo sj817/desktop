@@ -1,13 +1,13 @@
 import * as React from 'react'
 
+import { DiffSelection, ITextDiff } from '../../models/diff'
 import { Repository } from '../../models/repository'
-import { Dispatcher } from '../dispatcher'
 import { WorkingDirectoryFileChange } from '../../models/status'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
-import { PathText } from '../lib/path-text'
-import { Checkbox, CheckboxValue } from '../lib/checkbox'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { ITextDiff, DiffSelection } from '../../models/diff'
+import { Dispatcher } from '../dispatcher'
+import { Checkbox, CheckboxValue } from '../lib/checkbox'
+import { PathText } from '../lib/path-text'
 
 interface IDiscardSelectionProps {
   readonly repository: Repository

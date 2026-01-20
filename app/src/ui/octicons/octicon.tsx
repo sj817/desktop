@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { OcticonSymbol, OcticonSymbolVariant } from '.'
 import classNames from 'classnames'
+import * as React from 'react'
 import ReactDOM from 'react-dom'
+import { OcticonSymbol, OcticonSymbolVariant } from '.'
 import { createObservableRef } from '../lib/observable-ref'
 import { Tooltip, TooltipDirection } from '../lib/tooltip'
 

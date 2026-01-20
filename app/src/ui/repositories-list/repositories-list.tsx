@@ -1,32 +1,31 @@
 import * as React from 'react'
 
-import { commitGrammar, RepositoryListItem } from './repository-list-item'
+import memoizeOne from 'memoize-one'
+import { assertNever } from '../../lib/fatal-error'
+import { enableMultipleEnterpriseAccounts } from '../../lib/feature-flag'
+import { IMatches } from '../../lib/fuzzy-find'
+import { IMenuItem, showContextualMenu } from '../../lib/menu-item'
+import { encodePathAsUrl } from '../../lib/path'
+import { IAheadBehind } from '../../models/branch'
+import { PopupType } from '../../models/popup'
+import { ILocalRepositoryState, Repository } from '../../models/repository'
+import { Dispatcher } from '../dispatcher'
+import { KeyboardShortcut } from '../keyboard-shortcut/keyboard-shortcut'
+import { Button } from '../lib/button'
+import { IFilterListGroup } from '../lib/filter-list'
+import { SectionFilterList } from '../lib/section-filter-list'
+import { TooltippedContent } from '../lib/tooltipped-content'
+import { Octicon } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
+import { generateRepositoryListContextMenu } from '../repositories-list/repository-list-item-context-menu'
 import {
+  getGroupKey,
   groupRepositories,
   IRepositoryListItem,
   Repositoryish,
   RepositoryListGroup,
-  getGroupKey,
 } from './group-repositories'
-import { IFilterListGroup } from '../lib/filter-list'
-import { IMatches } from '../../lib/fuzzy-find'
-import { ILocalRepositoryState, Repository } from '../../models/repository'
-import { Dispatcher } from '../dispatcher'
-import { Button } from '../lib/button'
-import { Octicon } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
-import { showContextualMenu } from '../../lib/menu-item'
-import { IMenuItem } from '../../lib/menu-item'
-import { PopupType } from '../../models/popup'
-import { encodePathAsUrl } from '../../lib/path'
-import { TooltippedContent } from '../lib/tooltipped-content'
-import memoizeOne from 'memoize-one'
-import { KeyboardShortcut } from '../keyboard-shortcut/keyboard-shortcut'
-import { generateRepositoryListContextMenu } from '../repositories-list/repository-list-item-context-menu'
-import { SectionFilterList } from '../lib/section-filter-list'
-import { assertNever } from '../../lib/fatal-error'
-import { enableMultipleEnterpriseAccounts } from '../../lib/feature-flag'
-import { IAheadBehind } from '../../models/branch'
+import { commitGrammar, RepositoryListItem } from './repository-list-item'
 
 const BlankSlateImage = encodePathAsUrl(__dirname, 'static/empty-no-repo.svg')
 

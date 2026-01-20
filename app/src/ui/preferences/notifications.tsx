@@ -1,12 +1,12 @@
-import * as React from 'react'
-import { DialogContent } from '../dialog'
-import { Checkbox, CheckboxValue } from '../lib/checkbox'
-import { LinkButton } from '../lib/link-button'
 import {
   getNotificationSettingsUrl,
   supportsNotifications,
   supportsNotificationsPermissionRequest,
 } from 'desktop-notifications'
+import * as React from 'react'
+import { DialogContent } from '../dialog'
+import { Checkbox, CheckboxValue } from '../lib/checkbox'
+import { LinkButton } from '../lib/link-button'
 import {
   getNotificationsPermission,
   requestNotificationsPermission,

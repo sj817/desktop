@@ -1,5 +1,5 @@
-import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert'
+import { afterEach, describe, it } from 'node:test'
 import { CloneProgressParser } from '../../../src/lib/progress'
 
 describe('CloneProgressParser', () => {

@@ -5,9 +5,9 @@ import {
   MultiCommitOperationKind,
   MultiCommitOperationStepKind,
 } from '../../models/multi-commit-operation'
-import { ChooseTargetBranchDialog } from './choose-branch/choose-target-branch'
 import { CreateBranch } from '../create-branch'
 import { BaseMultiCommitOperation } from './base-multi-commit-operation'
+import { ChooseTargetBranchDialog } from './choose-branch/choose-target-branch'
 
 export abstract class CherryPick extends BaseMultiCommitOperation {
   protected onContinueAfterConflicts = async (): Promise<void> => {

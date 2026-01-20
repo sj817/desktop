@@ -1,20 +1,20 @@
 import mem from 'mem'
 
+import { Disposable, Emitter } from 'event-kit'
+import { Account } from '../../models/account'
+import { GitHubRepository } from '../../models/github-repository'
+import { PullRequest, PullRequestRef } from '../../models/pull-request'
+import { API, IAPIPullRequest, MaxResultsError } from '../api'
 import {
-  PullRequestDatabase,
   IPullRequest,
+  PullRequestDatabase,
   PullRequestKey,
   getPullRequestKey,
 } from '../databases/pull-request-database'
-import { GitHubRepository } from '../../models/github-repository'
-import { Account } from '../../models/account'
-import { API, IAPIPullRequest, MaxResultsError } from '../api'
-import { fatalError } from '../fatal-error'
-import { RepositoriesStore } from './repositories-store'
-import { PullRequest, PullRequestRef } from '../../models/pull-request'
 import { structuralEquals } from '../equality'
-import { Emitter, Disposable } from 'event-kit'
+import { fatalError } from '../fatal-error'
 import { APIError } from '../http'
+import { RepositoriesStore } from './repositories-store'
 
 /** The store for GitHub Pull Requests. */
 export class PullRequestStore {

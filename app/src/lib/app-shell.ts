@@ -3,10 +3,10 @@ import * as Path from 'path'
 
 import { Repository } from '../models/repository'
 import {
-  showItemInFolder,
-  showFolderContents,
-  openExternal,
   moveItemToTrash,
+  openExternal,
+  showFolderContents,
+  showItemInFolder,
 } from '../ui/main-process-proxy'
 
 export interface IAppShell {

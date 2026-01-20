@@ -1,14 +1,14 @@
 import * as React from 'react'
 
-import { Octicon } from '../octicons'
-import * as octicons from '../octicons/octicons.generated'
-import { HighlightText } from '../lib/highlight-text'
-import { Branch, IAheadBehind } from '../../models/branch'
+import { DisposableLike } from 'event-kit'
 import { IMatches } from '../../lib/fuzzy-find'
 import { AheadBehindStore } from '../../lib/stores/ahead-behind-store'
+import { Branch, IAheadBehind } from '../../models/branch'
 import { Repository } from '../../models/repository'
-import { DisposableLike } from 'event-kit'
+import { HighlightText } from '../lib/highlight-text'
 import { TooltippedContent } from '../lib/tooltipped-content'
+import { Octicon } from '../octicons'
+import * as octicons from '../octicons/octicons.generated'
 
 interface ICompareBranchListItemProps {
   readonly branch: Branch
