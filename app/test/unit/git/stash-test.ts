@@ -1,6 +1,6 @@
 import { describe, it, TestContext } from 'node:test'
 import assert from 'node:assert'
-import { appendFile, writeFile } from 'fs/promises'
+import * as FSE from 'fs-extra'
 import * as path from 'path'
 import { Repository } from '../../../src/models/repository'
 import { setupEmptyRepository } from '../../helpers/repositories'
@@ -40,7 +40,7 @@ describe('git/stash', () => {
     it('returns all stash entries created by Desktop', async t => {
       const repository = await setupEmptyRepository(t)
       const readme = path.join(repository.path, 'README.md')
-      await writeFile(readme, '')
+      await FSE.writeFile(readme, '')
       await exec(['add', 'README.md'], repository.path)
       await exec(['commit', '-m', 'initial commit'], repository.path)
 
@@ -60,7 +60,7 @@ describe('git/stash', () => {
     const setup = async (t: TestContext) => {
       const repository = await setupEmptyRepository(t)
       const readme = join(repository.path, 'README.md')
-      await writeFile(readme, '')
+      await FSE.writeFile(readme, '')
       await exec(['add', 'README.md'], repository.path)
       await exec(['commit', '-m', 'initial commit'], repository.path)
 
@@ -69,7 +69,10 @@ describe('git/stash', () => {
 
     it('creates a stash entry when repo is not unborn or in any kind of conflict or rebase state', async t => {
       const repository = await setup(t)
-      await appendFile(join(repository.path, 'README.md'), 'just testing stuff')
+      await FSE.appendFile(
+        join(repository.path, 'README.md'),
+        'just testing stuff'
+      )
 
       await createDesktopStashEntry(repository, 'master', [])
 
@@ -83,7 +86,7 @@ describe('git/stash', () => {
     it('stashes untracked files and removes them from the working directory', async t => {
       const repository = await setup(t)
       const untrackedFile = path.join(repository.path, 'not-tracked.txt')
-      writeFile(untrackedFile, 'some untracked file')
+      FSE.writeFile(untrackedFile, 'some untracked file')
 
       let status = await getStatusOrThrow(repository)
       let files = status.workingDirectory.files
@@ -107,7 +110,7 @@ describe('git/stash', () => {
   describe('getLastDesktopStashEntryForBranch', () => {
     const setup = async (t: TestContext) => {
       const repository = await setupEmptyRepository(t)
-      await writeFile(join(repository.path, 'README.md'), '')
+      await FSE.writeFile(join(repository.path, 'README.md'), '')
       await exec(['add', 'README.md'], repository.path)
       await exec(['commit', '-m', 'initial commit'], repository.path)
 
@@ -160,7 +163,7 @@ describe('git/stash', () => {
     const setup = async (t: TestContext) => {
       const repository = await setupEmptyRepository(t)
       const readme = join(repository.path, 'README.md')
-      await writeFile(readme, '')
+      await FSE.writeFile(readme, '')
       await exec(['add', 'README.md'], repository.path)
       await exec(['commit', '-m', 'initial commit'], repository.path)
 
@@ -229,7 +232,7 @@ describe('git/stash', () => {
     const setup = async (t: TestContext) => {
       const repository = await setupEmptyRepository(t)
       const readme = path.join(repository.path, 'README.md')
-      await writeFile(readme, '')
+      await FSE.writeFile(readme, '')
       await exec(['add', 'README.md'], repository.path)
       await exec(['commit', '-m', 'initial commit'], repository.path)
 
@@ -268,7 +271,7 @@ describe('git/stash', () => {
         assert.equal(desktopEntries.length, 1)
 
         const readme = path.join(repository.path, 'README.md')
-        await appendFile(readme, generateString())
+        await FSE.appendFile(readme, generateString())
         await exec(['commit', '-am', 'later commit'], repository.path)
 
         let status = await getStatusOrThrow(repository)
@@ -297,7 +300,7 @@ describe('git/stash', () => {
         assert.equal(desktopEntries.length, 1)
 
         const readme = path.join(repository.path, 'README.md')
-        await writeFile(readme, generateString())
+        await FSE.writeFile(readme, generateString())
 
         const entryToApply = desktopEntries[0]
         await assert.rejects(() =>
@@ -337,6 +340,6 @@ async function generateTestStashEntry(
 ): Promise<void> {
   const message = simulateDesktopEntry ? null : 'Should get filtered'
   const readme = path.join(repository.path, 'README.md')
-  await appendFile(readme, generateString())
+  await FSE.appendFile(readme, generateString())
   await stash(repository, branchName, message)
 }

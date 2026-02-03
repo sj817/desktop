@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as path from 'path'
-import { appendFile, writeFile } from 'fs/promises'
+import * as FSE from 'fs-extra'
 
 import { Repository } from '../../../src/models/repository'
 import {
@@ -35,6 +35,7 @@ import { getStatusOrThrow } from '../../helpers/status'
 
 import { GitError as DugiteError, exec } from 'dugite'
 import { makeCommit, switchTo } from '../../helpers/repository-scaffolding'
+import { writeFile } from 'fs/promises'
 import { join } from 'node:path'
 
 async function getTextDiff(
@@ -297,7 +298,7 @@ describe('git/diff', () => {
     it('is empty for a renamed file', async t => {
       const repo = await setupEmptyRepository(t)
 
-      await writeFile(path.join(repo.path, 'foo'), 'foo\n')
+      await FSE.writeFile(path.join(repo.path, 'foo'), 'foo\n')
 
       await exec(['add', 'foo'], repo.path)
       await exec(['commit', '-m', 'Initial commit'], repo.path)
@@ -320,13 +321,13 @@ describe('git/diff', () => {
     it('only shows modifications after move for a renamed and modified file', async t => {
       const repo = await setupEmptyRepository(t)
 
-      await writeFile(path.join(repo.path, 'foo'), 'foo\n')
+      await FSE.writeFile(path.join(repo.path, 'foo'), 'foo\n')
 
       await exec(['add', 'foo'], repo.path)
       await exec(['commit', '-m', 'Initial commit'], repo.path)
       await exec(['mv', 'foo', 'bar'], repo.path)
 
-      await writeFile(path.join(repo.path, 'bar'), 'bar\n')
+      await FSE.writeFile(path.join(repo.path, 'bar'), 'bar\n')
 
       const status = await getStatusOrThrow(repo)
       const files = status.workingDirectory.files
@@ -346,11 +347,14 @@ describe('git/diff', () => {
     it('handles unborn repository with mixed state', async t => {
       const repo = await setupEmptyRepository(t)
 
-      await writeFile(path.join(repo.path, 'foo'), 'WRITING THE FIRST LINE\n')
+      await FSE.writeFile(
+        path.join(repo.path, 'foo'),
+        'WRITING THE FIRST LINE\n'
+      )
 
       await exec(['add', 'foo'], repo.path)
 
-      await writeFile(path.join(repo.path, 'foo'), 'WRITING OVER THE TOP\n')
+      await FSE.writeFile(path.join(repo.path, 'foo'), 'WRITING OVER THE TOP\n')
 
       const status = await getStatusOrThrow(repo)
       const files = status.workingDirectory.files
@@ -374,7 +378,7 @@ describe('git/diff', () => {
 
       let lineEnding = '\r\n'
 
-      await writeFile(
+      await FSE.writeFile(
         filePath,
         `WRITING MANY LINES ${lineEnding} USING THIS LINE ENDING ${lineEnding} TO SHOW THAT GIT${lineEnding} WILL INSERT IT WITHOUT CHANGING THING ${lineEnding} HA HA BUSINESS`
       )
@@ -386,7 +390,7 @@ describe('git/diff', () => {
       await exec(['config', 'core.autocrlf', 'true'], repo.path)
       lineEnding = '\n\n'
 
-      await writeFile(
+      await FSE.writeFile(
         filePath,
         `WRITING MANY LINES ${lineEnding} USING THIS LINE ENDING ${lineEnding} TO SHOW THAT GIT${lineEnding} WILL INSERT IT WITHOUT CHANGING THING ${lineEnding} HA HA BUSINESS`
       )
@@ -410,7 +414,7 @@ describe('git/diff', () => {
       const filePath = path.join(repo.path, 'foo')
 
       const testString = 'here are some cool characters: • é  漢字'
-      await writeFile(filePath, testString)
+      await FSE.writeFile(filePath, testString)
 
       const status = await getStatusOrThrow(repo)
       const files = status.workingDirectory.files
@@ -523,7 +527,7 @@ describe('git/diff', () => {
       const repository = new Repository(repoPath, -1, null, false)
 
       // Just make any change to the submodule to get a diff
-      await writeFile(getSubmodulePath(repoPath, 'README.md'), 'hello\n')
+      await FSE.writeFile(getSubmodulePath(repoPath, 'README.md'), 'hello\n')
 
       const diff = await getSubmoduleDiff(repository)
       assert.equal(diff.fullPath, getSubmodulePath(repoPath))
@@ -536,7 +540,7 @@ describe('git/diff', () => {
       const repository = new Repository(repoPath, -1, null, false)
 
       // Modify README.md file. Now the submodule has modified changes.
-      await writeFile(getSubmodulePath(repoPath, 'README.md'), 'hello\n')
+      await FSE.writeFile(getSubmodulePath(repoPath, 'README.md'), 'hello\n')
 
       const diff = await getSubmoduleDiff(repository)
       assert(diff.oldSHA === null)
@@ -551,7 +555,7 @@ describe('git/diff', () => {
       const repository = new Repository(repoPath, -1, null, false)
 
       // Create NEW.md file. Now the submodule has untracked changes.
-      await writeFile(getSubmodulePath(repoPath, 'NEW.md'), 'hello\n')
+      await FSE.writeFile(getSubmodulePath(repoPath, 'NEW.md'), 'hello\n')
 
       const diff = await getSubmoduleDiff(repository)
       assert(diff.oldSHA === null)
@@ -566,7 +570,7 @@ describe('git/diff', () => {
       const repository = new Repository(repoPath, -1, null, false)
 
       // Make a change and commit it. Now the submodule has a commit change.
-      await writeFile(getSubmodulePath(repoPath, 'README.md'), 'hello\n')
+      await FSE.writeFile(getSubmodulePath(repoPath, 'README.md'), 'hello\n')
       await exec(['commit', '-a', '-m', 'test'], getSubmodulePath(repoPath))
 
       const diff = await getSubmoduleDiff(repository)
@@ -581,10 +585,10 @@ describe('git/diff', () => {
       const repoPath = await setupFixtureRepository(t, 'submodule-basic-setup')
       const repository = new Repository(repoPath, -1, null, false)
 
-      await writeFile(getSubmodulePath(repoPath, 'README.md'), 'hello\n')
+      await FSE.writeFile(getSubmodulePath(repoPath, 'README.md'), 'hello\n')
       await exec(['commit', '-a', '-m', 'test'], getSubmodulePath(repoPath))
-      await writeFile(getSubmodulePath(repoPath, 'README.md'), 'bye\n')
-      await writeFile(getSubmodulePath(repoPath, 'NEW.md'), 'new!!\n')
+      await FSE.writeFile(getSubmodulePath(repoPath, 'README.md'), 'bye\n')
+      await FSE.writeFile(getSubmodulePath(repoPath, 'NEW.md'), 'new!!\n')
 
       const diff = await getSubmoduleDiff(repository)
       assert(diff.oldSHA !== null)
@@ -679,14 +683,14 @@ describe('git/diff', () => {
 
       // Add foo.md to master
       const fooPath = path.join(repository.path, 'foo.md')
-      await writeFile(fooPath, 'foo\n')
+      await FSE.writeFile(fooPath, 'foo\n')
       await exec(['commit', '-a', '-m', 'foo'], repository.path)
 
       // Create feature branch from commit with foo.md
       await exec(['branch', 'feature-branch'], repository.path)
 
       // Commit a line "bar" to foo.md on master branch
-      await appendFile(fooPath, 'bar\n')
+      await FSE.appendFile(fooPath, 'bar\n')
       await exec(['add', fooPath], repository.path)
       await exec(['commit', '-m', 'A'], repository.path)
 
@@ -694,7 +698,7 @@ describe('git/diff', () => {
       await switchTo(repository, 'feature-branch')
 
       // Commit a line of "feature" to foo.md on feature branch
-      await appendFile(fooPath, 'feature\n')
+      await FSE.appendFile(fooPath, 'feature\n')
       await exec(['add', fooPath], repository.path)
       await exec(['commit', '-m', 'B'], repository.path)
 

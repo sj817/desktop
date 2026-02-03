@@ -2,7 +2,7 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as path from 'path'
 import * as os from 'os'
-import { mkdtemp, writeFile } from 'fs/promises'
+import * as FSE from 'fs-extra'
 import { exec } from 'dugite'
 import { DiffParser } from '../../src/lib/diff-parser'
 import {
@@ -35,10 +35,13 @@ async function prepareDiff(
     os.tmpdir(),
     'text-diff-expansion-test'
   )
-  const contentFolderPath = await mkdtemp(contentFolderPathPrefix)
+  const contentFolderPath = await FSE.mkdtemp(contentFolderPathPrefix)
 
-  await writeFile(path.join(contentFolderPath, 'original'), originalContents)
-  await writeFile(path.join(contentFolderPath, 'changed'), modifiedContents)
+  await FSE.writeFile(
+    path.join(contentFolderPath, 'original'),
+    originalContents
+  )
+  await FSE.writeFile(path.join(contentFolderPath, 'changed'), modifiedContents)
 
   // Generate diff with 3 lines of context
   const result = await exec(

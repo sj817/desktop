@@ -1,5 +1,5 @@
 import { exec } from 'dugite'
-import { writeFile } from 'fs/promises'
+import * as FSE from 'fs-extra'
 import * as Path from 'path'
 import { TestContext } from 'node:test'
 
@@ -53,7 +53,7 @@ export async function makeCommit(repository: Repository, tree: Tree) {
     if (entry.contents === null) {
       await exec(['rm', entry.path], repository.path)
     } else {
-      await writeFile(fullPath, entry.contents)
+      await FSE.writeFile(fullPath, entry.contents)
       await exec(['add', entry.path], repository.path)
     }
   }
