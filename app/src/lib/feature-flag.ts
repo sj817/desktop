@@ -103,4 +103,4 @@ export function enableAccessibleListToolTips(): boolean {
   return enableBetaFeatures()
 }
 
-export const enableHooksEnvironment = enableBetaFeatures
+export const enableHooksEnvironment = () => true
