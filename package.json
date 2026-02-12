@@ -32,7 +32,7 @@
     "eslint-check": "eslint --print-config .eslintrc.* | eslint-config-prettier-check",
     "validate-electron-version": "ts-node -P script/tsconfig.json script/validate-electron-version.ts",
     "validate-macos-version": "ts-node -P script/tsconfig.json script/validate-macos-version.ts",
-    "clean-slate": "rimraf out node_modules app/node_modules && yarn",
+    "clean-slate": "rimraf out node_modules app/node_modules && npm i",
     "rebuild-hard:dev": "npm run clean-slate && build:dev",
     "rebuild-hard:prod": "npm run clean-slate && build:prod",
     "draft-release": "ts-node -P script/tsconfig.json script/draft-release/index.ts",
@@ -47,8 +47,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">= 10",
-    "yarn": ">= 1.9"
+    "node": ">= 10"
   },
   "resolutions": {
     "@types/react-css-transition-replace/@types/react": "^16.14.62"
