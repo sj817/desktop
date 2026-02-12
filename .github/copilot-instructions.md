@@ -8,9 +8,9 @@ This repository contains GitHub Desktop, an open-source Electron-based GitHub ap
 - **UI Framework**: React 16.x
 - **Runtime**: Electron > 38.x (see `.npmrc` for specific version)
 - **Build Tool**: Webpack with parallel builds
-- **Package Manager**: Yarn (>= 1.21.1)
+- **Package Manager**: npm
 - **Node Version**: >= 22 (see `.nvmrc` for specific version)
-- **Testing**: Node.js built-in test runner (run using `yarn test`, optionally providing one or more test files e.g `yarn test app/test/unit/repository-list-test.ts`)
+- **Testing**: Node.js built-in test runner (run using `npm test`, optionally providing one or more test files e.g `npm test app/test/unit/repository-list-test.ts`)
 
 ## Code Style & Conventions
 
@@ -93,29 +93,29 @@ The codebase uses comprehensive ESLint rules. Key custom rules:
 
 ```bash
 # Install dependencies
-yarn
+npm install
 
 # Development build
-yarn build:dev
+npm run build:dev
 ```
 
 ### Testing
 
 ```bash
 # Run all unit tests
-yarn test
+npm test
 
 # Run specific test file
-yarn test <file>
+npm test <file>
 
 # Run tests in directory
-yarn test <directory>
+npm test <directory>
 
 # Run script tests
-yarn test:script
+npm run test:script
 
 # Run ESLint tests
-yarn test:eslint
+npm run test:eslint
 ```
 
 **Test Conventions**:
@@ -128,22 +128,22 @@ yarn test:eslint
 
 ```bash
 # Run all linters
-yarn lint
+npm run lint
 
 # Fix auto-fixable issues
-yarn lint:fix
+npm run lint:fix
 
 # Lint source code
-yarn lint:src
+npm run lint:src
 
 # Check Markdown files
-yarn markdownlint
+npm run markdownlint
 
 # Format with Prettier
-yarn prettier
+npm run prettier
 
 # Fix Prettier issues
-yarn prettier --write
+npm run prettier -- --write
 ```
 
 ## Security & Quality
