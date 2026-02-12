@@ -58,7 +58,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-      - run: npm install
+      - run: npm ci
       - run: npm run validate-electron-version
       - run: npm run lint
       - run: npm run validate-changelog
@@ -98,7 +98,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - name: Install and build dependencies
-        run: npm install
+        run: npm ci
         env:
           npm_config_arch: ${{ matrix.arch }}
           TARGET_ARCH: ${{ matrix.arch }}
@@ -108,7 +108,7 @@ jobs:
       - name: Run desktop-trampoline tests
         run: |
           cd vendor/desktop-trampoline
-          npm install
+          npm ci
           npm test
       - name: Build production app
         run: npm run build:prod
