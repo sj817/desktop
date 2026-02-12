@@ -12,7 +12,7 @@ const options: SpawnSyncOptions = {
   shell: process.platform === 'win32',
 }
 
-let result = spawnSync('npm', ['install'], {
+let result = spawnSync('npm', ['ci'], {
   ...options,
   cwd: Path.join(root, 'app'),
 })
