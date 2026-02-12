@@ -8,6 +8,8 @@ const root = Path.dirname(__dirname)
 const options: SpawnSyncOptions = {
   cwd: root,
   stdio: 'inherit',
+  // On Windows, shell is needed to execute .cmd files
+  shell: process.platform === 'win32',
 }
 
 let result = spawnSync('npm', ['install'], {
