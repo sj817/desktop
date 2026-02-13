@@ -62,7 +62,10 @@ import {
   AppFileStatusKind,
 } from '../../models/status'
 import { TipState, tipEquals, IValidBranch } from '../../models/tip'
-import { ICommitMessage } from '../../models/commit-message'
+import {
+  ICommitMessage,
+  DefaultCommitMessage,
+} from '../../models/commit-message'
 import {
   Progress,
   ICheckoutProgress,
@@ -3362,6 +3365,12 @@ export class AppStore extends TypedBaseStore<IAppState> {
         this.repositoryStateCache.update(repository, () => {
           return {
             commitToAmend: null,
+          }
+        })
+
+        this.repositoryStateCache.updateChangesState(repository, () => {
+          return {
+            commitMessage: DefaultCommitMessage,
           }
         })
 
