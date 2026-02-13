@@ -1,5 +1,6 @@
 {
   "releases": {
+    "3.5.5-test7": ["[New] Use Copilot SDK"],
     "3.5.5-beta4": [
       "[New] Enable hooks support by default - #21590",
       "[Added] Support rebase hooks - #21586"
