@@ -51,6 +51,10 @@ export class Checkbox extends React.Component<ICheckboxProps, ICheckboxState> {
   public constructor(props: ICheckboxProps) {
     super(props)
 
+    // TODO: I don't understand why we need this here, it was added in
+    // https://github.com/desktop/desktop/pull/17839 and I replaced uuid
+    // with crypto.randomUUID but like the whole point of createUniqueId
+    // is to create unique ids so this shouldn't be necessary.
     const friendlyName =
       props.label && typeof props.label === 'string'
         ? props.label
