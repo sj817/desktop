@@ -131,28 +131,32 @@ export class CreateBranch extends React.Component<
     }
   }
 
-  public componentWillReceiveProps(nextProps: ICreateBranchProps) {
+  public componentDidUpdate(prevProps: ICreateBranchProps) {
+    if (prevProps === this.props) {
+      return
+    }
+
     this.setState({
-      startPoint: getStartPoint(nextProps, this.state.startPoint),
+      startPoint: getStartPoint(this.props, this.state.startPoint),
     })
 
     if (!this.state.isCreatingBranch) {
       const defaultStartPoint = getStartPoint(
-        nextProps,
+        this.props,
         StartPoint.UpstreamDefaultBranch
       )
 
       this.setState({
-        tipAtCreateStart: nextProps.tip,
+        tipAtCreateStart: this.props.tip,
         defaultBranchAtCreateStart: getBranchForStartPoint(
           defaultStartPoint,
-          nextProps
+          this.props
         ),
       })
     }
 
-    if (nextProps.initialName.length > 0) {
-      this.checkBranchRules(nextProps.initialName)
+    if (this.props.initialName.length > 0) {
+      this.checkBranchRules(this.props.initialName)
     }
   }
 

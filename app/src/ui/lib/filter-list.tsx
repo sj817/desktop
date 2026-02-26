@@ -216,16 +216,14 @@ export class FilterList<
     this.state = createStateUpdate(props, null)
   }
 
-  public componentWillReceiveProps(
-    nextProps: IFilterListProps<T, GroupIdentifier>
-  ) {
-    this.setState(createStateUpdate(nextProps, this.state))
-  }
-
   public componentDidUpdate(
     prevProps: IFilterListProps<T, GroupIdentifier>,
     prevState: IFilterListState<T, GroupIdentifier>
   ) {
+    if (prevProps !== this.props) {
+      this.setState(createStateUpdate(this.props, this.state))
+    }
+
     if (this.props.onSelectionChanged) {
       const oldSelectedItemId = getItemIdFromRowIndex(
         prevState.rows,

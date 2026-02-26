@@ -85,12 +85,12 @@ export class RefNameTextBox extends React.Component<
     }
   }
 
-  public componentWillReceiveProps(nextProps: IRefNameProps): void {
+  public componentDidUpdate(prevProps: IRefNameProps): void {
     if (
-      nextProps.initialValue !== this.props.initialValue &&
+      this.props.initialValue !== prevProps.initialValue &&
       this.state.sanitizedValue === ''
     ) {
-      this.setState(this.getStateForInitialValue(nextProps.initialValue))
+      this.setState(this.getStateForInitialValue(this.props.initialValue))
     }
   }
 

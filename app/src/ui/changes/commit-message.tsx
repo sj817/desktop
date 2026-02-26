@@ -326,24 +326,22 @@ export class CommitMessage extends React.Component<
    * (and the React docs) believe it to be the right answer for this situation, see:
    * https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops
    */
-  public componentWillReceiveProps(nextProps: ICommitMessageProps) {
-    const { commitMessage } = nextProps
-
-    if (!commitMessage || commitMessage === this.props.commitMessage) {
-      return
-    }
-
-    if (commitMessage.timestamp > this.state.commitMessage.timestamp) {
-      this.setState({
-        commitMessage,
-      })
-    }
-  }
-
   public async componentDidUpdate(
     prevProps: ICommitMessageProps,
     prevState: ICommitMessageState
   ) {
+    const { commitMessage } = this.props
+
+    if (
+      commitMessage &&
+      commitMessage !== prevProps.commitMessage &&
+      commitMessage.timestamp > this.state.commitMessage.timestamp
+    ) {
+      this.setState({
+        commitMessage,
+      })
+    }
+
     if (
       this.props.autocompletionProviders !== prevProps.autocompletionProviders
     ) {

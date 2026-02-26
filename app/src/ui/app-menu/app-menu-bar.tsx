@@ -120,13 +120,11 @@ export class AppMenuBar extends React.Component<
     this.state = createState(props)
   }
 
-  public componentWillReceiveProps(nextProps: IAppMenuBarProps) {
-    if (nextProps.appMenu !== this.props.appMenu) {
-      this.setState(createState(nextProps))
-    }
-  }
-
   public componentDidUpdate(prevProps: IAppMenuBarProps) {
+    if (this.props.appMenu !== prevProps.appMenu) {
+      this.setState(createState(this.props))
+    }
+
     // Was the app menu foldout just opened or closed?
     if (this.props.foldoutState && !prevProps.foldoutState) {
       if (this.props.appMenu.length === 1 && !this.hasFocus) {

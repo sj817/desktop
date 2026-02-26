@@ -94,9 +94,9 @@ export class CompareSidebar extends React.Component<
     this.state = { focusedBranch: null }
   }
 
-  public componentWillReceiveProps(nextProps: ICompareSidebarProps) {
-    const newFormState = nextProps.compareState.formState
-    const oldFormState = this.props.compareState.formState
+  public componentDidUpdate(prevProps: ICompareSidebarProps) {
+    const newFormState = this.props.compareState.formState
+    const oldFormState = prevProps.compareState.formState
 
     if (
       newFormState.kind !== oldFormState.kind &&
@@ -105,10 +105,7 @@ export class CompareSidebar extends React.Component<
       this.setState({
         focusedBranch: null,
       })
-      return
-    }
-
-    if (
+    } else if (
       newFormState.kind !== HistoryTabMode.History &&
       oldFormState.kind !== HistoryTabMode.History
     ) {
@@ -122,20 +119,16 @@ export class CompareSidebar extends React.Component<
         })
       }
     }
-  }
 
-  public componentDidUpdate(prevProps: ICompareSidebarProps) {
     const { showBranchList } = this.props.compareState
 
-    if (showBranchList === prevProps.compareState.showBranchList) {
-      return
-    }
-
-    if (this.textbox !== null) {
-      if (showBranchList) {
-        this.textbox.focus()
-      } else if (!showBranchList) {
-        this.textbox.blur()
+    if (showBranchList !== prevProps.compareState.showBranchList) {
+      if (this.textbox !== null) {
+        if (showBranchList) {
+          this.textbox.focus()
+        } else if (!showBranchList) {
+          this.textbox.blur()
+        }
       }
     }
   }

@@ -154,9 +154,9 @@ export class RelativeTime extends React.Component<
     this.updateWithDate(this.props.date)
   }
 
-  public componentWillReceiveProps(nextProps: IRelativeTimeProps) {
-    if (this.props.date !== nextProps.date) {
-      this.updateWithDate(nextProps.date)
+  public componentDidUpdate(prevProps: IRelativeTimeProps) {
+    if (prevProps.date !== this.props.date) {
+      this.updateWithDate(this.props.date)
     }
   }
 

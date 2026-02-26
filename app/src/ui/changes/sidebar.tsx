@@ -127,16 +127,19 @@ export class ChangesSidebar extends React.Component<IChangesSidebarProps, {}> {
     this.receiveProps(props)
   }
 
-  public componentWillReceiveProps(nextProps: IChangesSidebarProps) {
-    this.receiveProps(nextProps)
+  public componentDidUpdate(prevProps: IChangesSidebarProps) {
+    this.receiveProps(this.props, prevProps)
   }
 
-  private receiveProps(props: IChangesSidebarProps) {
+  private receiveProps(
+    props: IChangesSidebarProps,
+    prevProps?: IChangesSidebarProps
+  ) {
     if (
       this.autocompletionProviders === null ||
-      this.props.emoji.size === 0 ||
-      props.repository.hash !== this.props.repository.hash ||
-      props.accounts !== this.props.accounts
+      (prevProps?.emoji.size ?? 0) === 0 ||
+      props.repository.hash !== prevProps?.repository.hash ||
+      props.accounts !== prevProps?.accounts
     ) {
       this.autocompletionProviders = buildAutocompletionProviders(
         props.repository,

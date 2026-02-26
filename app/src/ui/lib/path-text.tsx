@@ -257,12 +257,6 @@ export class PathText extends React.PureComponent<
     this.state = createState(props.path)
   }
 
-  public componentWillReceiveProps(nextProps: IPathTextProps) {
-    if (nextProps.path !== this.props.path) {
-      this.setState(createState(nextProps.path))
-    }
-  }
-
   public componentDidMount() {
     this.resizeIfNecessary()
     document.addEventListener('dialog-show', this.onDialogShow)
@@ -272,7 +266,11 @@ export class PathText extends React.PureComponent<
     document.removeEventListener('dialog-show', this.onDialogShow)
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps: IPathTextProps) {
+    if (this.props.path !== prevProps.path) {
+      this.setState(createState(this.props.path))
+    }
+
     this.resizeIfNecessary()
   }
 

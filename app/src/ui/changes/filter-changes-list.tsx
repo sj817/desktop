@@ -362,19 +362,19 @@ export class FilterChangesList extends React.Component<
     }
   }
 
-  public componentWillReceiveProps(nextProps: IFilterChangesListProps) {
+  public componentDidUpdate(prevProps: IFilterChangesListProps) {
     // No need to update state unless we haven't done it yet or the
     // selected file id list has changed.
     if (
-      !arrayEquals(nextProps.selectedFileIDs, this.props.selectedFileIDs) ||
+      !arrayEquals(this.props.selectedFileIDs, prevProps.selectedFileIDs) ||
       !arrayEquals(
-        nextProps.workingDirectory.files,
-        this.props.workingDirectory.files
+        this.props.workingDirectory.files,
+        prevProps.workingDirectory.files
       )
     ) {
       this.setState({
-        selectedItems: getSelectedItemsFromProps(nextProps),
-        groups: [this.createListItems(nextProps.workingDirectory.files)],
+        selectedItems: getSelectedItemsFromProps(this.props),
+        groups: [this.createListItems(this.props.workingDirectory.files)],
       })
     }
   }

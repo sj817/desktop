@@ -67,8 +67,8 @@ export class Welcome extends React.Component<IWelcomeProps, IWelcomeState> {
     }
   }
 
-  public componentWillReceiveProps(nextProps: IWelcomeProps) {
-    this.advanceOnSuccessfulSignIn(nextProps)
+  public componentDidUpdate(prevProps: IWelcomeProps) {
+    this.advanceOnSuccessfulSignIn(this.props, prevProps)
   }
 
   public componentDidMount() {
@@ -115,7 +115,10 @@ export class Welcome extends React.Component<IWelcomeProps, IWelcomeState> {
    * signed in successfully. If both conditions hold true we move
    * the user to the configure git step.
    */
-  private advanceOnSuccessfulSignIn(nextProps: IWelcomeProps) {
+  private advanceOnSuccessfulSignIn(
+    currentProps: IWelcomeProps,
+    prevProps: IWelcomeProps
+  ) {
     // If we're not currently in a sign in flow we don't care about
     // new props
     if (!this.inSignInStep) {
@@ -126,26 +129,26 @@ export class Welcome extends React.Component<IWelcomeProps, IWelcomeState> {
     // We need to currently have a sign in state _and_ receive a new
     // one in order to be able to make any sort of determination about
     // what's going on in the sign in flow.
-    if (!this.props.signInState) {
+    if (!prevProps.signInState) {
       log.info(`[Welcome] current sign in state not found. ignoring...`)
       return
     }
 
-    if (!nextProps.signInState) {
+    if (!currentProps.signInState) {
       log.info(`[Welcome] next sign in state not found. ignoring...`)
       return
     }
 
     // Only advance when the state first changes...
-    if (this.props.signInState.kind === nextProps.signInState.kind) {
+    if (prevProps.signInState.kind === currentProps.signInState.kind) {
       log.info(
-        `[Welcome] kind ${this.props.signInState.kind} is the same as ${nextProps.signInState.kind}. ignoring...`
+        `[Welcome] kind ${prevProps.signInState.kind} is the same as ${currentProps.signInState.kind}. ignoring...`
       )
       return
     }
 
     // ...and changes to success
-    if (nextProps.signInState.kind === SignInStep.Success) {
+    if (currentProps.signInState.kind === SignInStep.Success) {
       this.advanceToStep(WelcomeStep.ConfigureGit)
       this.props.dispatcher.resetSignInState()
     }

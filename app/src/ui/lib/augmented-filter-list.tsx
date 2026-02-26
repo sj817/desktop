@@ -258,16 +258,14 @@ export class AugmentedSectionFilterList<
     this.state = createStateUpdate(props, null)
   }
 
-  public componentWillReceiveProps(
-    nextProps: IAugmentedSectionFilterListProps<T>
-  ) {
-    this.setState(createStateUpdate(nextProps, this.state))
-  }
-
   public componentDidUpdate(
     prevProps: IAugmentedSectionFilterListProps<T>,
     prevState: IAugmentedSectionFilterListState<T>
   ) {
+    if (prevProps !== this.props) {
+      this.setState(createStateUpdate(this.props, this.state))
+    }
+
     if (this.props.onSelectionChanged) {
       const oldSelectedItemIds = prevState.selectedRows
         .map(row => getItemIdFromRowIndex(prevState.rows, row))

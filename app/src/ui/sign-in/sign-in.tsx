@@ -54,6 +54,15 @@ export class SignIn extends React.Component<ISignInProps, ISignInState> {
   }
 
   public componentDidUpdate(prevProps: ISignInProps) {
+    if (prevProps.signInState !== this.props.signInState) {
+      if (
+        this.props.signInState &&
+        this.props.signInState.kind === SignInStep.Success
+      ) {
+        this.onDismissed()
+      }
+    }
+
     // Whenever the sign in step changes we replace the dialog contents which
     // means we need to re-focus the first suitable child element as it's
     // essentially a "new" dialog we're showing only the dialog component itself
@@ -61,17 +70,6 @@ export class SignIn extends React.Component<ISignInProps, ISignInState> {
     if (prevProps.signInState !== null && this.props.signInState !== null) {
       if (prevProps.signInState.kind !== this.props.signInState.kind) {
         this.dialogRef.current?.focusFirstSuitableChild()
-      }
-    }
-  }
-
-  public componentWillReceiveProps(nextProps: ISignInProps) {
-    if (nextProps.signInState !== this.props.signInState) {
-      if (
-        nextProps.signInState &&
-        nextProps.signInState.kind === SignInStep.Success
-      ) {
-        this.onDismissed()
       }
     }
   }

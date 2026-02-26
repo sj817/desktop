@@ -36,9 +36,9 @@ export class ZoomInfo extends React.Component<IZoomInfoProps, IZoomInfoState> {
     }
   }
 
-  public componentWillReceiveProps(nextProps: IZoomInfoProps) {
+  public componentDidUpdate(prevProps: IZoomInfoProps) {
     const hasChanged =
-      this.state.windowZoomFactor !== nextProps.windowZoomFactor
+      prevProps.windowZoomFactor !== this.props.windowZoomFactor
 
     if (!hasChanged) {
       return
@@ -63,12 +63,12 @@ export class ZoomInfo extends React.Component<IZoomInfoProps, IZoomInfoState> {
     )
 
     const transitionName =
-      nextProps.windowZoomFactor > this.state.windowZoomFactor
+      this.props.windowZoomFactor > prevProps.windowZoomFactor
         ? 'zoom-in'
         : 'zoom-out'
 
     this.setState({
-      windowZoomFactor: nextProps.windowZoomFactor,
+      windowZoomFactor: this.props.windowZoomFactor,
       renderTransitionGroup: hasChanged,
       renderInfo: hasChanged,
       transitionName,

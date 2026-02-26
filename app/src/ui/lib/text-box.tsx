@@ -147,9 +147,12 @@ export class TextBox extends React.Component<ITextBoxProps, ITextBoxState> {
     }
   }
 
-  public componentWillReceiveProps(nextProps: ITextBoxProps) {
-    if (this.state.value !== nextProps.value) {
-      this.setState({ value: nextProps.value })
+  public componentDidUpdate(prevProps: ITextBoxProps) {
+    if (
+      this.state.value !== this.props.value &&
+      prevProps.value !== this.props.value
+    ) {
+      this.setState({ value: this.props.value })
     }
   }
 

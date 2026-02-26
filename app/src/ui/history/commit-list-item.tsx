@@ -70,12 +70,12 @@ export class CommitListItem extends React.PureComponent<
     }
   }
 
-  public componentWillReceiveProps(nextProps: ICommitProps) {
-    if (nextProps.commit !== this.props.commit) {
+  public componentDidUpdate(prevProps: ICommitProps) {
+    if (this.props.commit !== prevProps.commit) {
       this.setState({
         avatarUsers: getAvatarUsersForCommit(
-          nextProps.gitHubRepository,
-          nextProps.commit
+          this.props.gitHubRepository,
+          this.props.commit
         ),
       })
     }

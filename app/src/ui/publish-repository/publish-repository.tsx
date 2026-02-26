@@ -52,11 +52,11 @@ export class PublishRepository extends React.Component<
     this.fetchOrgs(this.props.account)
   }
 
-  public componentWillReceiveProps(nextProps: IPublishRepositoryProps) {
-    if (this.props.account !== nextProps.account) {
+  public componentDidUpdate(prevProps: IPublishRepositoryProps) {
+    if (prevProps.account !== this.props.account) {
       this.setState({ orgs: [] })
 
-      this.fetchOrgs(nextProps.account)
+      this.fetchOrgs(this.props.account)
     }
   }
 

@@ -97,10 +97,10 @@ export class TutorialPanel extends React.Component<
     return step === this.props.currentTutorialStep
   }
 
-  public componentWillReceiveProps(nextProps: ITutorialPanelProps) {
-    if (this.props.currentTutorialStep !== nextProps.currentTutorialStep) {
+  public componentDidUpdate(prevProps: ITutorialPanelProps) {
+    if (prevProps.currentTutorialStep !== this.props.currentTutorialStep) {
       this.setState({
-        currentlyOpenSectionId: nextProps.currentTutorialStep,
+        currentlyOpenSectionId: this.props.currentTutorialStep,
       })
     }
   }

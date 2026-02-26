@@ -57,13 +57,20 @@ export class AppError extends React.Component<IAppErrorProps, IAppErrorState> {
     }
   }
 
-  public componentWillReceiveProps(nextProps: IAppErrorProps) {
-    const error = nextProps.error
+  public componentDidUpdate(
+    prevProps: IAppErrorProps,
+    prevState: IAppErrorState
+  ) {
+    const error = this.props.error
 
     // We keep the currently shown error until it has disappeared
     // from the first spot in the application error queue.
-    if (error !== this.state.error) {
+    if (error !== prevProps.error) {
       this.setState({ error, disabled: false })
+    }
+
+    if (prevState.error !== this.state.error) {
+      this.scrollToBottomOfGitErrorMessage()
     }
   }
 
@@ -210,15 +217,6 @@ export class AppError extends React.Component<IAppErrorProps, IAppErrorState> {
 
   public componentDidMount() {
     this.scrollToBottomOfGitErrorMessage()
-  }
-
-  public componentDidUpdate(
-    prevProps: IAppErrorProps,
-    prevState: IAppErrorState
-  ) {
-    if (prevState.error !== this.state.error) {
-      this.scrollToBottomOfGitErrorMessage()
-    }
   }
 
   private onCloseButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {

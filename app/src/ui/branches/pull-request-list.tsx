@@ -117,19 +117,26 @@ export class PullRequestList extends React.Component<
     }
   }
 
-  public componentWillReceiveProps(nextProps: IPullRequestListProps) {
-    const group = createListItems(nextProps.pullRequests)
+  public componentDidUpdate(prevProps: IPullRequestListProps) {
+    if (
+      this.props.pullRequests === prevProps.pullRequests &&
+      this.props.isLoadingPullRequests === prevProps.isLoadingPullRequests
+    ) {
+      return
+    }
+
+    const group = createListItems(this.props.pullRequests)
     const selectedItem = resolveSelectedItem(
       group,
-      nextProps,
+      this.props,
       this.state.selectedItem
     )
 
     const loadingStarted =
-      !this.props.isLoadingPullRequests && nextProps.isLoadingPullRequests
+      !prevProps.isLoadingPullRequests && this.props.isLoadingPullRequests
     const loadingComplete =
-      this.props.isLoadingPullRequests && !nextProps.isLoadingPullRequests
-    const numPullRequests = this.props.pullRequests.length
+      prevProps.isLoadingPullRequests && !this.props.isLoadingPullRequests
+    const numPullRequests = prevProps.pullRequests.length
     const plural = numPullRequests === 1 ? '' : 's'
     const screenReaderStateMessage = loadingStarted
       ? 'Hang Tight. Loading pull requests as fast as I can!'

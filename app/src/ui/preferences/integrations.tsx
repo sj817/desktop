@@ -57,40 +57,6 @@ export class Integrations extends React.Component<
     }
   }
 
-  public async componentWillReceiveProps(
-    nextProps: IIntegrationsPreferencesProps
-  ) {
-    const editors = nextProps.availableEditors
-    let selectedExternalEditor = nextProps.selectedExternalEditor
-    if (editors.length) {
-      const indexOf = selectedExternalEditor
-        ? editors.indexOf(selectedExternalEditor)
-        : -1
-      if (indexOf === -1) {
-        selectedExternalEditor = editors[0]
-        nextProps.onSelectedEditorChanged(selectedExternalEditor)
-      }
-    }
-
-    const shells = nextProps.availableShells
-    let selectedShell = nextProps.selectedShell
-    if (shells.length) {
-      const indexOf = shells.indexOf(selectedShell)
-      if (indexOf === -1) {
-        selectedShell = shells[0]
-        nextProps.onSelectedShellChanged(selectedShell)
-      }
-    }
-    this.setState({
-      selectedExternalEditor,
-      selectedShell,
-      useCustomEditor: nextProps.useCustomEditor,
-      useCustomShell: nextProps.useCustomShell,
-      customShell: nextProps.customShell,
-      customEditor: nextProps.customEditor,
-    })
-  }
-
   public componentDidMount(): void {
     if (enableCustomIntegration()) {
       const {
@@ -119,6 +85,38 @@ export class Integrations extends React.Component<
     prevProps: IIntegrationsPreferencesProps,
     prevState: IIntegrationsPreferencesState
   ): void {
+    if (prevProps !== this.props) {
+      const editors = this.props.availableEditors
+      let selectedExternalEditor = this.props.selectedExternalEditor
+      if (editors.length) {
+        const indexOf = selectedExternalEditor
+          ? editors.indexOf(selectedExternalEditor)
+          : -1
+        if (indexOf === -1) {
+          selectedExternalEditor = editors[0]
+          this.props.onSelectedEditorChanged(selectedExternalEditor)
+        }
+      }
+
+      const shells = this.props.availableShells
+      let selectedShell = this.props.selectedShell
+      if (shells.length) {
+        const indexOf = shells.indexOf(selectedShell)
+        if (indexOf === -1) {
+          selectedShell = shells[0]
+          this.props.onSelectedShellChanged(selectedShell)
+        }
+      }
+      this.setState({
+        selectedExternalEditor,
+        selectedShell,
+        useCustomEditor: this.props.useCustomEditor,
+        useCustomShell: this.props.useCustomShell,
+        customShell: this.props.customShell,
+        customEditor: this.props.customEditor,
+      })
+    }
+
     // When the user switches to the custom editor or shell, we want to focus the
     // path input field.
     if (!prevState.useCustomEditor && this.state.useCustomEditor) {
