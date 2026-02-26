@@ -48,7 +48,7 @@ export class PublishRepository extends React.Component<
     this.name = props.settings.name
   }
 
-  public async componentWillMount() {
+  public async componentDidMount() {
     this.fetchOrgs(this.props.account)
   }
 

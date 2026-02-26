@@ -216,7 +216,7 @@ export class Preferences extends React.Component<
     }
   }
 
-  public async componentWillMount() {
+  public async componentDidMount() {
     const initialCommitterName = await getGlobalConfigValue('user.name')
     const initialCommitterEmail = await getGlobalConfigValue('user.email')
     const initialDefaultBranch = await getDefaultBranch()

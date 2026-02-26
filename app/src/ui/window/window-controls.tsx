@@ -37,8 +37,12 @@ interface IWindowControlState {
  * or out-of-bound events communicating the _current_ state as well.
  */
 export class WindowControls extends React.Component<{}, IWindowControlState> {
-  public componentWillMount() {
-    this.setState({ windowState: null })
+  public constructor(props: {}) {
+    super(props)
+    this.state = { windowState: null }
+  }
+
+  public componentDidMount() {
     this.initializeWindowState()
     ipcRenderer.on('window-state-changed', this.onWindowStateChanged)
   }

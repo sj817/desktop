@@ -449,6 +449,7 @@ export class SectionList extends React.Component<
 
     this.state = {
       scrollTop: 0,
+      rowIdPrefix: createUniqueId('ListRow'),
     }
 
     const ResizeObserverClass: typeof ResizeObserver = (window as any)
@@ -1087,10 +1088,6 @@ export class SectionList extends React.Component<
         }
       }
     }
-  }
-
-  public componentWillMount() {
-    this.setState({ rowIdPrefix: createUniqueId('ListRow') })
   }
 
   public componentWillUnmount() {

@@ -17,7 +17,7 @@ function sanitizeId(id: string): string {
  * to the generated id to maintain uniqueness.
  *
  * This method should be called from a component's
- * componentWillMount method and then released using the
+ * constructor and then released using the
  * releaseUniqueId method from the component's componentWillUnmount
  * method. The component should store the generated id in its
  * state for the lifetime of the component.

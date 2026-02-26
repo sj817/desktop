@@ -96,7 +96,7 @@ export class RepositorySettings extends React.Component<
     }
   }
 
-  public async componentWillMount() {
+  public async componentDidMount() {
     try {
       const ignoreText = await readGitIgnoreAtRoot(this.props.repository)
       this.setState({ ignoreText })

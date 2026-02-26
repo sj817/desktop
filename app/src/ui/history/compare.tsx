@@ -144,7 +144,7 @@ export class CompareSidebar extends React.Component<
     this.commitListRef.current?.focus()
   }
 
-  public componentWillMount() {
+  public componentDidMount() {
     this.props.dispatcher.initializeCompare(this.props.repository)
   }
 

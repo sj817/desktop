@@ -435,7 +435,10 @@ export class List extends React.Component<IListProps, IListState> {
   public constructor(props: IListProps) {
     super(props)
 
-    this.state = { keyboardInsertionIndexPath: null }
+    this.state = {
+      keyboardInsertionIndexPath: null,
+      rowIdPrefix: createUniqueId('ListRow'),
+    }
 
     const ResizeObserverClass: typeof ResizeObserver = (window as any)
       .ResizeObserver
@@ -1071,10 +1074,6 @@ export class List extends React.Component<IListProps, IListState> {
     ) {
       this.updateKeyboardInsertionElementPosition()
     }
-  }
-
-  public componentWillMount() {
-    this.setState({ rowIdPrefix: createUniqueId('ListRow') })
   }
 
   public componentWillUnmount() {

@@ -37,11 +37,13 @@ interface ISelectState {
  * Provide `children` elements for the contents of the `select` element.
  */
 export class Select extends React.Component<ISelectProps, ISelectState> {
-  public componentWillMount() {
-    const friendlyName = this.props.label || 'unknown'
+  public constructor(props: ISelectProps) {
+    super(props)
+
+    const friendlyName = props.label || 'unknown'
     const inputId = createUniqueId(`Select_${friendlyName}`)
 
-    this.setState({ inputId })
+    this.state = { inputId }
   }
 
   public componentWillUnmount() {

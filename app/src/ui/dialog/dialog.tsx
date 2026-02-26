@@ -278,7 +278,14 @@ export class Dialog extends React.Component<DialogProps, IDialogState> {
 
   public constructor(props: DialogProps) {
     super(props)
-    this.state = { isAppearing: true, titleId: this.props.titleId }
+
+    let titleId = props.titleId
+    if (!titleId && props.title) {
+      const id = typeof props.title === 'string' ? props.title : '???'
+      titleId = createUniqueId(`Dialog_${props.id}_${id}`)
+    }
+
+    this.state = { isAppearing: true, titleId }
 
     // Observe size changes and let codemirror know
     // when it needs to refresh.
@@ -375,10 +382,6 @@ export class Dialog extends React.Component<DialogProps, IDialogState> {
         titleId: createUniqueId(`Dialog_${this.props.id}_${id}`),
       })
     }
-  }
-
-  public componentWillMount() {
-    this.updateTitleId()
   }
 
   public componentDidMount() {

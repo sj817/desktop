@@ -48,6 +48,18 @@ interface ICheckboxState {
 export class Checkbox extends React.Component<ICheckboxProps, ICheckboxState> {
   private input: HTMLInputElement | null = null
 
+  public constructor(props: ICheckboxProps) {
+    super(props)
+
+    const friendlyName =
+      props.label && typeof props.label === 'string'
+        ? props.label
+        : crypto.randomUUID()
+    const inputId = createUniqueId(`Checkbox_${friendlyName}`)
+
+    this.state = { inputId }
+  }
+
   private onChange = (event: React.FormEvent<HTMLInputElement>) => {
     if (this.props.onChange) {
       this.props.onChange(event)
@@ -56,20 +68,6 @@ export class Checkbox extends React.Component<ICheckboxProps, ICheckboxState> {
 
   public componentDidUpdate() {
     this.updateInputState()
-  }
-
-  public componentWillMount() {
-    // TODO: I don't understand why we need this here, it was added in
-    // https://github.com/desktop/desktop/pull/17839 and I replaced uuid
-    // with crypto.randomUUID but like the whole point of createUniqueId
-    // is to create unique ids so this shouldn't be necessary.
-    const friendlyName =
-      this.props.label && typeof this.props.label === 'string'
-        ? this.props.label
-        : crypto.randomUUID()
-    const inputId = createUniqueId(`Checkbox_${friendlyName}`)
-
-    this.setState({ inputId })
   }
 
   public componentWillUnmount() {
