@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Repository } from '../models/repository'
 import { Commit, CommitOneLine } from '../models/commit'
-import { TipState } from '../models/tip'
+import { TipState, tipEquals } from '../models/tip'
 import { UiView } from './ui-view'
 import { Changes, ChangesSidebar } from './changes'
 import { NoChanges } from './changes/no-changes'
@@ -662,7 +662,7 @@ export class RepositoryView extends React.Component<
     window.removeEventListener('keydown', this.onGlobalKeyDown)
   }
 
-  public componentDidUpdate(): void {
+  public componentDidUpdate(prevProps: IRepositoryViewProps): void {
     if (this.focusChangesNeeded) {
       this.focusChangesNeeded = false
       this.changesSidebarRef.current?.focus()
@@ -671,6 +671,18 @@ export class RepositoryView extends React.Component<
     if (this.focusHistoryNeeded) {
       this.focusHistoryNeeded = false
       this.compareSidebarRef.current?.focusHistory()
+    }
+
+    // Reset the scroll position of the commit history list when the
+    // branch (or tip) changes so that the user always sees the most
+    // recent commits first after switching branches.
+    if (
+      !tipEquals(
+        prevProps.state.branchesState.tip,
+        this.props.state.branchesState.tip
+      )
+    ) {
+      this.scrollCompareListToTop()
     }
   }
 
