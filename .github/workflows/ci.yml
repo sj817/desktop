@@ -131,6 +131,10 @@ jobs:
         if: |
           (runner.os == 'Windows' && matrix.arch == 'x64') || (runner.os == 'macOS' && matrix.arch == 'arm64')
         run: yarn test:unit
+      - name: Run E2E smoke tests
+        if: |
+          (runner.os == 'Windows' && matrix.arch == 'x64') || (runner.os == 'macOS' && matrix.arch == 'arm64')
+        run: yarn test:e2e
       - name: Run script tests
         run: yarn test:script
       - name: Install Azure Code Signing Client

@@ -135,7 +135,7 @@ React component rendering tests using jsdom (already in the test environment) an
 
 **ESLint config:** `react/jsx-no-bind` is disabled for `app/test/**/*` to allow arrow function callbacks in test JSX.
 
-### Phase 4: E2E Smoke Tests
+### Phase 4: E2E Smoke Tests *(partially complete)*
 
 A minimal set of committed E2E tests that run in CI (`yarn test:e2e`) to catch catastrophic breakage. These are not meant to be comprehensive — they verify that the app launches, renders, and can perform the most basic operations.
 
