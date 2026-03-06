@@ -118,6 +118,8 @@ React component rendering tests using jsdom (already in the test environment) an
 | `Button` | `button-test.tsx` | 8 | Click, disabled, type, aria-disabled, className |
 | `OkCancelButtonGroup` | `ok-cancel-button-group-test.tsx` | 9 | Ok/Cancel text, clicks, disabled, hidden, destructive |
 | `DialogHeader` | `dialog-header-test.tsx` | 5 | Title text/JSX, titleId, close button |
+| `TextBox` | `text-box-test.tsx` | 12 | Input rendering, label, placeholder, disabled, readOnly, clear button, className |
+| `RadioButton` | `radio-button-test.tsx` | 7 | Checked/unchecked, label, onSelected, children as label |
 
 **Remaining (not yet implemented):**
 
@@ -130,8 +132,6 @@ React component rendering tests using jsdom (already in the test environment) an
 | `ui/merge-conflicts/` | Conflict list, resolution actions |
 | `ui/dialog/` (full Dialog) | Focus trap, Escape key dismiss, backdrop click |
 | `ui/repositories-list/` | Search, group headers, selection |
-| `ui/lib/text-box.tsx` | Input rendering, clear button, value changes |
-| `ui/lib/radio-button.tsx` | Selection, label, onSelected callback |
 
 **ESLint config:** `react/jsx-no-bind` is disabled for `app/test/**/*` to allow arrow function callbacks in test JSX.
 
@@ -179,13 +179,13 @@ When an agent is asked to implement a feature or fix a bug that touches UI:
 
 This approach gives agents confidence in UI changes without the maintenance burden of a large E2E test suite. The CI smoke tests (WebDriverIO) catch regressions; the agent's Playwright exploration catches implementation issues before code is even committed.
 
-### Phase 5: Agent Automation
+### Phase 5: Agent Automation *(complete)*
 
 Codify testing rules so agents maintain and improve the harness automatically.
 
 - Update `.github/copilot-instructions.md` with mandatory test requirements *(done)*
-- Create PR template testing checklist
-- Document test writing conventions in this file
+- Create PR template testing checklist *(done)*
+- Document test writing conventions in this file *(done)*
 
 ## Test Helpers Reference
 

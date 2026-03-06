@@ -25,3 +25,15 @@ If you don't believe this PR needs to be mentioned in the release notes, write "
 -->
 
 Notes:
+
+## Testing checklist
+
+<!--
+Check the items that apply to this PR. This helps reviewers verify test coverage.
+-->
+
+- [ ] New/modified functions have corresponding unit tests
+- [ ] Bug fixes include a regression test
+- [ ] Tests cover the happy path and at least one error/edge case
+- [ ] Tests are deterministic (no timing dependencies, no shared state)
+- [ ] Existing tests still pass (`yarn test`)
