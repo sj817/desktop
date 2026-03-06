@@ -208,3 +208,50 @@ This project adheres to the Contributor Covenant [Code of Conduct](../CODE_OF_CO
 4. **Update documentation**: Update docs if changes affect documented behavior
 5. **Follow existing patterns**: Match the style and patterns already in the codebase
 6. **Don't remove working code**: Only modify what's necessary for the task
+
+## Testing Requirements
+
+### Mandatory Test Coverage
+
+- **Every new function** in `app/src/lib/` MUST have a corresponding unit test in `app/test/unit/`.
+- **Every bug fix** MUST include a regression test demonstrating the fix.
+- **Every new store method** MUST have a test verifying its state transition.
+- **Every new git operation** MUST have a test using helpers from `app/test/helpers/repositories.ts`.
+- **Modified files** MUST NOT have decreased test coverage.
+
+### Writing Tests
+
+- Use Node.js built-in test runner: `import { describe, it } from 'node:test'` and `import assert from 'node:assert'`
+- Test files go in `app/test/unit/` with suffix `-test.ts` or `-test.tsx`
+- Use async tests: `it('description', async () => { ... })`
+- Use existing helpers:
+  - `setupEmptyRepository()` / `setupFixtureRepository()` from `app/test/helpers/repositories.ts`
+  - `makeCommit()`, `createBranch()`, `switchTo()` from `app/test/helpers/repository-scaffolding.ts`
+  - `TestStatsStore` from `app/test/helpers/test-stats-store.ts`
+  - `InMemoryDispatcher` from `app/test/helpers/in-memory-dispatcher.ts`
+  - `createMockGitResult()`, `createMockStatusResult()` from `app/test/helpers/mock-git.ts`
+  - `createMockAPI()`, `createMockAPIRepository()` from `app/test/helpers/mock-api.ts`
+  - `MockIPC` from `app/test/helpers/mock-ipc.ts`
+- Run tests: `yarn test app/test/unit/<your-test-file>.ts`
+
+### Test Structure
+
+Follow the Arrange/Act/Assert pattern:
+
+```typescript
+import { describe, it } from 'node:test'
+import assert from 'node:assert'
+
+describe('ModuleName', () => {
+  describe('methodName', () => {
+    it('should handle the happy path', async () => {
+      // Arrange — set up preconditions
+      // Act — call the function under test
+      // Assert — verify the result
+    })
+    it('should handle error cases', async () => {
+      // Test edge cases and error paths
+    })
+  })
+})
+```
