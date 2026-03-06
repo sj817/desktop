@@ -14,9 +14,7 @@ afterEach(() => unmount?.())
 
 describe('Button', () => {
   it('renders a button element', () => {
-    const { container, unmount: u } = renderComponent(
-      <Button>Click me</Button>
-    )
+    const { container, unmount: u } = renderComponent(<Button>Click me</Button>)
     unmount = u
 
     const button = queryOrThrow<HTMLButtonElement>(container, 'button')
@@ -25,7 +23,9 @@ describe('Button', () => {
 
   it('calls onClick when clicked', () => {
     let clicked = false
-    const handleClick = () => { clicked = true }
+    const handleClick = () => {
+      clicked = true
+    }
     const { container, unmount: u } = renderComponent(
       <Button onClick={handleClick}>Press</Button>
     )
@@ -37,7 +37,9 @@ describe('Button', () => {
 
   it('does not call onClick when disabled', () => {
     let clicked = false
-    const handleClick = () => { clicked = true }
+    const handleClick = () => {
+      clicked = true
+    }
     const { container, unmount: u } = renderComponent(
       <Button disabled={true} onClick={handleClick}>
         Press
@@ -50,9 +52,7 @@ describe('Button', () => {
   })
 
   it('defaults to type="button"', () => {
-    const { container, unmount: u } = renderComponent(
-      <Button>Test</Button>
-    )
+    const { container, unmount: u } = renderComponent(<Button>Test</Button>)
     unmount = u
 
     const button = queryOrThrow<HTMLButtonElement>(container, 'button')
@@ -80,9 +80,7 @@ describe('Button', () => {
   })
 
   it('has the button-component class', () => {
-    const { container, unmount: u } = renderComponent(
-      <Button>Styled</Button>
-    )
+    const { container, unmount: u } = renderComponent(<Button>Styled</Button>)
     unmount = u
 
     const button = queryOrThrow<HTMLButtonElement>(container, 'button')

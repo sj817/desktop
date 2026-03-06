@@ -1,10 +1,7 @@
 import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import {
-  renderComponent,
-  click,
-} from '../../helpers/component-test-utils'
+import { renderComponent, click } from '../../helpers/component-test-utils'
 import { OkCancelButtonGroup } from '../../../src/ui/dialog/ok-cancel-button-group'
 
 let unmount: () => void
@@ -103,9 +100,7 @@ describe('OkCancelButtonGroup', () => {
     unmount = u
 
     const buttons = container.querySelectorAll('button')
-    const okButton = Array.from(buttons).find(
-      b => b.textContent === 'Ok'
-    )!
+    const okButton = Array.from(buttons).find(b => b.textContent === 'Ok')!
     assert.equal(okButton.getAttribute('aria-disabled'), 'true')
   })
 

@@ -1,9 +1,7 @@
 import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import {
-  renderComponent,
-} from '../../helpers/component-test-utils'
+import { renderComponent } from '../../helpers/component-test-utils'
 import { DialogHeader } from '../../../src/ui/dialog/header'
 
 let unmount: () => void

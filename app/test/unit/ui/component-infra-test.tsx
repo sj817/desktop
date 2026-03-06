@@ -43,13 +43,11 @@ describe('component test infrastructure', () => {
   it('can fire events and assert results', () => {
     setup()
     let clicked = false
-    const handleClick = () => { clicked = true }
+    const handleClick = () => {
+      clicked = true
+    }
     function TestButton() {
-      return React.createElement(
-        'button',
-        { onClick: handleClick },
-        'Click'
-      )
+      return React.createElement('button', { onClick: handleClick }, 'Click')
     }
     act(() => {
       ReactDOM.render(React.createElement(TestButton), container)

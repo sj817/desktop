@@ -68,7 +68,11 @@ export function change(
 /**
  * Simulates a keyboard event on an element.
  */
-export function keyDown(element: Element, key: string, options: Partial<KeyboardEventInit> = {}) {
+export function keyDown(
+  element: Element,
+  key: string,
+  options: Partial<KeyboardEventInit> = {}
+) {
   act(() => {
     element.dispatchEvent(
       new KeyboardEvent('keydown', { key, bubbles: true, ...options })

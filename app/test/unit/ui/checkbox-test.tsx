@@ -19,7 +19,10 @@ describe('Checkbox', () => {
     )
     unmount = u
 
-    const input = queryOrThrow<HTMLInputElement>(container, 'input[type="checkbox"]')
+    const input = queryOrThrow<HTMLInputElement>(
+      container,
+      'input[type="checkbox"]'
+    )
     assert.equal(input.checked, false)
     assert.equal(input.indeterminate, false)
   })
@@ -30,7 +33,10 @@ describe('Checkbox', () => {
     )
     unmount = u
 
-    const input = queryOrThrow<HTMLInputElement>(container, 'input[type="checkbox"]')
+    const input = queryOrThrow<HTMLInputElement>(
+      container,
+      'input[type="checkbox"]'
+    )
     assert.equal(input.checked, true)
   })
 
@@ -40,7 +46,10 @@ describe('Checkbox', () => {
     )
     unmount = u
 
-    const input = queryOrThrow<HTMLInputElement>(container, 'input[type="checkbox"]')
+    const input = queryOrThrow<HTMLInputElement>(
+      container,
+      'input[type="checkbox"]'
+    )
     assert.equal(input.indeterminate, true)
   })
 
@@ -67,16 +76,18 @@ describe('Checkbox', () => {
 
   it('calls onChange when clicked', () => {
     let changed = false
-    const handleChange = () => { changed = true }
+    const handleChange = () => {
+      changed = true
+    }
     const { container, unmount: u } = renderComponent(
-      <Checkbox
-        value={CheckboxValue.Off}
-        onChange={handleChange}
-      />
+      <Checkbox value={CheckboxValue.Off} onChange={handleChange} />
     )
     unmount = u
 
-    const input = queryOrThrow<HTMLInputElement>(container, 'input[type="checkbox"]')
+    const input = queryOrThrow<HTMLInputElement>(
+      container,
+      'input[type="checkbox"]'
+    )
     click(input)
     assert.equal(changed, true)
   })
@@ -87,7 +98,10 @@ describe('Checkbox', () => {
     )
     unmount = u
 
-    const input = queryOrThrow<HTMLInputElement>(container, 'input[type="checkbox"]')
+    const input = queryOrThrow<HTMLInputElement>(
+      container,
+      'input[type="checkbox"]'
+    )
     assert.equal(input.disabled, true)
   })
 

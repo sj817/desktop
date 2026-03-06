@@ -103,7 +103,7 @@ The most impactful tests, prioritized by risk. All tests below are implemented, 
 2. `app/test/unit/status-utils-test.ts` — mapStatus, isConflictedFile, hasConflictedFiles *(11 tests)*
 3. `app/test/unit/file-system-test.ts` — getTempFilePath, readPartialFile *(6 tests)*
 
-### Phase 3: Component Tests *(complete)*
+### Phase 3: Component Tests *(partially complete)*
 
 React component rendering tests using jsdom (already in the test environment) and `ReactDOM.render` with `react-dom/test-utils`. Uses `app/test/helpers/component-test-utils.ts` for rendering, event simulation, and DOM querying.
 
@@ -118,6 +118,20 @@ React component rendering tests using jsdom (already in the test environment) an
 | `Button` | `button-test.tsx` | 8 | Click, disabled, type, aria-disabled, className |
 | `OkCancelButtonGroup` | `ok-cancel-button-group-test.tsx` | 9 | Ok/Cancel text, clicks, disabled, hidden, destructive |
 | `DialogHeader` | `dialog-header-test.tsx` | 5 | Title text/JSX, titleId, close button |
+
+**Remaining (not yet implemented):**
+
+| Component | What to Assert |
+|---|---|
+| `ui/diff/` | Line rendering, expand/collapse, selection (may need virtualization mocking) |
+| `ui/changes/` | File list, check/uncheck, filtering |
+| `ui/commit-message/` | Input validation, summary/description, co-authors |
+| `ui/branches/` | Search filtering, grouping, PR badges |
+| `ui/merge-conflicts/` | Conflict list, resolution actions |
+| `ui/dialog/` (full Dialog) | Focus trap, Escape key dismiss, backdrop click |
+| `ui/repositories-list/` | Search, group headers, selection |
+| `ui/lib/text-box.tsx` | Input rendering, clear button, value changes |
+| `ui/lib/radio-button.tsx` | Selection, label, onSelected callback |
 
 **ESLint config:** `react/jsx-no-bind` is disabled for `app/test/**/*` to allow arrow function callbacks in test JSX.
 
