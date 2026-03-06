@@ -53,7 +53,7 @@ This document outlines a plan to improve GitHub Desktop's test infrastructure so
 
 ## Improvement Plan
 
-### Phase 1: Foundation *(mostly complete)*
+### Phase 1: Foundation *(complete)*
 
 Infrastructure to make writing tests easy for agents and humans.
 
@@ -63,6 +63,7 @@ Infrastructure to make writing tests easy for agents and humans.
 | Create `mock-git.ts` helper | Done | `app/test/helpers/mock-git.ts` |
 | Create `mock-api.ts` helper | Done | `app/test/helpers/mock-api.ts` |
 | Create `mock-ipc.ts` helper | Done | `app/test/helpers/mock-ipc.ts` |
+| Create `app-store-test-harness.ts` | Done | `app/test/helpers/app-store-test-harness.ts` |
 | Add testing requirements to copilot-instructions | Done | `.github/copilot-instructions.md` |
 
 ### Phase 2: High-Value Unit Tests
@@ -190,13 +191,17 @@ Codify testing rules so agents maintain and improve the harness automatically.
 | `InMemoryDispatcher` | `app/test/helpers/in-memory-dispatcher.ts` | Dispatcher with no-op init |
 | `InMemoryStore` | `app/test/helpers/stores/in-memory-store.ts` | Sync key-value store |
 | `AsyncInMemoryStore` | `app/test/helpers/stores/async-in-memory-store.ts` | Async key-value store |
+| `createTestStores()` | `app/test/helpers/app-store-test-harness.ts` | Create all stores wired together with test dependencies |
+| `createTestAccountsStore()` | `app/test/helpers/app-store-test-harness.ts` | AccountsStore with in-memory storage |
+| `createTestSignInStore()` | `app/test/helpers/app-store-test-harness.ts` | SignInStore with test AccountsStore |
+| `createTestRepositoriesStore()` | `app/test/helpers/app-store-test-harness.ts` | RepositoriesStore with test database |
+| `createTestRepositoryStateCache()` | `app/test/helpers/app-store-test-harness.ts` | RepositoryStateCache with TestStatsStore |
 
 ### Helpers Still Needed
 
 | Helper | Purpose |
 |---|---|
-| `app/test/helpers/app-store-test-harness.ts` | Wire up AppStore with all mocks, return `{ appStore, dispatcher, mocks }` |
-| `app/test/helpers/component-test-utils.ts` | Render React components with required context providers |
+| `app/test/helpers/component-test-utils.ts` | Render React components with required context providers (Phase 3) |
 
 ## Writing Tests
 
