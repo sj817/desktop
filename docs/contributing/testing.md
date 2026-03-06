@@ -137,9 +137,14 @@ React component rendering tests using jsdom (already in the test environment) an
 
 ### Phase 4: E2E Smoke Tests
 
-A minimal set of committed E2E tests that run in CI to catch catastrophic breakage. These are not meant to be comprehensive — they verify that the app launches, renders, and can perform the most basic operations.
+A minimal set of committed E2E tests that run in CI (`yarn test:e2e`) to catch catastrophic breakage. These are not meant to be comprehensive — they verify that the app launches, renders, and can perform the most basic operations.
 
-**Framework:** Playwright with `_electron.launch()` for Electron support.
+**Framework:** WebDriverIO with `@wdio/electron-service` for native Electron integration.
+
+Why WebDriverIO over Playwright:
+- Playwright is reserved for agent-driven interactive verification during development (see below)
+- WebDriverIO's Electron service provides first-class support for launching and controlling the Electron app, accessing `BrowserWindow` APIs, and running in CI headless
+- Keeps the two use cases (CI regression suite vs. agent exploration) cleanly separated with different tools
 
 **Smoke tests (5 max):**
 
@@ -152,27 +157,27 @@ A minimal set of committed E2E tests that run in CI to catch catastrophic breaka
 These tests should be fast, stable, and narrowly scoped. They exist purely as a safety net — if any of them fail, something is fundamentally broken.
 
 **Architecture:**
-- Mock all API calls via Playwright's `page.route()`
+- Mock API calls by pre-seeding test state or intercepting network requests
 - Reuse existing repo scaffolding helpers for git setup
 - Use `data-testid` attributes for stable selectors
 - Fresh app instance per test, temp directories with auto-cleanup
-- No `waitForTimeout()` — use Playwright auto-waiting only
+- No `browser.pause()` — use WebDriverIO's built-in `waitForExist`/`waitForDisplayed`
 
 **Directory:** `app/test/e2e/`
 
 ### Agent-Driven UI Verification
 
-Beyond the minimal smoke tests above, AI agents should use browser automation tools (e.g., Playwright via MCP, or VS Code's built-in browser tools) during development to interactively verify their UI changes. This is ad-hoc and exploratory — nothing is committed as a test.
+Separately from the CI smoke tests, AI agents use Playwright to interactively verify their UI changes during development. This is ad-hoc and exploratory — nothing from this process gets committed as a test.
 
 When an agent is asked to implement a feature or fix a bug that touches UI:
 
 1. Run `yarn build:dev` to build the app
 2. Launch the app with `yarn start`
-3. Use browser automation to interact with the UI and verify the change works
+3. Use Playwright (via MCP tools, or VS Code's built-in browser automation) to interact with the UI and verify the change works
 4. Take screenshots if needed to confirm visual correctness
 5. Iterate on the code if something doesn't look right
 
-This approach gives agents confidence in UI changes without the maintenance burden of a large E2E test suite.
+This approach gives agents confidence in UI changes without the maintenance burden of a large E2E test suite. The CI smoke tests (WebDriverIO) catch regressions; the agent's Playwright exploration catches implementation issues before code is even committed.
 
 ### Phase 5: Agent Automation
 
