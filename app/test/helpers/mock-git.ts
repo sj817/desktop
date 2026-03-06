@@ -1,7 +1,4 @@
-import {
-  IGitResult,
-  IGitStringResult,
-} from '../../src/lib/git/core'
+import { IGitStringResult } from '../../src/lib/git/core'
 import { GitError as DugiteError } from 'dugite'
 import { IStatusResult } from '../../src/lib/git/status'
 import {

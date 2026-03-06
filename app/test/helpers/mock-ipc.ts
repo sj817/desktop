@@ -1,4 +1,7 @@
-import { RequestChannels, RequestResponseChannels } from '../../src/lib/ipc-shared'
+import {
+  RequestChannels,
+  RequestResponseChannels,
+} from '../../src/lib/ipc-shared'
 
 interface IPCSendCall {
   readonly channel: string
@@ -34,7 +37,10 @@ export class MockIPC {
   public readonly invokes: IPCInvokeCall[] = []
 
   /** Registered listeners by channel */
-  private readonly listeners = new Map<string, Array<(...args: any[]) => void>>()
+  private readonly listeners = new Map<
+    string,
+    Array<(...args: any[]) => void>
+  >()
 
   /** Registered invoke handlers */
   private readonly invokeHandlers = new Map<string, InvokeHandler>()
@@ -105,7 +111,9 @@ export class MockIPC {
    */
   public onInvoke<T extends keyof RequestResponseChannels>(
     channel: T,
-    handler: (...args: Parameters<RequestResponseChannels[T]>) => ReturnType<RequestResponseChannels[T]>
+    handler: (
+      ...args: Parameters<RequestResponseChannels[T]>
+    ) => ReturnType<RequestResponseChannels[T]>
   ): void {
     this.invokeHandlers.set(channel, handler as InvokeHandler)
   }

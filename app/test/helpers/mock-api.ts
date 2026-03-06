@@ -1,10 +1,4 @@
-import {
-  API,
-  IAPIRepository,
-  IAPIIdentity,
-  IAPIEmail,
-  IAPIIssue,
-} from '../../src/lib/api'
+import { API, IAPIRepository, IAPIIdentity, IAPIEmail } from '../../src/lib/api'
 
 /**
  * A partial record of API method overrides.
