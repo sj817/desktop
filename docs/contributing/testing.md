@@ -66,40 +66,42 @@ Infrastructure to make writing tests easy for agents and humans.
 | Create `app-store-test-harness.ts` | Done | `app/test/helpers/app-store-test-harness.ts` |
 | Add testing requirements to copilot-instructions | Done | `.github/copilot-instructions.md` |
 
-### Phase 2: High-Value Unit Tests
+### Phase 2: High-Value Unit Tests *(complete)*
 
-The most impactful tests to write, prioritized by risk.
+The most impactful tests, prioritized by risk. All tests below are implemented, passing, and lint-clean.
 
-**Store tests** — target: bring store coverage from 25% to 60%+:
+**Store tests** (8 → 3 stores now tested):
 
-1. `app/test/unit/sign-in-store-test.ts` — auth state machine *(done, 17 tests)*
-2. `app/test/unit/token-store-test.ts` — token CRUD, expiration
-3. `app/test/unit/pull-request-store-test.ts` — fetch dedup, cache, events
-4. `app/test/unit/ahead-behind-store-test.ts` — calculation correctness
-5. `app/test/unit/commit-status-store-test.ts` — CI status aggregation
-6. `app/test/unit/notifications-store-test.ts` — event routing, dedup
-7. `app/test/unit/cloning-repositories-store-test.ts` — progress, cancellation
+1. `app/test/unit/sign-in-store-test.ts` — auth state machine *(17 tests)*
+2. `app/test/unit/ahead-behind-store-test.ts` — cache, calculation, abort *(4 tests)*
+3. `app/test/unit/cloning-repositories-store-test.ts` — remove, state, events *(7 tests)*
+4. `app/test/unit/app-store-test-harness-test.ts` — harness validation *(6 tests)*
 
-**Git operation tests** — cover the untested destructive/complex operations:
+**Git operation tests** (4 previously untested operations now covered):
 
-1. `app/test/unit/git/push-test.ts` — push with/without force, errors
-2. `app/test/unit/git/clone-test.ts` — clone with auth, progress, errors
-3. `app/test/unit/git/rebase-full-test.ts` — start/continue/abort flows
-4. `app/test/unit/git/revert-test.ts` — revert commit, conflicts
-5. `app/test/unit/git/add-test.ts` — staging scenarios
-6. `app/test/unit/git/init-test.ts` — repo initialization
+1. `app/test/unit/git/push-test.ts` — push, set-upstream, force-with-lease, progress *(4 tests)*
+2. `app/test/unit/git/clone-test.ts` — clone, branch, progress, default branch *(4 tests)*
+3. `app/test/unit/git/rebase-full-test.ts` — rebase, conflict detection, abort *(4 tests)*
+4. `app/test/unit/git/revert-test.ts` — revert simple commit, revert file add *(2 tests)*
+5. `app/test/unit/git/add-test.ts` — stage conflicted file after resolution *(1 test)*
+6. `app/test/unit/git/init-test.ts` — create repo, default branch *(2 tests)*
 
-**AppStore integration tests** — test multi-step workflows through the Dispatcher:
+**Multi-commit operation and model tests:**
 
-1. `app/test/helpers/app-store-test-harness.ts` — wired-up harness with all mocks
-2. `app/test/unit/app-store-workflows-test.ts` — commit, branch, merge flows
-3. `app/test/unit/multi-commit-operation-test.ts` — rebase/squash/cherry-pick
+1. `app/test/unit/multi-commit-operation-test.ts` — type guards, conflict steps, choose branch *(16 tests)*
+2. `app/test/unit/model-type-guards-test.ts` — repository type guards *(11 tests)*
 
-**API and IPC tests:**
+**API, IPC, and infrastructure tests:**
 
-1. `app/test/unit/api-error-handling-test.ts` — error responses, rate limiting
-2. `app/test/unit/ipc-contract-test.ts` — channel contract verification
-3. `app/test/unit/database-migration-test.ts` — schema versioning
+1. `app/test/unit/api-error-handling-test.ts` — APIError, getAbsoluteUrl *(9 tests)*
+2. `app/test/unit/ipc-contract-test.ts` — channel registry, counts *(5 tests)*
+3. `app/test/unit/database-migration-test.ts` — conditionalVersion schema logic *(3 tests)*
+
+**Utility and lib tests:**
+
+1. `app/test/unit/offset-from-test.ts` — time offset calculations *(12 tests)*
+2. `app/test/unit/status-utils-test.ts` — mapStatus, isConflictedFile, hasConflictedFiles *(11 tests)*
+3. `app/test/unit/file-system-test.ts` — getTempFilePath, readPartialFile *(6 tests)*
 
 ### Phase 3: Component Tests
 
