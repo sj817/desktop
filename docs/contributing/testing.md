@@ -103,25 +103,23 @@ The most impactful tests, prioritized by risk. All tests below are implemented, 
 2. `app/test/unit/status-utils-test.ts` — mapStatus, isConflictedFile, hasConflictedFiles *(11 tests)*
 3. `app/test/unit/file-system-test.ts` — getTempFilePath, readPartialFile *(6 tests)*
 
-### Phase 3: Component Tests
+### Phase 3: Component Tests *(complete)*
 
-Add React component rendering tests using jsdom (already available in the test environment).
-
-**Prerequisite:** Install `@testing-library/react` v12 (last React 16-compatible version).
-
-**Target components:**
-
-| Component | What to Assert |
-|---|---|
-| `ui/diff/` | Line rendering, expand/collapse, selection |
-| `ui/changes/` | File list, check/uncheck, filtering |
-| `ui/commit-message/` | Input validation, summary/description, co-authors |
-| `ui/branches/` | Search filtering, grouping, PR badges |
-| `ui/merge-conflicts/` | Conflict list, resolution actions |
-| `ui/dialog/` | Focus trap, Escape key, button states |
-| `ui/repositories-list/` | Search, group headers, selection |
+React component rendering tests using jsdom (already in the test environment) and `ReactDOM.render` with `react-dom/test-utils`. Uses `app/test/helpers/component-test-utils.ts` for rendering, event simulation, and DOM querying.
 
 **Directory:** `app/test/unit/ui/`
+
+**Tests implemented:**
+
+| Component | File | Tests | What's Asserted |
+|---|---|---|---|
+| Infrastructure | `component-infra-test.tsx` | 3 | React rendering, events work in jsdom |
+| `Checkbox` | `checkbox-test.tsx` | 8 | On/Off/Mixed states, label, onChange, disabled |
+| `Button` | `button-test.tsx` | 8 | Click, disabled, type, aria-disabled, className |
+| `OkCancelButtonGroup` | `ok-cancel-button-group-test.tsx` | 9 | Ok/Cancel text, clicks, disabled, hidden, destructive |
+| `DialogHeader` | `dialog-header-test.tsx` | 5 | Title text/JSX, titleId, close button |
+
+**ESLint config:** `react/jsx-no-bind` is disabled for `app/test/**/*` to allow arrow function callbacks in test JSX.
 
 ### Phase 4: E2E Smoke Tests
 
@@ -198,12 +196,11 @@ Codify testing rules so agents maintain and improve the harness automatically.
 | `createTestSignInStore()` | `app/test/helpers/app-store-test-harness.ts` | SignInStore with test AccountsStore |
 | `createTestRepositoriesStore()` | `app/test/helpers/app-store-test-harness.ts` | RepositoriesStore with test database |
 | `createTestRepositoryStateCache()` | `app/test/helpers/app-store-test-harness.ts` | RepositoryStateCache with TestStatsStore |
-
-### Helpers Still Needed
-
-| Helper | Purpose |
-|---|---|
-| `app/test/helpers/component-test-utils.ts` | Render React components with required context providers (Phase 3) |
+| `renderComponent()` | `app/test/helpers/component-test-utils.ts` | Render React component, return container + unmount |
+| `click()` | `app/test/helpers/component-test-utils.ts` | Simulate click in `act()` block |
+| `change()` | `app/test/helpers/component-test-utils.ts` | Simulate input change |
+| `keyDown()` | `app/test/helpers/component-test-utils.ts` | Simulate keyboard event |
+| `queryOrThrow()` | `app/test/helpers/component-test-utils.ts` | Query DOM and assert element exists |
 
 ## Writing Tests
 
