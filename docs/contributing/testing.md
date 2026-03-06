@@ -120,6 +120,9 @@ React component rendering tests using jsdom (already in the test environment) an
 | `DialogHeader` | `dialog-header-test.tsx` | 5 | Title text/JSX, titleId, close button |
 | `TextBox` | `text-box-test.tsx` | 12 | Input rendering, label, placeholder, disabled, readOnly, clear button, className |
 | `RadioButton` | `radio-button-test.tsx` | 7 | Checked/unchecked, label, onSelected, children as label |
+| `LinkButton` | `link-button-test.tsx` | 10 | URI/href, onClick, disabled, role, aria-label, className |
+| `DialogContent` | `dialog-content-footer-test.tsx` | 3 | Children rendering, className, onRef callback |
+| `DialogFooter` | `dialog-content-footer-test.tsx` | 2 | Children rendering, composition with OkCancelButtonGroup |
 
 **Remaining (not yet implemented):**
 
