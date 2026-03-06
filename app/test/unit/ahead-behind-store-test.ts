@@ -35,13 +35,11 @@ describe('AheadBehindStore', () => {
     it('calculates ahead/behind for diverged branches', async t => {
       const repo = await setupEmptyRepository(t)
 
-      // Create initial commit on main
+      // Create initial commit on master
       await makeCommit(repo, {
         entries: [{ path: 'base.txt', contents: 'base' }],
         commitMessage: 'initial commit',
       })
-
-      const baseSHA = await getSHA(repo)
 
       // Create a feature branch and add a commit
       await createBranch(repo, 'feature', 'HEAD')
