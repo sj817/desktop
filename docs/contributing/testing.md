@@ -126,6 +126,8 @@ React component rendering tests using jsdom (already in the test environment) an
 | `Dialog` | `dialog-test.tsx` | 9 | Header wiring, focus selection, Escape dismiss, submit handling, ref lifecycle |
 | `Avatar` | `avatar-test.tsx` | 4 | Fallback octicon, sized image URL, aria-hidden, alt text fallback |
 | `ChangedFile` | `changed-file-test.tsx` | 5 | Include toggles, mixed state, renamed path rendering, aria-live status, disabled checkbox |
+| `FilesChangedBadge` | `files-changed-badge-test.tsx` | 3 | Exact count rendering, threshold boundary, capped `300+` badge text |
+| `MultipleSelection` | `multiple-selection-test.tsx` | 3 | Selected file count, blankslate container, decorative image rendering |
 | `NoBranches` | `no-branches-test.tsx` | 3 | Empty-state copy, create-branch CTA, shortcut hint, custom fallback message |
 | `NoPullRequests` | `no-pull-requests-test.tsx` | 3 | Search/loading empty states, repository message, create-branch and create-PR CTAs |
 | `PullRequestBadge` | `pull-request-badge-test.tsx` | 3 | PR ref wiring, badge enabled/disabled state, click handling, popover ARIA state |
