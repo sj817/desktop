@@ -2,39 +2,12 @@
 
 import { describe, it } from 'mocha'
 
-let desktopWindowHandle: string | null = null
-
-async function switchToDesktopWindow() {
-  if (desktopWindowHandle !== null) {
-    await browser.switchToWindow(desktopWindowHandle)
-    return
-  }
-
-  const handles = await browser.getWindowHandles()
-  let bestHandle: string | null = null
-  let bestHtmlLength = -1
-
-  for (const handle of handles) {
-    await browser.switchToWindow(handle)
-    const url = await browser.getUrl()
-    if (url.startsWith('devtools://')) {
-      continue
-    }
-
-    const body = await $('body')
-    const html = await body.getHTML().catch(() => '')
-
-    if (html.length > bestHtmlLength) {
-      bestHandle = handle
-      bestHtmlLength = html.length
-    }
-  }
-
-  if (bestHandle !== null) {
-    desktopWindowHandle = bestHandle
-    await browser.switchToWindow(bestHandle)
-  }
-}
+import {
+  resetDesktopWindowHandle,
+  smokeRepoFileName,
+  smokeRepoPath,
+  switchToDesktopWindow,
+} from './test-helpers'
 
 /**
  * E2E Smoke Test: App Launch
@@ -43,7 +16,8 @@ async function switchToDesktopWindow() {
  * This is the most basic smoke test — if this fails, the app is fundamentally broken.
  */
 describe('GitHub Desktop - App Launch', () => {
-  it('should launch and render the application window', async () => {
+  it('should launch and add a local repository', async () => {
+    resetDesktopWindowHandle()
     await switchToDesktopWindow()
 
     const title = await browser.getTitle()
@@ -63,6 +37,56 @@ describe('GitHub Desktop - App Launch', () => {
     const body = await $('body')
     const html = await body.getHTML()
     expect(html.length).toBeGreaterThan(50)
-    desktopWindowHandle = await browser.getWindowHandle()
+
+    const skipWelcomeButton = await $('a.skip-button')
+    await skipWelcomeButton.waitForDisplayed({ timeout: 15000 })
+    await browser.execute(element => element.click(), skipWelcomeButton)
+
+    const configureGit = await $('#configure-git')
+    await configureGit.waitForDisplayed({ timeout: 15000 })
+
+    const nameInput = await $('input[placeholder="Your Name"]')
+    if ((await nameInput.getValue()) === '') {
+      await nameInput.setValue('GitHub Desktop E2E')
+    }
+
+    const emailInput = await $('input[placeholder="your-email@example.com"]')
+    if ((await emailInput.getValue()) === '') {
+      await emailInput.setValue('desktop-e2e@example.com')
+    }
+
+    const finishButton = await $('//button[normalize-space()="Finish"]')
+    await finishButton.click()
+
+    await browser.waitUntil(async () => !(await $('#welcome').isExisting()), {
+      timeout: 15000,
+      timeoutMsg: 'Welcome flow did not close',
+    })
+
+    const noRepositoriesAddButton = await $(
+      '//*[contains(normalize-space(), "Add an Existing Repository from your Local Drive") or contains(normalize-space(), "Add an Existing Repository from your local drive")]'
+    )
+
+    if (await noRepositoriesAddButton.isDisplayed().catch(() => false)) {
+      await noRepositoriesAddButton.click()
+    }
+
+    const pathInput = await $('input[placeholder="repository path"]')
+    await pathInput.waitForDisplayed({ timeout: 15000 })
+
+    if ((await pathInput.getValue()) !== smokeRepoPath) {
+      await pathInput.setValue(smokeRepoPath)
+    }
+
+    const addRepositoryButton = await $(
+      '//button[normalize-space()="Add Repository" or normalize-space()="Add repository"]'
+    )
+
+    await addRepositoryButton.waitForDisplayed({ timeout: 15000 })
+    await addRepositoryButton.click()
+
+    const repoFile = await $(`//*[contains(normalize-space(), "${smokeRepoFileName}")]`)
+    await repoFile.waitForDisplayed({ timeout: 15000 })
+    await expect(repoFile).toBeDisplayed()
   })
 })
