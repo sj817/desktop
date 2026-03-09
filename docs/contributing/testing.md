@@ -136,6 +136,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `NoPullRequests` | `no-pull-requests-test.tsx` | 3 | Search/loading empty states, repository message, create-branch and create-PR CTAs |
 | `PullRequestBadge` | `pull-request-badge-test.tsx` | 3 | PR ref wiring, badge enabled/disabled state, click handling, popover ARIA state |
 | `PullRequestListItem` | `pull-request-list-item-test.tsx` | 3 | Subtitle rendering, loading state, hover position callback, commit drop handling |
+| `UndoCommit` | `undo-commit-test.tsx` | 3 | Commit summary rendering, undo action, disabled state during repository updates |
 
 **Remaining (not yet implemented):**
 
