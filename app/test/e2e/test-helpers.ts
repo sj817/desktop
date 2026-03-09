@@ -39,6 +39,26 @@ function runGit(args: ReadonlyArray<string>, cwd: string) {
   })
 }
 
+function readGitOutput(args: ReadonlyArray<string>, cwd: string) {
+  return execFileSync('git', [...args], {
+    cwd,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  }).trim()
+}
+
+export function getSmokeRepoStatus() {
+  return readGitOutput(['status', '--short'], smokeRepoPath)
+}
+
+export function getSmokeRepoHeadMessage() {
+  return readGitOutput(['log', '-1', '--pretty=%s'], smokeRepoPath)
+}
+
+export function getSmokeRepoCurrentBranch() {
+  return readGitOutput(['branch', '--show-current'], smokeRepoPath)
+}
+
 let desktopWindowHandle: string | null = null
 
 export function resetDesktopWindowHandle() {
