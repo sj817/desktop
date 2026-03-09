@@ -128,6 +128,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `BranchListItem` | `branch-list-item-test.tsx` | 3 | Branch name rendering, commit drag drop-target state, current-branch drop handling |
 | `CIStatus` | `ci-status-test.tsx` | 3 | Empty state, status class rendering, subscription-driven updates and cleanup |
 | `ChangedFile` | `changed-file-test.tsx` | 5 | Include toggles, mixed state, renamed path rendering, aria-live status, disabled checkbox |
+| `ChangesListFilterOptions` | `changes-list-filter-options-test.tsx` | 3 | Active filter badge, computed file counts, filter/clear callback handling |
 | `CommitWarning` | `commit-warning-test.tsx` | 3 | Message rendering, icon variant classes, context-menu suppression |
 | `ConfirmCommitFilteredChanges` | `confirm-commit-filtered-changes-test.tsx` | 3 | Submit flow, opt-out checkbox persistence, hidden-changes link dismissal |
 | `ContinueRebase` | `continue-rebase-test.tsx` | 3 | Conflict-disabled state, rebasing/untracked warnings, continue callback wiring |
