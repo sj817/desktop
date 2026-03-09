@@ -127,6 +127,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `Avatar` | `avatar-test.tsx` | 4 | Fallback octicon, sized image URL, aria-hidden, alt text fallback |
 | `ChangedFile` | `changed-file-test.tsx` | 5 | Include toggles, mixed state, renamed path rendering, aria-live status, disabled checkbox |
 | `NoBranches` | `no-branches-test.tsx` | 3 | Empty-state copy, create-branch CTA, shortcut hint, custom fallback message |
+| `PullRequestBadge` | `pull-request-badge-test.tsx` | 3 | PR ref wiring, badge enabled/disabled state, click handling, popover ARIA state |
 
 **Remaining (not yet implemented):**
 
@@ -135,7 +136,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `ui/diff/` | Line rendering, expand/collapse, selection (may need virtualization mocking) |
 | `ui/changes/` | File list, filtering |
 | `ui/commit-message/` | Input validation, summary/description, co-authors |
-| `ui/branches/` | Search filtering, grouping, PR badges |
+| `ui/branches/` | Search filtering, grouping |
 | `ui/merge-conflicts/` | Conflict list, resolution actions |
 | `ui/dialog/` (remaining Dialog behavior) | Backdrop click dismissal, alertdialog Tab wrap, resize positioning |
 | `ui/repositories-list/` | Search, group headers, selection |
