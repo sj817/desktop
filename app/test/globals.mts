@@ -40,9 +40,30 @@ Object.assign(globalThis, {
   BroadcastChannel: undefined,
 })
 
+Object.assign(globalThis, {
+  CustomEvent: window.CustomEvent,
+})
+
+Object.defineProperty(HTMLFormElement.prototype, 'requestSubmit', {
+  configurable: true,
+  writable: true,
+  value: function () {
+    this.dispatchEvent(
+      new window.Event('submit', { bubbles: true, cancelable: true })
+    )
+  },
+})
+
 mock.module('electron', {
   namedExports: {
     shell: {},
-    ipcRenderer: { on: mock.fn(x => {}) },
+    ipcRenderer: {
+      on: mock.fn(() => {}),
+      once: mock.fn(() => {}),
+      send: mock.fn(() => {}),
+      sendSync: mock.fn(() => {}),
+      invoke: mock.fn(async () => undefined),
+      removeListener: mock.fn(() => {}),
+    },
   },
 })

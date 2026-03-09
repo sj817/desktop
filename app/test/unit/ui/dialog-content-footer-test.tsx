@@ -1,7 +1,10 @@
 import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { renderComponent, queryOrThrow } from '../../helpers/component-test-utils'
+import {
+  renderComponent,
+  queryOrThrow,
+} from '../../helpers/component-test-utils'
 import { DialogContent } from '../../../src/ui/dialog/content'
 import { DialogFooter } from '../../../src/ui/dialog/footer'
 import { OkCancelButtonGroup } from '../../../src/ui/dialog/ok-cancel-button-group'
@@ -35,16 +38,16 @@ describe('DialogContent', () => {
   })
 
   it('calls onRef with the container element', () => {
-    let refElement: HTMLDivElement | null = null
+    let refTagName: string | null = null
     const handleRef = (el: HTMLDivElement | null) => {
-      refElement = el
+      refTagName = el?.tagName ?? null
     }
     const { unmount: u } = renderComponent(
       <DialogContent onRef={handleRef}>Content</DialogContent>
     )
     unmount = u
 
-    assert.ok(refElement instanceof HTMLDivElement)
+    assert.equal(refTagName, 'DIV')
   })
 })
 
