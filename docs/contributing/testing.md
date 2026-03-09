@@ -130,6 +130,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `ChangedFile` | `changed-file-test.tsx` | 5 | Include toggles, mixed state, renamed path rendering, aria-live status, disabled checkbox |
 | `ChangesListFilterOptions` | `changes-list-filter-options-test.tsx` | 3 | Active filter badge, computed file counts, filter/clear callback handling |
 | `CommitWarning` | `commit-warning-test.tsx` | 3 | Message rendering, icon variant classes, context-menu suppression |
+| `CommitConflictsWarning` | `commit-conflicts-warning-test.tsx` | 3 | Conflicted file list rendering, destructive action copy, cancel and commit-clear-reset flows |
 | `ConfirmCommitFilteredChanges` | `confirm-commit-filtered-changes-test.tsx` | 3 | Submit flow, opt-out checkbox persistence, hidden-changes link dismissal |
 | `ContinueRebase` | `continue-rebase-test.tsx` | 3 | Conflict-disabled state, rebasing/untracked warnings, continue callback wiring |
 | `DiffSearchInput` | `diff-search-input-test.tsx` | 4 | Search placeholder, clear-button state, Enter/Shift+Enter direction, Escape/blur close behavior |
