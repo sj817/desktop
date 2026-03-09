@@ -24,8 +24,21 @@ mock.module('../../../src/ui/lib/section-filter-list', {
           selectNextItem: () => {},
         }))
 
+        const filterText = props.filterText.toLowerCase()
+        const filteredGroups =
+          filterText.length === 0
+            ? props.groups
+            : props.groups
+                .map((group: any) => ({
+                  ...group,
+                  items: group.items.filter((item: any) =>
+                    item.text.join(' ').toLowerCase().includes(filterText)
+                  ),
+                }))
+                .filter((group: any) => group.items.length > 0)
+
         const rows = React.Children.toArray(
-          props.groups.flatMap((group: any) => [
+          filteredGroups.flatMap((group: any) => [
             props.renderGroupHeader?.(group.identifier),
             ...group.items.map((item: any) =>
               props.renderItem(item, { title: [], subtitle: [] })
@@ -39,10 +52,12 @@ mock.module('../../../src/ui/lib/section-filter-list', {
               type="button"
               className="trigger-item-click"
               onClick={() =>
-                props.onItemClick?.(props.groups[0].items[0], {
+                filteredGroups.length > 0
+                  ? props.onItemClick?.(filteredGroups[0].items[0], {
                   kind: 'mouse',
                   event: { preventDefault: () => {} },
-                })
+                  })
+                  : null
               }
             >
               Trigger Item Click
@@ -51,17 +66,26 @@ mock.module('../../../src/ui/lib/section-filter-list', {
               type="button"
               className="trigger-selection-change"
               onClick={() =>
-                props.onSelectionChanged?.(props.groups[0].items[0], {
+                filteredGroups.length > 0
+                  ? props.onSelectionChanged?.(filteredGroups[0].items[0], {
                   kind: 'keyboard',
                   event: { key: 'ArrowDown' },
-                })
+                  })
+                  : null
               }
             >
               Trigger Selection Change
             </button>
+            <button
+              type="button"
+              className="trigger-filter-change"
+              onClick={() => props.onFilterTextChanged?.('release')}
+            >
+              Trigger Filter Change
+            </button>
             <div className="rendered-rows">{rows}</div>
             <div className="no-items">
-              {props.groups.every((group: any) => group.items.length === 0)
+              {filteredGroups.length === 0
                 ? props.renderNoItems?.()
                 : null}
             </div>
@@ -129,6 +153,7 @@ function renderBranchList(props: {
   onCreateNewBranch?: (name: string) => void
   onItemClick?: (branch: Branch) => void
   onSelectionChanged?: (branch: Branch | null) => void
+  onFilterTextChanged?: (text: string) => void
   noBranchesMessage?: string
 } = {}) {
   const defaultBranch =
@@ -148,8 +173,8 @@ function renderBranchList(props: {
       selectedBranch={
         props.selectedBranch !== undefined ? props.selectedBranch : defaultBranch
       }
-      filterText={props.filterText ?? 'topic'}
-      onFilterTextChanged={() => {}}
+      filterText={props.filterText ?? ''}
+      onFilterTextChanged={props.onFilterTextChanged ?? (() => {})}
       canCreateNewBranch={props.canCreateNewBranch ?? true}
       onCreateNewBranch={props.onCreateNewBranch}
       getBranchAriaLabel={item => item.branch.name}
@@ -225,5 +250,35 @@ describe('BranchList', () => {
     createButton.click()
 
     assert.deepEqual(creations, ['feature/new-branch'])
+  })
+
+  it('filters branches using the branch name text and only renders matching groups', () => {
+    const { container, unmount: u } = renderBranchList({
+      filterText: 'release',
+    })
+    unmount = u
+
+    assert.ok(container.textContent?.includes(__DARWIN__ ? 'Recent Branches' : 'Recent branches'))
+    assert.ok(container.textContent?.includes('release/1.0'))
+    assert.equal(container.textContent?.includes(__DARWIN__ ? 'Default Branch' : 'Default branch'), false)
+    assert.equal(container.textContent?.includes(__DARWIN__ ? 'Other Branches' : 'Other branches'), false)
+    assert.equal(container.textContent?.includes('feature/login'), false)
+  })
+
+  it('shows the filtered no-results state and forwards filter text changes', () => {
+    const filterCalls = new Array<string>()
+    const { container, unmount: u } = renderBranchList({
+      filterText: 'missing-branch',
+      onFilterTextChanged: text => {
+        filterCalls.push(text)
+      },
+    })
+    unmount = u
+
+    assert.ok(container.querySelector('.create-branch-button'))
+
+    queryOrThrow<HTMLButtonElement>(container, '.trigger-filter-change').click()
+
+    assert.deepEqual(filterCalls, ['release'])
   })
 })

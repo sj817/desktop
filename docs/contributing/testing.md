@@ -130,7 +130,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `Dialog` | `dialog-resize-test.tsx` | 2 | Repositions overflowing dialogs on resize, leaves oversized dialogs unchanged |
 | `Avatar` | `avatar-test.tsx` | 4 | Fallback octicon, sized image URL, aria-hidden, alt text fallback |
 | `BranchListItem` | `branch-list-item-test.tsx` | 3 | Branch name rendering, commit drag drop-target state, current-branch drop handling |
-| `BranchList` | `branch-list-test.tsx` | 3 | Default/recent/other grouping, selected branch propagation, no-results create-branch and branch callback mapping |
+| `BranchList` | `branch-list-test.tsx` | 5 | Default/recent/other grouping, selected branch propagation, branch-name filtering, filtered no-results state, create-branch and branch/filter callback mapping |
 | `BranchSelect` | `branch-select-test.tsx` | 3 | Selected branch button text, filter text propagation, popover-close and onChange branch selection wiring |
 | `CIStatus` | `ci-status-test.tsx` | 3 | Empty state, status class rendering, subscription-driven updates and cleanup |
 | `ChangedFile` | `changed-file-test.tsx` | 5 | Include toggles, mixed state, renamed path rendering, aria-live status, disabled checkbox |
@@ -161,7 +161,6 @@ React component rendering tests using jsdom (already in the test environment) an
 |---|---|
 | `ui/diff/` | Line rendering, expand/collapse, selection (may need virtualization mocking) |
 | `ui/changes/` | File list, filtering |
-| `ui/branches/` | Search filtering, grouping |
 | `ui/merge-conflicts/` | Conflict list, resolution actions |
 
 **ESLint config:** `react/jsx-no-bind` is disabled for `app/test/**/*` to allow arrow function callbacks in test JSX.
