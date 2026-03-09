@@ -151,7 +151,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `OversizedFiles` | `oversized-files-warning-test.tsx` | 3 | Oversized file list, Git LFS recommendation, commit-and-reset submit flow |
 | `PullRequestBadge` | `pull-request-badge-test.tsx` | 3 | PR ref wiring, badge enabled/disabled state, click handling, popover ARIA state |
 | `PullRequestListItem` | `pull-request-list-item-test.tsx` | 3 | Subtitle rendering, loading state, hover position callback, commit drop handling |
-| `RepositoriesList` | `repositories-list-test.tsx` | 3 | Group headers, empty filtered state, selection and repo-click indicator wiring |
+| `RepositoriesList` | `repositories-list-test.tsx`, `repositories-list-search-test.tsx` | 5 | Group headers, selection and repo-click indicator wiring, searchable item text filtering, empty filtered state, filter text propagation |
 | `RepositoryListItem` | `repository-list-item-test.tsx` | 3 | Alias/prefix rendering, highlight text, ahead/behind and change indicators |
 | `UndoCommit` | `undo-commit-test.tsx` | 3 | Commit summary rendering, undo action, disabled state during repository updates |
 
@@ -163,7 +163,6 @@ React component rendering tests using jsdom (already in the test environment) an
 | `ui/changes/` | File list, filtering |
 | `ui/branches/` | Search filtering, grouping |
 | `ui/merge-conflicts/` | Conflict list, resolution actions |
-| `ui/repositories-list/` | Search, group headers, selection |
 
 **ESLint config:** `react/jsx-no-bind` is disabled for `app/test/**/*` to allow arrow function callbacks in test JSX.
 
