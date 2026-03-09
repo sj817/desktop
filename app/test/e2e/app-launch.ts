@@ -7,6 +7,7 @@ import {
   getSmokeRepoHeadMessage,
   getSmokeRepoStatus,
   resetDesktopWindowHandle,
+  smokeRepoFileContents,
   smokeRepoFileName,
   smokeRepoPath,
   switchToDesktopWindow,
@@ -36,7 +37,7 @@ async function dismissMoveToApplicationsDialog() {
  * This is the most basic smoke test — if this fails, the app is fundamentally broken.
  */
 describe('GitHub Desktop - App Launch', () => {
-  it('should launch, add a local repository, commit a change, and switch branches cleanly', async () => {
+  it('should launch, add a local repository, render a diff, commit a change, and switch branches cleanly', async () => {
     resetDesktopWindowHandle()
     await switchToDesktopWindow()
 
@@ -122,6 +123,17 @@ describe('GitHub Desktop - App Launch', () => {
 
     await repoFile.waitForDisplayed({ timeout: 15000 })
     await expect(repoFile).toBeDisplayed()
+    await browser.execute(element => element.click(), repoFile)
+
+    const diffContainer = await $('.diff-container')
+    await diffContainer.waitForDisplayed({ timeout: 15000 })
+    await browser.waitUntil(
+      async () => (await diffContainer.getText()).includes(smokeRepoFileContents),
+      {
+        timeout: 15000,
+        timeoutMsg: 'Diff contents did not render for the smoke repository file',
+      }
+    )
 
     const commitForm = await $('//*[@aria-label="Create commit"]')
     await commitForm.waitForDisplayed({ timeout: 15000 })

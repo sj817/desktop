@@ -9,6 +9,7 @@ export const smokeRepoPath = path.join(
 )
 export const smokeRepoName = path.basename(smokeRepoPath)
 export const smokeRepoFileName = 'smoke-change.txt'
+export const smokeRepoFileContents = 'This file should appear in the changes list.'
 
 export function ensureSmokeTestRepository() {
   fs.rmSync(smokeRepoPath, { recursive: true, force: true })
@@ -28,7 +29,7 @@ export function ensureSmokeTestRepository() {
 
   fs.writeFileSync(
     path.join(smokeRepoPath, smokeRepoFileName),
-    'This file should appear in the changes list.\n'
+    `${smokeRepoFileContents}\n`
   )
 }
 

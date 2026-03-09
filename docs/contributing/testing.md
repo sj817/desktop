@@ -157,7 +157,7 @@ Why WebDriverIO over Playwright:
 2. Add a local repo → file list appears *(implemented in `app-launch.ts`)*
 3. Make a change → stage → commit succeeds *(implemented in `app-launch.ts`)*
 4. Create branch → switch back → working directory is clean *(implemented in `app-launch.ts`)*
-5. View a diff → diff content renders
+5. View a diff → diff content renders *(implemented in `app-launch.ts`)*
 
 These tests should be fast, stable, and narrowly scoped. They exist purely as a safety net — if any of them fail, something is fundamentally broken.
 
@@ -172,7 +172,7 @@ These tests should be fast, stable, and narrowly scoped. They exist purely as a 
 **Current implementation note:**
 - The committed smoke harness currently targets the built app entry point and isolates user data successfully.
 - Earlier attempts to use `@wdio/electron-service` hit repeatable bridge timeouts on Desktop with Electron 40, so the committed launch smoke avoids that integration layer for now.
-- The current `app-launch.ts` smoke flow intentionally combines launch coverage, the local-repository add flow, a basic commit path, and branch create/switch-back coverage into one stable fresh-session scenario.
+- The current `app-launch.ts` smoke flow intentionally combines launch coverage, the local-repository add flow, diff rendering, a basic commit path, and branch create/switch-back coverage into one stable fresh-session scenario.
 
 **Directory:** `app/test/e2e/`
 
