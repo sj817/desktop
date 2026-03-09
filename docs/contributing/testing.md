@@ -102,6 +102,7 @@ The most impactful tests, prioritized by risk. All tests below are implemented, 
 1. `app/test/unit/offset-from-test.ts` — time offset calculations *(12 tests)*
 2. `app/test/unit/status-utils-test.ts` — mapStatus, isConflictedFile, hasConflictedFiles *(11 tests)*
 3. `app/test/unit/file-system-test.ts` — getTempFilePath, readPartialFile *(6 tests)*
+4. `app/test/unit/filter-changes-logic-test.ts` — filter combinations, hidden committed files, no-results copy, active-filter detection *(15 tests)*
 
 ### Phase 3: Component Tests *(partially complete)*
 
