@@ -133,6 +133,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `ConfirmCommitFilteredChanges` | `confirm-commit-filtered-changes-test.tsx` | 3 | Submit flow, opt-out checkbox persistence, hidden-changes link dismissal |
 | `ContinueRebase` | `continue-rebase-test.tsx` | 3 | Conflict-disabled state, rebasing/untracked warnings, continue callback wiring |
 | `DiffSearchInput` | `diff-search-input-test.tsx` | 4 | Search placeholder, clear-button state, Enter/Shift+Enter direction, Escape/blur close behavior |
+| `DiffHeader` | `diff-header-test.tsx` | 3 | Path label rendering, status icon class/title, submodule options suppression, options popover wiring |
 | `FilesChangedBadge` | `files-changed-badge-test.tsx` | 3 | Exact count rendering, threshold boundary, capped `300+` badge text |
 | `MultipleSelection` | `multiple-selection-test.tsx` | 3 | Selected file count, blankslate container, decorative image rendering |
 | `NoBranches` | `no-branches-test.tsx` | 3 | Empty-state copy, create-branch CTA, shortcut hint, custom fallback message |
