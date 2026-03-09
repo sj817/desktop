@@ -125,13 +125,15 @@ React component rendering tests using jsdom (already in the test environment) an
 | `DialogFooter` | `dialog-content-footer-test.tsx` | 2 | Children rendering, composition with OkCancelButtonGroup |
 | `Dialog` | `dialog-test.tsx` | 9 | Header wiring, focus selection, Escape dismiss, submit handling, ref lifecycle |
 | `Avatar` | `avatar-test.tsx` | 4 | Fallback octicon, sized image URL, aria-hidden, alt text fallback |
+| `ChangedFile` | `changed-file-test.tsx` | 5 | Include toggles, mixed state, renamed path rendering, aria-live status, disabled checkbox |
+| `NoBranches` | `no-branches-test.tsx` | 3 | Empty-state copy, create-branch CTA, shortcut hint, custom fallback message |
 
 **Remaining (not yet implemented):**
 
 | Component | What to Assert |
 |---|---|
 | `ui/diff/` | Line rendering, expand/collapse, selection (may need virtualization mocking) |
-| `ui/changes/` | File list, check/uncheck, filtering |
+| `ui/changes/` | File list, filtering |
 | `ui/commit-message/` | Input validation, summary/description, co-authors |
 | `ui/branches/` | Search filtering, grouping, PR badges |
 | `ui/merge-conflicts/` | Conflict list, resolution actions |

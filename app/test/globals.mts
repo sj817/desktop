@@ -44,6 +44,15 @@ Object.assign(globalThis, {
   CustomEvent: window.CustomEvent,
 })
 
+if (globalThis.ResizeObserver === undefined) {
+  class TestResizeObserver {
+    public observe() {}
+    public disconnect() {}
+  }
+
+  Object.assign(globalThis, { ResizeObserver: TestResizeObserver })
+}
+
 Object.defineProperty(HTMLFormElement.prototype, 'requestSubmit', {
   configurable: true,
   writable: true,
