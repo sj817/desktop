@@ -8,7 +8,7 @@ import { createUniqueId, releaseUniqueId } from './id-pool'
 
 const maxPopoverContentHeight = 500
 
-interface IPopoverDropdownProps {
+export interface IPopoverDropdownProps {
   readonly className?: string
   readonly contentTitle: string
   readonly buttonContent: JSX.Element | string

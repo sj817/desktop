@@ -43,7 +43,10 @@ type IFilterListRow<T extends IFilterListItem, GroupIdentifier> =
   | IFlattenedGroup<GroupIdentifier>
   | IFlattenedItem<T>
 
-interface ISectionFilterListProps<T extends IFilterListItem, GroupIdentifier> {
+export interface ISectionFilterListProps<
+  T extends IFilterListItem,
+  GroupIdentifier
+> {
   /** A class name for the wrapping element. */
   readonly className?: string
 

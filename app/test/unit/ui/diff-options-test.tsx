@@ -1,7 +1,6 @@
 import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 
 import { DiffOptions } from '../../../src/ui/diff/diff-options'
 import {
@@ -16,15 +15,6 @@ afterEach(() => {
   unmount?.()
   unmount = undefined
 })
-function setChecked(input: HTMLInputElement, checked: boolean) {
-  act(() => {
-    Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      'checked'
-    )?.set?.call(input, checked)
-    input.dispatchEvent(new window.Event('change', { bubbles: true }))
-  })
-}
 
 function renderDiffOptions(
   props: Partial<React.ComponentProps<typeof DiffOptions>> = {}

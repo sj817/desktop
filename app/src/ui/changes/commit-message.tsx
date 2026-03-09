@@ -88,7 +88,7 @@ interface ICreateCommitOptions {
   warnFilesNotVisible: boolean
 }
 
-interface ICommitMessageProps {
+export interface ICommitMessageProps {
   readonly onCreateCommit: (context: ICommitContext) => Promise<boolean>
   readonly branch: string | null
   readonly commitAuthor: CommitIdentity | null

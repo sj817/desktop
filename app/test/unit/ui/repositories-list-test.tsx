@@ -9,12 +9,20 @@ import {
   Repository,
 } from '../../../src/models/repository'
 import { Dispatcher } from '../../../src/ui/dispatcher'
+import type { ISectionFilterListProps } from '../../../src/ui/lib/section-filter-list'
+import {
+  IRepositoryListItem,
+  RepositoryListGroup,
+} from '../../../src/ui/repositories-list/group-repositories'
 import {
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
 
-type MockSectionFilterListProps = React.ComponentProps<any>
+type MockSectionFilterListProps = ISectionFilterListProps<
+  IRepositoryListItem,
+  RepositoryListGroup
+>
 
 let latestSectionFilterListProps: MockSectionFilterListProps | null = null
 let unmount: (() => void) | undefined
@@ -25,15 +33,18 @@ mock.module('../../../src/ui/lib/section-filter-list', {
     SectionFilterList: (props: MockSectionFilterListProps) => {
       latestSectionFilterListProps = props
 
-      const rows = props.groups.flatMap((group: any) => [
+      const rows = props.groups.flatMap(group => [
         props.renderGroupHeader?.(group.identifier),
-        ...group.items.map((item: any) =>
+        ...group.items.map(item =>
           props.renderItem(item, { title: [], subtitle: [] })
         ),
       ])
 
       return (
         <div className="mock-section-filter-list">
+          <div className="selected-item">
+            {props.selectedItem?.repository.name ?? ''}
+          </div>
           <button
             type="button"
             className="trigger-item-click"
@@ -116,7 +127,7 @@ function renderRepositoriesList(
     recentRepositories?: ReadonlyArray<number>
     localRepositoryStateLookup?: ReadonlyMap<number, ILocalRepositoryState>
     filterText?: string
-    onSelectionChanged?: (repository: Repository) => void
+    onSelectionChanged?: (repository: { readonly id: number }) => void
     onFilterTextChanged?: (text: string) => void
   } = {}
 ) {

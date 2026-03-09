@@ -157,11 +157,11 @@ describe('PullRequestListItem', () => {
         matches={{ title: [], subtitle: [] }}
         dispatcher={createDispatcher()}
         repository={createRepository()}
-        onDropOntoPullRequest={number => {
-          dropCalls.push(number)
+        onDropOntoPullRequest={pullRequestNumber => {
+          dropCalls.push(pullRequestNumber)
         }}
-        onMouseEnter={(number, top) => {
-          hoverCalls.push({ number, top })
+        onMouseEnter={(pullRequestNumber, top) => {
+          hoverCalls.push({ number: pullRequestNumber, top })
         }}
         onMouseLeave={event => {
           leaveEvents.push(event.nativeEvent)

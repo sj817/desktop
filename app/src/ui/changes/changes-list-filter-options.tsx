@@ -18,7 +18,7 @@ import classNames from 'classnames'
 import { IChangesListItem } from './filter-changes-list'
 import { WorkingDirectoryStatus } from '../../models/status'
 
-interface IChangesListFilterOptionsProps {
+export interface IChangesListFilterOptionsProps {
   readonly fileListFilter: IFileListFilterState
   readonly filteredItems: Map<string, IChangesListItem>
   readonly workingDirectory: WorkingDirectoryStatus

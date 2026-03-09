@@ -7,9 +7,18 @@ import { Account } from '../../../src/models/account'
 import { IAheadBehind } from '../../../src/models/branch'
 import { DefaultCommitMessage } from '../../../src/models/commit-message'
 import { CommitIdentity } from '../../../src/models/commit-identity'
+import { RepoRulesInfo } from '../../../src/models/repo-rules'
 import { Repository } from '../../../src/models/repository'
 import { WorkingDirectoryStatus } from '../../../src/models/status'
+import type { IChangesListFilterOptionsProps } from '../../../src/ui/changes/changes-list-filter-options'
+import type { IChangedFileProps } from '../../../src/ui/changes/changed-file'
+import type { IChangesListItem } from '../../../src/ui/changes/filter-changes-list'
 import { Dispatcher } from '../../../src/ui/dispatcher'
+import type { IButtonProps } from '../../../src/ui/lib/button'
+import type { ICheckboxProps } from '../../../src/ui/lib/checkbox'
+import type { ILinkButtonProps } from '../../../src/ui/lib/link-button'
+import type { ITextBoxProps } from '../../../src/ui/lib/text-box'
+import type { IAugmentedSectionFilterListProps } from '../../../src/ui/lib/augmented-filter-list'
 import {
   change,
   click,
@@ -18,7 +27,16 @@ import {
 } from '../../helpers/component-test-utils'
 import { createMockFileChange } from '../../helpers/mock-git'
 
-type MockAugmentedSectionFilterListProps = React.ComponentProps<any>
+interface IAugmentedSectionFilterListHandle {
+  onKeyDown(event: React.KeyboardEvent<HTMLInputElement>): void
+}
+
+type MockAugmentedSectionFilterListProps =
+  IAugmentedSectionFilterListProps<IChangesListItem>
+
+interface IFocusableHandle {
+  focus(): void
+}
 
 let FilterChangesList: typeof import('../../../src/ui/changes/filter-changes-list').FilterChangesList
 let unmount: (() => void) | undefined
@@ -26,7 +44,7 @@ let unmount: (() => void) | undefined
 mock.module('../../../src/ui/lib/augmented-filter-list', {
   namedExports: {
     AugmentedSectionFilterList: React.forwardRef<
-      { onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void },
+      IAugmentedSectionFilterListHandle,
       MockAugmentedSectionFilterListProps
     >((props, ref) => {
       React.useImperativeHandle(ref, () => ({
@@ -35,8 +53,8 @@ mock.module('../../../src/ui/lib/augmented-filter-list', {
 
       const visibleItems = React.useMemo(() => {
         const text = props.filterText.toLowerCase()
-        return props.groups.flatMap((group: any) =>
-          group.items.filter((item: any) => {
+        return props.groups.flatMap(group =>
+          group.items.filter(item => {
             const matchesText =
               text.length === 0 ||
               item.text.join(' ').toLowerCase().includes(text)
@@ -57,7 +75,7 @@ mock.module('../../../src/ui/lib/augmented-filter-list', {
           {props.renderCustomFilterRow?.()}
           <div className="rendered-items">
             {visibleItems.length > 0
-              ? visibleItems.map((item: any) =>
+              ? visibleItems.map(item =>
                   props.renderItem(item, { title: [], subtitle: [] })
                 )
               : props.renderNoItems?.()}
@@ -70,7 +88,7 @@ mock.module('../../../src/ui/lib/augmented-filter-list', {
 
 mock.module('../../../src/ui/changes/changed-file', {
   namedExports: {
-    ChangedFile: (props: any) => (
+    ChangedFile: (props: IChangedFileProps) => (
       <div className="changed-file-row">{props.file.path}</div>
     ),
   },
@@ -84,7 +102,7 @@ mock.module('../../../src/ui/changes/commit-message', {
 
 mock.module('../../../src/ui/changes/changes-list-filter-options', {
   namedExports: {
-    ChangesListFilterOptions: (props: any) => (
+    ChangesListFilterOptions: (props: IChangesListFilterOptionsProps) => (
       <div className="mock-filter-options">
         <button
           type="button"
@@ -107,15 +125,15 @@ mock.module('../../../src/ui/changes/changes-list-filter-options', {
 
 mock.module('../../../src/ui/lib/text-box', {
   namedExports: {
-    TextBox: React.forwardRef<any, any>((props, ref) => {
+    TextBox: React.forwardRef<IFocusableHandle, ITextBoxProps>((props, ref) => {
       React.useImperativeHandle(ref, () => ({ focus: () => {} }))
 
       return (
         <input
           className={props.className}
           placeholder={props.placeholder}
-          value={props.value}
-          onChange={event => props.onValueChanged(event.currentTarget.value)}
+          value={props.value ?? ''}
+          onChange={event => props.onValueChanged?.(event.currentTarget.value)}
           onKeyDown={props.onKeyDown}
         />
       )
@@ -126,25 +144,28 @@ mock.module('../../../src/ui/lib/text-box', {
 mock.module('../../../src/ui/lib/checkbox', {
   namedExports: {
     CheckboxValue: { On: 1, Off: 0, Mixed: -1 },
-    Checkbox: React.forwardRef<any, any>((props, ref) => {
-      React.useImperativeHandle(ref, () => ({ focus: () => {} }))
-      return (
-        <label className={props.className}>
-          <input
-            type="checkbox"
-            disabled={props.disabled}
-            onChange={props.onChange}
-          />
-          <span id="changes-list-check-all-label">{props.label}</span>
-        </label>
-      )
-    }),
+    Checkbox: React.forwardRef<IFocusableHandle, ICheckboxProps>(
+      (props, ref) => {
+        React.useImperativeHandle(ref, () => ({ focus: () => {} }))
+        return (
+          <label className={props.className}>
+            <input
+              type="checkbox"
+              checked={false}
+              disabled={props.disabled}
+              onChange={props.onChange}
+            />
+            <span id="changes-list-check-all-label">{props.label}</span>
+          </label>
+        )
+      }
+    ),
   },
 })
 
 mock.module('../../../src/ui/lib/button', {
   namedExports: {
-    Button: (props: any) => (
+    Button: (props: IButtonProps) => (
       <button
         type={props.type ?? 'button'}
         className={props.className}
@@ -159,11 +180,11 @@ mock.module('../../../src/ui/lib/button', {
 
 mock.module('../../../src/ui/lib/link-button', {
   namedExports: {
-    LinkButton: (props: any) => (
+    LinkButton: (props: ILinkButtonProps) => (
       <button
         type="button"
         className="link-button-component"
-        onClick={props.onClick}
+        onClick={() => props.onClick?.()}
       >
         {props.children}
       </button>
@@ -302,7 +323,7 @@ function renderFilterChangesList(
       shouldShowGenerateCommitMessageCallOut={false}
       commitToAmend={null}
       currentBranchProtected={false}
-      currentRepoRulesInfo={{} as any}
+      currentRepoRulesInfo={new RepoRulesInfo()}
       aheadBehind={{ ahead: 0, behind: 0 } as IAheadBehind}
       commitMessage={DefaultCommitMessage}
       autocompletionProviders={[]}
@@ -321,7 +342,6 @@ function renderFilterChangesList(
       hasCommitHooks={false}
       skipCommitHooks={false}
       onUpdateCommitOptions={() => {}}
-      showPromptForCommittingFileHiddenByFilter={false}
     />
   )
 

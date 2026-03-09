@@ -6,12 +6,20 @@ import { GitHubRepository } from '../../../src/models/github-repository'
 import { Owner } from '../../../src/models/owner'
 import { Repository } from '../../../src/models/repository'
 import { Dispatcher } from '../../../src/ui/dispatcher'
+import type { ISectionFilterListProps } from '../../../src/ui/lib/section-filter-list'
+import {
+  IRepositoryListItem,
+  RepositoryListGroup,
+} from '../../../src/ui/repositories-list/group-repositories'
 import {
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
 
-type MockSectionFilterListProps = React.ComponentProps<any>
+type MockSectionFilterListProps = ISectionFilterListProps<
+  IRepositoryListItem,
+  RepositoryListGroup
+>
 
 let RepositoriesList: typeof import('../../../src/ui/repositories-list/repositories-list').RepositoriesList
 let latestSectionFilterListProps: MockSectionFilterListProps | null = null
@@ -27,18 +35,18 @@ mock.module('../../../src/ui/lib/section-filter-list', {
         filterText.length === 0
           ? props.groups
           : props.groups
-              .map((group: any) => ({
+              .map(group => ({
                 ...group,
-                items: group.items.filter((item: any) =>
+                items: group.items.filter(item =>
                   item.text.join(' ').toLowerCase().includes(filterText)
                 ),
               }))
-              .filter((group: any) => group.items.length > 0)
+              .filter(group => group.items.length > 0)
 
       const rows = React.Children.toArray(
-        filteredGroups.flatMap((group: any) => [
+        filteredGroups.flatMap(group => [
           props.renderGroupHeader?.(group.identifier),
-          ...group.items.map((item: any) =>
+          ...group.items.map(item =>
             props.renderItem(item, { title: [], subtitle: [] })
           ),
         ])

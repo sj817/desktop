@@ -3,6 +3,8 @@ import assert from 'node:assert'
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 
+import { IAutocompletionProvider } from '../../../src/ui/autocompletion/autocompletion-provider'
+import type { IAutocompletingTextInputProps } from '../../../src/ui/autocompletion/autocompleting-text-input'
 import { Account } from '../../../src/models/account'
 import { Author, UnknownAuthor } from '../../../src/models/author'
 import { ICommitContext } from '../../../src/models/commit'
@@ -12,6 +14,13 @@ import { GitHubRepository } from '../../../src/models/github-repository'
 import { Owner } from '../../../src/models/owner'
 import { RepoRulesInfo } from '../../../src/models/repo-rules'
 import { Repository } from '../../../src/models/repository'
+import type { ICommitWarningProps } from '../../../src/ui/changes/commit-warning'
+import type { IAuthorInputProps } from '../../../src/ui/lib/author-input/author-input'
+import type { IButtonProps } from '../../../src/ui/lib/button'
+import type { IFocusContainerProps } from '../../../src/ui/lib/focus-container'
+import type { ILinkButtonProps } from '../../../src/ui/lib/link-button'
+import type { IPopoverProps } from '../../../src/ui/lib/popover'
+import type { IToggledtippedContentProps } from '../../../src/ui/lib/toggletipped-content'
 import {
   change,
   click,
@@ -22,25 +31,61 @@ import {
 let CommitMessage: typeof import('../../../src/ui/changes/commit-message').CommitMessage
 let unmount: (() => void) | undefined
 
-class MockCoAuthorAutocompletionProvider {}
+type IAutocompletingInputProps = IAutocompletingTextInputProps<
+  HTMLInputElement,
+  Author
+>
+type IAutocompletingTextAreaProps = IAutocompletingTextInputProps<
+  HTMLTextAreaElement,
+  Author
+>
+
+interface IFocusableHandle {
+  focus(): void
+}
+
+class MockCoAuthorAutocompletionProvider
+  implements IAutocompletionProvider<Author>
+{
+  public readonly kind = 'user' as const
+
+  public getRegExp(): RegExp {
+    return /@([a-z\d_-]*)/gi
+  }
+
+  public async getAutocompletionItems(): Promise<ReadonlyArray<Author>> {
+    return []
+  }
+
+  public renderItem(item: Author): JSX.Element {
+    return <span>{item.kind}</span>
+  }
+
+  public getCompletionText(item: Author): string {
+    return item.kind === 'known' ? item.username ?? item.name : item.username
+  }
+}
 
 mock.module('../../../src/ui/autocompletion', {
   namedExports: {
     CoAuthorAutocompletionProvider: MockCoAuthorAutocompletionProvider,
-    AutocompletingInput: (props: any) => (
+    AutocompletingInput: (props: IAutocompletingInputProps) => (
       <input
         className={props.className}
         aria-label={props.screenReaderLabel}
         placeholder={props.placeholder}
-        value={props.value}
+        value={props.value ?? ''}
         readOnly={props.readOnly}
         spellCheck={props.spellcheck}
         onContextMenu={props.onContextMenu}
-        onChange={event => props.onValueChanged(event.currentTarget.value)}
+        onChange={event => props.onValueChanged?.(event.currentTarget.value)}
         ref={props.onElementRef}
       />
     ),
-    AutocompletingTextArea: React.forwardRef<any, any>((props, ref) => {
+    AutocompletingTextArea: React.forwardRef<
+      IFocusableHandle,
+      IAutocompletingTextAreaProps
+    >((props, ref) => {
       const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null)
 
       React.useImperativeHandle(ref, () => ({
@@ -53,11 +98,11 @@ mock.module('../../../src/ui/autocompletion', {
           className={props.className}
           aria-label={props.screenReaderLabel}
           placeholder={props.placeholder}
-          value={props.value}
+          value={props.value ?? ''}
           readOnly={props.readOnly}
           spellCheck={props.spellcheck}
           onContextMenu={props.onContextMenu}
-          onChange={event => props.onValueChanged(event.currentTarget.value)}
+          onChange={event => props.onValueChanged?.(event.currentTarget.value)}
           ref={element => {
             textAreaRef.current = element
             props.onElementRef?.(element)
@@ -70,7 +115,7 @@ mock.module('../../../src/ui/autocompletion', {
 
 mock.module('../../../src/ui/lib/button', {
   namedExports: {
-    Button: (props: any) => (
+    Button: (props: IButtonProps) => (
       <button
         type={props.type ?? 'button'}
         className={['button-component', props.className]
@@ -89,8 +134,13 @@ mock.module('../../../src/ui/lib/button', {
 
 mock.module('../../../src/ui/lib/focus-container', {
   namedExports: {
-    FocusContainer: (props: any) => (
-      <div className={props.className} onClick={props.onClick}>
+    FocusContainer: (props: IFocusContainerProps) => (
+      <div
+        className={props.className}
+        onClick={props.onClick}
+        onKeyDown={() => {}}
+        role="presentation"
+      >
         {props.children}
       </div>
     ),
@@ -105,13 +155,15 @@ mock.module('../../../src/ui/changes/commit-message-avatar', {
 
 mock.module('../../../src/ui/lib/author-input/author-input', {
   namedExports: {
-    AuthorInput: React.forwardRef<any, any>((props, ref) => {
-      React.useImperativeHandle(ref, () => ({
-        focus: () => {},
-      }))
+    AuthorInput: React.forwardRef<IFocusableHandle, IAuthorInputProps>(
+      (props, ref) => {
+        React.useImperativeHandle(ref, () => ({
+          focus: () => {},
+        }))
 
-      return <div className="author-input">{props.authors.length}</div>
-    }),
+        return <div className="author-input">{props.authors.length}</div>
+      }
+    ),
   },
 })
 
@@ -129,7 +181,7 @@ mock.module('../../../src/ui/octicons', {
 
 mock.module('../../../src/ui/changes/commit-warning', {
   namedExports: {
-    CommitWarning: (props: any) => (
+    CommitWarning: (props: ICommitWarningProps) => (
       <div className="commit-warning">{props.children}</div>
     ),
     CommitWarningIcon: { Information: 'information' },
@@ -138,7 +190,7 @@ mock.module('../../../src/ui/changes/commit-warning', {
 
 mock.module('../../../src/ui/lib/link-button', {
   namedExports: {
-    LinkButton: (props: any) => (
+    LinkButton: (props: ILinkButtonProps) => (
       <button
         type="button"
         className="link-button-component"
@@ -152,7 +204,7 @@ mock.module('../../../src/ui/lib/link-button', {
 
 mock.module('../../../src/ui/lib/toggletipped-content', {
   namedExports: {
-    ToggledtippedContent: (props: any) => (
+    ToggledtippedContent: (props: IToggledtippedContentProps) => (
       <div className={props.className}>{props.children}</div>
     ),
   },
@@ -160,7 +212,9 @@ mock.module('../../../src/ui/lib/toggletipped-content', {
 
 mock.module('../../../src/ui/lib/popover', {
   namedExports: {
-    Popover: (props: any) => <div className="popover">{props.children}</div>,
+    Popover: (props: IPopoverProps) => (
+      <div className="popover">{props.children}</div>
+    ),
     PopoverAnchorPosition: { Bottom: 'bottom' },
     PopoverDecoration: { None: 'none' },
   },
@@ -419,7 +473,7 @@ describe('CommitMessage', () => {
   it('confirms unknown co-authors before committing and only includes known co-author trailers', () => {
     const onCreateCommitCalls = new Array<ICommitContext>()
     const confirmationCalls = new Array<ReadonlyArray<UnknownAuthor>>()
-    let continueCommit: (() => void) | null = null
+    const continuationCallbacks = new Array<() => void>()
 
     const { container, unmount: u } = renderCommitMessage({
       showCoAuthoredBy: true,
@@ -430,7 +484,7 @@ describe('CommitMessage', () => {
       },
       onConfirmCommitWithUnknownCoAuthors: (authors, onCommitAnyway) => {
         confirmationCalls.push(authors)
-        continueCommit = onCommitAnyway
+        continuationCallbacks.push(onCommitAnyway)
       },
     })
     unmount = u
@@ -444,7 +498,13 @@ describe('CommitMessage', () => {
     assert.equal(onCreateCommitCalls.length, 0)
     assert.deepEqual(confirmationCalls, [[createUnknownAuthor('octocat')]])
 
-    continueCommit?.()
+    const continueCommit = continuationCallbacks[0]
+
+    if (continueCommit === undefined) {
+      throw new Error('Expected commit continuation callback to be set')
+    }
+
+    continueCommit()
 
     assert.deepEqual(onCreateCommitCalls, [
       {

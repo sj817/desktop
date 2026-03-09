@@ -7,11 +7,19 @@ import { GitHubRepository } from '../../../src/models/github-repository'
 import { Owner } from '../../../src/models/owner'
 import { Repository } from '../../../src/models/repository'
 import {
+  BranchGroupIdentifier,
+  IBranchListItem,
+} from '../../../src/ui/branches/group-branches'
+import type { ISectionFilterListProps } from '../../../src/ui/lib/section-filter-list'
+import {
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
 
-type MockSectionFilterListProps = React.ComponentProps<any>
+type MockSectionFilterListProps = ISectionFilterListProps<
+  IBranchListItem,
+  BranchGroupIdentifier
+>
 
 let BranchList: typeof import('../../../src/ui/branches/branch-list').BranchList
 let latestSectionFilterListProps: MockSectionFilterListProps | null = null
@@ -19,82 +27,86 @@ let unmount: (() => void) | undefined
 
 mock.module('../../../src/ui/lib/section-filter-list', {
   namedExports: {
-    SectionFilterList: React.forwardRef<any, MockSectionFilterListProps>(
-      (props, ref) => {
-        latestSectionFilterListProps = props
+    SectionFilterList: React.forwardRef<
+      { selectNextItem: () => void },
+      MockSectionFilterListProps
+    >((props, ref) => {
+      latestSectionFilterListProps = props
 
-        React.useImperativeHandle(ref, () => ({
-          selectNextItem: () => {},
-        }))
+      React.useImperativeHandle(ref, () => ({
+        selectNextItem: () => {},
+      }))
 
-        const filterText = props.filterText.toLowerCase()
-        const filteredGroups =
-          filterText.length === 0
-            ? props.groups
-            : props.groups
-                .map((group: any) => ({
-                  ...group,
-                  items: group.items.filter((item: any) =>
-                    item.text.join(' ').toLowerCase().includes(filterText)
-                  ),
-                }))
-                .filter((group: any) => group.items.length > 0)
+      const filterText = props.filterText.toLowerCase()
+      const filteredGroups =
+        filterText.length === 0
+          ? props.groups
+          : props.groups
+              .map(group => ({
+                ...group,
+                items: group.items.filter(item =>
+                  item.text.join(' ').toLowerCase().includes(filterText)
+                ),
+              }))
+              .filter(group => group.items.length > 0)
 
-        const rows = React.Children.toArray(
-          filteredGroups.flatMap((group: any) => [
-            props.renderGroupHeader?.(group.identifier),
-            ...group.items.map((item: any) =>
-              props.renderItem(item, { title: [], subtitle: [] })
-            ),
-          ])
-        )
+      const rows = React.Children.toArray(
+        filteredGroups.flatMap(group => [
+          props.renderGroupHeader?.(group.identifier),
+          ...group.items.map(item =>
+            props.renderItem(item, { title: [], subtitle: [] })
+          ),
+        ])
+      )
 
-        return (
-          <div className="mock-section-filter-list branches-list">
-            <button
-              type="button"
-              className="trigger-item-click"
-              onClick={() =>
-                filteredGroups.length > 0
-                  ? props.onItemClick?.(filteredGroups[0].items[0], {
-                      kind: 'mouse',
-                      event: { preventDefault: () => {} },
-                    })
-                  : null
-              }
-            >
-              Trigger Item Click
-            </button>
-            <button
-              type="button"
-              className="trigger-selection-change"
-              onClick={() =>
-                filteredGroups.length > 0
-                  ? props.onSelectionChanged?.(filteredGroups[0].items[0], {
-                      kind: 'keyboard',
-                      event: { key: 'ArrowDown' },
-                    })
-                  : null
-              }
-            >
-              Trigger Selection Change
-            </button>
-            <button
-              type="button"
-              className="trigger-filter-change"
-              onClick={() => props.onFilterTextChanged?.('release')}
-            >
-              Trigger Filter Change
-            </button>
-            <div className="rendered-rows">{rows}</div>
-            <div className="no-items">
-              {filteredGroups.length === 0 ? props.renderNoItems?.() : null}
-            </div>
-            <div className="post-filter">{props.renderPostFilter?.()}</div>
+      return (
+        <div className="mock-section-filter-list branches-list">
+          <div className="selected-item">
+            {props.selectedItem?.branch.name ?? ''}
           </div>
-        )
-      }
-    ),
+          <button
+            type="button"
+            className="trigger-item-click"
+            onClick={() =>
+              filteredGroups.length > 0
+                ? props.onItemClick?.(filteredGroups[0].items[0], {
+                    kind: 'mouse',
+                    event: { preventDefault: () => {} },
+                  })
+                : null
+            }
+          >
+            Trigger Item Click
+          </button>
+          <button
+            type="button"
+            className="trigger-selection-change"
+            onClick={() =>
+              filteredGroups.length > 0
+                ? props.onSelectionChanged?.(filteredGroups[0].items[0], {
+                    kind: 'keyboard',
+                    event: { key: 'ArrowDown' },
+                  })
+                : null
+            }
+          >
+            Trigger Selection Change
+          </button>
+          <button
+            type="button"
+            className="trigger-filter-change"
+            onClick={() => props.onFilterTextChanged?.('release')}
+          >
+            Trigger Filter Change
+          </button>
+          <div className="rendered-rows">{rows}</div>
+          <div className="no-items">
+            {filteredGroups.length === 0 ? props.renderNoItems?.() : null}
+          </div>
+          <div className="post-filter">{props.renderPostFilter?.()}</div>
+        </div>
+      )
+    }),
   },
 })
 
@@ -167,11 +179,11 @@ function renderBranchList(
       : createBranch('main')
   const recentBranch = createBranch('release/1.0')
   const otherBranch = createBranch('feature/login')
-  const allBranches = props.allBranches ?? [
-    defaultBranch,
-    recentBranch,
-    otherBranch,
-  ]
+  const allBranches =
+    props.allBranches ??
+    [defaultBranch, recentBranch, otherBranch].filter(
+      (branch): branch is Branch => branch !== null
+    )
   const recentBranches = props.recentBranches ?? [recentBranch]
 
   const rendered = renderComponent(
@@ -217,6 +229,10 @@ describe('BranchList', () => {
     const { container, unmount: u, defaultBranch } = renderBranchList()
     unmount = u
 
+    if (defaultBranch === null) {
+      throw new Error('Expected default branch to be present')
+    }
+
     assert.ok(
       container.textContent?.includes(
         __DARWIN__ ? 'Default Branch' : 'Default branch'
@@ -254,6 +270,10 @@ describe('BranchList', () => {
       },
     })
     unmount = u
+
+    if (defaultBranch === null) {
+      throw new Error('Expected default branch to be present')
+    }
 
     queryOrThrow<HTMLButtonElement>(container, '.trigger-item-click').click()
     queryOrThrow<HTMLButtonElement>(

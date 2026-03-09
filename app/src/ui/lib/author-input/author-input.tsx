@@ -18,7 +18,7 @@ import { FocusContainer } from '../focus-container'
 import { AuthorHandle } from './author-handle'
 import { getFullTextForAuthor } from './author-text'
 
-interface IAuthorInputProps {
+export interface IAuthorInputProps {
   /**
    * An optional class name for the wrapper element around the
    * author input component

@@ -87,9 +87,15 @@ describe('RepositoryListItem', () => {
     })
     unmount = u
 
-    const indicators = queryOrThrow(container, '.repo-indicators')
-    const aheadBehind = queryOrThrow(indicators, '.ahead-behind')
-    const changeIndicator = queryOrThrow(
+    const indicators = queryOrThrow<HTMLDivElement>(
+      container,
+      '.repo-indicators'
+    )
+    const aheadBehind = queryOrThrow<HTMLDivElement>(
+      indicators,
+      '.ahead-behind'
+    )
+    const changeIndicator = queryOrThrow<HTMLDivElement>(
       indicators,
       '.change-indicator-wrapper'
     )
@@ -105,7 +111,10 @@ describe('RepositoryListItem', () => {
     })
     unmount = u
 
-    const indicators = queryOrThrow(container, '.repo-indicators')
+    const indicators = queryOrThrow<HTMLDivElement>(
+      container,
+      '.repo-indicators'
+    )
 
     assert.equal(indicators.querySelector('.ahead-behind'), null)
     assert.equal(indicators.querySelector('.change-indicator-wrapper'), null)

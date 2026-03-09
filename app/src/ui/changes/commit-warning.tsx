@@ -35,9 +35,13 @@ const renderIcon = (icon: CommitWarningIcon) => {
 
 /** A warning displayed above the commit button
  */
-export const CommitWarning: React.FunctionComponent<{
+export interface ICommitWarningProps {
   readonly icon: CommitWarningIcon
-}> = props => {
+}
+
+export const CommitWarning: React.FunctionComponent<
+  ICommitWarningProps
+> = props => {
   return (
     <div className="commit-warning-component" onContextMenu={ignoreContextMenu}>
       <div className="warning-icon-container">{renderIcon(props.icon)}</div>

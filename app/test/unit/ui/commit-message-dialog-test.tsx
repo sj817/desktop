@@ -14,20 +14,22 @@ import { RepoRulesInfo } from '../../../src/models/repo-rules'
 import { Repository } from '../../../src/models/repository'
 import { CommitOptions, FoldoutType } from '../../../src/lib/app-state'
 import { Dispatcher } from '../../../src/ui/dispatcher'
+import type { ICommitMessageProps } from '../../../src/ui/changes/commit-message'
 import {
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
 
-type MockCommitMessageProps = React.ComponentProps<any>
+type CommitMessageDialogType =
+  typeof import('../../../src/ui/commit-message/commit-message-dialog').CommitMessageDialog
 
-let latestCommitMessageProps: MockCommitMessageProps | null = null
-let CommitMessageDialog: typeof import('../../../src/ui/commit-message/commit-message-dialog').CommitMessageDialog
+let latestCommitMessageProps: ICommitMessageProps | null = null
+let CommitMessageDialog: CommitMessageDialogType
 let unmount: (() => void) | undefined
 
 mock.module('../../../src/ui/changes/commit-message', {
   namedExports: {
-    CommitMessage: (props: MockCommitMessageProps) => {
+    CommitMessage: (props: ICommitMessageProps) => {
       latestCommitMessageProps = props
 
       return (
@@ -95,7 +97,7 @@ mock.module('../../../src/ui/changes/commit-message', {
             type="button"
             className="show-foldout"
             onClick={() =>
-              props.onShowFoldout({ type: FoldoutType.Repositorys })
+              props.onShowFoldout({ type: FoldoutType.Repository })
             }
           >
             Show Foldout
@@ -329,7 +331,7 @@ describe('CommitMessageDialog', () => {
       'unknown:1',
       'refresh',
       `popup:${PopupType.AddRepository}`,
-      `foldout:${FoldoutType.Repositorys}`,
+      `foldout:${FoldoutType.Repository}`,
       'spellcheck:false',
       'stop-amending',
       'fork',

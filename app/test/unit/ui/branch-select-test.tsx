@@ -6,12 +6,18 @@ import { Branch, BranchType } from '../../../src/models/branch'
 import { GitHubRepository } from '../../../src/models/github-repository'
 import { Owner } from '../../../src/models/owner'
 import { Repository } from '../../../src/models/repository'
+import type { IBranchListProps } from '../../../src/ui/branches/branch-list'
+import type { IPopoverDropdownProps } from '../../../src/ui/lib/popover-dropdown'
 import {
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
 
-type MockBranchListProps = React.ComponentProps<any>
+type MockBranchListProps = IBranchListProps
+
+interface IPopoverDropdownHandle {
+  closePopover(): void
+}
 
 let latestBranchListProps: MockBranchListProps | null = null
 let closePopoverCalls = 0
@@ -22,10 +28,26 @@ mock.module('../../../src/ui/branches/branch-list', {
   namedExports: {
     BranchList: (props: MockBranchListProps) => {
       latestBranchListProps = props
+      const renderedBranch = props.renderBranch(
+        {
+          text: [props.selectedBranch?.name ?? ''],
+          id: props.selectedBranch?.name ?? 'selected-branch',
+          branch: props.selectedBranch ?? props.allBranches[0],
+        },
+        { title: [], subtitle: [] },
+        undefined
+      )
 
       return (
         <div className="mock-branch-list">
           <div className="filter-text">{props.filterText}</div>
+          <div className="selected-branch">
+            {props.selectedBranch?.name ?? ''}
+          </div>
+          <div className="can-create-new-branch">
+            {String(props.canCreateNewBranch)}
+          </div>
+          <div className="rendered-branch">{renderedBranch}</div>
           <div className="no-branches-message">
             {props.noBranchesMessage ?? null}
           </div>
@@ -39,12 +61,15 @@ mock.module('../../../src/ui/branches/branch-list', {
           <button
             type="button"
             className="select-second-branch"
-            onClick={() =>
-              props.onItemClick(props.allBranches[1], {
-                kind: 'mouse',
-                event: { preventDefault: () => {} },
-              })
-            }
+            onClick={event => {
+              const branch = props.allBranches[1]
+              if (branch !== undefined) {
+                props.onItemClick?.(branch, {
+                  kind: 'mouseclick',
+                  event,
+                })
+              }
+            }}
           >
             Select Branch
           </button>
@@ -56,7 +81,10 @@ mock.module('../../../src/ui/branches/branch-list', {
 
 mock.module('../../../src/ui/lib/popover-dropdown', {
   namedExports: {
-    PopoverDropdown: React.forwardRef<any, any>((props, ref) => {
+    PopoverDropdown: React.forwardRef<
+      IPopoverDropdownHandle,
+      IPopoverDropdownProps
+    >((props, ref) => {
       React.useImperativeHandle(ref, () => ({
         closePopover: () => {
           closePopoverCalls += 1
