@@ -166,7 +166,11 @@ These tests should be fast, stable, and narrowly scoped. They exist purely as a 
 - Reuse existing repo scaffolding helpers for git setup
 - Use `data-testid` attributes for stable selectors
 - Fresh app instance per test, temp directories with auto-cleanup
+- Launch the compiled app from `out/main.js` through the checked-in Electron runtime with an isolated `--user-data-dir` to avoid packaged-app updater noise during smoke runs
 - No `browser.pause()` — use WebDriverIO's built-in `waitForExist`/`waitForDisplayed`
+
+**Current implementation note:**
+- The committed smoke harness currently targets the built app entry point and isolates user data successfully, but Electron service bridge initialization still times out locally on Desktop with Electron 40. Stabilizing that bridge is the remaining blocker before expanding beyond the launch smoke test.
 
 **Directory:** `app/test/e2e/`
 

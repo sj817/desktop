@@ -3,35 +3,31 @@ import os from 'os'
 import path from 'path'
 
 const projectRoot = path.resolve(__dirname, '..', '..', '..')
-const distRoot = path.join(projectRoot, 'dist')
-const distArchitecture =
-  process.env.TARGET_ARCH ??
-  process.env.npm_config_arch ??
-  (process.arch === 'arm64' ? 'arm64' : 'x64')
-const distSuffix = `-${process.platform}-${distArchitecture}`
-const distFolderName = fs
-  .readdirSync(distRoot)
-  .find(name => name.endsWith(distSuffix))
-
-if (distFolderName === undefined) {
-  throw new Error(`Unable to find packaged app in ${distRoot}`)
-}
-
-const distPath = path.join(distRoot, distFolderName)
-const productName = distFolderName.slice(0, -distSuffix.length)
+const appEntryPoint = path.join(projectRoot, 'out', 'main.js')
 const appBinaryPath =
   process.platform === 'darwin'
     ? path.join(
-        distPath,
-        `${productName}.app`,
+        projectRoot,
+        'node_modules',
+        'electron',
+        'dist',
+        'Electron.app',
         'Contents',
         'MacOS',
-        productName
+        'Electron'
       )
     : process.platform === 'win32'
-    ? path.join(distPath, `${productName}.exe`)
-    : path.join(distPath, productName)
+    ? path.join(projectRoot, 'node_modules', 'electron', 'dist', 'electron.exe')
+    : path.join(projectRoot, 'node_modules', 'electron', 'dist', 'electron')
 const userDataDir = path.join(os.tmpdir(), 'github-desktop-wdio-user-data')
+
+if (!fs.existsSync(appEntryPoint)) {
+  throw new Error(`Unable to find built app entry point at ${appEntryPoint}`)
+}
+
+if (!fs.existsSync(appBinaryPath)) {
+  throw new Error(`Unable to find Electron binary at ${appBinaryPath}`)
+}
 
 fs.rmSync(userDataDir, { recursive: true, force: true })
 fs.mkdirSync(userDataDir, { recursive: true })
@@ -48,7 +44,7 @@ export const config: WebdriverIO.Config = {
       browserVersion: '40.1.0',
       'wdio:electronServiceOptions': {
         appBinaryPath,
-        appArgs: [`--user-data-dir=${userDataDir}`],
+        appArgs: [`--app=${appEntryPoint}`, `--user-data-dir=${userDataDir}`],
       },
     } as WebdriverIO.Capabilities,
   ],
