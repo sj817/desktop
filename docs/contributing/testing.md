@@ -153,7 +153,7 @@ Why WebDriverIO over Playwright:
 
 **Smoke tests (5 max):**
 
-1. App launches and renders the welcome/repository screen
+1. App launches and renders the welcome/repository screen *(implemented in `app-launch.ts`)*
 2. Add a local repo → file list appears
 3. Make a change → stage → commit succeeds
 4. Create branch → switch back → working directory is clean

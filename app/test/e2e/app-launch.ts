@@ -1,3 +1,41 @@
+/// <reference types="@wdio/globals/types" />
+
+import { describe, it } from 'mocha'
+
+let desktopWindowHandle: string | null = null
+
+async function switchToDesktopWindow() {
+  if (desktopWindowHandle !== null) {
+    await browser.switchToWindow(desktopWindowHandle)
+    return
+  }
+
+  const handles = await browser.getWindowHandles()
+  let bestHandle: string | null = null
+  let bestHtmlLength = -1
+
+  for (const handle of handles) {
+    await browser.switchToWindow(handle)
+    const url = await browser.getUrl()
+    if (url.startsWith('devtools://')) {
+      continue
+    }
+
+    const body = await $('body')
+    const html = await body.getHTML().catch(() => '')
+
+    if (html.length > bestHtmlLength) {
+      bestHandle = handle
+      bestHtmlLength = html.length
+    }
+  }
+
+  if (bestHandle !== null) {
+    desktopWindowHandle = bestHandle
+    await browser.switchToWindow(bestHandle)
+  }
+}
+
 /**
  * E2E Smoke Test: App Launch
  *
@@ -6,6 +44,8 @@
  */
 describe('GitHub Desktop - App Launch', () => {
   it('should launch and render the application window', async () => {
+    await switchToDesktopWindow()
+
     const title = await browser.getTitle()
     expect(typeof title).toBe('string')
 
@@ -23,5 +63,6 @@ describe('GitHub Desktop - App Launch', () => {
     const body = await $('body')
     const html = await body.getHTML()
     expect(html.length).toBeGreaterThan(50)
+    desktopWindowHandle = await browser.getWindowHandle()
   })
 })

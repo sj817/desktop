@@ -1,13 +1,34 @@
+import fs from 'fs'
+import os from 'os'
 import path from 'path'
 
 const projectRoot = path.resolve(__dirname, '..', '..', '..')
-const electronBinaryPath = path.join(
-  projectRoot,
-  'node_modules',
-  '.bin',
-  'electron'
-)
-const appPath = path.resolve(__dirname, '../../out')
+const distRoot = path.join(projectRoot, 'dist')
+const distArchitecture =
+  process.env.TARGET_ARCH ??
+  process.env.npm_config_arch ??
+  (process.arch === 'arm64' ? 'arm64' : 'x64')
+const distSuffix = `-${process.platform}-${distArchitecture}`
+const distFolderName = fs
+  .readdirSync(distRoot)
+  .find(name => name.endsWith(distSuffix))
+
+if (distFolderName === undefined) {
+  throw new Error(`Unable to find packaged app in ${distRoot}`)
+}
+
+const distPath = path.join(distRoot, distFolderName)
+const productName = distFolderName.slice(0, -distSuffix.length)
+const appBinaryPath =
+  process.platform === 'darwin'
+    ? path.join(distPath, `${productName}.app`, 'Contents', 'MacOS', productName)
+    : process.platform === 'win32'
+      ? path.join(distPath, `${productName}.exe`)
+      : path.join(distPath, productName)
+const userDataDir = path.join(os.tmpdir(), 'github-desktop-wdio-user-data')
+
+fs.rmSync(userDataDir, { recursive: true, force: true })
+fs.mkdirSync(userDataDir, { recursive: true })
 
 export const config: WebdriverIO.Config = {
   runner: 'local',
@@ -20,8 +41,8 @@ export const config: WebdriverIO.Config = {
       browserName: 'electron',
       browserVersion: '40.1.0',
       'wdio:electronServiceOptions': {
-        appBinaryPath: electronBinaryPath,
-        appArgs: [appPath],
+        appBinaryPath,
+        appArgs: [`--user-data-dir=${userDataDir}`],
       },
     },
   ],
