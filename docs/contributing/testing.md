@@ -126,6 +126,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `Dialog` | `dialog-test.tsx` | 9 | Header wiring, focus selection, Escape dismiss, submit handling, ref lifecycle |
 | `Dialog` | `dialog-backdrop-test.tsx` | 2 | Backdrop click dismissal after grace period, dismissal disabled when backdrop clicks are blocked |
 | `Dialog` | `dialog-alertdialog-test.tsx` | 2 | Windows alertdialog Tab and Shift+Tab focus wrap at the ends of the focusable set |
+| `Dialog` | `dialog-resize-test.tsx` | 2 | Repositions overflowing dialogs on resize, leaves oversized dialogs unchanged |
 | `Avatar` | `avatar-test.tsx` | 4 | Fallback octicon, sized image URL, aria-hidden, alt text fallback |
 | `BranchListItem` | `branch-list-item-test.tsx` | 3 | Branch name rendering, commit drag drop-target state, current-branch drop handling |
 | `CIStatus` | `ci-status-test.tsx` | 3 | Empty state, status class rendering, subscription-driven updates and cleanup |
@@ -157,7 +158,6 @@ React component rendering tests using jsdom (already in the test environment) an
 | `ui/commit-message/` | Input validation, summary/description, co-authors |
 | `ui/branches/` | Search filtering, grouping |
 | `ui/merge-conflicts/` | Conflict list, resolution actions |
-| `ui/dialog/` (remaining Dialog behavior) | resize positioning |
 | `ui/repositories-list/` | Search, group headers, selection |
 
 **ESLint config:** `react/jsx-no-bind` is disabled for `app/test/**/*` to allow arrow function callbacks in test JSX.
