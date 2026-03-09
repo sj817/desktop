@@ -129,6 +129,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `CIStatus` | `ci-status-test.tsx` | 3 | Empty state, status class rendering, subscription-driven updates and cleanup |
 | `ChangedFile` | `changed-file-test.tsx` | 5 | Include toggles, mixed state, renamed path rendering, aria-live status, disabled checkbox |
 | `CommitWarning` | `commit-warning-test.tsx` | 3 | Message rendering, icon variant classes, context-menu suppression |
+| `ConfirmCommitFilteredChanges` | `confirm-commit-filtered-changes-test.tsx` | 3 | Submit flow, opt-out checkbox persistence, hidden-changes link dismissal |
 | `ContinueRebase` | `continue-rebase-test.tsx` | 3 | Conflict-disabled state, rebasing/untracked warnings, continue callback wiring |
 | `FilesChangedBadge` | `files-changed-badge-test.tsx` | 3 | Exact count rendering, threshold boundary, capped `300+` badge text |
 | `MultipleSelection` | `multiple-selection-test.tsx` | 3 | Selected file count, blankslate container, decorative image rendering |
