@@ -21,10 +21,16 @@ const distPath = path.join(distRoot, distFolderName)
 const productName = distFolderName.slice(0, -distSuffix.length)
 const appBinaryPath =
   process.platform === 'darwin'
-    ? path.join(distPath, `${productName}.app`, 'Contents', 'MacOS', productName)
+    ? path.join(
+        distPath,
+        `${productName}.app`,
+        'Contents',
+        'MacOS',
+        productName
+      )
     : process.platform === 'win32'
-      ? path.join(distPath, `${productName}.exe`)
-      : path.join(distPath, productName)
+    ? path.join(distPath, `${productName}.exe`)
+    : path.join(distPath, productName)
 const userDataDir = path.join(os.tmpdir(), 'github-desktop-wdio-user-data')
 
 fs.rmSync(userDataDir, { recursive: true, force: true })
@@ -44,7 +50,7 @@ export const config: WebdriverIO.Config = {
         appBinaryPath,
         appArgs: [`--user-data-dir=${userDataDir}`],
       },
-    },
+    } as WebdriverIO.Capabilities,
   ],
 
   logLevel: 'warn',

@@ -2,6 +2,9 @@ import { IGitStringResult } from '../../src/lib/git/core'
 import { GitError as DugiteError } from 'dugite'
 import { IStatusResult } from '../../src/lib/git/status'
 import {
+  AppFileStatus,
+  GitStatusEntry,
+  UnmergedEntrySummary,
   WorkingDirectoryStatus,
   WorkingDirectoryFileChange,
   AppFileStatusKind,
@@ -48,9 +51,39 @@ export function createMockFileChange(
   path: string,
   kind: AppFileStatusKind = AppFileStatusKind.Modified
 ): WorkingDirectoryFileChange {
+  const status: AppFileStatus = (() => {
+    switch (kind) {
+      case AppFileStatusKind.New:
+      case AppFileStatusKind.Modified:
+      case AppFileStatusKind.Deleted:
+      case AppFileStatusKind.Untracked:
+        return { kind }
+
+      case AppFileStatusKind.Copied:
+      case AppFileStatusKind.Renamed:
+        return {
+          kind,
+          oldPath: `${path}.old`,
+          renameIncludesModifications: false,
+        }
+
+      case AppFileStatusKind.Conflicted:
+        return {
+          kind: AppFileStatusKind.Conflicted,
+          entry: {
+            kind: 'conflicted',
+            action: UnmergedEntrySummary.BothModified,
+            us: GitStatusEntry.UpdatedButUnmerged,
+            them: GitStatusEntry.UpdatedButUnmerged,
+          },
+          conflictMarkerCount: 1,
+        }
+    }
+  })()
+
   return new WorkingDirectoryFileChange(
     path,
-    { kind },
+    status,
     DiffSelection.fromInitialSelection(DiffSelectionType.All)
   )
 }
