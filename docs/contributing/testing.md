@@ -143,6 +143,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `OversizedFiles` | `oversized-files-warning-test.tsx` | 3 | Oversized file list, Git LFS recommendation, commit-and-reset submit flow |
 | `PullRequestBadge` | `pull-request-badge-test.tsx` | 3 | PR ref wiring, badge enabled/disabled state, click handling, popover ARIA state |
 | `PullRequestListItem` | `pull-request-list-item-test.tsx` | 3 | Subtitle rendering, loading state, hover position callback, commit drop handling |
+| `RepositoryListItem` | `repository-list-item-test.tsx` | 3 | Alias/prefix rendering, highlight text, ahead/behind and change indicators |
 | `UndoCommit` | `undo-commit-test.tsx` | 3 | Commit summary rendering, undo action, disabled state during repository updates |
 
 **Remaining (not yet implemented):**
