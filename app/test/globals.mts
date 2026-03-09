@@ -41,8 +41,31 @@ Object.assign(globalThis, {
 })
 
 Object.assign(globalThis, {
+  Event: window.Event,
   CustomEvent: window.CustomEvent,
 })
+
+type DialogElement = HTMLElement & {
+  open?: boolean
+  showModal?: () => void
+  close?: () => void
+}
+
+const dialogPrototype = HTMLElement.prototype as DialogElement
+
+if (typeof dialogPrototype.showModal !== 'function') {
+  dialogPrototype.showModal = function () {
+    this.open = true
+    this.setAttribute('open', '')
+  }
+}
+
+if (typeof dialogPrototype.close !== 'function') {
+  dialogPrototype.close = function () {
+    this.open = false
+    this.removeAttribute('open')
+  }
+}
 
 if (globalThis.ResizeObserver === undefined) {
   class TestResizeObserver {

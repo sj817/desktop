@@ -124,6 +124,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `DialogContent` | `dialog-content-footer-test.tsx` | 3 | Children rendering, className, onRef callback |
 | `DialogFooter` | `dialog-content-footer-test.tsx` | 2 | Children rendering, composition with OkCancelButtonGroup |
 | `Dialog` | `dialog-test.tsx` | 9 | Header wiring, focus selection, Escape dismiss, submit handling, ref lifecycle |
+| `Dialog` | `dialog-backdrop-test.tsx` | 2 | Backdrop click dismissal after grace period, dismissal disabled when backdrop clicks are blocked |
 | `Avatar` | `avatar-test.tsx` | 4 | Fallback octicon, sized image URL, aria-hidden, alt text fallback |
 | `BranchListItem` | `branch-list-item-test.tsx` | 3 | Branch name rendering, commit drag drop-target state, current-branch drop handling |
 | `CIStatus` | `ci-status-test.tsx` | 3 | Empty state, status class rendering, subscription-driven updates and cleanup |
@@ -155,7 +156,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `ui/commit-message/` | Input validation, summary/description, co-authors |
 | `ui/branches/` | Search filtering, grouping |
 | `ui/merge-conflicts/` | Conflict list, resolution actions |
-| `ui/dialog/` (remaining Dialog behavior) | Backdrop click dismissal, alertdialog Tab wrap, resize positioning |
+| `ui/dialog/` (remaining Dialog behavior) | alertdialog Tab wrap, resize positioning |
 | `ui/repositories-list/` | Search, group headers, selection |
 
 **ESLint config:** `react/jsx-no-bind` is disabled for `app/test/**/*` to allow arrow function callbacks in test JSX.
