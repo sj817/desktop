@@ -73,7 +73,9 @@ mock.module('../../../src/ui/lib/button', {
     Button: (props: any) => (
       <button
         type={props.type ?? 'button'}
-        className={['button-component', props.className].filter(Boolean).join(' ')}
+        className={['button-component', props.className]
+          .filter(Boolean)
+          .join(' ')}
         onClick={props.onClick}
         disabled={props.disabled}
         aria-label={props.ariaLabel}
@@ -127,7 +129,9 @@ mock.module('../../../src/ui/octicons', {
 
 mock.module('../../../src/ui/changes/commit-warning', {
   namedExports: {
-    CommitWarning: (props: any) => <div className="commit-warning">{props.children}</div>,
+    CommitWarning: (props: any) => (
+      <div className="commit-warning">{props.children}</div>
+    ),
     CommitWarningIcon: { Information: 'information' },
   },
 })
@@ -135,7 +139,11 @@ mock.module('../../../src/ui/changes/commit-warning', {
 mock.module('../../../src/ui/lib/link-button', {
   namedExports: {
     LinkButton: (props: any) => (
-      <button type="button" className="link-button-component" onClick={props.onClick}>
+      <button
+        type="button"
+        className="link-button-component"
+        onClick={props.onClick}
+      >
         {props.children}
       </button>
     ),
@@ -144,7 +152,9 @@ mock.module('../../../src/ui/lib/link-button', {
 
 mock.module('../../../src/ui/lib/toggletipped-content', {
   namedExports: {
-    ToggledtippedContent: (props: any) => <div className={props.className}>{props.children}</div>,
+    ToggledtippedContent: (props: any) => (
+      <div className={props.className}>{props.children}</div>
+    ),
   },
 })
 
@@ -182,8 +192,10 @@ mock.module('../../../src/lib/helpers/repo-rules', {
 
 mock.module('../../../src/lib/format-commit-message', {
   namedExports: {
-    formatCommitMessage: async (_repository: Repository, context: ICommitContext) =>
-      `${context.summary}\n${context.description ?? ''}`,
+    formatCommitMessage: async (
+      _repository: Repository,
+      context: ICommitContext
+    ) => `${context.summary}\n${context.description ?? ''}`,
   },
 })
 
@@ -218,7 +230,15 @@ function createRepository(withGitHubRepository = true) {
 }
 
 function createAccount() {
-  return new Account('desktop', 'https://api.github.com', 'token', [], '', 1, 'Desktop')
+  return new Account(
+    'desktop',
+    'https://api.github.com',
+    'token',
+    [],
+    '',
+    1,
+    'Desktop'
+  )
 }
 
 function createKnownAuthor(name: string): Author {
@@ -240,27 +260,29 @@ function createUnknownAuthor(username: string): UnknownAuthor {
 
 function changeTextArea(element: HTMLTextAreaElement, value: string) {
   act(() => {
-    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set?.call(
-      element,
-      value
-    )
+    Object.getOwnPropertyDescriptor(
+      HTMLTextAreaElement.prototype,
+      'value'
+    )?.set?.call(element, value)
     element.dispatchEvent(new Event('change', { bubbles: true }))
   })
 }
 
-function renderCommitMessage(props: {
-  anyFilesSelected?: boolean
-  prepopulateCommitSummary?: boolean
-  placeholder?: string
-  repository?: Repository
-  coAuthors?: ReadonlyArray<Author>
-  showCoAuthoredBy?: boolean
-  onCreateCommit?: (context: ICommitContext) => Promise<boolean>
-  onConfirmCommitWithUnknownCoAuthors?: (
-    authors: ReadonlyArray<UnknownAuthor>,
-    onCommitAnyway: () => void
-  ) => void
-} = {}) {
+function renderCommitMessage(
+  props: {
+    anyFilesSelected?: boolean
+    prepopulateCommitSummary?: boolean
+    placeholder?: string
+    repository?: Repository
+    coAuthors?: ReadonlyArray<Author>
+    showCoAuthoredBy?: boolean
+    onCreateCommit?: (context: ICommitContext) => Promise<boolean>
+    onConfirmCommitWithUnknownCoAuthors?: (
+      authors: ReadonlyArray<UnknownAuthor>,
+      onCommitAnyway: () => void
+    ) => void
+  } = {}
+) {
   const onCreateCommitCalls = new Array<ICommitContext>()
 
   const rendered = renderComponent(
@@ -273,7 +295,9 @@ function renderCommitMessage(props: {
         })
       }
       branch="main"
-      commitAuthor={new CommitIdentity('Desktop', 'desktop@example.com', new Date())}
+      commitAuthor={
+        new CommitIdentity('Desktop', 'desktop@example.com', new Date())
+      }
       anyFilesSelected={props.anyFilesSelected ?? true}
       filesToBeCommittedCount={1}
       showPromptForCommittingFileHiddenByFilter={false}
@@ -330,7 +354,10 @@ describe('CommitMessage', () => {
     const { container, unmount: u, onCreateCommitCalls } = renderCommitMessage()
     unmount = u
 
-    const submitButton = queryOrThrow<HTMLButtonElement>(container, '.commit-button')
+    const submitButton = queryOrThrow<HTMLButtonElement>(
+      container,
+      '.commit-button'
+    )
     assert.equal(submitButton.disabled, true)
 
     change(
@@ -338,7 +365,10 @@ describe('CommitMessage', () => {
       'Ship commit coverage'
     )
     changeTextArea(
-      queryOrThrow<HTMLTextAreaElement>(container, 'textarea.description-field'),
+      queryOrThrow<HTMLTextAreaElement>(
+        container,
+        'textarea.description-field'
+      ),
       'Exercise direct component behavior'
     )
 
@@ -357,13 +387,20 @@ describe('CommitMessage', () => {
   })
 
   it('uses the placeholder summary when prepopulation is enabled', () => {
-    const { container, unmount: u, onCreateCommitCalls } = renderCommitMessage({
+    const {
+      container,
+      unmount: u,
+      onCreateCommitCalls,
+    } = renderCommitMessage({
       prepopulateCommitSummary: true,
       placeholder: 'Commit selected files',
     })
     unmount = u
 
-    const submitButton = queryOrThrow<HTMLButtonElement>(container, '.commit-button')
+    const submitButton = queryOrThrow<HTMLButtonElement>(
+      container,
+      '.commit-button'
+    )
     assert.equal(submitButton.disabled, false)
 
     click(submitButton)
@@ -398,7 +435,10 @@ describe('CommitMessage', () => {
     })
     unmount = u
 
-    change(queryOrThrow<HTMLInputElement>(container, 'input.summary-field'), 'Add trailer coverage')
+    change(
+      queryOrThrow<HTMLInputElement>(container, 'input.summary-field'),
+      'Add trailer coverage'
+    )
     click(queryOrThrow<HTMLButtonElement>(container, '.commit-button'))
 
     assert.equal(onCreateCommitCalls.length, 0)
@@ -410,7 +450,9 @@ describe('CommitMessage', () => {
       {
         summary: 'Add trailer coverage',
         description: '',
-        trailers: [{ token: 'Co-Authored-By', value: 'Mona <mona@example.com>' }],
+        trailers: [
+          { token: 'Co-Authored-By', value: 'Mona <mona@example.com>' },
+        ],
         amend: false,
         messageGeneratedByCopilot: false,
       },

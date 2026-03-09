@@ -6,7 +6,10 @@ import { Branch, BranchType } from '../../../src/models/branch'
 import { GitHubRepository } from '../../../src/models/github-repository'
 import { Owner } from '../../../src/models/owner'
 import { Repository } from '../../../src/models/repository'
-import { queryOrThrow, renderComponent } from '../../helpers/component-test-utils'
+import {
+  queryOrThrow,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 
 type MockSectionFilterListProps = React.ComponentProps<any>
 
@@ -54,9 +57,9 @@ mock.module('../../../src/ui/lib/section-filter-list', {
               onClick={() =>
                 filteredGroups.length > 0
                   ? props.onItemClick?.(filteredGroups[0].items[0], {
-                  kind: 'mouse',
-                  event: { preventDefault: () => {} },
-                  })
+                      kind: 'mouse',
+                      event: { preventDefault: () => {} },
+                    })
                   : null
               }
             >
@@ -68,9 +71,9 @@ mock.module('../../../src/ui/lib/section-filter-list', {
               onClick={() =>
                 filteredGroups.length > 0
                   ? props.onSelectionChanged?.(filteredGroups[0].items[0], {
-                  kind: 'keyboard',
-                  event: { key: 'ArrowDown' },
-                  })
+                      kind: 'keyboard',
+                      event: { key: 'ArrowDown' },
+                    })
                   : null
               }
             >
@@ -85,9 +88,7 @@ mock.module('../../../src/ui/lib/section-filter-list', {
             </button>
             <div className="rendered-rows">{rows}</div>
             <div className="no-items">
-              {filteredGroups.length === 0
-                ? props.renderNoItems?.()
-                : null}
+              {filteredGroups.length === 0 ? props.renderNoItems?.() : null}
             </div>
             <div className="post-filter">{props.renderPostFilter?.()}</div>
           </div>
@@ -138,29 +139,39 @@ function createRepository() {
 
 function createBranch(name: string, type = BranchType.Local) {
   const ref =
-    type === BranchType.Local ? `refs/heads/${name}` : `refs/remotes/origin/${name}`
+    type === BranchType.Local
+      ? `refs/heads/${name}`
+      : `refs/remotes/origin/${name}`
 
   return new Branch(name, 'origin/main', { sha: `${name}-sha` }, type, ref)
 }
 
-function renderBranchList(props: {
-  allBranches?: ReadonlyArray<Branch>
-  recentBranches?: ReadonlyArray<Branch>
-  defaultBranch?: Branch | null
-  selectedBranch?: Branch | null
-  filterText?: string
-  canCreateNewBranch?: boolean
-  onCreateNewBranch?: (name: string) => void
-  onItemClick?: (branch: Branch) => void
-  onSelectionChanged?: (branch: Branch | null) => void
-  onFilterTextChanged?: (text: string) => void
-  noBranchesMessage?: string
-} = {}) {
+function renderBranchList(
+  props: {
+    allBranches?: ReadonlyArray<Branch>
+    recentBranches?: ReadonlyArray<Branch>
+    defaultBranch?: Branch | null
+    selectedBranch?: Branch | null
+    filterText?: string
+    canCreateNewBranch?: boolean
+    onCreateNewBranch?: (name: string) => void
+    onItemClick?: (branch: Branch) => void
+    onSelectionChanged?: (branch: Branch | null) => void
+    onFilterTextChanged?: (text: string) => void
+    noBranchesMessage?: string
+  } = {}
+) {
   const defaultBranch =
-    props.defaultBranch !== undefined ? props.defaultBranch : createBranch('main')
+    props.defaultBranch !== undefined
+      ? props.defaultBranch
+      : createBranch('main')
   const recentBranch = createBranch('release/1.0')
   const otherBranch = createBranch('feature/login')
-  const allBranches = props.allBranches ?? [defaultBranch, recentBranch, otherBranch]
+  const allBranches = props.allBranches ?? [
+    defaultBranch,
+    recentBranch,
+    otherBranch,
+  ]
   const recentBranches = props.recentBranches ?? [recentBranch]
 
   const rendered = renderComponent(
@@ -171,14 +182,18 @@ function renderBranchList(props: {
       allBranches={allBranches}
       recentBranches={recentBranches}
       selectedBranch={
-        props.selectedBranch !== undefined ? props.selectedBranch : defaultBranch
+        props.selectedBranch !== undefined
+          ? props.selectedBranch
+          : defaultBranch
       }
       filterText={props.filterText ?? ''}
       onFilterTextChanged={props.onFilterTextChanged ?? (() => {})}
       canCreateNewBranch={props.canCreateNewBranch ?? true}
       onCreateNewBranch={props.onCreateNewBranch}
       getBranchAriaLabel={item => item.branch.name}
-      renderBranch={item => <div className="rendered-branch">{item.branch.name}</div>}
+      renderBranch={item => (
+        <div className="rendered-branch">{item.branch.name}</div>
+      )}
       onItemClick={branch => {
         props.onItemClick?.(branch)
       }}
@@ -202,16 +217,35 @@ describe('BranchList', () => {
     const { container, unmount: u, defaultBranch } = renderBranchList()
     unmount = u
 
-    assert.ok(container.textContent?.includes(__DARWIN__ ? 'Default Branch' : 'Default branch'))
-    assert.ok(container.textContent?.includes(__DARWIN__ ? 'Recent Branches' : 'Recent branches'))
-    assert.ok(container.textContent?.includes(__DARWIN__ ? 'Other Branches' : 'Other branches'))
-    assert.equal(latestSectionFilterListProps?.selectedItem?.branch.name, defaultBranch.name)
+    assert.ok(
+      container.textContent?.includes(
+        __DARWIN__ ? 'Default Branch' : 'Default branch'
+      )
+    )
+    assert.ok(
+      container.textContent?.includes(
+        __DARWIN__ ? 'Recent Branches' : 'Recent branches'
+      )
+    )
+    assert.ok(
+      container.textContent?.includes(
+        __DARWIN__ ? 'Other Branches' : 'Other branches'
+      )
+    )
+    assert.equal(
+      latestSectionFilterListProps?.selectedItem?.branch.name,
+      defaultBranch.name
+    )
   })
 
   it('maps item click and selection change callbacks back to Branch values', () => {
     const clicks = new Array<string>()
     const selections = new Array<string | null>()
-    const { container, unmount: u, defaultBranch } = renderBranchList({
+    const {
+      container,
+      unmount: u,
+      defaultBranch,
+    } = renderBranchList({
       onItemClick: branch => {
         clicks.push(branch.name)
       },
@@ -222,7 +256,10 @@ describe('BranchList', () => {
     unmount = u
 
     queryOrThrow<HTMLButtonElement>(container, '.trigger-item-click').click()
-    queryOrThrow<HTMLButtonElement>(container, '.trigger-selection-change').click()
+    queryOrThrow<HTMLButtonElement>(
+      container,
+      '.trigger-selection-change'
+    ).click()
 
     assert.deepEqual(clicks, [defaultBranch.name])
     assert.deepEqual(selections, [defaultBranch.name])
@@ -258,10 +295,24 @@ describe('BranchList', () => {
     })
     unmount = u
 
-    assert.ok(container.textContent?.includes(__DARWIN__ ? 'Recent Branches' : 'Recent branches'))
+    assert.ok(
+      container.textContent?.includes(
+        __DARWIN__ ? 'Recent Branches' : 'Recent branches'
+      )
+    )
     assert.ok(container.textContent?.includes('release/1.0'))
-    assert.equal(container.textContent?.includes(__DARWIN__ ? 'Default Branch' : 'Default branch'), false)
-    assert.equal(container.textContent?.includes(__DARWIN__ ? 'Other Branches' : 'Other branches'), false)
+    assert.equal(
+      container.textContent?.includes(
+        __DARWIN__ ? 'Default Branch' : 'Default branch'
+      ),
+      false
+    )
+    assert.equal(
+      container.textContent?.includes(
+        __DARWIN__ ? 'Other Branches' : 'Other branches'
+      ),
+      false
+    )
     assert.equal(container.textContent?.includes('feature/login'), false)
   })
 

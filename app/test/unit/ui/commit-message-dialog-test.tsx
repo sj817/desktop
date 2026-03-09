@@ -14,7 +14,10 @@ import { RepoRulesInfo } from '../../../src/models/repo-rules'
 import { Repository } from '../../../src/models/repository'
 import { CommitOptions, FoldoutType } from '../../../src/lib/app-state'
 import { Dispatcher } from '../../../src/ui/dispatcher'
-import { queryOrThrow, renderComponent } from '../../helpers/component-test-utils'
+import {
+  queryOrThrow,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 
 type MockCommitMessageProps = React.ComponentProps<any>
 
@@ -40,7 +43,9 @@ mock.module('../../../src/ui/changes/commit-message', {
           <button
             type="button"
             className="toggle-coauthors"
-            onClick={() => props.onShowCoAuthoredByChanged(!props.showCoAuthoredBy)}
+            onClick={() =>
+              props.onShowCoAuthoredByChanged(!props.showCoAuthoredBy)
+            }
           >
             Toggle Coauthors
           </button>
@@ -89,7 +94,9 @@ mock.module('../../../src/ui/changes/commit-message', {
           <button
             type="button"
             className="show-foldout"
-            onClick={() => props.onShowFoldout({ type: FoldoutType.Repositorys })}
+            onClick={() =>
+              props.onShowFoldout({ type: FoldoutType.Repositorys })
+            }
           >
             Show Foldout
           </button>
@@ -160,7 +167,15 @@ function createRepository(withGitHubRepository = true) {
 }
 
 function createAccount() {
-  return new Account('desktop', 'https://api.github.com', 'token', [], '', 1, 'Desktop')
+  return new Account(
+    'desktop',
+    'https://api.github.com',
+    'token',
+    [],
+    '',
+    1,
+    'Desktop'
+  )
 }
 
 function createKnownAuthor(name: string): Author {
@@ -172,19 +187,23 @@ function createKnownAuthor(name: string): Author {
   }
 }
 
-function renderCommitMessageDialog(props: {
-  repository?: Repository
-  coAuthors?: ReadonlyArray<Author>
-  showCoAuthoredBy?: boolean
-  commitSpellcheckEnabled?: boolean
-  onSubmitCommitMessage?: (context: ICommitContext) => Promise<boolean>
-  dispatcherOverrides?: Partial<Dispatcher>
-} = {}) {
+function renderCommitMessageDialog(
+  props: {
+    repository?: Repository
+    coAuthors?: ReadonlyArray<Author>
+    showCoAuthoredBy?: boolean
+    commitSpellcheckEnabled?: boolean
+    onSubmitCommitMessage?: (context: ICommitContext) => Promise<boolean>
+    dispatcherOverrides?: Partial<Dispatcher>
+  } = {}
+) {
   const repository = props.repository ?? createRepository()
   const calls = new Array<string>()
   const dispatcher = Object.create(Dispatcher.prototype) as Dispatcher
   Object.assign(dispatcher, {
-    showUnknownAuthorsCommitWarning: (authors: ReadonlyArray<UnknownAuthor>) => {
+    showUnknownAuthorsCommitWarning: (
+      authors: ReadonlyArray<UnknownAuthor>
+    ) => {
       calls.push(`unknown:${authors.length}`)
     },
     refreshAuthor: (repo: Repository) => {
@@ -266,7 +285,9 @@ describe('CommitMessageDialog', () => {
     assert.ok(propsSummary.textContent?.includes('Commit Now'))
     assert.ok(propsSummary.textContent?.includes('"showCoAuthoredBy":true'))
     assert.ok(propsSummary.textContent?.includes('"coAuthors":1'))
-    assert.ok(propsSummary.textContent?.includes('"commitSpellcheckEnabled":true'))
+    assert.ok(
+      propsSummary.textContent?.includes('"commitSpellcheckEnabled":true')
+    )
   })
 
   it('updates the dialog-managed coauthor state through child callbacks', () => {
@@ -284,10 +305,18 @@ describe('CommitMessageDialog', () => {
   })
 
   it('routes child callbacks through the dispatcher and submit handler', () => {
-    const { container, unmount: u, calls, submitCalls } = renderCommitMessageDialog()
+    const {
+      container,
+      unmount: u,
+      calls,
+      submitCalls,
+    } = renderCommitMessageDialog()
     unmount = u
 
-    queryOrThrow<HTMLButtonElement>(container, '.confirm-unknown-authors').click()
+    queryOrThrow<HTMLButtonElement>(
+      container,
+      '.confirm-unknown-authors'
+    ).click()
     queryOrThrow<HTMLButtonElement>(container, '.refresh-author').click()
     queryOrThrow<HTMLButtonElement>(container, '.show-popup').click()
     queryOrThrow<HTMLButtonElement>(container, '.show-foldout').click()
@@ -311,7 +340,11 @@ describe('CommitMessageDialog', () => {
   })
 
   it('only opens the create fork dialog for repositories with a GitHub repository', () => {
-    const { container, unmount: u, calls } = renderCommitMessageDialog({
+    const {
+      container,
+      unmount: u,
+      calls,
+    } = renderCommitMessageDialog({
       repository: createRepository(false),
     })
     unmount = u

@@ -117,17 +117,17 @@ function createDispatcher() {
   return dispatcher
 }
 
-function renderRepositoriesList(props: {
-  repositories?: ReadonlyArray<Repository>
-  filterText?: string
-  onFilterTextChanged?: (text: string) => void
-} = {}) {
-  const repositories =
-    props.repositories ??
-    [
-      createRepository('/tmp/workbench', 1, 'Workbench', 'desktop', 'desktop'),
-      createRepository('/tmp/notifications', 2, null, 'desktop', 'notifications'),
-    ]
+function renderRepositoriesList(
+  props: {
+    repositories?: ReadonlyArray<Repository>
+    filterText?: string
+    onFilterTextChanged?: (text: string) => void
+  } = {}
+) {
+  const repositories = props.repositories ?? [
+    createRepository('/tmp/workbench', 1, 'Workbench', 'desktop', 'desktop'),
+    createRepository('/tmp/notifications', 2, null, 'desktop', 'notifications'),
+  ]
 
   return renderComponent(
     <RepositoriesList

@@ -60,7 +60,10 @@ describe('CommitConflictsWarning actions', () => {
       clearBanner: () => {
         calls.push('clear')
       },
-      setCommitMessage: (repo: Repository, message: typeof DefaultCommitMessage) => {
+      setCommitMessage: (
+        repo: Repository,
+        message: typeof DefaultCommitMessage
+      ) => {
         assert.equal(repo, repository)
         assert.deepEqual(message, DefaultCommitMessage)
         calls.push('reset')

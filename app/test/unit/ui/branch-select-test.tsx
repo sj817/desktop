@@ -6,7 +6,10 @@ import { Branch, BranchType } from '../../../src/models/branch'
 import { GitHubRepository } from '../../../src/models/github-repository'
 import { Owner } from '../../../src/models/owner'
 import { Repository } from '../../../src/models/repository'
-import { queryOrThrow, renderComponent } from '../../helpers/component-test-utils'
+import {
+  queryOrThrow,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 
 type MockBranchListProps = React.ComponentProps<any>
 
@@ -23,7 +26,9 @@ mock.module('../../../src/ui/branches/branch-list', {
       return (
         <div className="mock-branch-list">
           <div className="filter-text">{props.filterText}</div>
-          <div className="no-branches-message">{props.noBranchesMessage ?? null}</div>
+          <div className="no-branches-message">
+            {props.noBranchesMessage ?? null}
+          </div>
           <button
             type="button"
             className="change-filter"
@@ -94,13 +99,21 @@ function createRepository() {
 }
 
 function createBranch(name: string) {
-  return new Branch(name, 'origin/main', { sha: `${name}-sha` }, BranchType.Local, `refs/heads/${name}`)
+  return new Branch(
+    name,
+    'origin/main',
+    { sha: `${name}-sha` },
+    BranchType.Local,
+    `refs/heads/${name}`
+  )
 }
 
-function renderBranchSelect(props: {
-  onChange?: (branch: Branch) => void
-  noBranchesMessage?: string
-} = {}) {
+function renderBranchSelect(
+  props: {
+    onChange?: (branch: Branch) => void
+    noBranchesMessage?: string
+  } = {}
+) {
   const branches = [createBranch('main'), createBranch('feature/login')]
   const rendered = renderComponent(
     <BranchSelect
@@ -120,7 +133,11 @@ function renderBranchSelect(props: {
 
 describe('BranchSelect', () => {
   it('renders the current selected branch in the popover button and forwards props to BranchList', () => {
-    const { container, unmount: u, branches } = renderBranchSelect({
+    const {
+      container,
+      unmount: u,
+      branches,
+    } = renderBranchSelect({
       noBranchesMessage: 'No branches available',
     })
     unmount = u
@@ -130,7 +147,10 @@ describe('BranchSelect', () => {
     assert.ok(container.textContent?.includes(branches[0].name))
     assert.equal(latestBranchListProps?.selectedBranch?.name, branches[0].name)
     assert.equal(latestBranchListProps?.canCreateNewBranch, false)
-    assert.equal(latestBranchListProps?.noBranchesMessage, 'No branches available')
+    assert.equal(
+      latestBranchListProps?.noBranchesMessage,
+      'No branches available'
+    )
   })
 
   it('updates the filter text passed to BranchList', () => {
@@ -145,7 +165,11 @@ describe('BranchSelect', () => {
 
   it('closes the popover, updates selection, and emits onChange when a branch is clicked', () => {
     const changes = new Array<string>()
-    const { container, unmount: u, branches } = renderBranchSelect({
+    const {
+      container,
+      unmount: u,
+      branches,
+    } = renderBranchSelect({
       onChange: branch => {
         changes.push(branch.name)
       },

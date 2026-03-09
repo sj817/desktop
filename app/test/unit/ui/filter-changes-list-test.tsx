@@ -38,7 +38,8 @@ mock.module('../../../src/ui/lib/augmented-filter-list', {
         return props.groups.flatMap((group: any) =>
           group.items.filter((item: any) => {
             const matchesText =
-              text.length === 0 || item.text.join(' ').toLowerCase().includes(text)
+              text.length === 0 ||
+              item.text.join(' ').toLowerCase().includes(text)
             const matchesFilter = props.filterMethod
               ? props.filterMethod(item)
               : true
@@ -129,7 +130,11 @@ mock.module('../../../src/ui/lib/checkbox', {
       React.useImperativeHandle(ref, () => ({ focus: () => {} }))
       return (
         <label className={props.className}>
-          <input type="checkbox" disabled={props.disabled} onChange={props.onChange} />
+          <input
+            type="checkbox"
+            disabled={props.disabled}
+            onChange={props.onChange}
+          />
           <span id="changes-list-check-all-label">{props.label}</span>
         </label>
       )
@@ -249,13 +254,16 @@ function createDispatcher(calls: string[]) {
   return dispatcher
 }
 
-function renderFilterChangesList(props: {
-  fileListFilter?: IFileListFilterState
-  workingDirectory?: WorkingDirectoryStatus
-} = {}) {
+function renderFilterChangesList(
+  props: {
+    fileListFilter?: IFileListFilterState
+    workingDirectory?: WorkingDirectoryStatus
+  } = {}
+) {
   const calls = new Array<string>()
   const includedFile = createMockFileChange('src/app.ts')
-  const excludedFile = createMockFileChange('docs/readme.md').withIncludeAll(false)
+  const excludedFile =
+    createMockFileChange('docs/readme.md').withIncludeAll(false)
   const workingDirectory =
     props.workingDirectory ??
     WorkingDirectoryStatus.fromFiles([includedFile, excludedFile])
@@ -283,7 +291,9 @@ function renderFilterChangesList(props: {
       onOpenItem={() => {}}
       onOpenItemInExternalEditor={() => {}}
       branch="main"
-      commitAuthor={new CommitIdentity('Desktop', 'desktop@example.com', new Date())}
+      commitAuthor={
+        new CommitIdentity('Desktop', 'desktop@example.com', new Date())
+      }
       dispatcher={createDispatcher(calls)}
       availableWidth={300}
       isCommitting={false}
@@ -323,7 +333,11 @@ function renderFilterChangesList(props: {
 
 describe('FilterChangesList', () => {
   it('filters rendered files by filter text and dispatches filter text changes', () => {
-    const { container, unmount: u, calls } = renderFilterChangesList({
+    const {
+      container,
+      unmount: u,
+      calls,
+    } = renderFilterChangesList({
       fileListFilter: createFilterState({ filterText: 'src' }),
     })
     unmount = u
@@ -341,7 +355,11 @@ describe('FilterChangesList', () => {
   })
 
   it('renders the filtered empty state and clears all active filters', () => {
-    const { container, unmount: u, calls } = renderFilterChangesList({
+    const {
+      container,
+      unmount: u,
+      calls,
+    } = renderFilterChangesList({
       fileListFilter: createFilterState({
         filterText: 'missing',
         isModifiedFile: true,
@@ -349,7 +367,9 @@ describe('FilterChangesList', () => {
     })
     unmount = u
 
-    assert.ok(container.textContent?.includes('No files match your current filters'))
+    assert.ok(
+      container.textContent?.includes('No files match your current filters')
+    )
     assert.ok(container.textContent?.includes('"missing"'))
     assert.ok(container.textContent?.includes('Modified files'))
 
@@ -368,14 +388,24 @@ describe('FilterChangesList', () => {
 
   it('shows hidden committed changes and adjusts filters to reveal them', () => {
     const includedFile = createMockFileChange('src/app.ts')
-    const excludedFile = createMockFileChange('docs/readme.md').withIncludeAll(false)
-    const { container, unmount: u, calls } = renderFilterChangesList({
-      workingDirectory: WorkingDirectoryStatus.fromFiles([includedFile, excludedFile]),
+    const excludedFile =
+      createMockFileChange('docs/readme.md').withIncludeAll(false)
+    const {
+      container,
+      unmount: u,
+      calls,
+    } = renderFilterChangesList({
+      workingDirectory: WorkingDirectoryStatus.fromFiles([
+        includedFile,
+        excludedFile,
+      ]),
       fileListFilter: createFilterState({ isExcludedFromCommit: true }),
     })
     unmount = u
 
-    assert.ok(container.textContent?.includes('Hidden changes will be committed.'))
+    assert.ok(
+      container.textContent?.includes('Hidden changes will be committed.')
+    )
 
     click(queryOrThrow<HTMLButtonElement>(container, '.link-button-component'))
 
