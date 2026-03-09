@@ -2,7 +2,11 @@ import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
 
-import { click, queryOrThrow, renderComponent } from '../../helpers/component-test-utils'
+import {
+  click,
+  queryOrThrow,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 import { APICheckConclusion, APICheckStatus } from '../../../src/lib/api'
 import { ICombinedRefCheck } from '../../../src/lib/ci-checks/ci-checks'
 import { GitHubRepository } from '../../../src/models/github-repository'

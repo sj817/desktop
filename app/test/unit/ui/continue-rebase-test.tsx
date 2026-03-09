@@ -5,7 +5,10 @@ import { act } from 'react-dom/test-utils'
 
 import { RebaseConflictState } from '../../../src/lib/app-state'
 import { Repository } from '../../../src/models/repository'
-import { AppFileStatusKind, WorkingDirectoryStatus } from '../../../src/models/status'
+import {
+  AppFileStatusKind,
+  WorkingDirectoryStatus,
+} from '../../../src/models/status'
 import { ContinueRebase } from '../../../src/ui/changes/continue-rebase'
 import { Dispatcher } from '../../../src/ui/dispatcher'
 import {
@@ -58,7 +61,10 @@ describe('ContinueRebase', () => {
     )
     unmount = u
 
-    const button = queryOrThrow<HTMLButtonElement>(container, 'button.commit-button')
+    const button = queryOrThrow<HTMLButtonElement>(
+      container,
+      'button.commit-button'
+    )
 
     act(() => {
       button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
@@ -81,7 +87,10 @@ describe('ContinueRebase', () => {
     )
     unmount = u
 
-    const button = queryOrThrow<HTMLButtonElement>(container, 'button.commit-button')
+    const button = queryOrThrow<HTMLButtonElement>(
+      container,
+      'button.commit-button'
+    )
     assert.equal(button.getAttribute('aria-disabled'), 'true')
     assert.ok(queryOrThrow(container, '.warning-untracked-files'))
     assert.ok(button.textContent?.includes('Rebasing'))
@@ -128,7 +137,10 @@ describe('ContinueRebase', () => {
     )
     unmount = u
 
-    const button = queryOrThrow<HTMLButtonElement>(container, 'button.commit-button')
+    const button = queryOrThrow<HTMLButtonElement>(
+      container,
+      'button.commit-button'
+    )
 
     act(() => {
       button.dispatchEvent(new MouseEvent('click', { bubbles: true }))

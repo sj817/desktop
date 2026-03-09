@@ -1,7 +1,10 @@
 import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { queryOrThrow, renderComponent } from '../../helpers/component-test-utils'
+import {
+  queryOrThrow,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 import { Avatar } from '../../../src/ui/lib/avatar'
 import { IAvatarUser } from '../../../src/models/avatar'
 
@@ -41,10 +44,7 @@ describe('Avatar', () => {
     unmount = u
 
     const image = queryOrThrow<HTMLImageElement>(container, 'img.avatar')
-    assert.equal(
-      image.src,
-      'https://avatars.githubusercontent.com/u/1?s=32'
-    )
+    assert.equal(image.src, 'https://avatars.githubusercontent.com/u/1?s=32')
     assert.equal(image.alt, 'Avatar for Mona Lisa')
   })
 

@@ -3,7 +3,10 @@ import assert from 'node:assert'
 import * as React from 'react'
 
 import { IFileListFilterState } from '../../../src/lib/app-state'
-import { AppFileStatusKind, WorkingDirectoryStatus } from '../../../src/models/status'
+import {
+  AppFileStatusKind,
+  WorkingDirectoryStatus,
+} from '../../../src/models/status'
 import { ChangesListFilterOptions } from '../../../src/ui/changes/changes-list-filter-options'
 import { IChangesListItem } from '../../../src/ui/changes/filter-changes-list'
 import {
@@ -34,7 +37,9 @@ function createFilterState(
   }
 }
 
-function createChangesListItem(change: ReturnType<typeof createMockFileChange>): IChangesListItem {
+function createChangesListItem(
+  change: ReturnType<typeof createMockFileChange>
+): IChangesListItem {
   return {
     id: change.id,
     text: [change.path],
@@ -113,16 +118,24 @@ describe('ChangesListFilterOptions', () => {
     )
     unmount = u
 
-    const button = queryOrThrow<HTMLButtonElement>(container, 'button.filter-button')
+    const button = queryOrThrow<HTMLButtonElement>(
+      container,
+      'button.filter-button'
+    )
     assert.ok(button.classList.contains('active'))
-    assert.equal(button.getAttribute('aria-label'), 'Filter Options (2 applied)')
+    assert.equal(
+      button.getAttribute('aria-label'),
+      'Filter Options (2 applied)'
+    )
     assert.ok(container.querySelector('.active-badge'))
   })
 
   it('shows filter counts and clears filters from the popover', () => {
-    const { container, unmount: u, calls } = renderFilterOptions(
-      createFilterState({ isIncludedInCommit: true })
-    )
+    const {
+      container,
+      unmount: u,
+      calls,
+    } = renderFilterOptions(createFilterState({ isIncludedInCommit: true }))
     unmount = u
 
     click(queryOrThrow(container, 'button.filter-button'))
@@ -154,7 +167,12 @@ describe('ChangesListFilterOptions', () => {
       throw new Error('Could not find modified files filter label')
     }
 
-    click(queryOrThrow(modifiedLabel.parentElement as HTMLElement, 'input[type="checkbox"]'))
+    click(
+      queryOrThrow(
+        modifiedLabel.parentElement as HTMLElement,
+        'input[type="checkbox"]'
+      )
+    )
 
     assert.equal(calls.modified, 1)
     assert.equal(container.querySelector('.filter-popover'), null)

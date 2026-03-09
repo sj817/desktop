@@ -65,7 +65,9 @@ describe('NoPullRequests', () => {
     unmount = u
 
     assert.ok(container.textContent?.includes("You're all set!"))
-    assert.ok(container.textContent?.includes('No open pull requests in desktop'))
+    assert.ok(
+      container.textContent?.includes('No open pull requests in desktop')
+    )
     assert.ok(
       queryOrThrow(container, '.ref-component').textContent?.includes('desktop')
     )

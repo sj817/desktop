@@ -75,7 +75,10 @@ describe('UndoCommit', () => {
     )
     unmount = u
 
-    const button = queryOrThrow<HTMLButtonElement>(container, 'button.small-button')
+    const button = queryOrThrow<HTMLButtonElement>(
+      container,
+      'button.small-button'
+    )
     click(button)
 
     assert.equal(undoCalls, 1)
@@ -97,7 +100,10 @@ describe('UndoCommit', () => {
     )
     unmount = u
 
-    const button = queryOrThrow<HTMLButtonElement>(container, 'button.small-button')
+    const button = queryOrThrow<HTMLButtonElement>(
+      container,
+      'button.small-button'
+    )
     click(button)
 
     assert.equal(button.getAttribute('aria-disabled'), 'true')

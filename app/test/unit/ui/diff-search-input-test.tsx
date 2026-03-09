@@ -19,8 +19,10 @@ afterEach(() => {
 
 function setInputValue(input: HTMLInputElement, value: string) {
   act(() => {
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')
-      ?.set?.call(input, value)
+    Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      'value'
+    )?.set?.call(input, value)
     input.dispatchEvent(new window.Event('change', { bubbles: true }))
   })
 }
@@ -43,7 +45,10 @@ describe('DiffSearchInput', () => {
   })
 
   it('searches forward when Enter is pressed', () => {
-    const searches = new Array<{ query: string; direction: 'next' | 'previous' }>()
+    const searches = new Array<{
+      query: string
+      direction: 'next' | 'previous'
+    }>()
 
     const { container, unmount: u } = renderComponent(
       <DiffSearchInput
@@ -65,7 +70,10 @@ describe('DiffSearchInput', () => {
   })
 
   it('searches backward when Shift+Enter is pressed', () => {
-    const searches = new Array<{ query: string; direction: 'next' | 'previous' }>()
+    const searches = new Array<{
+      query: string
+      direction: 'next' | 'previous'
+    }>()
 
     const { container, unmount: u } = renderComponent(
       <DiffSearchInput

@@ -99,7 +99,9 @@ describe('PullRequestListItem', () => {
     assert.ok(row.classList.contains('open'))
     assert.ok(container.textContent?.includes('Improve test harness'))
     assert.ok(container.textContent?.includes(expectedSubtitle))
-    assert.ok(container.querySelector('.ci-status-container .ci-status-success'))
+    assert.ok(
+      container.querySelector('.ci-status-container .ci-status-success')
+    )
   })
 
   it('renders loading state without title or subtitle text', () => {
@@ -185,9 +187,10 @@ describe('PullRequestListItem', () => {
     })
 
     assert.ok(
-      queryOrThrow<HTMLDivElement>(container, '.pull-request-item').classList.contains(
-        'drop-target'
-      )
+      queryOrThrow<HTMLDivElement>(
+        container,
+        '.pull-request-item'
+      ).classList.contains('drop-target')
     )
     assert.deepEqual(hoverCalls, [{ number: 9, top: 37 }])
     assert.deepEqual(enteredTargets, ['Improve test harness'])

@@ -79,7 +79,7 @@ function stubElementWidth(width: number) {
       toJSON() {
         return this
       },
-    }) as DOMRect
+    } as DOMRect)
 }
 
 async function waitForDismissGracePeriod() {
@@ -128,8 +128,8 @@ describe('CommitConflictsWarning', () => {
     assert.ok(renderedPaths.includes('src/conflicted.ts'))
     assert.ok(renderedPaths.includes('docs/merge.md'))
 
-    const buttons = Array.from(container.querySelectorAll('button')).map(button =>
-      button.textContent?.trim()
+    const buttons = Array.from(container.querySelectorAll('button')).map(
+      button => button.textContent?.trim()
     )
     assert.ok(
       buttons.includes(__DARWIN__ ? 'Yes, Commit Files' : 'Yes, commit files')
@@ -169,7 +169,10 @@ describe('CommitConflictsWarning', () => {
       <CommitConflictsWarning
         dispatcher={dispatcher}
         files={[
-          createMockFileChange('src/conflicted.ts', AppFileStatusKind.Conflicted),
+          createMockFileChange(
+            'src/conflicted.ts',
+            AppFileStatusKind.Conflicted
+          ),
         ]}
         repository={repository}
         context={context}

@@ -28,7 +28,9 @@ function createCombinedCheck(
 ): ICombinedRefCheck {
   return {
     status:
-      conclusion === null ? APICheckStatus.InProgress : APICheckStatus.Completed,
+      conclusion === null
+        ? APICheckStatus.InProgress
+        : APICheckStatus.Completed,
     conclusion,
     checks: [
       {
@@ -117,7 +119,9 @@ describe('CIStatus', () => {
   })
 
   it('renders the current check state with the appropriate status class', () => {
-    const dispatcher = createDispatcher(createCombinedCheck(APICheckConclusion.Success))
+    const dispatcher = createDispatcher(
+      createCombinedCheck(APICheckConclusion.Success)
+    )
 
     const { container, unmount: u } = renderComponent(
       <CIStatus
@@ -129,7 +133,9 @@ describe('CIStatus', () => {
     )
     unmount = u
 
-    const icon = container.querySelector('svg.ci-status.ci-status-success.extra-class')
+    const icon = container.querySelector(
+      'svg.ci-status.ci-status-success.extra-class'
+    )
     assert.ok(icon)
   })
 

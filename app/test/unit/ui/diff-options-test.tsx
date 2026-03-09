@@ -147,7 +147,11 @@ describe('DiffOptions', () => {
   })
 
   it('switches from unified to split diff display mode', () => {
-    const { container, unmount: u, calls } = renderDiffOptions({
+    const {
+      container,
+      unmount: u,
+      calls,
+    } = renderDiffOptions({
       showSideBySideDiff: false,
       isInteractiveDiff: false,
     })

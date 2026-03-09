@@ -3,7 +3,11 @@ import assert from 'node:assert'
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 
-import { keyDown, queryOrThrow, renderComponent } from '../../helpers/component-test-utils'
+import {
+  keyDown,
+  queryOrThrow,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 import { Dialog, DialogStackContext } from '../../../src/ui/dialog/dialog'
 
 let unmount: (() => void) | undefined

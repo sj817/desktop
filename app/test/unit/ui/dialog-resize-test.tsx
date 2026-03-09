@@ -3,7 +3,10 @@ import assert from 'node:assert'
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 
-import { queryOrThrow, renderComponent } from '../../helpers/component-test-utils'
+import {
+  queryOrThrow,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 import { Dialog, DialogStackContext } from '../../../src/ui/dialog/dialog'
 import { getTitleBarHeight } from '../../../src/ui/window/title-bar'
 

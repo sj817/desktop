@@ -71,9 +71,10 @@ describe('BranchListItem', () => {
     })
 
     assert.ok(
-      queryOrThrow<HTMLDivElement>(container, '.branches-list-item').classList.contains(
-        'drop-target'
-      )
+      queryOrThrow<HTMLDivElement>(
+        container,
+        '.branches-list-item'
+      ).classList.contains('drop-target')
     )
     assert.deepEqual(enteredTargets, ['release/1.0'])
 

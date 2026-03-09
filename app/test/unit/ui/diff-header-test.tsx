@@ -12,7 +12,9 @@ import {
 } from '../../helpers/component-test-utils'
 
 let unmount: (() => void) | undefined
-let originalGetBoundingClientRect: typeof HTMLElement.prototype.getBoundingClientRect | undefined
+let originalGetBoundingClientRect:
+  | typeof HTMLElement.prototype.getBoundingClientRect
+  | undefined
 
 afterEach(() => {
   unmount?.()
@@ -39,7 +41,7 @@ function stubElementWidth(width: number) {
       toJSON() {
         return this
       },
-    }) as DOMRect
+    } as DOMRect)
 }
 
 describe('DiffHeader', () => {
@@ -146,7 +148,11 @@ describe('DiffHeader', () => {
     click(button)
 
     assert.equal(button.getAttribute('aria-expanded'), 'true')
-    assert.ok(container.textContent?.includes(__DARWIN__ ? 'Diff Settings' : 'Diff Options'))
+    assert.ok(
+      container.textContent?.includes(
+        __DARWIN__ ? 'Diff Settings' : 'Diff Options'
+      )
+    )
     assert.deepEqual(calls, ['opened'])
 
     click(button)

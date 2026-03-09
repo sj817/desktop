@@ -13,7 +13,9 @@ import {
 } from '../../helpers/component-test-utils'
 
 let unmount: (() => void) | undefined
-let originalGetBoundingClientRect: typeof HTMLElement.prototype.getBoundingClientRect | undefined
+let originalGetBoundingClientRect:
+  | typeof HTMLElement.prototype.getBoundingClientRect
+  | undefined
 
 afterEach(() => {
   unmount?.()
@@ -52,7 +54,7 @@ describe('OversizedFiles', () => {
         toJSON() {
           return this
         },
-      }) as DOMRect
+      } as DOMRect)
 
     const { container, unmount: u } = renderComponent(
       <OversizedFiles
@@ -76,9 +78,14 @@ describe('OversizedFiles', () => {
 
     assert.ok(renderedPaths.includes('large/video.mov'))
     assert.ok(renderedPaths.includes('archive/bundle.zip'))
-    assert.ok(container.textContent?.includes('The following files are over 100MB'))
+    assert.ok(
+      container.textContent?.includes('The following files are over 100MB')
+    )
 
-    const link = queryOrThrow<HTMLAnchorElement>(container, 'a.link-button-component')
+    const link = queryOrThrow<HTMLAnchorElement>(
+      container,
+      'a.link-button-component'
+    )
     assert.equal(
       link.href,
       'https://help.github.com/articles/versioning-large-files/'
@@ -115,12 +122,18 @@ describe('OversizedFiles', () => {
 
     const dispatcher = Object.create(Dispatcher.prototype) as Dispatcher
     Object.assign(dispatcher, {
-      commitIncludedChanges: async (repo: Repository, commitContext: ICommitContext) => {
+      commitIncludedChanges: async (
+        repo: Repository,
+        commitContext: ICommitContext
+      ) => {
         assert.equal(repo, repository)
         assert.equal(commitContext, context)
         calls.push('commit')
       },
-      setCommitMessage: (repo: Repository, message: typeof DefaultCommitMessage) => {
+      setCommitMessage: (
+        repo: Repository,
+        message: typeof DefaultCommitMessage
+      ) => {
         assert.equal(repo, repository)
         assert.deepEqual(message, DefaultCommitMessage)
         calls.push('reset')

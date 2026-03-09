@@ -39,13 +39,15 @@ function createRepository(alias: string | null = null) {
   )
 }
 
-function renderRepositoryListItem(props: {
-  repository?: Repository
-  needsDisambiguation?: boolean
-  matches?: { title: number[]; subtitle: number[] }
-  aheadBehind?: IAheadBehind | null
-  changedFilesCount?: number
-} = {}) {
+function renderRepositoryListItem(
+  props: {
+    repository?: Repository
+    needsDisambiguation?: boolean
+    matches?: { title: number[]; subtitle: number[] }
+    aheadBehind?: IAheadBehind | null
+    changedFilesCount?: number
+  } = {}
+) {
   return renderComponent(
     <RepositoryListItem
       repository={props.repository ?? createRepository()}
@@ -68,8 +70,8 @@ describe('RepositoryListItem', () => {
 
     const name = queryOrThrow(container, '.name.alias')
     const prefix = queryOrThrow(container, '.prefix')
-    const highlights = Array.from(name.querySelectorAll('mark')).map(mark =>
-      mark.textContent
+    const highlights = Array.from(name.querySelectorAll('mark')).map(
+      mark => mark.textContent
     )
 
     assert.equal(prefix.textContent, 'desktop/')
@@ -87,7 +89,10 @@ describe('RepositoryListItem', () => {
 
     const indicators = queryOrThrow(container, '.repo-indicators')
     const aheadBehind = queryOrThrow(indicators, '.ahead-behind')
-    const changeIndicator = queryOrThrow(indicators, '.change-indicator-wrapper')
+    const changeIndicator = queryOrThrow(
+      indicators,
+      '.change-indicator-wrapper'
+    )
 
     assert.equal(aheadBehind.querySelectorAll('svg').length, 2)
     assert.equal(changeIndicator.querySelectorAll('svg').length, 1)

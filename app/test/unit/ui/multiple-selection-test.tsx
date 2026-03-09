@@ -39,7 +39,10 @@ describe('MultipleSelection', () => {
     )
     unmount = u
 
-    const image = queryOrThrow<HTMLImageElement>(container, 'img.blankslate-image')
+    const image = queryOrThrow<HTMLImageElement>(
+      container,
+      'img.blankslate-image'
+    )
     assert.equal(image.alt, '')
   })
 })

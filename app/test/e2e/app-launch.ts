@@ -128,10 +128,12 @@ describe('GitHub Desktop - App Launch', () => {
     const diffContainer = await $('.diff-container')
     await diffContainer.waitForDisplayed({ timeout: 15000 })
     await browser.waitUntil(
-      async () => (await diffContainer.getText()).includes(smokeRepoFileContents),
+      async () =>
+        (await diffContainer.getText()).includes(smokeRepoFileContents),
       {
         timeout: 15000,
-        timeoutMsg: 'Diff contents did not render for the smoke repository file',
+        timeoutMsg:
+          'Diff contents did not render for the smoke repository file',
       }
     )
 
@@ -219,7 +221,8 @@ describe('GitHub Desktop - App Launch', () => {
       async () => getSmokeRepoCurrentBranch() === initialBranch,
       {
         timeout: 15000,
-        timeoutMsg: 'Smoke repository did not switch back to the original branch',
+        timeoutMsg:
+          'Smoke repository did not switch back to the original branch',
       }
     )
 

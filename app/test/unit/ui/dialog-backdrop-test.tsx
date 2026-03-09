@@ -4,7 +4,10 @@ import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 
 import { Dialog, DialogStackContext } from '../../../src/ui/dialog/dialog'
-import { queryOrThrow, renderComponent } from '../../helpers/component-test-utils'
+import {
+  queryOrThrow,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 
 let unmount: (() => void) | undefined
 
