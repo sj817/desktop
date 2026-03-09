@@ -136,7 +136,7 @@ React component rendering tests using jsdom (already in the test environment) an
 | `ChangedFile` | `changed-file-test.tsx` | 5 | Include toggles, mixed state, renamed path rendering, aria-live status, disabled checkbox |
 | `ChangesListFilterOptions` | `changes-list-filter-options-test.tsx` | 3 | Active filter badge, computed file counts, filter/clear callback handling |
 | `CommitWarning` | `commit-warning-test.tsx` | 3 | Message rendering, icon variant classes, context-menu suppression |
-| `CommitConflictsWarning` | `commit-conflicts-warning-test.tsx` | 3 | Conflicted file list rendering, destructive action copy, cancel and commit-clear-reset flows |
+| `CommitConflictsWarning` | `commit-conflicts-warning-test.tsx`, `commit-conflicts-warning-actions-test.tsx` | 4 | Conflicted file list rendering, destructive action copy, Escape dismissal, destructive button submit wiring, commit-clear-reset flow |
 | `CommitMessage` | `commit-message-test.tsx` | 3 | Summary-required submit state, summary/description commit context, placeholder prepopulation and co-author confirmation/trailers |
 | `CommitMessageDialog` | `commit-message-dialog-test.tsx` | 4 | Dialog title, wrapper prop forwarding, local coauthor state, dispatcher and submit callback wiring |
 | `ConfirmCommitFilteredChanges` | `confirm-commit-filtered-changes-test.tsx` | 3 | Submit flow, opt-out checkbox persistence, hidden-changes link dismissal |
@@ -161,7 +161,6 @@ React component rendering tests using jsdom (already in the test environment) an
 |---|---|
 | `ui/diff/` | Line rendering, expand/collapse, selection (may need virtualization mocking) |
 | `ui/changes/` | File list, filtering |
-| `ui/merge-conflicts/` | Conflict list, resolution actions |
 
 **ESLint config:** `react/jsx-no-bind` is disabled for `app/test/**/*` to allow arrow function callbacks in test JSX.
 
