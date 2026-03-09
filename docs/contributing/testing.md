@@ -144,11 +144,11 @@ React component rendering tests using jsdom (already in the test environment) an
 
 A minimal set of committed E2E tests that run in CI (`yarn test:e2e`) to catch catastrophic breakage. These are not meant to be comprehensive — they verify that the app launches, renders, and can perform the most basic operations.
 
-**Framework:** WebDriverIO with `@wdio/electron-service` for native Electron integration.
+**Framework:** WebDriverIO using standard WebDriver Chrome capabilities pointed at the checked-in Electron runtime.
 
 Why WebDriverIO over Playwright:
 - Playwright is reserved for agent-driven interactive verification during development (see below)
-- WebDriverIO's Electron service provides first-class support for launching and controlling the Electron app, accessing `BrowserWindow` APIs, and running in CI headless
+- WebDriverIO can launch the Electron app directly through Chrome-compatible WebDriver support, which is sufficient for committed smoke coverage and stable in CI
 - Keeps the two use cases (CI regression suite vs. agent exploration) cleanly separated with different tools
 
 **Smoke tests (5 max):**
@@ -170,7 +170,8 @@ These tests should be fast, stable, and narrowly scoped. They exist purely as a 
 - No `browser.pause()` — use WebDriverIO's built-in `waitForExist`/`waitForDisplayed`
 
 **Current implementation note:**
-- The committed smoke harness currently targets the built app entry point and isolates user data successfully, but Electron service bridge initialization still times out locally on Desktop with Electron 40. Stabilizing that bridge is the remaining blocker before expanding beyond the launch smoke test.
+- The committed smoke harness currently targets the built app entry point and isolates user data successfully.
+- Earlier attempts to use `@wdio/electron-service` hit repeatable bridge timeouts on Desktop with Electron 40, so the committed launch smoke avoids that integration layer for now.
 
 **Directory:** `app/test/e2e/`
 

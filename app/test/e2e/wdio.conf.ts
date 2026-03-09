@@ -40,12 +40,14 @@ export const config: WebdriverIO.Config = {
   maxInstances: 1,
   capabilities: [
     {
-      browserName: 'electron',
-      browserVersion: '40.1.0',
-      'wdio:electronServiceOptions': {
-        appBinaryPath,
-        appArgs: [`--app=${appEntryPoint}`, `--user-data-dir=${userDataDir}`],
+      browserName: 'chrome',
+      browserVersion: '144.0.7559.96',
+      'goog:chromeOptions': {
+        binary: appBinaryPath,
+        windowTypes: ['app', 'webview'],
+        args: [`--app=${appEntryPoint}`, `--user-data-dir=${userDataDir}`],
       },
+      'wdio:enforceWebDriverClassic': true,
     } as WebdriverIO.Capabilities,
   ],
 
@@ -54,7 +56,6 @@ export const config: WebdriverIO.Config = {
   connectionRetryTimeout: 30000,
   connectionRetryCount: 1,
 
-  services: ['electron'],
   framework: 'mocha',
   reporters: ['spec'],
 
