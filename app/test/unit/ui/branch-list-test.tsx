@@ -16,20 +16,18 @@ import {
   renderComponent,
 } from '../../helpers/component-test-utils'
 
-type MockSectionFilterListProps = ISectionFilterListProps<
+let BranchList: typeof import('../../../src/ui/branches/branch-list').BranchList
+let latestSectionFilterListProps: ISectionFilterListProps<
   IBranchListItem,
   BranchGroupIdentifier
->
-
-let BranchList: typeof import('../../../src/ui/branches/branch-list').BranchList
-let latestSectionFilterListProps: MockSectionFilterListProps | null = null
+> | null = null
 let unmount: (() => void) | undefined
 
 mock.module('../../../src/ui/lib/section-filter-list', {
   namedExports: {
     SectionFilterList: React.forwardRef<
       { selectNextItem: () => void },
-      MockSectionFilterListProps
+      ISectionFilterListProps<IBranchListItem, BranchGroupIdentifier>
     >((props, ref) => {
       latestSectionFilterListProps = props
 
@@ -37,7 +35,7 @@ mock.module('../../../src/ui/lib/section-filter-list', {
         selectNextItem: () => {},
       }))
 
-      const filterText = props.filterText.toLowerCase()
+      const filterText = (props.filterText ?? '').toLowerCase()
       const filteredGroups =
         filterText.length === 0
           ? props.groups
@@ -67,11 +65,11 @@ mock.module('../../../src/ui/lib/section-filter-list', {
           <button
             type="button"
             className="trigger-item-click"
-            onClick={() =>
+            onClick={event =>
               filteredGroups.length > 0
                 ? props.onItemClick?.(filteredGroups[0].items[0], {
-                    kind: 'mouse',
-                    event: { preventDefault: () => {} },
+                    kind: 'mouseclick',
+                    event,
                   })
                 : null
             }
@@ -85,7 +83,9 @@ mock.module('../../../src/ui/lib/section-filter-list', {
               filteredGroups.length > 0
                 ? props.onSelectionChanged?.(filteredGroups[0].items[0], {
                     kind: 'keyboard',
-                    event: { key: 'ArrowDown' },
+                    event: new KeyboardEvent('keydown', {
+                      key: 'ArrowDown',
+                    }) as unknown as React.KeyboardEvent<any>,
                   })
                 : null
             }

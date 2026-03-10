@@ -31,9 +31,6 @@ interface IAugmentedSectionFilterListHandle {
   onKeyDown(event: React.KeyboardEvent<HTMLInputElement>): void
 }
 
-type MockAugmentedSectionFilterListProps =
-  IAugmentedSectionFilterListProps<IChangesListItem>
-
 interface IFocusableHandle {
   focus(): void
 }
@@ -45,14 +42,14 @@ mock.module('../../../src/ui/lib/augmented-filter-list', {
   namedExports: {
     AugmentedSectionFilterList: React.forwardRef<
       IAugmentedSectionFilterListHandle,
-      MockAugmentedSectionFilterListProps
+      IAugmentedSectionFilterListProps<IChangesListItem>
     >((props, ref) => {
       React.useImperativeHandle(ref, () => ({
         onKeyDown: () => {},
       }))
 
       const visibleItems = React.useMemo(() => {
-        const text = props.filterText.toLowerCase()
+        const text = (props.filterText ?? '').toLowerCase()
         return props.groups.flatMap(group =>
           group.items.filter(item => {
             const matchesText =
@@ -165,7 +162,7 @@ mock.module('../../../src/ui/lib/checkbox', {
 
 mock.module('../../../src/ui/lib/button', {
   namedExports: {
-    Button: (props: IButtonProps) => (
+    Button: (props: React.PropsWithChildren<IButtonProps>) => (
       <button
         type={props.type ?? 'button'}
         className={props.className}
@@ -180,7 +177,7 @@ mock.module('../../../src/ui/lib/button', {
 
 mock.module('../../../src/ui/lib/link-button', {
   namedExports: {
-    LinkButton: (props: ILinkButtonProps) => (
+    LinkButton: (props: React.PropsWithChildren<ILinkButtonProps>) => (
       <button
         type="button"
         className="link-button-component"

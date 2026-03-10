@@ -19,18 +19,18 @@ import {
   renderComponent,
 } from '../../helpers/component-test-utils'
 
-type MockSectionFilterListProps = ISectionFilterListProps<
+let latestSectionFilterListProps: ISectionFilterListProps<
   IRepositoryListItem,
   RepositoryListGroup
->
-
-let latestSectionFilterListProps: MockSectionFilterListProps | null = null
+> | null = null
 let unmount: (() => void) | undefined
 let RepositoriesList: typeof import('../../../src/ui/repositories-list/repositories-list').RepositoriesList
 
 mock.module('../../../src/ui/lib/section-filter-list', {
   namedExports: {
-    SectionFilterList: (props: MockSectionFilterListProps) => {
+    SectionFilterList: (
+      props: ISectionFilterListProps<IRepositoryListItem, RepositoryListGroup>
+    ) => {
       latestSectionFilterListProps = props
 
       const rows = props.groups.flatMap(group => [
@@ -48,8 +48,11 @@ mock.module('../../../src/ui/lib/section-filter-list', {
           <button
             type="button"
             className="trigger-item-click"
-            onClick={() =>
-              props.onItemClick?.(props.groups[0].items[0], { kind: 'mouse' })
+            onClick={event =>
+              props.onItemClick?.(props.groups[0].items[0], {
+                kind: 'mouseclick',
+                event,
+              })
             }
           >
             Trigger Item Click
@@ -57,7 +60,14 @@ mock.module('../../../src/ui/lib/section-filter-list', {
           <button
             type="button"
             className="trigger-selection-change"
-            onClick={() => props.onSelectionChanged?.(props.groups[0].items[0])}
+            onClick={() =>
+              props.onSelectionChanged?.(props.groups[0].items[0], {
+                kind: 'keyboard',
+                event: new KeyboardEvent('keydown', {
+                  key: 'ArrowDown',
+                }) as unknown as React.KeyboardEvent<any>,
+              })
+            }
           >
             Trigger Selection Change
           </button>

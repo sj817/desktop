@@ -13,20 +13,18 @@ import {
   renderComponent,
 } from '../../helpers/component-test-utils'
 
-type MockBranchListProps = IBranchListProps
-
 interface IPopoverDropdownHandle {
   closePopover(): void
 }
 
-let latestBranchListProps: MockBranchListProps | null = null
+let latestBranchListProps: IBranchListProps | null = null
 let closePopoverCalls = 0
 let BranchSelect: typeof import('../../../src/ui/branches/branch-select').BranchSelect
 let unmount: (() => void) | undefined
 
 mock.module('../../../src/ui/branches/branch-list', {
   namedExports: {
-    BranchList: (props: MockBranchListProps) => {
+    BranchList: (props: IBranchListProps) => {
       latestBranchListProps = props
       const renderedBranch = props.renderBranch(
         {

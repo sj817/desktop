@@ -16,21 +16,21 @@ import {
   renderComponent,
 } from '../../helpers/component-test-utils'
 
-type MockSectionFilterListProps = ISectionFilterListProps<
+let RepositoriesList: typeof import('../../../src/ui/repositories-list/repositories-list').RepositoriesList
+let latestSectionFilterListProps: ISectionFilterListProps<
   IRepositoryListItem,
   RepositoryListGroup
->
-
-let RepositoriesList: typeof import('../../../src/ui/repositories-list/repositories-list').RepositoriesList
-let latestSectionFilterListProps: MockSectionFilterListProps | null = null
+> | null = null
 let unmount: (() => void) | undefined
 
 mock.module('../../../src/ui/lib/section-filter-list', {
   namedExports: {
-    SectionFilterList: (props: MockSectionFilterListProps) => {
+    SectionFilterList: (
+      props: ISectionFilterListProps<IRepositoryListItem, RepositoryListGroup>
+    ) => {
       latestSectionFilterListProps = props
 
-      const filterText = props.filterText.toLowerCase()
+      const filterText = (props.filterText ?? '').toLowerCase()
       const filteredGroups =
         filterText.length === 0
           ? props.groups

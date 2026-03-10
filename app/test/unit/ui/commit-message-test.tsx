@@ -115,7 +115,7 @@ mock.module('../../../src/ui/autocompletion', {
 
 mock.module('../../../src/ui/lib/button', {
   namedExports: {
-    Button: (props: IButtonProps) => (
+    Button: (props: React.PropsWithChildren<IButtonProps>) => (
       <button
         type={props.type ?? 'button'}
         className={['button-component', props.className]
@@ -134,7 +134,7 @@ mock.module('../../../src/ui/lib/button', {
 
 mock.module('../../../src/ui/lib/focus-container', {
   namedExports: {
-    FocusContainer: (props: IFocusContainerProps) => (
+    FocusContainer: (props: React.PropsWithChildren<IFocusContainerProps>) => (
       <div
         className={props.className}
         onClick={props.onClick}
@@ -181,7 +181,7 @@ mock.module('../../../src/ui/octicons', {
 
 mock.module('../../../src/ui/changes/commit-warning', {
   namedExports: {
-    CommitWarning: (props: ICommitWarningProps) => (
+    CommitWarning: (props: React.PropsWithChildren<ICommitWarningProps>) => (
       <div className="commit-warning">{props.children}</div>
     ),
     CommitWarningIcon: { Information: 'information' },
@@ -190,7 +190,7 @@ mock.module('../../../src/ui/changes/commit-warning', {
 
 mock.module('../../../src/ui/lib/link-button', {
   namedExports: {
-    LinkButton: (props: ILinkButtonProps) => (
+    LinkButton: (props: React.PropsWithChildren<ILinkButtonProps>) => (
       <button
         type="button"
         className="link-button-component"
@@ -204,15 +204,15 @@ mock.module('../../../src/ui/lib/link-button', {
 
 mock.module('../../../src/ui/lib/toggletipped-content', {
   namedExports: {
-    ToggledtippedContent: (props: IToggledtippedContentProps) => (
-      <div className={props.className}>{props.children}</div>
-    ),
+    ToggledtippedContent: (
+      props: React.PropsWithChildren<IToggledtippedContentProps>
+    ) => <div className={props.className}>{props.children}</div>,
   },
 })
 
 mock.module('../../../src/ui/lib/popover', {
   namedExports: {
-    Popover: (props: IPopoverProps) => (
+    Popover: (props: React.PropsWithChildren<IPopoverProps>) => (
       <div className="popover">{props.children}</div>
     ),
     PopoverAnchorPosition: { Bottom: 'bottom' },
