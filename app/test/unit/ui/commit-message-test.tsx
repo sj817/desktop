@@ -393,6 +393,7 @@ function renderCommitMessage(
       accounts={[createAccount()]}
       hasCommitHooks={false}
       skipCommitHooks={false}
+      signOffCommits={false}
       onUpdateCommitOptions={() => {}}
     />
   )

@@ -266,6 +266,7 @@ function renderCommitMessageDialog(
       accounts={[createAccount()]}
       hasCommitHooks={true}
       skipCommitHooks={false}
+      signOffCommits={false}
       onUpdateCommitOptions={(_: Repository, __: CommitOptions) => {
         calls.push('update-options')
       }}

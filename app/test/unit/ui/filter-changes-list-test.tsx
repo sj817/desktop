@@ -338,6 +338,7 @@ function renderFilterChangesList(
       showChangesFilter={true}
       hasCommitHooks={false}
       skipCommitHooks={false}
+      signOffCommits={false}
       onUpdateCommitOptions={() => {}}
     />
   )
