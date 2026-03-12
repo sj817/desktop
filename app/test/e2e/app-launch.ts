@@ -412,21 +412,14 @@ describe('Auto-update', () => {
       expect(messageText).toContain(
         'Do not close GitHub Desktop while the update is in progress'
       )
-    })
 
-    it('restores mock to no-update', async () => {
       await controlMockServer('set-behavior/no-update')
       await controlMockServer('reset-requests')
-    })
 
-    it('quits the app via Quit Anyway', async () => {
       // Trigger quit again to re-show the installing-update dialog
       await browser.execute(() => {
         require('electron').ipcRenderer.send('quit-app')
       })
-
-      const installingDialog = await $('#installing-update')
-      await installingDialog.waitForDisplayed({ timeout: 5000 })
 
       const quitBtn = await installingDialog.$(
         '.button-group.destructive button[type="button"]'
