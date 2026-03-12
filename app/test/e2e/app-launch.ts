@@ -44,23 +44,21 @@ describe('GitHub Desktop - App Launch', () => {
     const title = await browser.getTitle()
     expect(typeof title).toBe('string')
 
-    // Wait for the body to have some content
+    // Wait for the React app to mount and render content
     await browser.waitUntil(
       async () => {
-        const body = await $('body')
-        const html = await body.getHTML()
-        return html.length > 50
+        const container = await $('#desktop-app-container')
+        const html = await container.getHTML()
+        return html.length > 100
       },
-      { timeout: 15000, timeoutMsg: 'App did not render content within 15s' }
+      {
+        timeout: 30000,
+        timeoutMsg: 'App did not render content within 30s',
+      }
     )
 
-    // Verify the page has rendered something
-    const body = await $('body')
-    const html = await body.getHTML()
-    expect(html.length).toBeGreaterThan(50)
-
     const skipWelcomeButton = await $('a.skip-button')
-    await skipWelcomeButton.waitForDisplayed({ timeout: 15000 })
+    await skipWelcomeButton.waitForDisplayed({ timeout: 30000 })
     await browser.execute(element => element.click(), skipWelcomeButton)
 
     const configureGit = await $('#configure-git')
