@@ -36,7 +36,17 @@ export const config: WebdriverIO.Config = {
   ],
 
   maxInstances: 1,
-  services: [['electron', { cdpBridgeTimeout: 60000 }]],
+  services: [
+    [
+      'electron',
+      {
+        // Set a very short bridge timeout so it fails quickly and
+        // doesn't block test execution. We don't use Electron API
+        // mocking so the bridge is not needed.
+        cdpBridgeTimeout: 1,
+      },
+    ],
+  ],
   capabilities: [
     {
       browserName: 'electron',
@@ -52,7 +62,7 @@ export const config: WebdriverIO.Config = {
 
   logLevel: 'warn',
   waitforTimeout: 10000,
-  connectionRetryTimeout: 120000,
+  connectionRetryTimeout: 30000,
   connectionRetryCount: 1,
 
   framework: 'mocha',

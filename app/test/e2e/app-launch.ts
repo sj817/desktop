@@ -414,43 +414,48 @@ describe('Auto-update', () => {
       )
     })
 
-    it('quits the app when clicking Quit Anyway', async () => {
+    it('restores mock to no-update', async () => {
+      await controlMockServer('set-behavior/no-update')
+      await controlMockServer('reset-requests')
+    })
+
+    it('quits the app via Quit Anyway', async () => {
+      // Trigger quit again to re-show the installing-update dialog
+      await browser.execute(() => {
+        require('electron').ipcRenderer.send('quit-app')
+      })
+
       const installingDialog = await $('#installing-update')
       await installingDialog.waitForDisplayed({ timeout: 5000 })
 
-      // The dialog has a destructive button group with Cancel (submit)
-      // and "Quit Anyway" (type="button") buttons.
       const quitBtn = await installingDialog.$(
         '.button-group.destructive button[type="button"]'
       )
       await quitBtn.waitForClickable({ timeout: 5000 })
+
+      // Get the Electron renderer process PID before clicking so we can
+      // verify the app actually exits — without using WebDriver on the
+      // dead session (which would hang).
+      const rendererPid: number = await browser.execute(() => process.pid)
+
       await quitBtn.click()
 
-      // The app should quit — the WebDriver session window will close.
-      // We verify by waiting for the window to become unavailable.
-      await browser.waitUntil(
-        async () => {
-          try {
-            await browser.getTitle()
-            return false
-          } catch {
-            // "no such window" or session error means the app quit
-            return true
-          }
-        },
-        {
-          timeout: 10000,
-          interval: 500,
-          timeoutMsg: 'App did not quit after clicking Quit Anyway',
+      // Poll the OS to confirm the renderer process exited.
+      // process.kill(pid, 0) throws when the process no longer exists.
+      const deadline = Date.now() + 10000
+      while (Date.now() < deadline) {
+        try {
+          process.kill(rendererPid, 0)
+          await new Promise(r => setTimeout(r, 200))
+        } catch {
+          // Process is gone — app quit successfully
+          return
         }
-      )
-    })
+      }
 
-    it('restores mock to no-update', async () => {
-      // This uses the mock server's HTTP control plane (not WebDriver),
-      // so it works even after the app has quit.
-      await controlMockServer('set-behavior/no-update')
-      await controlMockServer('reset-requests')
+      throw new Error(
+        `Electron renderer process ${rendererPid} did not exit within 10 seconds`
+      )
     })
   })
 })
