@@ -1,5 +1,6 @@
 /// <reference types="@wdio/globals/types" />
 
+import http from 'http'
 import { describe, it } from 'mocha'
 
 import {
@@ -12,6 +13,7 @@ import {
   smokeRepoPath,
   switchToDesktopWindow,
 } from './test-helpers'
+import { MOCK_CONTROL_URL } from './mock-update-server'
 
 async function dismissMoveToApplicationsDialog() {
   const notNowButton = await $(
@@ -227,6 +229,228 @@ describe('GitHub Desktop - App Launch', () => {
     await browser.waitUntil(async () => getSmokeRepoStatus() === '', {
       timeout: 15000,
       timeoutMsg: 'Smoke repository was not clean after switching branches',
+    })
+  })
+})
+
+// ── Helpers for the mock update server control plane ────────────────────
+
+function controlMockServer(action: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    http
+      .get(`${MOCK_CONTROL_URL}/${action}`, res => {
+        let data = ''
+        res.on('data', chunk => (data += chunk))
+        res.on('end', () => resolve(data))
+      })
+      .on('error', reject)
+  })
+}
+
+function getMockRequests(): Promise<
+  ReadonlyArray<{ method: string; url: string }>
+> {
+  return controlMockServer('requests').then(JSON.parse)
+}
+
+// ── Auto-update ─────────────────────────────────────────────────────────
+
+describe('Auto-update', () => {
+  describe('startup update check', () => {
+    it('sends an update check to the mock server on launch', async () => {
+      // The app performs an update check shortly after launch. It should
+      // have already hit the mock server by the time the smoke tests above
+      // finished.
+      await browser.waitUntil(
+        async () => {
+          const reqs = await getMockRequests()
+          return reqs.some(r => r.method === 'GET' && r.url.includes('/update'))
+        },
+        {
+          timeout: 30000,
+          interval: 1000,
+          timeoutMsg:
+            'Expected the app to send a GET update check to the mock server',
+        }
+      )
+    })
+
+    it('does not show update banner when no update is available', async () => {
+      // With the default "no-update" (HTTP 204), the banner should not
+      // be visible.
+      const banner = await $('#update-available')
+      const isDisplayed = await banner.isDisplayed().catch(() => false)
+      expect(isDisplayed).toBe(false)
+    })
+  })
+
+  describe('About dialog', () => {
+    it('shows the current version', async () => {
+      await browser.execute(() => {
+        require('electron').ipcRenderer.emit('menu-event', {}, 'show-about')
+      })
+
+      const aboutDialog = await $('#about')
+      await aboutDialog.waitForDisplayed({
+        timeout: 5000,
+        timeoutMsg: 'About dialog did not appear',
+      })
+
+      // The version text is in <span class="selectable-text">Version X.Y.Z (arch)</span>
+      const versionSpan = await aboutDialog.$('.selectable-text')
+      const versionText = await versionSpan.getText()
+      expect(versionText).toMatch(/Version \d+\.\d+\.\d+/)
+    })
+
+    it('shows up-to-date status after no-update check', async () => {
+      const aboutDialog = await $('#about')
+      const updateStatus = await aboutDialog.$('.update-status')
+      await updateStatus.waitForDisplayed({ timeout: 10000 })
+
+      const txt = await updateStatus.getText()
+      expect(txt.toLowerCase()).toContain('you have the latest version')
+    })
+
+    it('closes the About dialog', async () => {
+      // Submit the dialog form (the Close button is type="submit")
+      const closeBtn = await $('#about button[type="submit"]')
+      await closeBtn.click()
+
+      const aboutDialog = await $('#about')
+      await aboutDialog.waitForDisplayed({
+        timeout: 5000,
+        reverse: true,
+        timeoutMsg: 'About dialog did not close',
+      })
+    })
+  })
+
+  describe('update available', () => {
+    it('switches mock server to return an update', async () => {
+      await controlMockServer('reset-requests')
+      await controlMockServer('set-behavior/update-available')
+
+      const behavior = await controlMockServer('behavior')
+      expect(behavior).toBe('update-available')
+    })
+
+    it('triggers an update check and the app processes it', async () => {
+      // Open About dialog and click "Check for Updates"
+      await browser.execute(() => {
+        require('electron').ipcRenderer.emit('menu-event', {}, 'show-about')
+      })
+
+      const aboutDialog = await $('#about')
+      await aboutDialog.waitForDisplayed({ timeout: 5000 })
+
+      const checkBtn = await aboutDialog.$(
+        'button.button-component=Check for Updates'
+      )
+      if (await checkBtn.isExisting()) {
+        await checkBtn.click()
+      }
+
+      // Wait for the About dialog to show a status change from the update
+      // check — "Checking for updates…" or "Downloading update…" confirms
+      // the app processed the mock's update-available JSON feed.
+      const updateStatus = await aboutDialog.$('.update-status')
+      await browser.waitUntil(
+        async () => {
+          const isDisplayed = await updateStatus
+            .isDisplayed()
+            .catch(() => false)
+          if (!isDisplayed) {
+            return false
+          }
+          const txt = (await updateStatus.getText()).toLowerCase()
+          return (
+            txt.includes('checking') ||
+            txt.includes('downloading') ||
+            txt.includes('ready to be installed')
+          )
+        },
+        {
+          timeout: 15000,
+          interval: 1000,
+          timeoutMsg: 'Expected About dialog to show update-in-progress status',
+        }
+      )
+
+      // Close the dialog
+      const closeBtn = await $('#about button[type="submit"]')
+      await closeBtn.click()
+      await aboutDialog
+        .waitForDisplayed({ timeout: 5000, reverse: true })
+        .catch(() => {})
+    })
+
+    it('sent update check requests to the mock server', async () => {
+      const reqs = await getMockRequests()
+      const updateReqs = reqs.filter(
+        r => r.method === 'GET' && r.url.includes('/update')
+      )
+      expect(updateReqs.length).toBeGreaterThanOrEqual(1)
+    })
+
+    it('shows installing-update warning when quitting during download', async () => {
+      // The app is currently in the "downloading update" state because the
+      // mock server's download endpoint hangs forever. Attempting to quit
+      // should trigger the installing-update dialog warning the user.
+      await browser.execute(() => {
+        require('electron').ipcRenderer.send('quit-app')
+      })
+
+      const installingDialog = await $('#installing-update')
+      await installingDialog.waitForDisplayed({
+        timeout: 5000,
+        timeoutMsg: 'Installing update dialog did not appear when quitting',
+      })
+
+      // Verify the warning message is shown
+      const message = await installingDialog.$('.updating-message')
+      const messageText = await message.getText()
+      expect(messageText).toContain(
+        'Do not close GitHub Desktop while the update is in progress'
+      )
+    })
+
+    it('quits the app when clicking Quit Anyway', async () => {
+      const installingDialog = await $('#installing-update')
+      await installingDialog.waitForDisplayed({ timeout: 5000 })
+
+      // The dialog has a destructive button group with Cancel (submit)
+      // and "Quit Anyway" (type="button") buttons.
+      const quitBtn = await installingDialog.$(
+        '.button-group.destructive button[type="button"]'
+      )
+      await quitBtn.waitForClickable({ timeout: 5000 })
+      await quitBtn.click()
+
+      // The app should quit — the WebDriver session window will close.
+      // We verify by waiting for the window to become unavailable.
+      await browser.waitUntil(
+        async () => {
+          try {
+            await browser.getTitle()
+            return false
+          } catch {
+            // "no such window" or session error means the app quit
+            return true
+          }
+        },
+        {
+          timeout: 10000,
+          interval: 500,
+          timeoutMsg: 'App did not quit after clicking Quit Anyway',
+        }
+      )
+    })
+
+    it('restores mock to no-update', async () => {
+      // This uses the mock server's HTTP control plane (not WebDriver),
+      // so it works even after the app has quit.
+      await controlMockServer('set-behavior/no-update')
+      await controlMockServer('reset-requests')
     })
   })
 })

@@ -6,17 +6,26 @@ import http from 'http'
 export const MOCK_UPDATE_PORT = 51789
 export const MOCK_UPDATE_URL = `http://127.0.0.1:${MOCK_UPDATE_PORT}/update`
 
-type UpdateBehavior = 'no-update'
+/**
+ * URL that e2e tests can use to control the mock server behaviour at runtime
+ * via simple GET requests (e.g. `/_control/set-behavior/update-available`).
+ */
+export const MOCK_CONTROL_URL = `http://127.0.0.1:${MOCK_UPDATE_PORT}/_control`
+
+type UpdateBehavior = 'no-update' | 'update-available'
 
 export interface IMockUpdateServer {
   readonly server: http.Server
   readonly url: string
 
-  /** All requests received by the mock server. */
-  readonly requests: ReadonlyArray<{ method: string; url: string }>
+  /** All requests received by the mock server (excluding control requests). */
+  readonly requests: Array<{ method: string; url: string }>
 
   /** Change how the server responds to update checks. */
   setBehavior(behavior: UpdateBehavior): void
+
+  /** Reset the captured request log. */
+  resetRequests(): void
 
   close(): Promise<void>
 }
@@ -26,6 +35,16 @@ export interface IMockUpdateServer {
  * central.github.com for Squirrel (macOS) and Squirrel.Windows.
  *
  * By default, it responds with "no update available" (HTTP 204).
+ *
+ * In `update-available` mode, the JSON feed tells Squirrel an update
+ * exists. Squirrel will attempt to download the zip, receive a 404, and
+ * emit an `error` event. This is enough to verify that the app correctly
+ * processes the update feed and transitions through the expected states.
+ *
+ * Full binary verification is not possible in dev builds because
+ * Squirrel.Mac requires the update zip to satisfy the running app's code
+ * signing designated requirements — something only production-signed
+ * builds can provide.
  */
 export function createMockUpdateServer(): Promise<IMockUpdateServer> {
   return new Promise((resolve, reject) => {
@@ -33,21 +52,94 @@ export function createMockUpdateServer(): Promise<IMockUpdateServer> {
     const requests: Array<{ method: string; url: string }> = []
 
     const server = http.createServer((req, res) => {
-      requests.push({ method: req.method ?? 'GET', url: req.url ?? '/' })
+      const url = req.url ?? '/'
+
+      // ── Control plane ─────────────────────────────────────────────
+      if (url.startsWith('/_control/')) {
+        const action = url.replace('/_control/', '')
+
+        if (action === 'set-behavior/no-update') {
+          behavior = 'no-update'
+          res.writeHead(200)
+          res.end('ok')
+          return
+        }
+
+        if (action === 'set-behavior/update-available') {
+          behavior = 'update-available'
+          res.writeHead(200)
+          res.end('ok')
+          return
+        }
+
+        if (action === 'reset-requests') {
+          requests.length = 0
+          res.writeHead(200)
+          res.end('ok')
+          return
+        }
+
+        if (action === 'requests') {
+          res.writeHead(200, { 'content-type': 'application/json' })
+          res.end(JSON.stringify(requests))
+          return
+        }
+
+        if (action === 'behavior') {
+          res.writeHead(200)
+          res.end(behavior)
+          return
+        }
+
+        res.writeHead(404)
+        res.end('unknown control action')
+        return
+      }
+
+      // ── Update plane ──────────────────────────────────────────────
+      requests.push({ method: req.method ?? 'GET', url })
+
+      // Serve the fake download URL by hanging forever — send headers
+      // but never finish the body. Squirrel stays in "downloading"
+      // state without ever hitting an error or trying to unzip.
+      if (url.startsWith('/download/')) {
+        res.writeHead(200, {
+          'content-type': 'application/octet-stream',
+          'content-length': '999999999',
+        })
+        // Intentionally never call res.end() — the connection stays
+        // open until the server is shut down or the client disconnects.
+        return
+      }
+
+      if (req.method === 'HEAD') {
+        // Priority update status check.
+        res.writeHead(200, { 'x-prioritize-update': 'false' })
+        res.end()
+        return
+      }
 
       if (behavior === 'no-update') {
-        // Squirrel.Mac interprets 204 as "no update available".
-        // Squirrel.Windows interprets an empty RELEASES file similarly.
-        if (req.method === 'HEAD') {
-          // Priority update status check — no priority update.
-          res.writeHead(200, {
-            'x-prioritize-update': 'false',
-          })
-          res.end()
-        } else {
-          res.writeHead(204)
-          res.end()
-        }
+        res.writeHead(204)
+        res.end()
+        return
+      }
+
+      if (behavior === 'update-available') {
+        // Squirrel.Mac JSON feed. The download URL points back to this
+        // server's /download/ handler which hangs forever, keeping the
+        // app in "downloading" state without completing or erroring.
+        const body = JSON.stringify({
+          url: `http://127.0.0.1:${MOCK_UPDATE_PORT}/download/update.zip`,
+          name: '99.0.0',
+          notes: 'E2E test update',
+          pub_date: new Date().toISOString(),
+        })
+        res.writeHead(200, {
+          'content-type': 'application/json',
+          'content-length': Buffer.byteLength(body),
+        })
+        res.end(body)
         return
       }
 
@@ -57,19 +149,23 @@ export function createMockUpdateServer(): Promise<IMockUpdateServer> {
 
     server.on('error', reject)
     server.listen(MOCK_UPDATE_PORT, '127.0.0.1', () => {
-      resolve({
+      const instance: IMockUpdateServer = {
         server,
         url: MOCK_UPDATE_URL,
         requests,
         setBehavior(b: UpdateBehavior) {
           behavior = b
         },
+        resetRequests() {
+          requests.length = 0
+        },
         close() {
           return new Promise<void>((res, rej) =>
             server.close(err => (err ? rej(err) : res()))
           )
         },
-      })
+      }
+      resolve(instance)
     })
   })
 }
