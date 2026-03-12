@@ -5,6 +5,18 @@ import {
   defaultDateFormat,
   defaultTimeFormat,
 } from '../models/formatting-preferences'
+import { enableFormattingPreferences } from './feature-flag'
+import mem from 'mem'
+import QuickLRU from 'quick-lru'
+
+// Initializing a date formatter is expensive but formatting is relatively cheap
+// so we cache them based on the locale and their options. The maxSize of a 100
+// is only as an escape hatch, we don't expect to ever create more than a
+// handful different formatters.
+const getDateFormatter = mem(Intl.DateTimeFormat, {
+  cache: new QuickLRU({ maxSize: 100 }),
+  cacheKey: (...args) => JSON.stringify(args),
+})
 
 const dateFormatKey = 'dateFormat'
 const timeFormatKey = 'timeFormat'
@@ -40,6 +52,13 @@ export function formatDate(
 ): string {
   if (isNaN(value.valueOf())) {
     return 'Invalid date'
+  }
+
+  if (!enableFormattingPreferences()) {
+    return getDateFormatter('en-US', {
+      dateStyle: date ? 'full' : undefined,
+      timeStyle: time ? 'short' : undefined,
+    }).format(value)
   }
 
   const parts: Array<string> = []

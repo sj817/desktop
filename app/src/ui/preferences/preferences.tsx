@@ -67,6 +67,7 @@ import {
   numberFormatToKey,
   numberFormatFromKey,
 } from '../../models/formatting-preferences'
+import { enableFormattingPreferences } from '../../lib/feature-flag'
 
 const dateFormatKey = 'dateFormat'
 const timeFormatKey = 'timeFormat'
@@ -232,9 +233,11 @@ export class Preferences extends React.Component<
       selectedGitHookEnvShell: getGitHookEnvShell(),
       hooksPreferencesDirty: false,
       selectedDateFormat:
-        (localStorage.getItem(dateFormatKey) as DateFormat) ?? defaultDateFormat,
+        (localStorage.getItem(dateFormatKey) as DateFormat) ??
+        defaultDateFormat,
       selectedTimeFormat:
-        (localStorage.getItem(timeFormatKey) as TimeFormat) ?? defaultTimeFormat,
+        (localStorage.getItem(timeFormatKey) as TimeFormat) ??
+        defaultTimeFormat,
       selectedNumberFormat: numberFormatFromKey(
         localStorage.getItem(numberFormatKey) ?? ''
       ),
@@ -351,10 +354,12 @@ export class Preferences extends React.Component<
               <Octicon className="icon" symbol={octicons.paintbrush} />
               Appearance
             </span>
-            <span id={this.getTabId(PreferencesTab.Formatting)}>
-              <Octicon className="icon" symbol={octicons.number} />
-              Formatting
-            </span>
+            {enableFormattingPreferences() && (
+              <span id={this.getTabId(PreferencesTab.Formatting)}>
+                <Octicon className="icon" symbol={octicons.number} />
+                Formatting
+              </span>
+            )}
             <span id={this.getTabId(PreferencesTab.Notifications)}>
               <Octicon className="icon" symbol={octicons.bell} />
               Notifications

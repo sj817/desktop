@@ -115,3 +115,5 @@ export function enableAccessibleListToolTips(): boolean {
 export const enableHooksEnvironment = () => true
 
 export const enableHooksByDefault = enableBetaFeatures
+
+export const enableFormattingPreferences = enableBetaFeatures
