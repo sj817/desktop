@@ -136,10 +136,6 @@ export function getDistArchitecture(): 'arm64' | 'x64' {
 }
 
 export function getUpdatesURL() {
-  if (process.env.DESKTOP_UPDATES_URL) {
-    return process.env.DESKTOP_UPDATES_URL
-  }
-
   // It is also possible to use a `x64/` path, but for now we'll leave the
   // original URL without architecture in it (which will still work for
   // compatibility reasons) in case anything goes wrong until we have everything

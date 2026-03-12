@@ -12,7 +12,7 @@
     "test": "node script/test.mjs",
     "test:unit": "node script/test.mjs",
     "test:setup": "ts-node -P script/tsconfig.json script/test-setup.ts",
-    "test:e2e": "cross-env DESKTOP_UPDATES_URL=http://127.0.0.1:51789/update NODE_ENV=production TS_NODE_PROJECT=script/tsconfig.json NODE_OPTIONS='--max_old_space_size=4096' webpack --config app/webpack.production.ts && wdio run app/test/e2e/wdio.conf.ts",
+    "test:e2e": "cross-env DESKTOP_E2E_UPDATES_URL=http://127.0.0.1:51789/update NODE_ENV=production TS_NODE_PROJECT=script/tsconfig.json NODE_OPTIONS='--max_old_space_size=4096' webpack --config app/webpack.production.ts && wdio run app/test/e2e/wdio.conf.ts",
     "postinstall": "ts-node -P script/tsconfig.json script/post-install.ts",
     "start": "cross-env NODE_ENV=development ts-node -P script/tsconfig.json script/start.ts",
     "start:prod": "cross-env NODE_ENV=production ts-node -P script/tsconfig.json script/start.ts",
