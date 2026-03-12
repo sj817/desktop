@@ -5,6 +5,10 @@ import os from 'os'
 import path from 'path'
 
 import { ensureSmokeTestRepository, smokeRepoPath } from './test-helpers'
+import {
+  createMockUpdateServer,
+  type IMockUpdateServer,
+} from './mock-update-server'
 
 const projectRoot = path.resolve(__dirname, '..', '..', '..')
 const appEntryPoint = path.join(projectRoot, 'out', 'main.js')
@@ -19,6 +23,8 @@ if (!fs.existsSync(appEntryPoint)) {
 fs.rmSync(userDataDir, { recursive: true, force: true })
 fs.mkdirSync(userDataDir, { recursive: true })
 
+let mockUpdateServer: IMockUpdateServer | null = null
+
 export const config: WebdriverIO.Config = {
   runner: 'local',
   rootDir: projectRoot,
@@ -26,6 +32,7 @@ export const config: WebdriverIO.Config = {
   exclude: [
     path.join(__dirname, 'wdio.conf.ts'),
     path.join(__dirname, 'test-helpers.ts'),
+    path.join(__dirname, 'mock-update-server.ts'),
   ],
 
   maxInstances: 1,
@@ -54,5 +61,17 @@ export const config: WebdriverIO.Config = {
   mochaOpts: {
     ui: 'bdd',
     timeout: 120000,
+  },
+
+  async onPrepare() {
+    mockUpdateServer = await createMockUpdateServer()
+    console.log(`Mock update server listening at ${mockUpdateServer.url}`)
+  },
+
+  async onComplete() {
+    if (mockUpdateServer !== null) {
+      await mockUpdateServer.close()
+      console.log('Mock update server stopped')
+    }
   },
 }
