@@ -1,13 +1,16 @@
 /**
- * Playwright helper for ad-hoc agent-driven UI verification.
+ * Launch GitHub Desktop via Playwright for agent-driven UI verification.
  *
- * This script launches GitHub Desktop in Electron via Playwright and opens
- * an interactive REPL where agents (or developers) can explore the UI,
- * take screenshots, and verify visual changes.
+ * This script starts the app and keeps it running so that an agent can
+ * interact with it using Playwright browser automation tools (click
+ * elements, take screenshots, inspect the DOM, etc.).
+ *
+ * Set RECORD_VIDEO=1 to enable video recording of the session. The video
+ * is saved to the project root when the app closes.
  *
  * Usage:
- *   yarn playwright:launch              # launch app and open REPL
- *   yarn playwright:screenshot          # launch, take a screenshot, exit
+ *   npx ts-node -P script/tsconfig.json script/playwright-electron.ts
+ *   RECORD_VIDEO=1 npx ts-node -P script/tsconfig.json script/playwright-electron.ts
  *
  * Prerequisites:
  *   yarn build:dev   # or yarn compile:dev — need out/main.js
@@ -17,14 +20,13 @@
 
 import path from 'path'
 import fs from 'fs'
+import os from 'os'
 import { _electron as electron } from 'playwright'
 
 const projectRoot = path.resolve(__dirname, '..')
 const appEntryPoint = path.join(projectRoot, 'out', 'main.js')
-const userDataDir = path.join(
-  require('os').tmpdir(),
-  'github-desktop-playwright-verify'
-)
+const userDataDir = path.join(os.tmpdir(), 'github-desktop-playwright-verify')
+const videosDir = path.join(projectRoot, 'playwright-videos')
 
 if (!fs.existsSync(appEntryPoint)) {
   console.error(
@@ -36,8 +38,15 @@ if (!fs.existsSync(appEntryPoint)) {
 fs.rmSync(userDataDir, { recursive: true, force: true })
 fs.mkdirSync(userDataDir, { recursive: true })
 
+const recordVideo = process.env.RECORD_VIDEO === '1'
+
 async function main() {
-  const mode = process.argv[2] ?? 'launch'
+  if (recordVideo) {
+    fs.mkdirSync(videosDir, { recursive: true })
+    console.log(
+      `Video recording enabled — videos will be saved to ${videosDir}`
+    )
+  }
 
   console.log('Launching GitHub Desktop via Playwright…')
   const app = await electron.launch({
@@ -48,37 +57,37 @@ async function main() {
       GIT_CONFIG_GLOBAL: path.join(userDataDir, '.gitconfig'),
       GIT_CONFIG_SYSTEM: path.join(userDataDir, '.gitconfig-system'),
     },
+    recordVideo: recordVideo
+      ? { dir: videosDir, size: { width: 1280, height: 800 } }
+      : undefined,
   })
 
   const window = await app.firstWindow()
   console.log(`Window title: ${await window.title()}`)
   console.log(`Window URL:   ${window.url()}`)
+  console.log('\nPlaywright Electron session is active.')
+  console.log(
+    'Use Playwright browser automation tools to interact with the app.'
+  )
+  console.log('Press Ctrl+C to close.\n')
 
-  if (mode === 'screenshot') {
-    // Wait for the app to render
-    await window.waitForLoadState('domcontentloaded')
-    await window.waitForTimeout(3000)
-
-    const screenshotPath = path.join(projectRoot, 'screenshot.png')
-    await window.screenshot({ path: screenshotPath })
-    console.log(`Screenshot saved to ${screenshotPath}`)
-
+  // When the process is interrupted, close gracefully so videos are flushed
+  process.on('SIGINT', async () => {
+    console.log('\nClosing app…')
     await app.close()
+
+    if (recordVideo) {
+      const video = window.video()
+      if (video) {
+        const videoPath = await video.path()
+        console.log(`Video saved: ${videoPath}`)
+      }
+    }
+
     process.exit(0)
-  }
+  })
 
-  // Interactive mode — keep the app open
-  console.log('\n=== Playwright Electron session active ===')
-  console.log('The app is running. You can use Playwright MCP tools to')
-  console.log('interact with it, or press Ctrl+C to close.\n')
-  console.log('Useful Playwright page methods:')
-  console.log('  await page.screenshot({ path: "screenshot.png" })')
-  console.log('  await page.locator("#selector").click()')
-  console.log('  await page.locator("text=Button").click()')
-  console.log('  const html = await page.content()')
-  console.log('')
-
-  // Keep process alive
+  // Keep process alive until interrupted
   await new Promise(() => {})
 }
 

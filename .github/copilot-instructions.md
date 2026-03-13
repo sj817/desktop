@@ -255,3 +255,60 @@ describe('ModuleName', () => {
   })
 })
 ```
+
+### Visual UI Verification with Playwright
+
+When making UI changes (adding buttons, changing layouts, updating themes, etc.), verify your work visually using Playwright connected to the running Electron app. This is **not** for writing committed test files — it's for interactive, ad-hoc verification during development.
+
+#### Setup
+
+1. Build the app: `yarn build:dev`
+2. Launch via Playwright: `npx ts-node -P script/tsconfig.json script/playwright-electron.ts`
+3. The app opens in a fresh, isolated environment (separate user data, git config)
+
+#### Workflow
+
+Once the app is running, use Playwright browser automation tools to interact with it:
+
+1. **Navigate** to the UI you changed (click buttons, open dialogs, switch tabs)
+2. **Take screenshots** before and after your change to verify the visual result
+3. **Inspect elements** to confirm correct CSS classes, layout, and accessibility attributes
+4. **Test interactions** — click your new buttons, fill inputs, verify state transitions
+5. **Close** the app (Ctrl+C in the terminal) when done
+
+#### Example: Verifying a new theme toggle button
+
+```
+1. Launch the app with Playwright
+2. Navigate: open a repository, open the diff view
+3. Screenshot: take a "before" screenshot of the current theme
+4. Interact: click the diff options popover, find the new theme toggle
+5. Screenshot: capture the popover with the new button visible
+6. Interact: click the theme toggle button
+7. Screenshot: take an "after" screenshot showing the theme changed
+8. Compare the before/after screenshots to verify the change
+```
+
+#### Key details
+
+- The app runs in an isolated environment — your real git config and GitHub Desktop settings are not affected.
+- The launch script is at `script/playwright-electron.ts`.
+- Screenshots should NOT be committed to the repository (`screenshot.png` is gitignored).
+
+#### Recording a demo video for Pull Requests
+
+Before submitting a Pull Request that includes UI changes, record a video demonstrating the feature working end-to-end. This video is attached to the PR description so reviewers can see the change in action without building locally.
+
+1. Build the app with your changes: `yarn build:dev`
+2. Launch with video recording enabled:
+   ```bash
+   RECORD_VIDEO=1 npx ts-node -P script/tsconfig.json script/playwright-electron.ts
+   ```
+3. Use Playwright browser automation tools to walk through the feature:
+   - Navigate to the relevant UI
+   - Demonstrate the new/changed behavior step by step
+   - Take screenshots at key moments (these can be attached to the PR alongside the video)
+4. Close the app (Ctrl+C) — the video is saved to `playwright-videos/`
+5. Attach the video and screenshots to the PR description
+
+Videos are saved at 1280×800 resolution in WebM format. The `playwright-videos/` directory is gitignored — videos are meant to be uploaded to the PR as attachments, not committed.

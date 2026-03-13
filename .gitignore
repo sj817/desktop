@@ -20,3 +20,4 @@ junit*.xml
 *.swp
 tslint-rules/
 screenshot.png
+playwright-videos/
