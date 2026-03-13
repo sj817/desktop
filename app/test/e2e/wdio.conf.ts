@@ -40,6 +40,26 @@ process.env.GIT_SSH_COMMAND = 'false'
 
 let mockUpdateServer: IMockUpdateServer | null = null
 
+/**
+ * The wdio-electron-service's CDP bridge always fails with un-packaged
+ * Electron (fuse detection fails), and this failure crashes the entire
+ * test session. Monkey-patch the service's `before` hook to catch the
+ * bridge error so tests proceed normally. We don't need the bridge —
+ * it's only used for Electron API mocking via `browser.electron`.
+ */
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const ElectronWorkerService = require('wdio-electron-service').default
+const originalBefore = ElectronWorkerService.prototype.before
+ElectronWorkerService.prototype.before = async function (
+  ...args: unknown[]
+): Promise<void> {
+  try {
+    await originalBefore.apply(this, args)
+  } catch {
+    console.warn('[e2e] CDP bridge failed (expected with dev Electron)')
+  }
+}
+
 export const config: WebdriverIO.Config = {
   runner: 'local',
   rootDir: projectRoot,
@@ -55,10 +75,7 @@ export const config: WebdriverIO.Config = {
     [
       'electron',
       {
-        // Set a very short bridge timeout so it fails quickly and
-        // doesn't block test execution. We don't use Electron API
-        // mocking so the bridge is not needed.
-        cdpBridgeTimeout: 1,
+        cdpBridgeTimeout: 2000,
       },
     ],
   ],
@@ -77,8 +94,8 @@ export const config: WebdriverIO.Config = {
 
   logLevel: 'warn',
   waitforTimeout: 10000,
-  connectionRetryTimeout: 30000,
-  connectionRetryCount: 1,
+  connectionRetryTimeout: 5000,
+  connectionRetryCount: 0,
 
   framework: 'mocha',
   reporters: ['spec'],
