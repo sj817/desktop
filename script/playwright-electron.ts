@@ -53,9 +53,14 @@ async function main() {
     args: [appEntryPoint, `--user-data-dir=${userDataDir}`],
     env: {
       ...process.env,
-      // Isolate git config from the developer's real config
+      // Isolate all user config so the agent doesn't read or modify the
+      // developer's real settings.
       GIT_CONFIG_GLOBAL: path.join(userDataDir, '.gitconfig'),
       GIT_CONFIG_SYSTEM: path.join(userDataDir, '.gitconfig-system'),
+      XDG_CONFIG_HOME: path.join(userDataDir, '.config'),
+      // Prevent SSH from using the developer's real keys
+      SSH_AUTH_SOCK: '',
+      GIT_SSH_COMMAND: 'false',
     },
     recordVideo: recordVideo
       ? { dir: videosDir, size: { width: 1280, height: 800 } }
