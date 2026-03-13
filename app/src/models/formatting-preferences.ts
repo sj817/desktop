@@ -25,9 +25,99 @@ const twelveHourCountries = new Set([
   'CO', // Colombia
 ])
 
+// Sourced from https://en.wikipedia.org/wiki/Decimal_separator
+const decimalPointCountries = [
+  'AU', // Australia
+  'BS', // Bahamas, The
+  'BD', // Bangladesh
+  'BW', // Botswana
+  // British West Indies - No single ISO code (historical region, now multiple countries)
+  // Copilot expanded it to the following country codes
+  ...[
+    'AI', // Anguilla (British Overseas Territory)
+    'AG', // Antigua and Barbuda
+    'BS', // Bahamas
+    'BB', // Barbados
+    'BM', // Bermuda (British Overseas Territory)
+    'VG', // British Virgin Islands (British Overseas Territory)
+    'KY', // Cayman Islands (British Overseas Territory)
+    'DM', // Dominica
+    'GD', // Grenada
+    'JM', // Jamaica
+    'MS', // Montserrat (British Overseas Territory)
+    'KN', // Saint Kitts and Nevis
+    'LC', // Saint Lucia
+    'VC', // Saint Vincent and the Grenadines
+    'TT', // Trinidad and Tobago
+    'TC', // Turks and Caicos Islands (British Overseas Territory)
+    'GY', // Guyana (formerly British Guiana)
+    'BZ', // Belize (formerly British Honduras)
+  ],
+  'KH', // Cambodia
+  'CA', // Canada
+  'CN', // China
+  'CY', // Cyprus
+  'DO', // Dominican Republic
+  'EG', // Egypt
+  'SV', // El Salvador
+  'ET', // Ethiopia
+  'GH', // Ghana
+  'GT', // Guatemala
+  'GY', // Guyana
+  'HN', // Honduras
+  'HK', // Hong Kong
+  'IN', // India
+  'IE', // Ireland
+  'IL', // Israel
+  'JM', // Jamaica
+  'JP', // Japan
+  'JO', // Jordan
+  'KE', // Kenya
+  'KP', // Korea, North
+  'KR', // Korea, South
+  'LY', // Libya
+  'LI', // Liechtenstein
+  'MO', // Macau
+  'MY', // Malaysia
+  'MV', // Maldives
+  'MT', // Malta
+  'MX', // Mexico
+  'MM', // Myanmar
+  'NA', // Namibia
+  'NP', // Nepal
+  'NZ', // New Zealand
+  'NI', // Nicaragua
+  'NG', // Nigeria
+  'PK', // Pakistan
+  'PA', // Panama
+  'PH', // Philippines
+  'RW', // Rwanda
+  'QA', // Qatar
+  'SA', // Saudi Arabia
+  'SG', // Singapore
+  'SO', // Somalia
+  'LK', // Sri Lanka
+  'CH', // Switzerland
+  'SY', // Syria
+  'TW', // Taiwan
+  'TZ', // Tanzania
+  'TH', // Thailand
+  'UG', // Uganda
+  'AE', // United Arab Emirates
+  'GB', // United Kingdom
+  'US', // United States
+]
+
 function prefersTwelveHourTime(): boolean {
   return (
     localeCountryCode !== null && twelveHourCountries.has(localeCountryCode)
+  )
+}
+
+function prefersDecimalPoint(): boolean {
+  return (
+    localeCountryCode !== null &&
+    decimalPointCountries.includes(localeCountryCode)
   )
 }
 
@@ -180,10 +270,9 @@ export const defaultDateFormat: DateFormat = 'MMM d, yyyy'
 export const defaultTimeFormat: TimeFormat = prefersTwelveHourTime()
   ? 'h:mm aaa'
   : 'HH:mm'
-export const defaultNumberFormat: INumberFormat = {
-  thousandsSeparator: '',
-  decimalSeparator: '.',
-}
+export const defaultNumberFormat: INumberFormat = prefersDecimalPoint()
+  ? { thousandsSeparator: ' ', decimalSeparator: '.' }
+  : { thousandsSeparator: ' ', decimalSeparator: ',' }
 
 const dateFormatKey = 'dateFormat'
 const timeFormatKey = 'timeFormat'
