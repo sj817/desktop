@@ -141,9 +141,11 @@ jobs:
 
       - name: Check dry run
         if: steps.parse.outputs.dry-run == 'true'
+        env:
+          NEXT_VERSION: ${{ steps.parse.outputs.next-version }}
         run: |
           echo "🏃 Dry run mode — skipping branch and PR creation."
-          echo "Would have created release branch and PR for ${{ steps.parse.outputs.next-version }}"
+          echo "Would have created release branch and PR for $NEXT_VERSION"
           exit 0
 
       - name: Create release branch
@@ -248,10 +250,11 @@ jobs:
       - name: Build PR body
         if: steps.parse.outputs.dry-run != 'true'
         id: pr-body
+        env:
+          NEXT_VERSION: ${{ steps.parse.outputs.next-version }}
+          CHANNEL: ${{ steps.parse.outputs.channel }}
+          UNCERTAIN_COUNT: ${{ steps.parse.outputs.uncertain-count }}
         run: |
-          NEXT_VERSION="${{ steps.parse.outputs.next-version }}"
-          CHANNEL="${{ steps.parse.outputs.channel }}"
-          UNCERTAIN_COUNT="${{ steps.parse.outputs.uncertain-count }}"
 
           {
             echo 'body<<PREOF'
