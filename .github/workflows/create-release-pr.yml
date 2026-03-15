@@ -1,0 +1,323 @@
+name: 'Create Release PR from Draft Notes'
+
+on:
+  workflow_run:
+    workflows: ['Draft Release Notes for GitHub Desktop']
+    types: [completed]
+
+jobs:
+  create-release-pr:
+    name: Create Release PR
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      actions: read
+
+    steps:
+      - name: Download agent outputs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: agent_outputs
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: agent-outputs
+
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.DESKTOP_RELEASES_APP_ID }}
+          private-key: ${{ secrets.DESKTOP_RELEASES_APP_PRIVATE_KEY }}
+          owner: desktop
+          repositories: desktop
+
+      - name: Extract release notes draft
+        run: |
+          echo "📂 Agent outputs contents:"
+          find agent-outputs -type f
+
+          # Try direct file first (if the artifact capture works)
+          if [ -f agent-outputs/sandbox/agent/release-notes-draft.json ]; then
+            cp agent-outputs/sandbox/agent/release-notes-draft.json release-notes-draft.json
+            echo "✅ Found release-notes-draft.json as direct file"
+          elif [ -f agent-outputs/release-notes-draft.json ]; then
+            cp agent-outputs/release-notes-draft.json release-notes-draft.json
+            echo "✅ Found release-notes-draft.json as direct file"
+          else
+            # Fallback: extract JSON from conversation.md
+            echo "⚠️ Direct file not found, extracting from conversation.md..."
+
+            CONVO="agent-outputs/sandbox/agent/logs/conversation.md"
+            if [ ! -f "$CONVO" ]; then
+              echo "❌ conversation.md not found either"
+              exit 1
+            fi
+
+            # Extract JSON: find the last JSON object with "nextVersion" using
+            # brace-matching, which is more robust than regex code block parsing
+            node -e '
+              const fs = require("fs");
+              const convo = fs.readFileSync(process.argv[1], "utf8");
+
+              const marker = "\"nextVersion\":";
+              let searchFrom = convo.length;
+              let lastValid = null;
+
+              while (searchFrom > 0) {
+                const idx = convo.lastIndexOf(marker, searchFrom - 1);
+                if (idx === -1) break;
+                searchFrom = idx;
+
+                let start = idx;
+                while (start > 0 && convo[start] !== "{") start--;
+
+                let depth = 0, end = start;
+                for (let i = start; i < convo.length; i++) {
+                  if (convo[i] === "{") depth++;
+                  if (convo[i] === "}") {
+                    depth--;
+                    if (depth === 0) { end = i; break; }
+                  }
+                }
+
+                const candidate = convo.substring(start, end + 1);
+                try {
+                  const parsed = JSON.parse(candidate);
+                  if (parsed.nextVersion && Array.isArray(parsed.entries)) {
+                    lastValid = parsed;
+                    break;
+                  }
+                } catch (e) {
+                  // Try next occurrence
+                }
+              }
+
+              if (!lastValid) {
+                console.error("❌ No valid release notes JSON found in conversation.md");
+                process.exit(1);
+              }
+
+              fs.writeFileSync("release-notes-draft.json", JSON.stringify(lastValid, null, 2));
+              console.log("✅ Extracted release notes from conversation.md");
+              console.log("   Entries:", lastValid.entries.length, "Skipped:", (lastValid.skippedPRs || []).length);
+            ' "$CONVO"
+          fi
+
+          echo "📋 Release notes content:"
+          cat release-notes-draft.json | jq .
+
+      - name: Parse release notes draft
+        id: parse
+        run: |
+          cat release-notes-draft.json | jq .
+
+          NEXT_VERSION=$(jq -r '.nextVersion' release-notes-draft.json)
+          PREVIOUS_VERSION=$(jq -r '.previousVersion' release-notes-draft.json)
+          CHANNEL=$(jq -r '.channel' release-notes-draft.json)
+          SOURCE_REF=$(jq -r '.sourceRef' release-notes-draft.json)
+          DRY_RUN=$(jq -r '.dryRun' release-notes-draft.json)
+
+          echo "next-version=$NEXT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "previous-version=$PREVIOUS_VERSION" >> "$GITHUB_OUTPUT"
+          echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
+          echo "source-ref=$SOURCE_REF" >> "$GITHUB_OUTPUT"
+          echo "dry-run=$DRY_RUN" >> "$GITHUB_OUTPUT"
+
+          # Count entries and uncertain entries
+          ENTRY_COUNT=$(jq '.entries | length' release-notes-draft.json)
+          UNCERTAIN_COUNT=$(jq '.uncertainEntries | length' release-notes-draft.json)
+          SKIPPED_COUNT=$(jq '.skippedPRs | length' release-notes-draft.json)
+          echo "entry-count=$ENTRY_COUNT" >> "$GITHUB_OUTPUT"
+          echo "uncertain-count=$UNCERTAIN_COUNT" >> "$GITHUB_OUTPUT"
+          echo "skipped-count=$SKIPPED_COUNT" >> "$GITHUB_OUTPUT"
+
+          echo "## Release Notes Draft Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Version**: $NEXT_VERSION (from $PREVIOUS_VERSION)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Channel**: $CHANNEL" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Entries**: $ENTRY_COUNT" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Uncertain entries**: $UNCERTAIN_COUNT" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Skipped PRs**: $SKIPPED_COUNT" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Dry run**: $DRY_RUN" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Check dry run
+        if: steps.parse.outputs.dry-run == 'true'
+        run: |
+          echo "🏃 Dry run mode — skipping branch and PR creation."
+          echo "Would have created release branch and PR for ${{ steps.parse.outputs.next-version }}"
+          exit 0
+
+      - name: Create release branch
+        if: steps.parse.outputs.dry-run != 'true'
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          NEXT_VERSION: ${{ steps.parse.outputs.next-version }}
+          SOURCE_REF: ${{ steps.parse.outputs.source-ref }}
+        run: |
+          # Check if branch already exists
+          if gh api "repos/desktop/desktop/git/ref/heads/releases/$NEXT_VERSION" --silent 2>/dev/null; then
+            echo "⚠️ Branch releases/$NEXT_VERSION already exists — skipping creation"
+            exit 0
+          fi
+
+          # Get the SHA for the source ref
+          SOURCE_SHA=$(gh api "repos/desktop/desktop/git/ref/heads/$SOURCE_REF" --jq '.object.sha' 2>/dev/null || true)
+
+          if [ -z "$SOURCE_SHA" ]; then
+            # Try as a tag
+            SOURCE_SHA=$(gh api "repos/desktop/desktop/git/ref/tags/$SOURCE_REF" --jq '.object.sha' 2>/dev/null || true)
+          fi
+
+          if [ -z "$SOURCE_SHA" ]; then
+            echo "❌ Could not resolve source ref: $SOURCE_REF"
+            exit 1
+          fi
+
+          gh api "repos/desktop/desktop/git/refs" \
+            -f ref="refs/heads/releases/$NEXT_VERSION" \
+            -f sha="$SOURCE_SHA"
+
+          echo "✅ Created branch releases/$NEXT_VERSION from $SOURCE_REF ($SOURCE_SHA)"
+
+      - name: Update changelog.json
+        if: steps.parse.outputs.dry-run != 'true'
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          NEXT_VERSION: ${{ steps.parse.outputs.next-version }}
+        run: |
+          # Get current changelog from the release branch
+          if gh api "repos/desktop/desktop/contents/changelog.json?ref=releases/$NEXT_VERSION" --silent 2>/dev/null; then
+            FILE_SHA=$(gh api "repos/desktop/desktop/contents/changelog.json?ref=releases/$NEXT_VERSION" --jq '.sha')
+            CURRENT_CONTENT=$(gh api "repos/desktop/desktop/contents/changelog.json?ref=releases/$NEXT_VERSION" \
+              -H "Accept: application/vnd.github.raw+json")
+
+            UPDATED_CHANGELOG=$(echo "$CURRENT_CONTENT" | node -e "
+              const fs = require('fs');
+              const draft = JSON.parse(fs.readFileSync('release-notes-draft.json', 'utf8'));
+              const changelog = JSON.parse(fs.readFileSync(0, 'utf8'));
+              const newReleases = { [draft.nextVersion]: draft.entries };
+              Object.assign(newReleases, changelog.releases);
+              changelog.releases = newReleases;
+              console.log(JSON.stringify(changelog, null, 2));
+            ")
+
+            ENCODED=$(echo "$UPDATED_CHANGELOG" | base64 -w 0)
+            gh api "repos/desktop/desktop/contents/changelog.json" \
+              -X PUT \
+              -f message="Update changelog for $NEXT_VERSION" \
+              -f content="$ENCODED" \
+              -f branch="releases/$NEXT_VERSION" \
+              -f sha="$FILE_SHA"
+            echo "✅ Updated changelog.json"
+          else
+            echo "❌ changelog.json not found on releases/$NEXT_VERSION branch"
+            exit 1
+          fi
+
+      - name: Update app/package.json version
+        if: steps.parse.outputs.dry-run != 'true'
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          NEXT_VERSION: ${{ steps.parse.outputs.next-version }}
+        run: |
+          # Get current package.json from the release branch
+          if gh api "repos/desktop/desktop/contents/app/package.json?ref=releases/$NEXT_VERSION" --silent 2>/dev/null; then
+            PKG_SHA=$(gh api "repos/desktop/desktop/contents/app/package.json?ref=releases/$NEXT_VERSION" --jq '.sha')
+            CONTENT=$(gh api "repos/desktop/desktop/contents/app/package.json?ref=releases/$NEXT_VERSION" \
+              -H "Accept: application/vnd.github.raw+json")
+
+            UPDATED=$(echo "$CONTENT" | node -e "
+              const fs = require('fs');
+              const pkg = JSON.parse(fs.readFileSync(0, 'utf8'));
+              pkg.version = process.env.NEXT_VERSION;
+              console.log(JSON.stringify(pkg, null, 2));
+            ")
+
+            ENCODED=$(echo "$UPDATED" | base64 -w 0)
+            gh api "repos/desktop/desktop/contents/app/package.json" \
+              -X PUT \
+              -f message="Bump version to $NEXT_VERSION" \
+              -f content="$ENCODED" \
+              -f branch="releases/$NEXT_VERSION" \
+              -f sha="$PKG_SHA"
+            echo "✅ Updated app/package.json to $NEXT_VERSION"
+          else
+            echo "❌ app/package.json not found on releases/$NEXT_VERSION branch"
+            exit 1
+          fi
+
+      - name: Build PR body
+        if: steps.parse.outputs.dry-run != 'true'
+        id: pr-body
+        run: |
+          NEXT_VERSION="${{ steps.parse.outputs.next-version }}"
+          CHANNEL="${{ steps.parse.outputs.channel }}"
+          UNCERTAIN_COUNT="${{ steps.parse.outputs.uncertain-count }}"
+
+          {
+            echo 'body<<PREOF'
+
+            if [ "$CHANNEL" = "beta" ]; then
+              echo "Beta release of v$NEXT_VERSION"
+            else
+              echo "Production release v$NEXT_VERSION"
+            fi
+
+            echo ""
+            echo "## Release checklist"
+            echo "- [ ] Check to see if there are any errors in Sentry that have only occurred since the last production release"
+            echo "- [ ] Verify that all feature flags are flipped appropriately"
+            echo "- [ ] If there are any new metrics, ensure that central and desktop.github.com have been updated"
+            echo ""
+
+            if [ "$UNCERTAIN_COUNT" != "0" ]; then
+              echo "## ⚠️ Entries needing human review"
+              echo ""
+              echo "The following entries were tagged \`[???]\` because the AI could not confidently determine the appropriate tag:"
+              echo ""
+              jq -r '.uncertainEntries[]' release-notes-draft.json | while read -r entry; do
+                echo "- $entry"
+              done
+              echo ""
+            fi
+
+            # Add collapsed section for skipped PRs
+            SKIPPED_COUNT=$(jq '.skippedPRs | length' release-notes-draft.json 2>/dev/null || echo "0")
+            if [ "$SKIPPED_COUNT" != "0" ]; then
+              echo "<details>"
+              echo "<summary>PRs not included in release notes ($SKIPPED_COUNT PRs)</summary>"
+              echo ""
+              echo "The following PRs were merged in this release but not included in the changelog. Please review to ensure nothing user-facing was missed."
+              echo ""
+              jq -r '.skippedPRs[] | "- #\(.number) \(.title) — _\(.reason)_"' release-notes-draft.json
+              echo ""
+              echo "</details>"
+              echo ""
+            fi
+
+            echo "---"
+            echo ""
+            echo "> **Note**: These release notes were AI-generated and should be reviewed against"
+            echo "> the [writing release notes guide](https://github.com/desktop/desktop/blob/development/docs/process/writing-release-notes.md)."
+
+            echo 'PREOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open draft PR
+        if: steps.parse.outputs.dry-run != 'true'
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          NEXT_VERSION: ${{ steps.parse.outputs.next-version }}
+          PR_BODY: ${{ steps.pr-body.outputs.body }}
+        run: |
+          # Write body to file to avoid shell interpolation issues
+          echo "$PR_BODY" > /tmp/pr-body.md
+
+          gh pr create \
+            --repo "desktop/desktop" \
+            --head "releases/$NEXT_VERSION" \
+            --base "development" \
+            --title "Release $NEXT_VERSION" \
+            --body-file /tmp/pr-body.md \
+            --draft
+
+          echo "✅ Created draft PR for Release $NEXT_VERSION"
