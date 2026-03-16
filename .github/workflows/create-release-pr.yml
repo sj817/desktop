@@ -33,77 +33,50 @@ jobs:
 
       - name: Extract release notes draft
         run: |
-          echo "📂 Agent outputs contents:"
-          find agent-outputs -type f
-
-          # Try direct file first (if the artifact capture works)
-          if [ -f agent-outputs/sandbox/agent/release-notes-draft.json ]; then
-            cp agent-outputs/sandbox/agent/release-notes-draft.json release-notes-draft.json
-            echo "✅ Found release-notes-draft.json as direct file"
-          elif [ -f agent-outputs/release-notes-draft.json ]; then
-            cp agent-outputs/release-notes-draft.json release-notes-draft.json
-            echo "✅ Found release-notes-draft.json as direct file"
-          else
-            # Fallback: extract JSON from conversation.md
-            echo "⚠️ Direct file not found, extracting from conversation.md..."
-
-            CONVO="agent-outputs/sandbox/agent/logs/conversation.md"
-            if [ ! -f "$CONVO" ]; then
-              echo "❌ conversation.md not found either"
-              exit 1
-            fi
-
-            # Extract JSON: find the last JSON object with "nextVersion" using
-            # brace-matching, which is more robust than regex code block parsing
-            node -e '
-              const fs = require("fs");
-              const convo = fs.readFileSync(process.argv[1], "utf8");
-
-              const marker = "\"nextVersion\":";
-              let searchFrom = convo.length;
-              let lastValid = null;
-
-              while (searchFrom > 0) {
-                const idx = convo.lastIndexOf(marker, searchFrom - 1);
-                if (idx === -1) break;
-                searchFrom = idx;
-
-                let start = idx;
-                while (start > 0 && convo[start] !== "{") start--;
-
-                let depth = 0, end = start;
-                for (let i = start; i < convo.length; i++) {
-                  if (convo[i] === "{") depth++;
-                  if (convo[i] === "}") {
-                    depth--;
-                    if (depth === 0) { end = i; break; }
-                  }
-                }
-
-                const candidate = convo.substring(start, end + 1);
-                try {
-                  const parsed = JSON.parse(candidate);
-                  if (parsed.nextVersion && Array.isArray(parsed.entries)) {
-                    lastValid = parsed;
-                    break;
-                  }
-                } catch (e) {
-                  // Try next occurrence
-                }
-              }
-
-              if (!lastValid) {
-                console.error("❌ No valid release notes JSON found in conversation.md");
-                process.exit(1);
-              }
-
-              fs.writeFileSync("release-notes-draft.json", JSON.stringify(lastValid, null, 2));
-              console.log("✅ Extracted release notes from conversation.md");
-              console.log("   Entries:", lastValid.entries.length, "Skipped:", (lastValid.skippedPRs || []).length);
-            ' "$CONVO"
+          CONVO="agent-outputs/sandbox/agent/logs/conversation.md"
+          if [ ! -f "$CONVO" ]; then
+            echo "❌ conversation.md not found in agent outputs"
+            find agent-outputs -type f
+            exit 1
           fi
 
-          echo "📋 Release notes content:"
+          # Extract the release notes JSON from the agent's conversation log.
+          # The agent outputs the JSON via `jq .` which appears in conversation.md.
+          # We find the last valid JSON object containing "nextVersion" using brace-matching.
+          node -e '
+            const fs = require("fs");
+            const convo = fs.readFileSync(process.argv[1], "utf8");
+            const marker = "\"nextVersion\":";
+            let searchFrom = convo.length;
+
+            while (searchFrom > 0) {
+              const idx = convo.lastIndexOf(marker, searchFrom - 1);
+              if (idx === -1) break;
+              searchFrom = idx;
+
+              let start = idx;
+              while (start > 0 && convo[start] !== "{") start--;
+
+              let depth = 0, end = start;
+              for (let i = start; i < convo.length; i++) {
+                if (convo[i] === "{") depth++;
+                if (convo[i] === "}") { depth--; if (depth === 0) { end = i; break; } }
+              }
+
+              try {
+                const parsed = JSON.parse(convo.substring(start, end + 1));
+                if (parsed.nextVersion && Array.isArray(parsed.entries)) {
+                  fs.writeFileSync("release-notes-draft.json", JSON.stringify(parsed, null, 2));
+                  console.log("✅ Extracted release notes — entries:", parsed.entries.length, "skipped:", (parsed.skippedPRs || []).length);
+                  process.exit(0);
+                }
+              } catch {}
+            }
+
+            console.error("❌ No valid release notes JSON found in conversation.md");
+            process.exit(1);
+          ' "$CONVO"
+
           cat release-notes-draft.json | jq .
 
       - name: Parse release notes draft
@@ -161,16 +134,20 @@ jobs:
             exit 0
           fi
 
-          # Get the SHA for the source ref
+          # Resolve source ref: try as branch, then tag, then commit SHA
           SOURCE_SHA=$(gh api "repos/desktop/desktop/git/ref/heads/$SOURCE_REF" --jq '.object.sha' 2>/dev/null || true)
 
           if [ -z "$SOURCE_SHA" ]; then
-            # Try as a tag
             SOURCE_SHA=$(gh api "repos/desktop/desktop/git/ref/tags/$SOURCE_REF" --jq '.object.sha' 2>/dev/null || true)
           fi
 
           if [ -z "$SOURCE_SHA" ]; then
-            echo "❌ Could not resolve source ref: $SOURCE_REF"
+            # Try as a commit SHA directly
+            SOURCE_SHA=$(gh api "repos/desktop/desktop/git/commits/$SOURCE_REF" --jq '.sha' 2>/dev/null || true)
+          fi
+
+          if [ -z "$SOURCE_SHA" ]; then
+            echo "❌ Could not resolve source ref: $SOURCE_REF (tried as branch, tag, and commit SHA)"
             exit 1
           fi
 

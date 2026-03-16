@@ -133,9 +133,14 @@ If `${{ inputs.source }}` is provided and not empty, use it as `compareRef`.
 Otherwise:
 
 - For **beta** channel: use `development`
-- For **production** channel: use `release-{previousVersion}` where
-  `previousVersion` is the latest beta version (list all tags including betas
-  and find the newest one)
+- For **production** channel: you need to find the **latest beta version** to
+  use as the comparison endpoint. List all tags (including betas) and find the
+  newest beta tag. Use `release-{latestBetaVersion}` as `compareRef`.
+
+  Note: `previousVersion` (used for version bumping) and the comparison endpoint
+  are different for production releases. `previousVersion` is the latest
+  *production* version (no betas), while `compareRef` uses the latest *beta*
+  tag because the beta already contains all the changes going into production.
 
 ## Step 2: Find Merged PRs
 
@@ -146,22 +151,28 @@ been merged into `development` days or weeks before the release was cut. The
 only reliable way to find which PRs are new in a release is to compare the
 commit histories of the two tags.
 
-**Step 2a**: Get commits on the current release endpoint (up to 100):
+**Step 2a**: Get commits on the current release endpoint. Fetch **all commits**
+by paginating (100 per page) until you get fewer results than `perPage`:
 
 ```
-github-list_commits(owner: "desktop", repo: "desktop", sha: "{compareRef}", perPage: 100)
+# Page 1
+github-list_commits(owner: "desktop", repo: "desktop", sha: "{compareRef}", perPage: 100, page: 1)
+# Page 2 (if page 1 returned 100 results)
+github-list_commits(owner: "desktop", repo: "desktop", sha: "{compareRef}", perPage: 100, page: 2)
+# Continue until a page returns fewer than 100 results
 ```
 
-Save the output to a temp file and extract all SHAs:
+Combine all pages into a single file and extract all SHAs:
 
 ```bash
 cat /tmp/gh-aw/agent/compare-commits.json | jq -r '.[].sha' > /tmp/gh-aw/agent/compare-shas.txt
 ```
 
-**Step 2b**: Get commits on the previous release tag (up to 100):
+**Step 2b**: Get commits on the previous release tag (paginate the same way):
 
 ```
-github-list_commits(owner: "desktop", repo: "desktop", sha: "release-{previousVersion}", perPage: 100)
+github-list_commits(owner: "desktop", repo: "desktop", sha: "release-{previousVersion}", perPage: 100, page: 1)
+# Continue paginating until a page returns fewer than 100 results
 ```
 
 Save and extract SHAs:
@@ -388,7 +399,10 @@ Write the following JSON to `/tmp/gh-aw/agent/release-notes-draft.json`
 using bash (use `node -e` or `cat <<'EOF'` to write valid JSON).
 
 **IMPORTANT**: Write to `/tmp/gh-aw/agent/release-notes-draft.json` — this is
-the pre-created temp directory for agent output files.
+the pre-created temp directory for agent output files. The downstream workflow
+extracts this JSON from `conversation.md` (the agent conversation log which is
+automatically captured in the `agent_outputs` artifact). Make sure the final
+JSON is displayed in the conversation by running `jq .` on it.
 
 ```json
 {
