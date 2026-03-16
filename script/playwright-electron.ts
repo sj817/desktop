@@ -39,6 +39,7 @@ fs.rmSync(userDataDir, { recursive: true, force: true })
 fs.mkdirSync(userDataDir, { recursive: true })
 
 const recordVideo = process.env.RECORD_VIDEO === '1'
+const repoPath = process.argv[2] // Optional: path to a repo to open
 
 async function main() {
   if (recordVideo) {
@@ -48,9 +49,15 @@ async function main() {
     )
   }
 
+  const appArgs = [appEntryPoint, `--user-data-dir=${userDataDir}`]
+  if (repoPath) {
+    appArgs.push(`--cli-open=${repoPath}`)
+    console.log(`Opening repository: ${repoPath}`)
+  }
+
   console.log('Launching GitHub Desktop via Playwright…')
   const app = await electron.launch({
-    args: [appEntryPoint, `--user-data-dir=${userDataDir}`],
+    args: appArgs,
     env: {
       ...process.env,
       // Isolate all user config so the agent doesn't read or modify the
@@ -65,6 +72,7 @@ async function main() {
     recordVideo: recordVideo
       ? { dir: videosDir, size: { width: 1280, height: 800 } }
       : undefined,
+    timeout: 30000,
   })
 
   const window = await app.firstWindow()
