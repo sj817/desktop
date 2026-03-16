@@ -9,8 +9,8 @@
  *  - `mockServer` — the mock update server (with control helpers)
  *
  * All fixtures are scoped to the **worker** so the app launches once
- * and all tests in the file share the same session (matching the wdio
- * behaviour where one Electron session runs all specs sequentially).
+ * and all tests in the file share the same session (one Electron
+ * session runs all specs sequentially).
  */
 
 import fs from 'fs'

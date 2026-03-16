@@ -168,35 +168,34 @@ React component rendering tests using jsdom (already in the test environment) an
 
 A minimal set of committed E2E tests that run in CI (`yarn test:e2e`) to catch catastrophic breakage. These are not meant to be comprehensive — they verify that the app launches, renders, and can perform the most basic operations.
 
-**Framework:** WebDriverIO using standard WebDriver Chrome capabilities pointed at the checked-in Electron runtime.
+**Framework:** Playwright with `_electron.launch()` for Electron support. Tests record video and traces automatically.
 
-Why WebDriverIO over Playwright:
-- Playwright is reserved for agent-driven interactive verification during development (see below)
-- WebDriverIO can launch the Electron app directly through Chrome-compatible WebDriver support, which is sufficient for committed smoke coverage and stable in CI
-- Keeps the two use cases (CI regression suite vs. agent exploration) cleanly separated with different tools
+**Smoke tests:**
 
-**Smoke tests (5 max):**
+1. App launches and renders the welcome/repository screen *(implemented in `app-launch.e2e.ts`)*
+2. Add a local repo → file list appears *(implemented in `app-launch.e2e.ts`)*
+3. Make a change → stage → commit succeeds *(implemented in `app-launch.e2e.ts`)*
+4. Create branch → switch back → working directory is clean *(implemented in `app-launch.e2e.ts`)*
+5. View a diff → diff content renders *(implemented in `app-launch.e2e.ts`)*
 
-1. App launches and renders the welcome/repository screen *(implemented in `app-launch.ts`)*
-2. Add a local repo → file list appears *(implemented in `app-launch.ts`)*
-3. Make a change → stage → commit succeeds *(implemented in `app-launch.ts`)*
-4. Create branch → switch back → working directory is clean *(implemented in `app-launch.ts`)*
-5. View a diff → diff content renders *(implemented in `app-launch.ts`)*
+**Auto-update tests:**
+
+6. Startup update check hits mock server *(implemented in `app-launch.e2e.ts`)*
+7. No-update banner when server returns 204 *(implemented in `app-launch.e2e.ts`)*
+8. About dialog shows version and up-to-date status *(implemented in `app-launch.e2e.ts`)*
+9. Update-available flow with mock server *(implemented in `app-launch.e2e.ts`)*
+10. Installing-update warning on quit during download *(implemented in `app-launch.e2e.ts`)*
 
 These tests should be fast, stable, and narrowly scoped. They exist purely as a safety net — if any of them fail, something is fundamentally broken.
 
 **Architecture:**
-- Mock API calls by pre-seeding test state or intercepting network requests
+- Mock update server on port 51789 with HTTP control plane for runtime behavior switching
 - Reuse existing repo scaffolding helpers for git setup
-- Use `data-testid` attributes for stable selectors
-- Fresh app instance per test, temp directories with auto-cleanup
-- Launch the compiled app from `out/main.js` through the checked-in Electron runtime with an isolated `--user-data-dir` to avoid packaged-app updater noise during smoke runs
-- No `browser.pause()` — use WebDriverIO's built-in `waitForExist`/`waitForDisplayed`
-
-**Current implementation note:**
-- The committed smoke harness currently targets the built app entry point and isolates user data successfully.
-- Earlier attempts to use `@wdio/electron-service` hit repeatable bridge timeouts on Desktop with Electron 40, so the committed launch smoke avoids that integration layer for now.
-- The current `app-launch.ts` smoke flow intentionally combines launch coverage, the local-repository add flow, diff rendering, a basic commit path, and branch create/switch-back coverage into one stable fresh-session scenario.
+- Fresh app instance per test file, temp directories with auto-cleanup
+- Launch the compiled app from `out/main.js` via Playwright's Electron support with an isolated `--user-data-dir`
+- Git config isolation via `GIT_CONFIG_GLOBAL`, `GIT_CONFIG_SYSTEM`, `XDG_CONFIG_HOME`
+- Video recordings and traces saved to `playwright-videos/`
+- Worker-scoped fixtures in `e2e-fixtures.ts` provide `app`, `mainWindow`, and `mockServer`
 
 **Directory:** `app/test/e2e/`
 
@@ -212,7 +211,7 @@ When an agent is asked to implement a feature or fix a bug that touches UI:
 4. Take screenshots if needed to confirm visual correctness
 5. Iterate on the code if something doesn't look right
 
-This approach gives agents confidence in UI changes without the maintenance burden of a large E2E test suite. The CI smoke tests (WebDriverIO) catch regressions; the agent's Playwright exploration catches implementation issues before code is even committed.
+This approach gives agents confidence in UI changes without the maintenance burden of a large E2E test suite. The CI smoke tests catch regressions; the agent's Playwright exploration catches implementation issues before code is even committed.
 
 ### Phase 5: Agent Automation *(complete)*
 
