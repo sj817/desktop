@@ -53,4 +53,11 @@ findYarnVersion(path => {
   if (result.status !== 0) {
     process.exit(result.status || 1)
   }
+
+  // Install ffmpeg for Playwright video recording support
+  result = spawnSync('npx', ['playwright', 'install', 'ffmpeg'], options)
+
+  if (result.status !== 0) {
+    console.warn('Warning: failed to install Playwright ffmpeg (video recording may not work)')
+  }
 })
