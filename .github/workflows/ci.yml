@@ -97,6 +97,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: yarn
+      - name: Install ffmpeg
+        if: runner.os == 'Windows' && matrix.arch == 'x64'
+        run: choco install ffmpeg --yes --no-progress
       - name: Install and build dependencies
         run: yarn
         env:
