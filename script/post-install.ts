@@ -18,6 +18,10 @@ const captureOutputOptions: SpawnSyncOptions = {
   encoding: 'utf8',
 }
 
+// Some Windows CI runners do not expose an `npx` executable on PATH, so
+// invoke the locally installed Playwright CLI through the current Node binary.
+const playwrightCliPath = require.resolve('playwright/cli')
+
 function findYarnVersion(callback: (path: string) => void) {
   glob('vendor/yarn-*.js', (error, files) => {
     if (error != null) {
@@ -61,8 +65,8 @@ findYarnVersion(path => {
 
   // Capture output here so CI failures include the Playwright-specific error.
   result = spawnSync(
-    'npx',
-    ['playwright', 'install', 'ffmpeg'],
+    process.execPath,
+    [playwrightCliPath, 'install', 'ffmpeg'],
     captureOutputOptions
   )
 
