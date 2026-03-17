@@ -12,7 +12,7 @@ import { Owner } from '../../../src/models/owner'
 import { PopupType } from '../../../src/models/popup'
 import { RepoRulesInfo } from '../../../src/models/repo-rules'
 import { Repository } from '../../../src/models/repository'
-import { CommitOptions, FoldoutType } from '../../../src/lib/app-state'
+import { FoldoutType } from '../../../src/lib/app-state'
 import { Dispatcher } from '../../../src/ui/dispatcher'
 import type { ICommitMessageProps } from '../../../src/ui/changes/commit-message'
 import {
@@ -267,7 +267,7 @@ function renderCommitMessageDialog(
       hasCommitHooks={true}
       skipCommitHooks={false}
       signOffCommits={false}
-      onUpdateCommitOptions={(_: Repository, __: CommitOptions) => {
+      onUpdateCommitOptions={() => {
         calls.push('update-options')
       }}
     />
