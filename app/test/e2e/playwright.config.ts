@@ -5,6 +5,7 @@ import { defineConfig } from '@playwright/test'
 
 const projectRoot = path.resolve(__dirname, '..', '..', '..')
 
+// eslint-disable-next-line no-restricted-syntax
 export default defineConfig({
   testDir: __dirname,
   testMatch: '*.e2e.ts',

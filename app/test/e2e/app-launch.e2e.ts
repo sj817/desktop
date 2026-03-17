@@ -207,7 +207,9 @@ test.describe('Auto-update', () => {
       expect(versionText).toMatch(/Version \d+\.\d+\.\d+/)
     })
 
-    test('shows up-to-date status after no-update check', async ({ mainWindow: page }) => {
+    test('shows up-to-date status after no-update check', async ({
+      mainWindow: page,
+    }) => {
       const updateStatus = page.locator('#about .update-status')
       await updateStatus.waitFor({ state: 'visible', timeout: 10000 })
 
@@ -217,9 +219,7 @@ test.describe('Auto-update', () => {
 
     test('closes the About dialog', async ({ mainWindow: page }) => {
       await page.locator('#about button[type="submit"]').click()
-      await page
-        .locator('#about')
-        .waitFor({ state: 'hidden', timeout: 5000 })
+      await page.locator('#about').waitFor({ state: 'hidden', timeout: 5000 })
     })
   })
 

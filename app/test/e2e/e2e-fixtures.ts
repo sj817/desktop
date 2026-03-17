@@ -17,12 +17,13 @@ import fs from 'fs'
 import http from 'http'
 import os from 'os'
 import path from 'path'
-import { test as base, type ElectronApplication, type Page } from '@playwright/test'
-import { _electron as electron } from 'playwright'
 import {
-  ensureSmokeTestRepository,
-  smokeRepoPath,
-} from './test-helpers'
+  test as base,
+  type ElectronApplication,
+  type Page,
+} from '@playwright/test'
+import { _electron as electron } from 'playwright'
+import { ensureSmokeTestRepository, smokeRepoPath } from './test-helpers'
 import {
   createMockUpdateServer,
   MOCK_CONTROL_URL,
