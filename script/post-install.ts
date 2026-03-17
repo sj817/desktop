@@ -20,7 +20,9 @@ const captureOutputOptions: SpawnSyncOptions = {
 
 // Some Windows CI runners do not expose an `npx` executable on PATH, so
 // invoke the locally installed Playwright CLI through the current Node binary.
-const playwrightCliPath = require.resolve('playwright/cli')
+// Resolve from the exported package root since `playwright/cli` is not exported.
+const playwrightPackagePath = require.resolve('playwright/package.json')
+const playwrightCliPath = Path.join(Path.dirname(playwrightPackagePath), 'cli.js')
 
 function findYarnVersion(callback: (path: string) => void) {
   glob('vendor/yarn-*.js', (error, files) => {
