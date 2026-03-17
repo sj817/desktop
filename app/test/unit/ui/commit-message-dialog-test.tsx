@@ -267,6 +267,7 @@ function renderCommitMessageDialog(
       hasCommitHooks={true}
       skipCommitHooks={false}
       signOffCommits={false}
+      allowEmptyCommit={false}
       onUpdateCommitOptions={() => {
         calls.push('update-options')
       }}

@@ -394,6 +394,7 @@ function renderCommitMessage(
       hasCommitHooks={false}
       skipCommitHooks={false}
       signOffCommits={false}
+      allowEmptyCommit={false}
       onUpdateCommitOptions={() => {}}
     />
   )
