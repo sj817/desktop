@@ -60,6 +60,9 @@ findYarnVersion(path => {
   if (result.status !== 0) {
     console.error(
       'Error: failed to install Playwright ffmpeg (video recording may not work)',
+      '\nstdout:',
+      result.stdout?.toString(),
+      '\nstderr:',
       result.stderr?.toString()
     )
   }
