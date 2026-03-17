@@ -22,7 +22,10 @@ const captureOutputOptions: SpawnSyncOptions = {
 // invoke the locally installed Playwright CLI through the current Node binary.
 // Resolve from the exported package root since `playwright/cli` is not exported.
 const playwrightPackagePath = require.resolve('playwright/package.json')
-const playwrightCliPath = Path.join(Path.dirname(playwrightPackagePath), 'cli.js')
+const playwrightCliPath = Path.join(
+  Path.dirname(playwrightPackagePath),
+  'cli.js'
+)
 
 function findYarnVersion(callback: (path: string) => void) {
   glob('vendor/yarn-*.js', (error, files) => {
