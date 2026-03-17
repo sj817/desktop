@@ -13,6 +13,11 @@ const options: SpawnSyncOptions = {
   stdio: 'inherit',
 }
 
+const captureOutputOptions: SpawnSyncOptions = {
+  cwd: root,
+  encoding: 'utf8',
+}
+
 function findYarnVersion(callback: (path: string) => void) {
   glob('vendor/yarn-*.js', (error, files) => {
     if (error != null) {
@@ -54,16 +59,28 @@ findYarnVersion(path => {
     process.exit(result.status || 1)
   }
 
-  // Install ffmpeg for Playwright video recording support
-  result = spawnSync('npx', ['playwright', 'install', 'ffmpeg'], options)
+  // Capture output here so CI failures include the Playwright-specific error.
+  result = spawnSync(
+    'npx',
+    ['playwright', 'install', 'ffmpeg'],
+    captureOutputOptions
+  )
 
   if (result.status !== 0) {
     console.error(
       'Error: failed to install Playwright ffmpeg (video recording may not work)',
+      '\nplatform:',
+      process.platform,
+      '\nstatus:',
+      result.status,
+      '\nsignal:',
+      result.signal,
+      '\nerror:',
+      result.error,
       '\nstdout:',
-      result.stdout?.toString(),
+      result.stdout,
       '\nstderr:',
-      result.stderr?.toString()
+      result.stderr
     )
   }
 })
