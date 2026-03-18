@@ -290,6 +290,11 @@ test.describe('GitHub Desktop - App Launch', () => {
 // ── Auto-update tests ───────────────────────────────────────────────
 
 test.describe('Auto-update', () => {
+  test.skip(
+    process.platform === 'win32',
+    'Packaged Windows app directories do not include the Squirrel installation context required for auto-update.'
+  )
+
   test.describe('startup update check', () => {
     test('sends an update check to the mock server on launch', async ({
       mockServer,
