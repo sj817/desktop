@@ -156,6 +156,10 @@ export const test = base.extend<{}, E2EFixtures>({
 
       await use(app)
 
+      if (process.platform === 'win32') {
+        killLingeringWindowsUpdaterProcesses()
+      }
+
       await app.close().catch(() => {})
       killLingeringWindowsUpdaterProcesses()
       await new Promise(resolve => setTimeout(resolve, 1000))

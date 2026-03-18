@@ -406,11 +406,17 @@ test.describe('Auto-update', () => {
     })
 
     test('sent update check requests to the mock server', async ({}) => {
-      const reqs = await getMockRequests()
-      const updateReqs = reqs.filter(
-        r => r.method === 'GET' && isMockUpdateRequest(r.url)
-      )
-      expect(updateReqs.length).toBeGreaterThanOrEqual(1)
+      await expect
+        .poll(
+          async () => {
+            const reqs = await getMockRequests()
+            return reqs.filter(
+              r => r.method === 'GET' && isMockUpdateRequest(r.url)
+            ).length
+          },
+          { timeout: 15000, intervals: [1000] }
+        )
+        .toBeGreaterThanOrEqual(1)
     })
 
     test('shows installing-update warning when quitting during download', async ({
