@@ -117,6 +117,18 @@ export const test = base.extend<{}, E2EFixtures>({
     async ({ app }, use) => {
       const page = await app.firstWindow()
 
+      page.on('console', message => {
+        const text = message.text()
+        if (message.type() === 'error' || text.includes('Uncaught exception')) {
+          console.log(`[e2e:console:${message.type()}] ${text}`)
+        }
+      })
+
+      page.on('pageerror', error => {
+        const details = error.stack ?? error.message
+        console.log(`[e2e:pageerror] ${details}`)
+      })
+
       // Start tracing for this worker session
       await page.context().tracing.start({
         screenshots: true,

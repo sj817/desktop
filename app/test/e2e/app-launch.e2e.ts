@@ -61,13 +61,21 @@ async function attachRepositorySelectionDebugInfo(
     return {
       dialogs,
       repositoryPathInputs,
+      appErrorOpen: (document.querySelector('#app-error') as HTMLDialogElement | null)
+        ?.open ?? false,
+      appErrorText:
+        document.querySelector('#app-error-description')?.textContent ?? null,
       welcomeVisible: document.querySelector('#welcome') !== null,
-      addExistingRepositoryButtonVisible:
-        Array.from(document.querySelectorAll('button, a')).some(el =>
+      addExistingRepositoryButtonVisible: Array.from(
+        document.querySelectorAll('button, a')
+      ).some(
+        el =>
           (el.textContent ?? '').includes('Add an Existing Repository') ||
           (el.textContent ?? '').includes('Add an Existing Repository') ||
-          (el.textContent ?? '').includes('Add an Existing Repository from your local drive')
-        ),
+          (el.textContent ?? '').includes(
+            'Add an Existing Repository from your local drive'
+          )
+      ),
       smokeFileVisible: Array.from(document.querySelectorAll('*')).some(el =>
         (el.textContent ?? '').includes('smoke-change.txt')
       ),
@@ -86,6 +94,30 @@ async function attachRepositorySelectionDebugInfo(
     body: await page.screenshot({ fullPage: true }),
     contentType: 'image/png',
   })
+}
+
+async function failIfAppErrorDialogIsVisible(
+  page: Page,
+  testInfo: TestInfo,
+  label: string
+) {
+  const appErrorDialog = page.locator('dialog#app-error')
+  const isVisible = await appErrorDialog.isVisible().catch(() => false)
+
+  if (!isVisible) {
+    return
+  }
+
+  const title = (await appErrorDialog.locator('.dialog-header h1').textContent()) ?? ''
+  const description =
+    (await page.locator('#app-error-description').textContent().catch(() => null)) ??
+    ''
+
+  await attachRepositorySelectionDebugInfo(page, testInfo, label)
+
+  throw new Error(
+    `App error dialog blocked the E2E flow. Title: ${title.trim()} Description: ${description.trim()}`
+  )
 }
 
 // ── Smoke tests ─────────────────────────────────────────────────────
@@ -144,6 +176,12 @@ test.describe('GitHub Desktop - App Launch', () => {
         .catch(() => {}),
       addButton.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {}),
     ])
+
+    await failIfAppErrorDialogIsVisible(
+      page,
+      testInfo,
+      'repository-selection-app-error'
+    )
 
     if (!(await repoFile.isVisible().catch(() => false))) {
       await attachRepositorySelectionDebugInfo(
