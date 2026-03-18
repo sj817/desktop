@@ -12,6 +12,7 @@ import {
   controlMockServer,
   getMockRequests,
   dismissMoveToApplicationsDialog,
+  terminateWindowsUpdaterProcesses,
 } from './e2e-fixtures'
 import {
   smokeRepoFileContents,
@@ -312,7 +313,7 @@ test.describe('Auto-update', () => {
         .poll(
           async () => {
             const reqs = await getMockRequests()
-            return reqs.some(r => r.url.includes('/update'))
+            return reqs.some(r => isMockUpdateRequest(r.url))
           },
           { timeout: 30000, intervals: [1000] }
         )
@@ -473,6 +474,8 @@ test.describe('Auto-update', () => {
           { timeout: 10000, intervals: [200] }
         )
         .toBe(true)
+
+      terminateWindowsUpdaterProcesses()
     })
   })
 })

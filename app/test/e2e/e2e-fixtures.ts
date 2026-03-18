@@ -75,6 +75,10 @@ function killLingeringWindowsUpdaterProcesses() {
   }
 }
 
+export function terminateWindowsUpdaterProcesses() {
+  killLingeringWindowsUpdaterProcesses()
+}
+
 // ── Helpers exposed to tests ────────────────────────────────────────
 
 export function controlMockServer(action: string): Promise<string> {
@@ -154,6 +158,7 @@ export const test = base.extend<{}, E2EFixtures>({
 
       await app.close().catch(() => {})
       killLingeringWindowsUpdaterProcesses()
+      await new Promise(resolve => setTimeout(resolve, 1000))
     },
     { scope: 'worker' },
   ],
