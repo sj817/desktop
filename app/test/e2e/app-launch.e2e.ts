@@ -21,16 +21,79 @@ import {
   getSmokeRepoHeadMessage,
   getSmokeRepoStatus,
 } from './test-helpers'
+import type { Page, TestInfo } from '@playwright/test'
 
 // All tests run sequentially in the same Electron session.
 test.describe.configure({ mode: 'serial' })
+
+async function attachRepositorySelectionDebugInfo(
+  page: Page,
+  testInfo: TestInfo,
+  label: string
+) {
+  const state = await page.evaluate(() => {
+    const dialogs = Array.from(document.querySelectorAll('dialog')).map(d => {
+      const element = d as HTMLDialogElement
+      return {
+        id: element.id,
+        open: element.open,
+        ariaHidden: element.getAttribute('aria-hidden'),
+      }
+    })
+
+    const repositoryPathInputs = Array.from(
+      document.querySelectorAll('input[placeholder="repository path"]')
+    ).map(input => {
+      const element = input as HTMLInputElement
+      const style = window.getComputedStyle(element)
+      const rect = element.getBoundingClientRect()
+      return {
+        id: element.id,
+        value: element.value,
+        visible:
+          style.display !== 'none' &&
+          style.visibility !== 'hidden' &&
+          rect.width > 0 &&
+          rect.height > 0,
+      }
+    })
+
+    return {
+      dialogs,
+      repositoryPathInputs,
+      welcomeVisible: document.querySelector('#welcome') !== null,
+      addExistingRepositoryButtonVisible:
+        Array.from(document.querySelectorAll('button, a')).some(el =>
+          (el.textContent ?? '').includes('Add an Existing Repository') ||
+          (el.textContent ?? '').includes('Add an Existing Repository') ||
+          (el.textContent ?? '').includes('Add an Existing Repository from your local drive')
+        ),
+      smokeFileVisible: Array.from(document.querySelectorAll('*')).some(el =>
+        (el.textContent ?? '').includes('smoke-change.txt')
+      ),
+    }
+  })
+
+  const body = JSON.stringify(state, null, 2)
+  console.log(`[e2e:${label}] ${body}`)
+
+  await testInfo.attach(`${label}-ui-state`, {
+    body,
+    contentType: 'application/json',
+  })
+
+  await testInfo.attach(`${label}-screenshot`, {
+    body: await page.screenshot({ fullPage: true }),
+    contentType: 'image/png',
+  })
+}
 
 // ── Smoke tests ─────────────────────────────────────────────────────
 
 test.describe('GitHub Desktop - App Launch', () => {
   test('should launch, complete welcome flow, commit, and switch branches', async ({
     mainWindow: page,
-  }) => {
+  }, testInfo) => {
     // Wait for the React app to mount
     await page.waitForFunction(
       () =>
@@ -72,20 +135,36 @@ test.describe('GitHub Desktop - App Launch', () => {
         '//*[contains(normalize-space(), "Add an Existing Repository from your Local Drive") or contains(normalize-space(), "Add an Existing Repository from your local drive")]'
       )
       .first()
+    const addRepositoryDialog = page.locator('dialog#add-existing-repository')
 
     await Promise.race([
       repoFile.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {}),
+      addRepositoryDialog
+        .waitFor({ state: 'visible', timeout: 15000 })
+        .catch(() => {}),
       addButton.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {}),
     ])
 
     if (!(await repoFile.isVisible().catch(() => false))) {
-      await addButton.click()
-      const pathInput = page.locator('input[placeholder="repository path"]')
+      await attachRepositorySelectionDebugInfo(
+        page,
+        testInfo,
+        'repository-selection-fallback'
+      )
+
+      if (!(await addRepositoryDialog.isVisible().catch(() => false))) {
+        await addButton.click()
+      }
+
+      await addRepositoryDialog.waitFor({ state: 'visible', timeout: 15000 })
+      const pathInput = addRepositoryDialog.locator(
+        'input[placeholder="repository path"]'
+      )
       await pathInput.waitFor({ state: 'visible', timeout: 15000 })
       if ((await pathInput.inputValue()) !== smokeRepoPath) {
         await pathInput.fill(smokeRepoPath)
       }
-      await page
+      await addRepositoryDialog
         .locator(
           'button:has-text("Add Repository"), button:has-text("Add repository")'
         )
