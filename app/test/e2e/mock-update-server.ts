@@ -1,6 +1,11 @@
 /* eslint-disable no-sync */
 
 import http from 'http'
+import {
+  getDistArchitecture,
+  getWindowsFullNugetPackageName,
+  getWindowsIdentifierName,
+} from '../../../script/dist-info'
 
 /** Fixed port used for the mock update server during e2e tests. */
 export const MOCK_UPDATE_PORT = 51789
@@ -11,6 +16,23 @@ export const MOCK_UPDATE_URL = `http://127.0.0.1:${MOCK_UPDATE_PORT}/update`
  * via simple GET requests (e.g. `/_control/set-behavior/update-available`).
  */
 export const MOCK_CONTROL_URL = `http://127.0.0.1:${MOCK_UPDATE_PORT}/_control`
+
+const currentWindowsPackageName = getWindowsFullNugetPackageName(true)
+const nextWindowsPackageName = `${getWindowsIdentifierName()}-99.0.0-${getDistArchitecture()}-full.nupkg`
+const fakeSha = '0123456789012345678901234567890123456789'
+const fakePackageSize = '999999999'
+
+function isWindowsFeedRequest(url: string) {
+  return url.includes('/RELEASES') || url.endsWith('.nupkg')
+}
+
+function getWindowsNoUpdateReleases() {
+  return `${fakeSha} ${currentWindowsPackageName} ${fakePackageSize}`
+}
+
+function getWindowsUpdateAvailableReleases() {
+  return `${fakeSha} ${nextWindowsPackageName} ${fakePackageSize}`
+}
 
 type UpdateBehavior = 'no-update' | 'update-available'
 
@@ -99,10 +121,10 @@ export function createMockUpdateServer(): Promise<IMockUpdateServer> {
       // ── Update plane ──────────────────────────────────────────────
       requests.push({ method: req.method ?? 'GET', url })
 
-      // Serve the fake download URL by hanging forever — send headers
-      // but never finish the body. Squirrel stays in "downloading"
-      // state without ever hitting an error or trying to unzip.
-      if (url.startsWith('/download/')) {
+      // Serve fake download URLs by hanging forever — send headers but never
+      // finish the body. This keeps the updater in "downloading" state
+      // without ever completing or failing validation.
+      if (url.startsWith('/download/') || url.endsWith('.nupkg')) {
         res.writeHead(200, {
           'content-type': 'application/octet-stream',
           'content-length': '999999999',
@@ -119,6 +141,22 @@ export function createMockUpdateServer(): Promise<IMockUpdateServer> {
         return
       }
 
+      if (isWindowsFeedRequest(url)) {
+        const body =
+          behavior === 'update-available'
+            ? getWindowsUpdateAvailableReleases()
+            : getWindowsNoUpdateReleases()
+
+        if (url.includes('/RELEASES')) {
+          res.writeHead(200, {
+            'content-type': 'text/plain; charset=utf-8',
+            'content-length': Buffer.byteLength(body),
+          })
+          res.end(body)
+          return
+        }
+      }
+
       if (behavior === 'no-update') {
         res.writeHead(204)
         res.end()
@@ -126,9 +164,9 @@ export function createMockUpdateServer(): Promise<IMockUpdateServer> {
       }
 
       if (behavior === 'update-available') {
-        // Squirrel.Mac JSON feed. The download URL points back to this
-        // server's /download/ handler which hangs forever, keeping the
-        // app in "downloading" state without completing or erroring.
+        // Squirrel.Mac JSON feed. The download URL points back to this server's
+        // /download/ handler which hangs forever, keeping the app in
+        // "downloading" state without completing or erroring.
         const body = JSON.stringify({
           url: `http://127.0.0.1:${MOCK_UPDATE_PORT}/download/update.zip`,
           name: '99.0.0',
