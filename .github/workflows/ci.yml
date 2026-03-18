@@ -208,5 +208,59 @@ jobs:
         env:
           npm_config_arch: ${{ matrix.arch }}
           TARGET_ARCH: ${{ matrix.arch }}
+      - name: Build production app
+        run: yarn build:prod
+        env:
+          DESKTOP_OAUTH_CLIENT_ID: ${{ secrets.DESKTOP_OAUTH_CLIENT_ID }}
+          DESKTOP_OAUTH_CLIENT_SECRET:
+            ${{ secrets.DESKTOP_OAUTH_CLIENT_SECRET }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APPLICATION_CERT: ${{ secrets.APPLE_APPLICATION_CERT }}
+          KEY_PASSWORD: ${{ secrets.APPLE_APPLICATION_CERT_PASSWORD }}
+          npm_config_arch: ${{ matrix.arch }}
+          TARGET_ARCH: ${{ matrix.arch }}
+      - name: Install Azure Code Signing Client
+        if: ${{ runner.os == 'Windows' && inputs.sign }}
+        run: |
+          $acsZip = Join-Path $env:RUNNER_TEMP "acs.zip"
+          $acsDir = Join-Path $env:RUNNER_TEMP "acs"
+          Invoke-WebRequest -Uri https://www.nuget.org/api/v2/package/Microsoft.Trusted.Signing.Client/1.0.95 -OutFile $acsZip -Verbose
+          Expand-Archive $acsZip -Destination $acsDir -Force -Verbose
+          Copy-Item -Path "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\*" -Include signtool.exe,signtool.exe.manifest,Microsoft.Windows.Build.Signing.mssign32.dll.manifest,mssign32.dll,Microsoft.Windows.Build.Signing.wintrust.dll.manifest,wintrust.dll,Microsoft.Windows.Build.Appx.AppxSip.dll.manifest,AppxSip.dll,Microsoft.Windows.Build.Appx.AppxPackaging.dll.manifest,AppxPackaging.dll,Microsoft.Windows.Build.Appx.OpcServices.dll.manifest,OpcServices.dll -Destination "node_modules\electron-winstaller\vendor" -Verbose
+      - name: Azure Login (OIDC)
+        if: ${{ runner.os == 'Windows' && inputs.sign }}
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CODE_SIGNING_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_CODE_SIGNING_TENANT_ID }}
+          allow-no-subscriptions: true
+      - name: Package production app
+        run: yarn package
+        env:
+          npm_config_arch: ${{ matrix.arch }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_CODE_SIGNING_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CODE_SIGNING_CLIENT_ID }}
+      - name: Install app on macOS
+        if: runner.os == 'macOS'
+        run: |
+          rm -rf "/Applications/GitHub Desktop.app"
+          ditto "dist/GitHub Desktop-darwin-arm64/GitHub Desktop.app" "/Applications/GitHub Desktop.app"
+          echo "DESKTOP_E2E_APP_PATH=/Applications/GitHub Desktop.app/Contents/MacOS/GitHub Desktop" >> "$GITHUB_ENV"
+      - name: Install app on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $setupExe = "dist/GitHubDesktopSetup-${{ matrix.arch }}.exe"
+          Start-Process -FilePath $setupExe -ArgumentList "/S" -Wait
+          Get-Process GitHubDesktop -ErrorAction SilentlyContinue | Stop-Process -Force
+          $installedExe = Get-ChildItem "$env:LOCALAPPDATA\GitHubDesktop\app-*\GitHubDesktop.exe" |
+            Sort-Object FullName -Descending |
+            Select-Object -First 1 -ExpandProperty FullName
+          if (-not $installedExe) {
+            throw "Unable to locate installed GitHub Desktop executable"
+          }
+          Add-Content -Path $env:GITHUB_ENV -Value "DESKTOP_E2E_APP_PATH=$installedExe"
       - name: Run E2E smoke tests
-        run: yarn test:e2e
+        run: yarn test:e2e:run

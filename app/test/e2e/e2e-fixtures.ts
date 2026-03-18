@@ -35,6 +35,7 @@ import { getProductName } from '../../package-info'
 const projectRoot = path.resolve(__dirname, '..', '..', '..')
 const userDataDir = path.join(os.tmpdir(), 'github-desktop-pw-e2e')
 const fakeHomeDir = path.join(os.tmpdir(), 'github-desktop-pw-fake-home')
+const installedAppExecutablePath = process.env.DESKTOP_E2E_APP_PATH
 
 function getPackagedAppExecutablePath() {
   const distPath = getDistPath()
@@ -57,7 +58,8 @@ function getPackagedAppExecutablePath() {
   return path.join(distPath, getExecutableName())
 }
 
-const packagedAppExecutablePath = getPackagedAppExecutablePath()
+const e2eAppExecutablePath =
+  installedAppExecutablePath ?? getPackagedAppExecutablePath()
 
 // ── Helpers exposed to tests ────────────────────────────────────────
 
@@ -105,9 +107,9 @@ export const test = base.extend<{}, E2EFixtures>({
       // Setup directories
       ensureSmokeTestRepository()
 
-      if (!fs.existsSync(packagedAppExecutablePath)) {
+      if (!fs.existsSync(e2eAppExecutablePath)) {
         throw new Error(
-          `Packaged app not found at ${packagedAppExecutablePath}. Run yarn test:e2e:build first.`
+          `E2E app not found at ${e2eAppExecutablePath}. Run yarn test:e2e:build first.`
         )
       }
 
@@ -117,7 +119,7 @@ export const test = base.extend<{}, E2EFixtures>({
       fs.mkdirSync(fakeHomeDir, { recursive: true })
 
       const app = await electron.launch({
-        executablePath: packagedAppExecutablePath,
+        executablePath: e2eAppExecutablePath,
         args: [`--user-data-dir=${userDataDir}`, `--cli-open=${smokeRepoPath}`],
         env: {
           ...process.env,
