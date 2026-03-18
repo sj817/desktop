@@ -32,6 +32,8 @@ import {
 
 const projectRoot = path.resolve(__dirname, '..', '..', '..')
 const appEntryPoint = path.join(projectRoot, 'out', 'main.js')
+const outGitDir = path.join(projectRoot, 'out', 'git')
+const sourceGitDir = path.join(projectRoot, 'app', 'node_modules', 'dugite', 'git')
 const userDataDir = path.join(os.tmpdir(), 'github-desktop-pw-e2e')
 const fakeHomeDir = path.join(os.tmpdir(), 'github-desktop-pw-fake-home')
 
@@ -65,6 +67,33 @@ export async function dismissMoveToApplicationsDialog(page: Page) {
   }
 }
 
+function getEmbeddedGitBinaryPath(gitDir: string) {
+  return process.platform === 'win32'
+    ? path.join(gitDir, 'cmd', 'git.exe')
+    : path.join(gitDir, 'bin', 'git')
+}
+
+function ensureEmbeddedGitEnvironment() {
+  const packagedGitBinary = getEmbeddedGitBinaryPath(outGitDir)
+  if (fs.existsSync(packagedGitBinary)) {
+    return
+  }
+
+  const sourceGitBinary = getEmbeddedGitBinaryPath(sourceGitDir)
+  if (!fs.existsSync(sourceGitBinary)) {
+    throw new Error(
+      `Unable to find embedded Git for E2E tests at ${sourceGitBinary}`
+    )
+  }
+
+  console.log('[e2e] Copying embedded Git environment into out/git')
+  fs.rmSync(outGitDir, { recursive: true, force: true })
+  fs.cpSync(sourceGitDir, outGitDir, {
+    recursive: true,
+    verbatimSymlinks: true,
+  })
+}
+
 // ── Fixtures ────────────────────────────────────────────────────────
 
 type E2EFixtures = {
@@ -80,6 +109,7 @@ export const test = base.extend<{}, E2EFixtures>({
     async ({ mockServer }, use) => {
       // Setup directories
       ensureSmokeTestRepository()
+      ensureEmbeddedGitEnvironment()
       fs.rmSync(userDataDir, { recursive: true, force: true })
       fs.mkdirSync(userDataDir, { recursive: true })
       fs.rmSync(fakeHomeDir, { recursive: true, force: true })
