@@ -1,8 +1,8 @@
 /* eslint-disable no-sync */
 
 import http from 'http'
+import type net from 'net'
 import {
-  getDistArchitecture,
   getWindowsFullNugetPackageName,
   getWindowsIdentifierName,
 } from '../../../script/dist-info'
@@ -17,8 +17,8 @@ export const MOCK_UPDATE_URL = `http://127.0.0.1:${MOCK_UPDATE_PORT}/update`
  */
 export const MOCK_CONTROL_URL = `http://127.0.0.1:${MOCK_UPDATE_PORT}/_control`
 
-const currentWindowsPackageName = getWindowsFullNugetPackageName(true)
-const nextWindowsPackageName = `${getWindowsIdentifierName()}-99.0.0-${getDistArchitecture()}-full.nupkg`
+const currentWindowsPackageName = getWindowsFullNugetPackageName()
+const nextWindowsPackageName = `${getWindowsIdentifierName()}-99.0.0-full.nupkg`
 const fakeSha = '0123456789012345678901234567890123456789'
 const fakePackageSize = '999999999'
 
@@ -72,6 +72,7 @@ export function createMockUpdateServer(): Promise<IMockUpdateServer> {
   return new Promise((resolve, reject) => {
     let behavior: UpdateBehavior = 'no-update'
     const requests: Array<{ method: string; url: string }> = []
+    const sockets = new Set<net.Socket>()
 
     const server = http.createServer((req, res) => {
       const url = req.url ?? '/'
@@ -186,6 +187,10 @@ export function createMockUpdateServer(): Promise<IMockUpdateServer> {
     })
 
     server.on('error', reject)
+    server.on('connection', socket => {
+      sockets.add(socket)
+      socket.on('close', () => sockets.delete(socket))
+    })
     server.listen(MOCK_UPDATE_PORT, '127.0.0.1', () => {
       const instance: IMockUpdateServer = {
         server,
@@ -198,9 +203,13 @@ export function createMockUpdateServer(): Promise<IMockUpdateServer> {
           requests.length = 0
         },
         close() {
-          return new Promise<void>((res, rej) =>
+          return new Promise<void>((res, rej) => {
+            for (const socket of sockets) {
+              socket.destroy()
+            }
+
             server.close(err => (err ? rej(err) : res()))
-          )
+          })
         },
       }
       resolve(instance)
