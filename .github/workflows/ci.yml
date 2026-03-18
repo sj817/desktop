@@ -97,9 +97,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: yarn
-      - name: Install ffmpeg
-        if: runner.os == 'Windows' && matrix.arch == 'x64'
-        run: choco install ffmpeg --yes --no-progress
       - name: Install and build dependencies
         run: yarn
         env:
@@ -134,10 +131,6 @@ jobs:
         if: |
           (runner.os == 'Windows' && matrix.arch == 'x64') || (runner.os == 'macOS' && matrix.arch == 'arm64')
         run: yarn test:unit
-      - name: Run E2E smoke tests
-        if: |
-          (runner.os == 'Windows' && matrix.arch == 'x64') || (runner.os == 'macOS' && matrix.arch == 'arm64')
-        run: yarn test:e2e
       - name: Run script tests
         run: yarn test:script
       - name: Install Azure Code Signing Client
@@ -174,3 +167,46 @@ jobs:
             dist/GitHubDesktopSetup-${{matrix.arch}}.msi
             dist/bundle-size.json
           if-no-files-found: error
+  e2e-smoke:
+    name: E2E Smoke ${{ matrix.friendlyName }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14-xlarge
+            friendlyName: macOS
+            arch: arm64
+          - os: windows-2022
+            friendlyName: Windows
+            arch: x64
+    timeout-minutes: 60
+    environment: ${{ inputs.environment }}
+    env:
+      RELEASE_CHANNEL: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.repository || github.repository }}
+          ref: ${{ inputs.ref }}
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+      - name: Install ffmpeg
+        if: runner.os == 'Windows'
+        run: choco install ffmpeg --yes --no-progress
+      - name: Install and build dependencies
+        run: yarn
+        env:
+          npm_config_arch: ${{ matrix.arch }}
+          TARGET_ARCH: ${{ matrix.arch }}
+      - name: Run E2E smoke tests
+        run: yarn test:e2e
