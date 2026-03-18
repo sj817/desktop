@@ -13,7 +13,7 @@
     "test:unit": "node script/test.mjs",
     "test:setup": "ts-node -P script/tsconfig.json script/test-setup.ts",
     "test:e2e": "yarn test:e2e:build && yarn test:e2e:run",
-    "test:e2e:build": "cross-env DESKTOP_E2E_UPDATES_URL=http://127.0.0.1:51789/update NODE_ENV=production TS_NODE_PROJECT=script/tsconfig.json NODE_OPTIONS='--max_old_space_size=4096' webpack --config app/webpack.production.ts",
+    "test:e2e:build": "cross-env DESKTOP_E2E_UPDATES_URL=http://127.0.0.1:51789/update NODE_ENV=production RELEASE_CHANNEL=production DESKTOP_E2E=1 yarn build:prod",
     "test:e2e:run": "npx playwright test --config app/test/e2e/playwright.config.ts",
     "postinstall": "ts-node -P script/tsconfig.json script/post-install.ts",
     "start": "cross-env NODE_ENV=development ts-node -P script/tsconfig.json script/start.ts",

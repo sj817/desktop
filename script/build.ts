@@ -58,6 +58,7 @@ import assert from 'assert'
 const isPublishableBuild = isPublishable()
 const isNonProductionRelease = getChannel() !== 'production'
 const isDevelopmentBuild = getChannel() === 'development'
+const isE2EBuild = process.env.DESKTOP_E2E === '1'
 
 const projectRoot = path.join(__dirname, '..')
 const entitlementsSuffix = isDevelopmentBuild ? '-dev' : ''
@@ -84,7 +85,12 @@ generateLicenseMetadata(outRoot)
 
 moveAnalysisFiles()
 
-if (isGitHubActions() && process.platform === 'darwin' && isPublishableBuild) {
+if (
+  isGitHubActions() &&
+  process.platform === 'darwin' &&
+  isPublishableBuild &&
+  !isE2EBuild
+) {
   console.log('Setting up keychain…')
   cp.execSync(path.join(__dirname, 'setup-macos-keychain'))
 }
@@ -151,10 +157,12 @@ function packageApp() {
   }
 
   // get notarization deets, unless we're not going to publish this
-  const osxNotarize = isPublishableBuild ? getNotarizationOptions() : undefined
+  const osxNotarize =
+    isPublishableBuild && !isE2EBuild ? getNotarizationOptions() : undefined
 
   if (
     isPublishableBuild &&
+    !isE2EBuild &&
     isGitHubActions() &&
     process.platform === 'darwin' &&
     osxNotarize === undefined
@@ -197,19 +205,21 @@ function packageApp() {
     appBundleId: getBundleID(),
     appCategoryType: 'public.app-category.developer-tools',
     darwinDarkModeSupport: true,
-    osxSign: {
-      optionsForFile: (path: string) => ({
-        hardenedRuntime: true,
-        entitlements: entitlementsPath,
-      }),
-      type: isPublishableBuild ? 'distribution' : 'development',
-      // For development, we will use '-' as the identifier so that codesign
-      // will sign the app to run locally. We need to disable 'identity-validation'
-      // or otherwise it will replace '-' with one of the regular codesigning
-      // identities in our system.
-      identity: isDevelopmentBuild ? '-' : undefined,
-      identityValidation: !isDevelopmentBuild,
-    },
+    osxSign: isE2EBuild
+      ? undefined
+      : {
+          optionsForFile: (path: string) => ({
+            hardenedRuntime: true,
+            entitlements: entitlementsPath,
+          }),
+          type: isPublishableBuild ? 'distribution' : 'development',
+          // For development, we will use '-' as the identifier so that codesign
+          // will sign the app to run locally. We need to disable 'identity-validation'
+          // or otherwise it will replace '-' with one of the regular codesigning
+          // identities in our system.
+          identity: isDevelopmentBuild ? '-' : undefined,
+          identityValidation: !isDevelopmentBuild,
+        },
     osxNotarize,
     protocols: [
       {
