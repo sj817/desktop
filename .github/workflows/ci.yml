@@ -208,5 +208,9 @@ jobs:
         env:
           npm_config_arch: ${{ matrix.arch }}
           TARGET_ARCH: ${{ matrix.arch }}
+      - name: Prepare testing environment
+        run: yarn test:setup
+        env:
+          npm_config_arch: ${{ matrix.arch }}
       - name: Run E2E smoke tests
         run: yarn test:e2e

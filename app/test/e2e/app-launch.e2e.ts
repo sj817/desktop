@@ -61,8 +61,9 @@ async function attachRepositorySelectionDebugInfo(
     return {
       dialogs,
       repositoryPathInputs,
-      appErrorOpen: (document.querySelector('#app-error') as HTMLDialogElement | null)
-        ?.open ?? false,
+      appErrorOpen:
+        (document.querySelector('#app-error') as HTMLDialogElement | null)
+          ?.open ?? false,
       appErrorText:
         document.querySelector('#app-error-description')?.textContent ?? null,
       welcomeVisible: document.querySelector('#welcome') !== null,
@@ -108,10 +109,13 @@ async function failIfAppErrorDialogIsVisible(
     return
   }
 
-  const title = (await appErrorDialog.locator('.dialog-header h1').textContent()) ?? ''
+  const title =
+    (await appErrorDialog.locator('.dialog-header h1').textContent()) ?? ''
   const description =
-    (await page.locator('#app-error-description').textContent().catch(() => null)) ??
-    ''
+    (await page
+      .locator('#app-error-description')
+      .textContent()
+      .catch(() => null)) ?? ''
 
   await attachRepositorySelectionDebugInfo(page, testInfo, label)
 
