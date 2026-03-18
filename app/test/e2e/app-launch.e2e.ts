@@ -124,6 +124,15 @@ async function failIfAppErrorDialogIsVisible(
   )
 }
 
+function isMockUpdateRequest(url: string) {
+  return (
+    url.includes('/update') ||
+    url.includes('/RELEASES') ||
+    url.endsWith('.nupkg') ||
+    url.startsWith('/download/')
+  )
+}
+
 // ── Smoke tests ─────────────────────────────────────────────────────
 
 test.describe('GitHub Desktop - App Launch', () => {
@@ -398,7 +407,7 @@ test.describe('Auto-update', () => {
     test('sent update check requests to the mock server', async ({}) => {
       const reqs = await getMockRequests()
       const updateReqs = reqs.filter(
-        r => r.method === 'GET' && r.url.includes('/update')
+        r => r.method === 'GET' && isMockUpdateRequest(r.url)
       )
       expect(updateReqs.length).toBeGreaterThanOrEqual(1)
     })

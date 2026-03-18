@@ -17,6 +17,7 @@ import fs from 'fs'
 import http from 'http'
 import os from 'os'
 import path from 'path'
+import { spawnSync } from 'child_process'
 import {
   test as base,
   type ElectronApplication,
@@ -60,6 +61,19 @@ function getPackagedAppExecutablePath() {
 
 const e2eAppExecutablePath =
   installedAppExecutablePath ?? getPackagedAppExecutablePath()
+
+function killLingeringWindowsUpdaterProcesses() {
+  if (process.platform !== 'win32') {
+    return
+  }
+
+  for (const imageName of ['Update.exe', 'GitHubDesktop.exe']) {
+    spawnSync('taskkill', ['/F', '/T', '/IM', imageName], {
+      stdio: 'ignore',
+      windowsHide: true,
+    })
+  }
+}
 
 // ── Helpers exposed to tests ────────────────────────────────────────
 
@@ -139,6 +153,7 @@ export const test = base.extend<{}, E2EFixtures>({
       await use(app)
 
       await app.close().catch(() => {})
+      killLingeringWindowsUpdaterProcesses()
     },
     { scope: 'worker' },
   ],
