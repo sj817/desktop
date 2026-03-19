@@ -370,7 +370,9 @@ test.describe('Auto-update', () => {
         .toContain('downloading update')
 
       await page.locator('#about button[type="submit"]').click()
-      await aboutDialog.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {})
+      await aboutDialog
+        .waitFor({ state: 'hidden', timeout: 5000 })
+        .catch(() => {})
 
       await page.evaluate(() => {
         require('electron').ipcRenderer.send('quit-app')
