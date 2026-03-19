@@ -22,87 +22,12 @@ import {
   getSmokeRepoHeadMessage,
   getSmokeRepoStatus,
 } from './test-helpers'
-import type { Page, TestInfo } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 // All tests run sequentially in the same Electron session.
 test.describe.configure({ mode: 'serial' })
 
-async function attachRepositorySelectionDebugInfo(
-  page: Page,
-  testInfo: TestInfo,
-  label: string
-) {
-  const state = await page.evaluate(() => {
-    const dialogs = Array.from(document.querySelectorAll('dialog')).map(d => {
-      const element = d as HTMLDialogElement
-      return {
-        id: element.id,
-        open: element.open,
-        ariaHidden: element.getAttribute('aria-hidden'),
-      }
-    })
-
-    const repositoryPathInputs = Array.from(
-      document.querySelectorAll('input[placeholder="repository path"]')
-    ).map(input => {
-      const element = input as HTMLInputElement
-      const style = window.getComputedStyle(element)
-      const rect = element.getBoundingClientRect()
-      return {
-        id: element.id,
-        value: element.value,
-        visible:
-          style.display !== 'none' &&
-          style.visibility !== 'hidden' &&
-          rect.width > 0 &&
-          rect.height > 0,
-      }
-    })
-
-    return {
-      dialogs,
-      repositoryPathInputs,
-      appErrorOpen:
-        (document.querySelector('#app-error') as HTMLDialogElement | null)
-          ?.open ?? false,
-      appErrorText:
-        document.querySelector('#app-error-description')?.textContent ?? null,
-      welcomeVisible: document.querySelector('#welcome') !== null,
-      addExistingRepositoryButtonVisible: Array.from(
-        document.querySelectorAll('button, a')
-      ).some(
-        el =>
-          (el.textContent ?? '').includes('Add an Existing Repository') ||
-          (el.textContent ?? '').includes('Add an Existing Repository') ||
-          (el.textContent ?? '').includes(
-            'Add an Existing Repository from your local drive'
-          )
-      ),
-      smokeFileVisible: Array.from(document.querySelectorAll('*')).some(el =>
-        (el.textContent ?? '').includes('smoke-change.txt')
-      ),
-    }
-  })
-
-  const body = JSON.stringify(state, null, 2)
-  console.log(`[e2e:${label}] ${body}`)
-
-  await testInfo.attach(`${label}-ui-state`, {
-    body,
-    contentType: 'application/json',
-  })
-
-  await testInfo.attach(`${label}-screenshot`, {
-    body: await page.screenshot({ fullPage: true }),
-    contentType: 'image/png',
-  })
-}
-
-async function failIfAppErrorDialogIsVisible(
-  page: Page,
-  testInfo: TestInfo,
-  label: string
-) {
+async function failIfAppErrorDialogIsVisible(page: Page) {
   const appErrorDialog = page.locator('dialog#app-error')
   const isVisible = await appErrorDialog.isVisible().catch(() => false)
 
@@ -117,8 +42,6 @@ async function failIfAppErrorDialogIsVisible(
       .locator('#app-error-description')
       .textContent()
       .catch(() => null)) ?? ''
-
-  await attachRepositorySelectionDebugInfo(page, testInfo, label)
 
   throw new Error(
     `App error dialog blocked the E2E flow. Title: ${title.trim()} Description: ${description.trim()}`
@@ -139,7 +62,7 @@ function isMockUpdateRequest(url: string) {
 test.describe('GitHub Desktop - App Launch', () => {
   test('should launch, complete welcome flow, commit, and switch branches', async ({
     mainWindow: page,
-  }, testInfo) => {
+  }) => {
     // Wait for the React app to mount
     await page.waitForFunction(
       () =>
@@ -191,19 +114,9 @@ test.describe('GitHub Desktop - App Launch', () => {
       addButton.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {}),
     ])
 
-    await failIfAppErrorDialogIsVisible(
-      page,
-      testInfo,
-      'repository-selection-app-error'
-    )
+    await failIfAppErrorDialogIsVisible(page)
 
     if (!(await repoFile.isVisible().catch(() => false))) {
-      await attachRepositorySelectionDebugInfo(
-        page,
-        testInfo,
-        'repository-selection-fallback'
-      )
-
       if (!(await addRepositoryDialog.isVisible().catch(() => false))) {
         await addButton.click()
       }
