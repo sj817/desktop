@@ -336,6 +336,37 @@ test.describe('Auto-update', () => {
       mainWindow: page,
     }) => {
       await page.evaluate(() => {
+        require('electron').ipcRenderer.emit('menu-event', {}, 'show-about')
+      })
+
+      const aboutDialog = page.locator('#about')
+      await aboutDialog.waitFor({ state: 'visible', timeout: 5000 })
+
+      const checkBtn = aboutDialog.locator(
+        'button.button-component:has-text("Check for Updates")'
+      )
+      if (await checkBtn.isVisible()) {
+        await checkBtn.click()
+      }
+
+      const updateStatus = aboutDialog.locator('.update-status')
+      await expect
+        .poll(
+          async () => {
+            if (!(await updateStatus.isVisible().catch(() => false))) {
+              return ''
+            }
+
+            return ((await updateStatus.textContent()) ?? '').toLowerCase()
+          },
+          { timeout: 15000, intervals: [1000] }
+        )
+        .toContain('downloading update')
+
+      await page.locator('#about button[type="submit"]').click()
+      await aboutDialog.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {})
+
+      await page.evaluate(() => {
         require('electron').ipcRenderer.send('quit-app')
       })
 
