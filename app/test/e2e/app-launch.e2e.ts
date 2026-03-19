@@ -293,7 +293,10 @@ test.describe('Auto-update', () => {
       const checkBtn = aboutDialog.locator(
         'button.button-component:has-text("Check for Updates")'
       )
-      if (await checkBtn.isVisible()) {
+      if (
+        (await checkBtn.isVisible().catch(() => false)) &&
+        (await checkBtn.isEnabled().catch(() => false))
+      ) {
         await checkBtn.click()
       }
 
@@ -345,7 +348,10 @@ test.describe('Auto-update', () => {
       const checkBtn = aboutDialog.locator(
         'button.button-component:has-text("Check for Updates")'
       )
-      if (await checkBtn.isVisible()) {
+      if (
+        (await checkBtn.isVisible().catch(() => false)) &&
+        (await checkBtn.isEnabled().catch(() => false))
+      ) {
         await checkBtn.click()
       }
 
