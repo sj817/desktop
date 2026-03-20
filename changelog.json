@@ -1,5 +1,6 @@
 {
   "releases": {
+    "3.5.7-test4": ["[New] add-e2e-tests-critical-paths"],
     "3.5.7-beta2": [
       "[Added] Allow empty commits via the commit options menu - #21771"
     ],
