@@ -44,7 +44,7 @@ type IFilterListRow<T extends IFilterListItem> =
   | IFlattenedGroup
   | IFlattenedItem<T>
 
-interface IAugmentedSectionFilterListProps<T extends IFilterListItem> {
+export interface IAugmentedSectionFilterListProps<T extends IFilterListItem> {
   /** The unique identifier for the outer element of the component (optional, defaults to null) */
   readonly id?: string
 

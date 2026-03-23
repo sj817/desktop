@@ -10,7 +10,7 @@ import { TooltippedContent } from '../lib/tooltipped-content'
 import { AriaLiveContainer } from '../accessibility/aria-live-container'
 import { IMatches } from '../../lib/fuzzy-find'
 
-interface IChangedFileProps {
+export interface IChangedFileProps {
   readonly file: WorkingDirectoryFileChange
   readonly include: boolean | null
   readonly availableWidth: number

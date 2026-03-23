@@ -40,9 +40,62 @@ Object.assign(globalThis, {
   BroadcastChannel: undefined,
 })
 
+Object.assign(globalThis, {
+  Event: window.Event,
+  CustomEvent: window.CustomEvent,
+})
+
+type DialogElement = HTMLElement & {
+  open?: boolean
+  showModal?: () => void
+  close?: () => void
+}
+
+const dialogPrototype = HTMLElement.prototype as DialogElement
+
+if (typeof dialogPrototype.showModal !== 'function') {
+  dialogPrototype.showModal = function () {
+    this.open = true
+    this.setAttribute('open', '')
+  }
+}
+
+if (typeof dialogPrototype.close !== 'function') {
+  dialogPrototype.close = function () {
+    this.open = false
+    this.removeAttribute('open')
+  }
+}
+
+if (globalThis.ResizeObserver === undefined) {
+  class TestResizeObserver {
+    public observe() {}
+    public disconnect() {}
+  }
+
+  Object.assign(globalThis, { ResizeObserver: TestResizeObserver })
+}
+
+Object.defineProperty(HTMLFormElement.prototype, 'requestSubmit', {
+  configurable: true,
+  writable: true,
+  value: function () {
+    this.dispatchEvent(
+      new window.Event('submit', { bubbles: true, cancelable: true })
+    )
+  },
+})
+
 mock.module('electron', {
   namedExports: {
     shell: {},
-    ipcRenderer: { on: mock.fn(x => {}) },
+    ipcRenderer: {
+      on: mock.fn(() => {}),
+      once: mock.fn(() => {}),
+      send: mock.fn(() => {}),
+      sendSync: mock.fn(() => {}),
+      invoke: mock.fn(async () => undefined),
+      removeListener: mock.fn(() => {}),
+    },
   },
 })

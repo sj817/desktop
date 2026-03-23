@@ -9,7 +9,7 @@ export enum CheckboxValue {
   Mixed,
 }
 
-interface ICheckboxProps {
+export interface ICheckboxProps {
   /** Is the component disabled. */
   readonly disabled?: boolean
 

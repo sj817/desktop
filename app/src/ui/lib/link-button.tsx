@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import { Tooltip } from './tooltip'
 import { createObservableRef } from './observable-ref'
 
-interface ILinkButtonProps {
+export interface ILinkButtonProps {
   /** A URI to open on click. */
   readonly uri?: string
 

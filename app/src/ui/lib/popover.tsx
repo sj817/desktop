@@ -57,7 +57,7 @@ const TipSize = 8
 const TipCornerPadding = TipSize
 export const PopoverScreenBorderPadding = 10
 
-interface IPopoverProps {
+export interface IPopoverProps {
   readonly onClickOutside?: (event?: MouseEvent) => void
   readonly onMousedownOutside?: (event?: MouseEvent) => void
   /** Element to anchor the popover to */

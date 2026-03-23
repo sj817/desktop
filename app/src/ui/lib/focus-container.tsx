@@ -1,7 +1,7 @@
 import * as React from 'react'
 import classNames from 'classnames'
 
-interface IFocusContainerProps {
+export interface IFocusContainerProps {
   readonly className?: string
   readonly role?: React.HTMLAttributes<HTMLElement>['role']
   readonly onClick?: (event: React.MouseEvent<HTMLDivElement>) => void

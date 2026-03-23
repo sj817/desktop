@@ -26,7 +26,7 @@ import { formatDate } from '../../lib/format-date'
 
 const RowHeight = 30
 
-interface IBranchListProps {
+export interface IBranchListProps {
   readonly repository: Repository
 
   /**

@@ -23,7 +23,10 @@ interface IRange {
   readonly length: number
 }
 
-interface IAutocompletingTextInputProps<ElementType, AutocompleteItemType> {
+export interface IAutocompletingTextInputProps<
+  ElementType,
+  AutocompleteItemType
+> {
   /** An optional specified id for the input */
   readonly inputId?: string
 
