@@ -45,6 +45,12 @@ Object.assign(globalThis, {
   CustomEvent: window.CustomEvent,
 })
 
+// Some code references Event and CustomEvent from the global scope instead of
+// going through window, so mirror JSDOM's constructors onto globalThis.
+
+// JSDOM doesn't implement HTMLDialogElement, but several components call
+// showModal/close and read the open state. This minimal shim preserves the
+// behavior those tests care about without needing a full dialog polyfill.
 type DialogElement = HTMLElement & {
   open?: boolean
   showModal?: () => void
@@ -68,6 +74,9 @@ if (typeof dialogPrototype.close !== 'function') {
 }
 
 if (globalThis.ResizeObserver === undefined) {
+  // JSDOM has no layout engine and doesn't provide ResizeObserver. A few UI
+  // components subscribe to it during mount, so a no-op implementation keeps
+  // them renderable in tests without trying to emulate real measurements.
   class TestResizeObserver {
     public observe() {}
     public disconnect() {}
@@ -76,6 +85,9 @@ if (globalThis.ResizeObserver === undefined) {
   Object.assign(globalThis, { ResizeObserver: TestResizeObserver })
 }
 
+// requestSubmit is missing in JSDOM, but some form-driven components use it to
+// exercise their normal submit path. Dispatching a cancelable submit event is
+// enough for the handlers under test.
 Object.defineProperty(HTMLFormElement.prototype, 'requestSubmit', {
   configurable: true,
   writable: true,
