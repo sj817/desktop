@@ -1,5 +1,6 @@
 {
   "releases": {
+    "3.5.7-test5": ["[New] Automated test release"],
     "3.5.7-beta2": [
       "[Added] Allow empty commits via the commit options menu - #21771"
     ],
