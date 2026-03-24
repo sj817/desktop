@@ -140,7 +140,7 @@ mock.module('../../../src/ui/lib/text-box', {
 
 mock.module('../../../src/ui/lib/checkbox', {
   namedExports: {
-    CheckboxValue: { On: 1, Off: 0, Mixed: -1 },
+    CheckboxValue: { On: 0, Off: 1, Mixed: 2 },
     Checkbox: React.forwardRef<IFocusableHandle, ICheckboxProps>(
       (props, ref) => {
         React.useImperativeHandle(ref, () => ({ focus: () => {} }))
