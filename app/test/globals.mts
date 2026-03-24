@@ -88,15 +88,17 @@ if (globalThis.ResizeObserver === undefined) {
 // requestSubmit is missing in JSDOM, but some form-driven components use it to
 // exercise their normal submit path. Dispatching a cancelable submit event is
 // enough for the handlers under test.
-Object.defineProperty(HTMLFormElement.prototype, 'requestSubmit', {
-  configurable: true,
-  writable: true,
-  value: function () {
-    this.dispatchEvent(
-      new window.Event('submit', { bubbles: true, cancelable: true })
-    )
-  },
-})
+if (typeof HTMLFormElement.prototype.requestSubmit !== 'function') {
+  Object.defineProperty(HTMLFormElement.prototype, 'requestSubmit', {
+    configurable: true,
+    writable: true,
+    value: function () {
+      this.dispatchEvent(
+        new window.Event('submit', { bubbles: true, cancelable: true })
+      )
+    },
+  })
+}
 
 mock.module('electron', {
   namedExports: {
