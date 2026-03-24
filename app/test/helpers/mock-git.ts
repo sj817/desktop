@@ -118,9 +118,7 @@ export function createMockStatusWithFiles(
   overrides: Partial<IStatusResult> = {}
 ): IStatusResult {
   return createMockStatusResult({
-    workingDirectory: WorkingDirectoryStatus.fromFiles(
-      files as WorkingDirectoryFileChange[]
-    ),
+    workingDirectory: WorkingDirectoryStatus.fromFiles(files),
     ...overrides,
   })
 }
