@@ -56,10 +56,19 @@ export function change(
         'checked'
       )?.set?.call(element, value)
     } else {
-      Object.getOwnPropertyDescriptor(
-        HTMLInputElement.prototype,
-        'value'
-      )?.set?.call(element, value)
+      const prototype =
+        element instanceof HTMLInputElement
+          ? HTMLInputElement.prototype
+          : element instanceof HTMLSelectElement
+          ? HTMLSelectElement.prototype
+          : HTMLTextAreaElement.prototype
+      const descriptor = Object.getOwnPropertyDescriptor(prototype, 'value')
+
+      if (descriptor?.set !== undefined) {
+        descriptor.set.call(element, value)
+      } else {
+        element.value = value
+      }
     }
     element.dispatchEvent(new Event('change', { bubbles: true }))
   })
