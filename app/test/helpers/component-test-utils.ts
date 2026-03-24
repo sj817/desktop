@@ -56,6 +56,10 @@ export function change(
         'checked'
       )?.set?.call(element, value)
     } else {
+      if (typeof value !== 'string') {
+        throw new Error('Boolean values are only supported for input elements')
+      }
+
       const prototype =
         element instanceof HTMLInputElement
           ? HTMLInputElement.prototype
