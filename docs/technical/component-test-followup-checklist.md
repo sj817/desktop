@@ -127,10 +127,10 @@ approach we are trying to settle on.
     `SectionFilterList`.
   - [x] Tighten grouped-repository text assertions so they are less dependent on the
     full flattened container text.
-- [ ] [app/test/unit/ui/repositories-list-search-test.tsx](../../app/test/unit/ui/repositories-list-search-test.tsx)
+- [x] [app/test/unit/ui/repositories-list-search-test.tsx](../../app/test/unit/ui/repositories-list-search-test.tsx)
   - [x] Reduce broad `textContent` assertions and switch to narrower lookups for
     visible repository rows and empty-state controls.
-  - Reuse any shared search/filter helper patterns that come out of the main
+  - [x] Reuse the shared search/filter list shell pattern from the main
     repositories list work.
 - [ ] [app/test/unit/ui/filter-changes-list-test.tsx](../../app/test/unit/ui/filter-changes-list-test.tsx)
   - Split the current coverage into clearly labeled wrapper tests versus
@@ -153,14 +153,14 @@ approach we are trying to settle on.
   - [x] Avoid JSON-string prop summaries once a clearer assertion shape is available.
   - [x] Separate parent-managed state assertions from dispatcher-routing assertions
     if that improves readability.
-- [ ] [app/test/unit/ui/dialog-test.tsx](../../app/test/unit/ui/dialog-test.tsx)
+- [x] [app/test/unit/ui/dialog-test.tsx](../../app/test/unit/ui/dialog-test.tsx)
   - [x] Remove duplicated global shims.
   - [x] Replace the local dismiss-grace helper with a shared one.
-  - Continue shifting assertions toward focused button and heading lookups.
-- [ ] [app/test/unit/ui/dialog-backdrop-test.tsx](../../app/test/unit/ui/dialog-backdrop-test.tsx)
+  - [x] Continue shifting assertions toward focused button and heading lookups.
+- [x] [app/test/unit/ui/dialog-backdrop-test.tsx](../../app/test/unit/ui/dialog-backdrop-test.tsx)
   - [x] Share the dismiss-grace helper with `dialog-test.tsx`.
-  - Consider sharing backdrop-click setup if the same shape appears in more
-    dialog tests.
+  - [x] Keep the local backdrop-click helper for now; the shape does not recur in
+    other dialog tests.
 - [x] [app/test/unit/ui/commit-conflicts-warning-test.tsx](../../app/test/unit/ui/commit-conflicts-warning-test.tsx)
   - [x] Remove duplicated dialog shim logic that now belongs in shared globals.
   - [x] Replace local submit dispatch and button text scans with the shared helper
@@ -250,17 +250,17 @@ have consistency cleanup available if they are touched again.
   - [x] Optional cleanup for text and class assertions.
 - [x] [app/test/unit/ui/radio-button-test.tsx](../../app/test/unit/ui/radio-button-test.tsx)
   - [x] Optional label lookup cleanup.
-- [ ] [app/test/unit/ui/text-box-test.tsx](../../app/test/unit/ui/text-box-test.tsx)
-  - Optional cleanup if a shared input helper lands.
+- [x] [app/test/unit/ui/text-box-test.tsx](../../app/test/unit/ui/text-box-test.tsx)
+  - [x] Optional cleanup if a shared input helper lands.
 - [x] [app/test/unit/ui/undo-commit-test.tsx](../../app/test/unit/ui/undo-commit-test.tsx)
   - [x] Optional narrowing of container-text assertions.
 
 ## Focused follow-up for files already touched on this branch
 
-- [ ] [app/test/helpers/component-test-utils.ts](../../app/test/helpers/component-test-utils.ts)
-  - Finish the first round of shared helpers before expanding test coverage any
+- [x] [app/test/helpers/component-test-utils.ts](../../app/test/helpers/component-test-utils.ts)
+  - [x] Finish the first round of shared helpers before expanding test coverage any
     further.
-  - Keep the API small enough that tests remain explicit and readable.
+  - [x] Keep the API small enough that tests remain explicit and readable.
 - [ ] [app/test/globals.mts](../../app/test/globals.mts)
   - [x] Resolve the outstanding `requestSubmit` warning.
   - Avoid growing this file with per-test behavior unless the behavior is truly
@@ -271,8 +271,8 @@ have consistency cleanup available if they are touched again.
   - Revisit only if submit or link helpers change again.
 - [ ] [app/test/unit/ui/dialog-content-footer-test.tsx](../../app/test/unit/ui/dialog-content-footer-test.tsx)
   - Tighten remaining content assertions if new shared text helpers land.
-- [ ] [app/test/unit/ui/dialog-test.tsx](../../app/test/unit/ui/dialog-test.tsx)
-  - See remaining high-priority dialog cleanup items above.
+- [x] [app/test/unit/ui/dialog-test.tsx](../../app/test/unit/ui/dialog-test.tsx)
+  - [x] See remaining high-priority dialog cleanup items above.
 - [ ] [app/test/unit/ui/ok-cancel-button-group-test.tsx](../../app/test/unit/ui/ok-cancel-button-group-test.tsx)
   - Revisit only if a clearer group-level helper or shared button-group pattern
     emerges.

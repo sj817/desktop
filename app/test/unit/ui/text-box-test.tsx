@@ -2,6 +2,7 @@ import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
 import {
+  queryByTextOrThrow,
   renderComponent,
   queryOrThrow,
 } from '../../helpers/component-test-utils'
@@ -34,9 +35,7 @@ describe('TextBox', () => {
     )
     unmount = u
 
-    const label = container.querySelector('label')
-    assert.ok(label)
-    assert.equal(label!.textContent, 'Username')
+    queryByTextOrThrow(container, 'label', 'Username')
   })
 
   it('renders with placeholder text', () => {

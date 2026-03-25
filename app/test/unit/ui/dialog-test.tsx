@@ -2,6 +2,7 @@ import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
 import {
+  queryByTextOrThrow,
   keyDown,
   queryOrThrow,
   renderComponent,
@@ -81,8 +82,11 @@ describe('Dialog', () => {
       </Dialog>
     )
 
-    const heading = queryOrThrow<HTMLHeadingElement>(dialog, 'h1')
-    assert.equal(heading.textContent, 'Preferences')
+    const heading = queryByTextOrThrow<HTMLHeadingElement>(
+      dialog,
+      'h1',
+      'Preferences'
+    )
     assert.equal(heading.id, 'preferences-title')
     assert.ok(dialog.classList.contains('custom-dialog'))
     assert.equal(dialog.getAttribute('aria-labelledby'), 'preferences-title')
