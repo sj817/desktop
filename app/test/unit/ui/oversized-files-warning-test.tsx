@@ -9,6 +9,7 @@ import { OversizedFiles } from '../../../src/ui/changes/oversized-files-warning'
 import { Dispatcher } from '../../../src/ui/dispatcher'
 import {
   buttonWithText,
+  pathTextWithSegments,
   queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
@@ -55,15 +56,8 @@ describe('OversizedFiles', () => {
     )
     unmount = u
 
-    const rows = Array.from(container.querySelectorAll('.files-list li'))
-    const renderedPaths = rows.map(row => {
-      const dirname = row.querySelector('.dirname')?.textContent ?? ''
-      const filename = row.querySelector('.filename')?.textContent ?? ''
-      return `${dirname}${filename}`
-    })
-
-    assert.ok(renderedPaths.includes('large/video.mov'))
-    assert.ok(renderedPaths.includes('archive/bundle.zip'))
+    pathTextWithSegments(container, 'large/', 'video.mov')
+    pathTextWithSegments(container, 'archive/', 'bundle.zip')
     queryByTextOrThrow(
       container,
       '.dialog-content p',

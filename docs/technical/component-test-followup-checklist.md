@@ -161,12 +161,12 @@ approach we are trying to settle on.
   - [x] Share the dismiss-grace helper with `dialog-test.tsx`.
   - Consider sharing backdrop-click setup if the same shape appears in more
     dialog tests.
-- [ ] [app/test/unit/ui/commit-conflicts-warning-test.tsx](../../app/test/unit/ui/commit-conflicts-warning-test.tsx)
+- [x] [app/test/unit/ui/commit-conflicts-warning-test.tsx](../../app/test/unit/ui/commit-conflicts-warning-test.tsx)
   - [x] Remove duplicated dialog shim logic that now belongs in shared globals.
   - [x] Replace local submit dispatch and button text scans with the shared helper
     API.
-  - Consider extracting a shared helper for rendered conflicted-file path
-    assertions if the same filename/dirname pattern continues to appear.
+  - [x] Reuse the shared split-path helper for rendered conflicted-file path
+    assertions.
 
 ## Medium-priority file-by-file work
 
@@ -276,8 +276,8 @@ have consistency cleanup available if they are touched again.
 - [ ] [app/test/unit/ui/ok-cancel-button-group-test.tsx](../../app/test/unit/ui/ok-cancel-button-group-test.tsx)
   - Revisit only if a clearer group-level helper or shared button-group pattern
     emerges.
-- [ ] [app/test/unit/ui/oversized-files-warning-test.tsx](../../app/test/unit/ui/oversized-files-warning-test.tsx)
-  - Revisit file-list assertions if a shared split-path helper is introduced.
+- [x] [app/test/unit/ui/oversized-files-warning-test.tsx](../../app/test/unit/ui/oversized-files-warning-test.tsx)
+  - [x] Revisit file-list assertions if a shared split-path helper is introduced.
 
 ## Explicit “keep as-is unless touched” files
 

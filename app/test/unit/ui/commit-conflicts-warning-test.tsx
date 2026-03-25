@@ -13,6 +13,7 @@ import { createMockFileChange } from '../../helpers/mock-git'
 import {
   buttonWithText,
   keyDown,
+  pathTextWithSegments,
   queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
@@ -76,16 +77,8 @@ describe('CommitConflictsWarning', () => {
       'Are you sure you want to commit these conflicted files?'
     )
 
-    const renderedPaths = Array.from(
-      container.querySelectorAll('.conflicted-files-text li')
-    ).map(row => {
-      const dirname = row.querySelector('.dirname')?.textContent ?? ''
-      const filename = row.querySelector('.filename')?.textContent ?? ''
-      return `${dirname}${filename}`
-    })
-
-    assert.ok(renderedPaths.includes('src/conflicted.ts'))
-    assert.ok(renderedPaths.includes('docs/merge.md'))
+    pathTextWithSegments(container, 'src/', 'conflicted.ts')
+    pathTextWithSegments(container, 'docs/', 'merge.md')
 
     assert.ok(
       buttonWithText(
