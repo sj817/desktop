@@ -271,6 +271,41 @@ export function linkWithText(
 }
 
 /**
+ * Queries for a rendered path segment pair and asserts it exists.
+ */
+export function pathTextWithSegments(
+  container: HTMLElement,
+  directory: string,
+  filename: string
+): HTMLDivElement {
+  const matches = Array.from(
+    container.querySelectorAll<HTMLDivElement>('.path-text-component')
+  ).filter(element => {
+    const dirname = element.querySelector('.dirname')?.textContent ?? ''
+    const file = element.querySelector('.filename')?.textContent ?? ''
+
+    return (
+      normalizeTextContent(dirname) === normalizeTextContent(directory) &&
+      normalizeTextContent(file) === normalizeTextContent(filename)
+    )
+  })
+
+  if (matches.length === 0) {
+    throw new Error(
+      `Could not find path text with directory "${directory}" and filename "${filename}" in:\n${container.innerHTML}`
+    )
+  }
+
+  if (matches.length > 1) {
+    throw new Error(
+      `Found multiple path texts with directory "${directory}" and filename "${filename}" in:\n${container.innerHTML}`
+    )
+  }
+
+  return matches[0]
+}
+
+/**
  * Queries for a checkbox by its rendered label text and asserts it exists.
  */
 export function checkboxWithLabel(

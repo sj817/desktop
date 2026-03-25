@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import {
   click,
+  pathTextWithSegments,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -83,10 +84,9 @@ describe('ChangedFile', () => {
     )
     unmount = u
 
-    const pathLabel = queryOrThrow(container, '.path-label-component')
-    assert.ok(pathLabel.textContent?.includes('src/new-name.ts.old'))
-    assert.ok(pathLabel.textContent?.includes('src/new-name.ts'))
-    assert.ok(container.querySelector('.rename-arrow'))
+    pathTextWithSegments(container, 'src/', 'new-name.ts.old')
+    pathTextWithSegments(container, 'src/', 'new-name.ts')
+    queryOrThrow(container, '.rename-arrow')
   })
 
   it('announces file status and inclusion through the aria live region', () => {

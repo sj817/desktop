@@ -48,9 +48,22 @@ describe('CommitWarning', () => {
       error.unmount()
     }
 
-    assert.ok(warning.container.querySelector('svg.warning-icon'))
-    assert.ok(information.container.querySelector('svg.information-icon'))
-    assert.ok(error.container.querySelector('svg.error-icon'))
+    assert.ok(
+      queryOrThrow<SVGElement>(warning.container, '.warning-icon-container svg').classList.contains(
+        'warning-icon'
+      )
+    )
+    assert.ok(
+      queryOrThrow<SVGElement>(
+        information.container,
+        '.warning-icon-container svg'
+      ).classList.contains('information-icon')
+    )
+    assert.ok(
+      queryOrThrow<SVGElement>(error.container, '.warning-icon-container svg').classList.contains(
+        'error-icon'
+      )
+    )
   })
 
   it('suppresses the context menu on the root element', () => {

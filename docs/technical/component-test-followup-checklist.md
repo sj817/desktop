@@ -211,10 +211,10 @@ approach we are trying to settle on.
   - [x] Revisit icon and indicator assertions to make sure they are not over-coupled
     to internal markup.
 - [ ] [app/test/unit/ui/changed-file-test.tsx](../../app/test/unit/ui/changed-file-test.tsx)
-  - Consider a shared helper for path-label assertions where dirname and filename
+  - [x] Consider a shared helper for path-label assertions where dirname and filename
     are split across child nodes.
 - [ ] [app/test/unit/ui/commit-warning-test.tsx](../../app/test/unit/ui/commit-warning-test.tsx)
-  - Revisit whether icon assertions should stay CSS-only or move toward a more
+  - [x] Revisit whether icon assertions should stay CSS-only or move toward a more
     explicit warning-type contract.
 - [ ] [app/test/unit/ui/dialog-alertdialog-test.tsx](../../app/test/unit/ui/dialog-alertdialog-test.tsx)
   - Share any dialog focus helper utilities that come out of the main dialog
