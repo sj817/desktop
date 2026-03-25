@@ -1,11 +1,11 @@
 import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 import {
   keyDown,
   queryOrThrow,
   renderComponent,
+  submit,
 } from '../../helpers/component-test-utils'
 import {
   Dialog,
@@ -165,12 +165,7 @@ describe('Dialog', () => {
       </Dialog>
     )
 
-    const form = queryOrThrow<HTMLFormElement>(dialog, 'form')
-    act(() => {
-      form.dispatchEvent(
-        new window.Event('submit', { bubbles: true, cancelable: true })
-      )
-    })
+    submit(queryOrThrow<HTMLFormElement>(dialog, 'form'))
 
     assert.equal(submitted, true)
   })
@@ -186,12 +181,7 @@ describe('Dialog', () => {
 
     await waitForDismissGracePeriod()
 
-    const form = queryOrThrow<HTMLFormElement>(dialog, 'form')
-    act(() => {
-      form.dispatchEvent(
-        new window.Event('submit', { bubbles: true, cancelable: true })
-      )
-    })
+    submit(queryOrThrow<HTMLFormElement>(dialog, 'form'))
 
     assert.equal(dismissed, true)
   })

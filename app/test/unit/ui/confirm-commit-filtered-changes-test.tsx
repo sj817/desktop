@@ -1,13 +1,13 @@
 import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 
 import { ConfirmCommitFilteredChanges } from '../../../src/ui/changes/confirm-commit-filtered-changes-dialog'
 import {
   click,
   queryOrThrow,
   renderComponent,
+  submit,
 } from '../../helpers/component-test-utils'
 
 let unmount: (() => void) | undefined
@@ -41,12 +41,7 @@ describe('ConfirmCommitFilteredChanges', () => {
     )
     unmount = u
 
-    const form = queryOrThrow<HTMLFormElement>(container, 'form')
-    act(() => {
-      form.dispatchEvent(
-        new window.Event('submit', { bubbles: true, cancelable: true })
-      )
-    })
+    submit(queryOrThrow<HTMLFormElement>(container, 'form'))
 
     assert.deepEqual(confirmationValues, [true])
     assert.equal(committed, 1)
@@ -80,12 +75,7 @@ describe('ConfirmCommitFilteredChanges', () => {
     )
     click(checkbox)
 
-    const form = queryOrThrow<HTMLFormElement>(container, 'form')
-    act(() => {
-      form.dispatchEvent(
-        new window.Event('submit', { bubbles: true, cancelable: true })
-      )
-    })
+    submit(queryOrThrow<HTMLFormElement>(container, 'form'))
 
     assert.deepEqual(confirmationValues, [false])
   })

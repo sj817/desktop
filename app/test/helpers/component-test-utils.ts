@@ -42,6 +42,10 @@ export function click(element: Element) {
   })
 }
 
+function normalizeTextContent(text: string | null): string {
+  return text?.replace(/\s+/g, ' ').trim() ?? ''
+}
+
 /**
  * Simulates a change event on an input/checkbox/select element.
  */
@@ -107,4 +111,53 @@ export function queryOrThrow<T extends Element>(
     )
   }
   return el
+}
+
+/**
+ * Queries for an element with matching normalized text content and asserts it exists.
+ */
+export function queryByTextOrThrow<T extends Element>(
+  container: HTMLElement,
+  selector: string,
+  text: string
+): T {
+  const normalizedText = normalizeTextContent(text)
+  const matches = Array.from(container.querySelectorAll<T>(selector)).filter(
+    element => normalizeTextContent(element.textContent) === normalizedText
+  )
+
+  if (matches.length === 0) {
+    throw new Error(
+      `Could not find element matching "${selector}" with text "${normalizedText}" in:\n${container.innerHTML}`
+    )
+  }
+
+  if (matches.length > 1) {
+    throw new Error(
+      `Found multiple elements matching "${selector}" with text "${normalizedText}" in:\n${container.innerHTML}`
+    )
+  }
+
+  return matches[0]
+}
+
+/**
+ * Queries for a button with matching normalized text content and asserts it exists.
+ */
+export function buttonWithText(
+  container: HTMLElement,
+  text: string
+): HTMLButtonElement {
+  return queryByTextOrThrow<HTMLButtonElement>(container, 'button', text)
+}
+
+/**
+ * Dispatches a submit event on a form within an `act()` block.
+ */
+export function submit(form: HTMLFormElement) {
+  act(() => {
+    form.dispatchEvent(
+      new window.Event('submit', { bubbles: true, cancelable: true })
+    )
+  })
 }

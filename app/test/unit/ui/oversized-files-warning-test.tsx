@@ -8,8 +8,10 @@ import { Repository } from '../../../src/models/repository'
 import { OversizedFiles } from '../../../src/ui/changes/oversized-files-warning'
 import { Dispatcher } from '../../../src/ui/dispatcher'
 import {
+  buttonWithText,
   queryOrThrow,
   renderComponent,
+  submit,
 } from '../../helpers/component-test-utils'
 
 let unmount: (() => void) | undefined
@@ -107,12 +109,13 @@ describe('OversizedFiles', () => {
     )
     unmount = u
 
-    const buttons = Array.from(container.querySelectorAll('button')).map(b =>
-      b.textContent?.trim()
+    assert.ok(
+      buttonWithText(
+        container,
+        __DARWIN__ ? 'Commit Anyway' : 'Commit anyway'
+      )
     )
-
-    assert.ok(buttons.includes(__DARWIN__ ? 'Commit Anyway' : 'Commit anyway'))
-    assert.ok(buttons.includes('Cancel'))
+    assert.ok(buttonWithText(container, 'Cancel'))
   })
 
   it('dismisses, commits included changes, and resets the commit message on submit', async () => {
@@ -153,10 +156,7 @@ describe('OversizedFiles', () => {
     )
     unmount = u
 
-    const form = queryOrThrow<HTMLFormElement>(container, 'form')
-    form.dispatchEvent(
-      new window.Event('submit', { bubbles: true, cancelable: true })
-    )
+    submit(queryOrThrow<HTMLFormElement>(container, 'form'))
 
     await Promise.resolve()
 

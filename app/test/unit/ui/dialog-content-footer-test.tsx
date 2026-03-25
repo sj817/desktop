@@ -2,6 +2,7 @@ import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
 import {
+  buttonWithText,
   renderComponent,
   queryOrThrow,
 } from '../../helpers/component-test-utils'
@@ -77,9 +78,7 @@ describe('DialogFooter', () => {
     const footer = queryOrThrow(container, '.dialog-footer')
     const buttons = footer.querySelectorAll('button')
     assert.equal(buttons.length, 2)
-
-    const texts = Array.from(buttons).map(b => b.textContent)
-    assert.ok(texts.includes('Save'))
-    assert.ok(texts.includes('Discard'))
+    assert.ok(buttonWithText(footer, 'Save'))
+    assert.ok(buttonWithText(footer, 'Discard'))
   })
 })

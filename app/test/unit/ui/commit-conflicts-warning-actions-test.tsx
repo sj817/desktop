@@ -8,7 +8,11 @@ import { Repository } from '../../../src/models/repository'
 import { AppFileStatusKind } from '../../../src/models/status'
 import { CommitConflictsWarning } from '../../../src/ui/merge-conflicts/commit-conflicts-warning'
 import { Dispatcher } from '../../../src/ui/dispatcher'
-import { click, renderComponent } from '../../helpers/component-test-utils'
+import {
+  buttonWithText,
+  click,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 import { createMockFileChange } from '../../helpers/mock-git'
 
 let unmount: (() => void) | undefined
@@ -29,15 +33,6 @@ function createCommitContext(): ICommitContext {
     amend: true,
     trailers: [{ token: 'Co-Authored-By', value: 'Mona <mona@example.com>' }],
   }
-}
-
-function findButtonByText(container: HTMLElement, text: string) {
-  const button = Array.from(container.querySelectorAll('button')).find(
-    element => element.textContent?.trim() === text
-  )
-
-  assert.ok(button, `Expected button with text ${text}`)
-  return button as HTMLButtonElement
 }
 
 describe('CommitConflictsWarning actions', () => {
@@ -89,7 +84,7 @@ describe('CommitConflictsWarning actions', () => {
     unmount = u
 
     click(
-      findButtonByText(
+      buttonWithText(
         container,
         __DARWIN__ ? 'Yes, Commit Files' : 'Yes, commit files'
       )

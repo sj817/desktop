@@ -1,7 +1,11 @@
 import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { renderComponent, click } from '../../helpers/component-test-utils'
+import {
+  buttonWithText,
+  click,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 import { OkCancelButtonGroup } from '../../../src/ui/dialog/ok-cancel-button-group'
 
 let unmount: () => void
@@ -19,10 +23,8 @@ describe('OkCancelButtonGroup', () => {
 
     const buttons = container.querySelectorAll('button')
     assert.equal(buttons.length, 2)
-
-    const texts = Array.from(buttons).map(b => b.textContent)
-    assert.ok(texts.includes('Ok'))
-    assert.ok(texts.includes('Cancel'))
+    assert.ok(buttonWithText(container, 'Ok'))
+    assert.ok(buttonWithText(container, 'Cancel'))
   })
 
   it('uses custom Ok button text', () => {
@@ -33,9 +35,7 @@ describe('OkCancelButtonGroup', () => {
     )
     unmount = u
 
-    const buttons = container.querySelectorAll('button')
-    const texts = Array.from(buttons).map(b => b.textContent)
-    assert.ok(texts.includes('Save'))
+    assert.ok(buttonWithText(container, 'Save'))
   })
 
   it('uses custom Cancel button text', () => {
@@ -46,9 +46,7 @@ describe('OkCancelButtonGroup', () => {
     )
     unmount = u
 
-    const buttons = container.querySelectorAll('button')
-    const texts = Array.from(buttons).map(b => b.textContent)
-    assert.ok(texts.includes('Dismiss'))
+    assert.ok(buttonWithText(container, 'Dismiss'))
   })
 
   it('calls onOkButtonClick when Ok is clicked', () => {
@@ -64,9 +62,7 @@ describe('OkCancelButtonGroup', () => {
     )
     unmount = u
 
-    const buttons = container.querySelectorAll('button')
-    const okButton = Array.from(buttons).find(b => b.textContent === 'Ok')!
-    click(okButton)
+    click(buttonWithText(container, 'Ok'))
     assert.equal(okClicked, true)
   })
 
@@ -83,11 +79,7 @@ describe('OkCancelButtonGroup', () => {
     )
     unmount = u
 
-    const buttons = container.querySelectorAll('button')
-    const cancelButton = Array.from(buttons).find(
-      b => b.textContent === 'Cancel'
-    )!
-    click(cancelButton)
+    click(buttonWithText(container, 'Cancel'))
     assert.equal(cancelClicked, true)
   })
 
@@ -99,8 +91,7 @@ describe('OkCancelButtonGroup', () => {
     )
     unmount = u
 
-    const buttons = container.querySelectorAll('button')
-    const okButton = Array.from(buttons).find(b => b.textContent === 'Ok')!
+    const okButton = buttonWithText(container, 'Ok')
     assert.equal(okButton.getAttribute('aria-disabled'), 'true')
   })
 
@@ -114,7 +105,7 @@ describe('OkCancelButtonGroup', () => {
 
     const buttons = container.querySelectorAll('button')
     assert.equal(buttons.length, 1)
-    assert.equal(buttons[0].textContent, 'Ok')
+    assert.equal(buttonWithText(container, 'Ok').textContent, 'Ok')
   })
 
   it('has the button-group class', () => {
