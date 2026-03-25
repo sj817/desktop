@@ -216,8 +216,8 @@ approach we are trying to settle on.
 - [x] [app/test/unit/ui/commit-warning-test.tsx](../../app/test/unit/ui/commit-warning-test.tsx)
   - [x] Revisit whether icon assertions should stay CSS-only or move toward a more
     explicit warning-type contract.
-- [ ] [app/test/unit/ui/dialog-alertdialog-test.tsx](../../app/test/unit/ui/dialog-alertdialog-test.tsx)
-  - Share any dialog focus helper utilities that come out of the main dialog
+- [x] [app/test/unit/ui/dialog-alertdialog-test.tsx](../../app/test/unit/ui/dialog-alertdialog-test.tsx)
+  - [x] Share any dialog focus helper utilities that come out of the main dialog
     cleanup.
 - [ ] [app/test/unit/ui/dialog-resize-test.tsx](../../app/test/unit/ui/dialog-resize-test.tsx)
   - Consider centralizing viewport and `requestAnimationFrame` setup if more

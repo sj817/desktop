@@ -135,6 +135,15 @@ export function blur(element: Element) {
 }
 
 /**
+ * Focuses an element within an `act()` block.
+ */
+export function focus(element: HTMLElement) {
+  act(() => {
+    element.focus()
+  })
+}
+
+/**
  * Simulates a mouse down event on an element.
  */
 export function mouseDown(

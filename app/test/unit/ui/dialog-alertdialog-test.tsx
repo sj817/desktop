@@ -1,9 +1,9 @@
 import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 
 import {
+  focus,
   keyDown,
   queryOrThrow,
   renderComponent,
@@ -59,9 +59,7 @@ describe('Dialog Alertdialog Behavior', () => {
     const closeButton = buttons[0]
     const lastButton = buttons[2]
 
-    act(() => {
-      lastButton.focus()
-    })
+    focus(lastButton)
 
     keyDown(dialog, 'Tab')
 
@@ -90,9 +88,7 @@ describe('Dialog Alertdialog Behavior', () => {
     const closeButton = buttons[0]
     const lastButton = buttons[2]
 
-    act(() => {
-      closeButton.focus()
-    })
+    focus(closeButton)
 
     keyDown(dialog, 'Tab', { shiftKey: true })
 
