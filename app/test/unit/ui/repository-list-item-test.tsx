@@ -76,7 +76,10 @@ describe('RepositoryListItem', () => {
     )
 
     queryByTextOrThrow(container, '.prefix', 'desktop/')
-    assert.ok(name.textContent?.includes('Desktop App'))
+    assert.equal(
+      name.textContent?.replace(prefix.textContent ?? '', ''),
+      'Desktop App'
+    )
     assert.deepEqual(highlights, ['Des'])
     queryOrThrow(container, '.icon-for-repository')
   })

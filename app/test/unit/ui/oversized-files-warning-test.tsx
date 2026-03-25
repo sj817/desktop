@@ -9,6 +9,7 @@ import { OversizedFiles } from '../../../src/ui/changes/oversized-files-warning'
 import { Dispatcher } from '../../../src/ui/dispatcher'
 import {
   buttonWithText,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
   submit,
@@ -80,8 +81,10 @@ describe('OversizedFiles', () => {
 
     assert.ok(renderedPaths.includes('large/video.mov'))
     assert.ok(renderedPaths.includes('archive/bundle.zip'))
-    assert.ok(
-      container.textContent?.includes('The following files are over 100MB')
+    queryByTextOrThrow(
+      container,
+      '.dialog-content p',
+      'The following files are over 100MB. If you commit these files, you will no longer be able to push this repository to GitHub.com.'
     )
 
     const link = queryOrThrow<HTMLAnchorElement>(

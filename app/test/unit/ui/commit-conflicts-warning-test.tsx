@@ -13,6 +13,7 @@ import { createMockFileChange } from '../../helpers/mock-git'
 import {
   buttonWithText,
   keyDown,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
   submit,
@@ -85,13 +86,15 @@ describe('CommitConflictsWarning', () => {
     )
     unmount = u
 
-    assert.ok(
-      container.textContent?.includes('Confirm committing conflicted files')
+    queryByTextOrThrow(
+      container,
+      '.dialog-header h1',
+      'Confirm committing conflicted files'
     )
-    assert.ok(
-      container.textContent?.includes(
-        'Are you sure you want to commit these conflicted files?'
-      )
+    queryByTextOrThrow(
+      container,
+      '.dialog-content p:last-of-type',
+      'Are you sure you want to commit these conflicted files?'
     )
 
     const renderedPaths = Array.from(
