@@ -105,16 +105,16 @@ approach we are trying to settle on.
 - [ ] [app/test/unit/ui/branch-select-test.tsx](../../app/test/unit/ui/branch-select-test.tsx)
   - Keep the existing wrapper coverage, but add a companion test that exercises
     a less-mocked branch selection flow.
-  - Reduce reliance on broad `container.textContent` checks for popover and
+  - [x] Reduce reliance on broad `container.textContent` checks for popover and
     selected-branch assertions.
   - Decide whether the current amount of mocking around `BranchList` and
     `PopoverDropdown` is still justified once helper ergonomics improve.
 - [ ] [app/test/unit/ui/branch-list-test.tsx](../../app/test/unit/ui/branch-list-test.tsx)
-  - Replace brittle platform-case string checks for group headings with either
+  - [x] Replace brittle platform-case string checks for group headings with either
     derived expectations or narrower structural assertions.
   - Reduce dependence on mocked `SectionFilterList` behavior where a more direct
     branch-list behavior check would provide better signal.
-  - Convert remaining direct `.click()` usage to shared helpers for consistency.
+  - [x] Convert remaining direct `.click()` usage to shared helpers for consistency.
 - [ ] [app/test/unit/ui/repositories-list-test.tsx](../../app/test/unit/ui/repositories-list-test.tsx)
   - [x] Replace the remaining raw mouse event dispatch with shared interaction
     helpers.
@@ -124,7 +124,7 @@ approach we are trying to settle on.
   - Tighten grouped-repository text assertions so they are less dependent on the
     full flattened container text.
 - [ ] [app/test/unit/ui/repositories-list-search-test.tsx](../../app/test/unit/ui/repositories-list-search-test.tsx)
-  - Reduce broad `textContent` assertions and switch to narrower lookups for
+  - [x] Reduce broad `textContent` assertions and switch to narrower lookups for
     visible repository rows and empty-state controls.
   - Reuse any shared search/filter helper patterns that come out of the main
     repositories list work.
@@ -133,7 +133,7 @@ approach we are trying to settle on.
     behavior-focused tests.
   - Add at least one less-mocked path for filter clearing or hidden-change
     adjustment.
-  - Replace string-heavy assertions with more targeted element-level checks.
+  - [x] Replace string-heavy assertions with more targeted element-level checks.
   - Re-evaluate the breadth of mocked child components and keep only the ones
     that are true boundaries for the behavior under test.
 - [ ] [app/test/unit/ui/commit-message-test.tsx](../../app/test/unit/ui/commit-message-test.tsx)

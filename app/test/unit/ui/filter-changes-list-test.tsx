@@ -22,6 +22,7 @@ import type { IAugmentedSectionFilterListProps } from '../../../src/ui/lib/augme
 import {
   change,
   click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -361,8 +362,8 @@ describe('FilterChangesList', () => {
     })
     unmount = u
 
-    assert.ok(container.textContent?.includes('src/app.ts'))
-    assert.equal(container.textContent?.includes('docs/readme.md'), false)
+    queryByTextOrThrow(container, '.changed-file-row', 'src/app.ts')
+    assert.equal(container.querySelectorAll('.changed-file-row').length, 1)
 
     const input = queryOrThrow<HTMLInputElement>(
       container,
@@ -386,11 +387,16 @@ describe('FilterChangesList', () => {
     })
     unmount = u
 
-    assert.ok(
-      container.textContent?.includes('No files match your current filters')
+    queryByTextOrThrow(
+      container,
+      '.no-changes-filtered .title',
+      'No files match your current filters'
     )
-    assert.ok(container.textContent?.includes('"missing"'))
-    assert.ok(container.textContent?.includes('Modified files'))
+    queryByTextOrThrow(
+      container,
+      '.no-changes-filtered .subtitle',
+      `Sorry, I can't find any changed files matching the following filters: "missing" and Modified files`
+    )
 
     click(queryOrThrow<HTMLButtonElement>(container, '.clear-filters-button'))
 
@@ -422,8 +428,10 @@ describe('FilterChangesList', () => {
     })
     unmount = u
 
-    assert.ok(
-      container.textContent?.includes('Hidden changes will be committed.')
+    queryByTextOrThrow(
+      container,
+      '.link-button-component',
+      'Adjust the filters to see all 1 changes'
     )
 
     click(queryOrThrow<HTMLButtonElement>(container, '.link-button-component'))

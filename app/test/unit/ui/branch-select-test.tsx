@@ -9,6 +9,8 @@ import { Repository } from '../../../src/models/repository'
 import type { IBranchListProps } from '../../../src/ui/branches/branch-list'
 import type { IPopoverDropdownProps } from '../../../src/ui/lib/popover-dropdown'
 import {
+  click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -168,9 +170,13 @@ describe('BranchSelect', () => {
     })
     unmount = u
 
-    assert.ok(container.textContent?.includes('Choose a base branch'))
-    assert.ok(container.textContent?.includes('base:'))
-    assert.ok(container.textContent?.includes(branches[0].name))
+    queryByTextOrThrow(container, '.content-title', 'Choose a base branch')
+    queryByTextOrThrow(container, '.popover-dropdown-button-label', 'base:')
+    assert.ok(
+      queryOrThrow<HTMLDivElement>(container, '.button-content').textContent?.includes(
+        branches[0].name
+      )
+    )
     assert.equal(latestBranchListProps?.selectedBranch?.name, branches[0].name)
     assert.equal(latestBranchListProps?.canCreateNewBranch, false)
     assert.equal(
@@ -183,10 +189,10 @@ describe('BranchSelect', () => {
     const { container, unmount: u } = renderBranchSelect()
     unmount = u
 
-    queryOrThrow<HTMLButtonElement>(container, '.change-filter').click()
+    click(queryOrThrow<HTMLButtonElement>(container, '.change-filter'))
 
     assert.equal(latestBranchListProps?.filterText, 'feature')
-    assert.ok(container.textContent?.includes('feature'))
+    queryByTextOrThrow(container, '.filter-text', 'feature')
   })
 
   it('closes the popover, updates selection, and emits onChange when a branch is clicked', () => {
@@ -202,11 +208,15 @@ describe('BranchSelect', () => {
     })
     unmount = u
 
-    queryOrThrow<HTMLButtonElement>(container, '.select-second-branch').click()
+    click(queryOrThrow<HTMLButtonElement>(container, '.select-second-branch'))
 
     assert.equal(closePopoverCalls, 1)
     assert.deepEqual(changes, [branches[1].name])
     assert.equal(latestBranchListProps?.selectedBranch?.name, branches[1].name)
-    assert.ok(container.textContent?.includes(branches[1].name))
+    assert.ok(
+      queryOrThrow<HTMLDivElement>(container, '.button-content').textContent?.includes(
+        branches[1].name
+      )
+    )
   })
 })

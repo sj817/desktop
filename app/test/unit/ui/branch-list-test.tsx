@@ -12,6 +12,8 @@ import {
 } from '../../../src/ui/branches/group-branches'
 import type { ISectionFilterListProps } from '../../../src/ui/lib/section-filter-list'
 import {
+  click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -233,21 +235,22 @@ describe('BranchList', () => {
       throw new Error('Expected default branch to be present')
     }
 
-    assert.ok(
-      container.textContent?.includes(
-        __DARWIN__ ? 'Default Branch' : 'Default branch'
-      )
+    queryByTextOrThrow(
+      container,
+      '.filter-list-group-header',
+      __DARWIN__ ? 'Default Branch' : 'Default branch'
     )
-    assert.ok(
-      container.textContent?.includes(
-        __DARWIN__ ? 'Recent Branches' : 'Recent branches'
-      )
+    queryByTextOrThrow(
+      container,
+      '.filter-list-group-header',
+      __DARWIN__ ? 'Recent Branches' : 'Recent branches'
     )
-    assert.ok(
-      container.textContent?.includes(
-        __DARWIN__ ? 'Other Branches' : 'Other branches'
-      )
+    queryByTextOrThrow(
+      container,
+      '.filter-list-group-header',
+      __DARWIN__ ? 'Other Branches' : 'Other branches'
     )
+    queryByTextOrThrow(container, '.selected-item', defaultBranch.name)
     assert.equal(
       latestSectionFilterListProps?.selectedItem?.branch.name,
       defaultBranch.name
@@ -275,11 +278,10 @@ describe('BranchList', () => {
       throw new Error('Expected default branch to be present')
     }
 
-    queryOrThrow<HTMLButtonElement>(container, '.trigger-item-click').click()
-    queryOrThrow<HTMLButtonElement>(
-      container,
-      '.trigger-selection-change'
-    ).click()
+    click(queryOrThrow<HTMLButtonElement>(container, '.trigger-item-click'))
+    click(
+      queryOrThrow<HTMLButtonElement>(container, '.trigger-selection-change')
+    )
 
     assert.deepEqual(clicks, [defaultBranch.name])
     assert.deepEqual(selections, [defaultBranch.name])
@@ -304,7 +306,7 @@ describe('BranchList', () => {
       '.create-branch-button'
     )
 
-    createButton.click()
+    click(createButton)
 
     assert.deepEqual(creations, ['feature/new-branch'])
   })
@@ -315,25 +317,17 @@ describe('BranchList', () => {
     })
     unmount = u
 
-    assert.ok(
-      container.textContent?.includes(
-        __DARWIN__ ? 'Recent Branches' : 'Recent branches'
-      )
+    const headers = Array.from(
+      container.querySelectorAll('.filter-list-group-header'),
+      element => element.textContent?.trim() ?? ''
     )
-    assert.ok(container.textContent?.includes('release/1.0'))
-    assert.equal(
-      container.textContent?.includes(
-        __DARWIN__ ? 'Default Branch' : 'Default branch'
-      ),
-      false
+    const branches = Array.from(
+      container.querySelectorAll('.rendered-branch'),
+      element => element.textContent?.trim() ?? ''
     )
-    assert.equal(
-      container.textContent?.includes(
-        __DARWIN__ ? 'Other Branches' : 'Other branches'
-      ),
-      false
-    )
-    assert.equal(container.textContent?.includes('feature/login'), false)
+
+    assert.deepEqual(headers, [__DARWIN__ ? 'Recent Branches' : 'Recent branches'])
+    assert.deepEqual(branches, ['release/1.0'])
   })
 
   it('shows the filtered no-results state and forwards filter text changes', () => {
@@ -346,9 +340,13 @@ describe('BranchList', () => {
     })
     unmount = u
 
-    assert.ok(container.querySelector('.create-branch-button'))
+    queryByTextOrThrow(
+      container,
+      '.create-branch-button',
+      __DARWIN__ ? 'Create New Branch' : 'Create new branch'
+    )
 
-    queryOrThrow<HTMLButtonElement>(container, '.trigger-filter-change').click()
+    click(queryOrThrow<HTMLButtonElement>(container, '.trigger-filter-change'))
 
     assert.deepEqual(filterCalls, ['release'])
   })

@@ -13,6 +13,7 @@ import {
 } from '../../../src/ui/repositories-list/group-repositories'
 import {
   click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -175,9 +176,9 @@ describe('RepositoriesList search', () => {
     })
     unmount = u
 
-    assert.ok(container.textContent?.includes('Workbench'))
-    assert.ok(container.textContent?.includes('desktop'))
-    assert.equal(container.textContent?.includes('notifications'), false)
+    queryByTextOrThrow(container, '.filter-list-group-header', 'desktop')
+    queryByTextOrThrow(container, '.repository-list-item .name', 'Workbench')
+    assert.equal(container.querySelectorAll('.repository-list-item').length, 1)
     assert.equal(latestSectionFilterListProps?.filterText, 'desktop/desktop')
   })
 
@@ -191,10 +192,12 @@ describe('RepositoriesList search', () => {
     })
     unmount = u
 
-    assert.ok(
-      container.textContent?.includes("Sorry, I can't find that repository")
+    queryByTextOrThrow(
+      container,
+      '.no-results-found .title',
+      "Sorry, I can't find that repository"
     )
-    assert.ok(container.querySelector('.new-repository-button'))
+    queryByTextOrThrow(container, '.new-repository-button', 'Add')
 
     click(queryOrThrow<HTMLButtonElement>(container, '.trigger-filter-change'))
 
