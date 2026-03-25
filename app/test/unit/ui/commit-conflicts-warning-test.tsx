@@ -11,37 +11,18 @@ import { CommitConflictsWarning } from '../../../src/ui/merge-conflicts/commit-c
 import { Dispatcher } from '../../../src/ui/dispatcher'
 import { createMockFileChange } from '../../helpers/mock-git'
 import {
+  buttonWithText,
   keyDown,
   queryOrThrow,
   renderComponent,
+  submit,
+  waitForDuration,
 } from '../../helpers/component-test-utils'
 
 let unmount: (() => void) | undefined
 let originalGetBoundingClientRect:
   | typeof HTMLElement.prototype.getBoundingClientRect
   | undefined
-
-type DialogElement = HTMLElement & {
-  open?: boolean
-  showModal?: () => void
-  close?: () => void
-}
-
-const dialogPrototype = HTMLElement.prototype as DialogElement
-
-if (typeof dialogPrototype.showModal !== 'function') {
-  dialogPrototype.showModal = function () {
-    this.open = true
-    this.setAttribute('open', '')
-  }
-}
-
-if (typeof dialogPrototype.close !== 'function') {
-  dialogPrototype.close = function () {
-    this.open = false
-    this.removeAttribute('open')
-  }
-}
 
 afterEach(() => {
   unmount?.()
@@ -80,10 +61,6 @@ function stubElementWidth(width: number) {
         return this
       },
     } as DOMRect)
-}
-
-async function waitForDismissGracePeriod() {
-  await new Promise(resolve => window.setTimeout(resolve, 300))
 }
 
 describe('CommitConflictsWarning', () => {
@@ -128,13 +105,13 @@ describe('CommitConflictsWarning', () => {
     assert.ok(renderedPaths.includes('src/conflicted.ts'))
     assert.ok(renderedPaths.includes('docs/merge.md'))
 
-    const buttons = Array.from(container.querySelectorAll('button')).map(
-      button => button.textContent?.trim()
-    )
     assert.ok(
-      buttons.includes(__DARWIN__ ? 'Yes, Commit Files' : 'Yes, commit files')
+      buttonWithText(
+        container,
+        __DARWIN__ ? 'Yes, Commit Files' : 'Yes, commit files'
+      )
     )
-    assert.ok(buttons.includes('Cancel'))
+    assert.ok(buttonWithText(container, 'Cancel'))
   })
 
   it('dismisses, commits, clears the banner, and resets the commit message on submit', async () => {
@@ -183,10 +160,7 @@ describe('CommitConflictsWarning', () => {
     )
     unmount = u
 
-    const form = queryOrThrow<HTMLFormElement>(container, 'form')
-    form.dispatchEvent(
-      new window.Event('submit', { bubbles: true, cancelable: true })
-    )
+    submit(queryOrThrow<HTMLFormElement>(container, 'form'))
 
     await Promise.resolve()
 
@@ -216,7 +190,7 @@ describe('CommitConflictsWarning', () => {
     )
     unmount = u
 
-    await waitForDismissGracePeriod()
+    await waitForDuration(300)
 
     const dialog = queryOrThrow<HTMLElement>(container, 'dialog')
     keyDown(dialog, 'Escape')

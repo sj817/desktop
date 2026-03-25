@@ -1,12 +1,14 @@
 import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 
 import { Dialog, DialogStackContext } from '../../../src/ui/dialog/dialog'
 import {
+  mouseDown,
+  mouseUp,
   queryOrThrow,
   renderComponent,
+  waitForDuration,
 } from '../../helpers/component-test-utils'
 
 let unmount: (() => void) | undefined
@@ -50,28 +52,9 @@ function stubDialogRect(dialog: HTMLElement) {
   })
 }
 
-async function waitForDismissGracePeriod() {
-  await new Promise(resolve => window.setTimeout(resolve, 300))
-}
-
 function dispatchBackdropDismiss(dialog: HTMLElement) {
-  act(() => {
-    dialog.dispatchEvent(
-      new MouseEvent('mousedown', {
-        bubbles: true,
-        clientX: 40,
-        clientY: 80,
-      })
-    )
-
-    document.dispatchEvent(
-      new MouseEvent('mouseup', {
-        bubbles: true,
-        clientX: 40,
-        clientY: 80,
-      })
-    )
-  })
+  mouseDown(dialog, { clientX: 40, clientY: 80 })
+  mouseUp(document, { clientX: 40, clientY: 80 })
 }
 
 describe('Dialog Backdrop Behavior', () => {
@@ -82,7 +65,7 @@ describe('Dialog Backdrop Behavior', () => {
     )
 
     stubDialogRect(dialog)
-    await waitForDismissGracePeriod()
+    await waitForDuration(300)
 
     dispatchBackdropDismiss(dialog)
 
@@ -100,7 +83,7 @@ describe('Dialog Backdrop Behavior', () => {
     )
 
     stubDialogRect(dialog)
-    await waitForDismissGracePeriod()
+    await waitForDuration(300)
 
     dispatchBackdropDismiss(dialog)
 

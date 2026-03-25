@@ -28,7 +28,7 @@ Everything below is still outstanding.
 
 ## Cross-cutting harness work
 
-- [ ] Eliminate the `HTMLFormElement.prototype.requestSubmit` warning that still
+- [x] Eliminate the `HTMLFormElement.prototype.requestSubmit` warning that still
       appears during targeted UI test runs.
   - Investigate whether clicking submit buttons is taking a native `requestSubmit`
     path before the synthetic submit helper is involved.
@@ -53,7 +53,7 @@ Everything below is still outstanding.
   - a helper for temporary viewport or bounding-rect stubbing when layout is part
     of the behavior under test
   - optional text-based helpers for links, headings, and other common elements
-- [ ] Add a shared helper for dialog dismissal grace periods instead of
+- [x] Add a shared helper for dialog dismissal grace periods instead of
       re-declaring `waitForDismissGracePeriod()` in individual files.
 - [ ] Audit all manual `dispatchEvent(new MouseEvent('click', ...))` usages in
       `app/test/unit/ui` and replace them with the shared click helper unless the
@@ -67,12 +67,12 @@ Everything below is still outstanding.
 
 ## Shared environment cleanup
 
-- [ ] Remove test-local dialog and `ResizeObserver` shims that duplicate the
+- [x] Remove test-local dialog and `ResizeObserver` shims that duplicate the
       logic already present in
       [app/test/globals.mts](../../app/test/globals.mts).
-  - [ ] clean up
+  - [x] clean up
         [app/test/unit/ui/dialog-test.tsx](../../app/test/unit/ui/dialog-test.tsx)
-  - [ ] clean up
+  - [x] clean up
         [app/test/unit/ui/commit-conflicts-warning-test.tsx](../../app/test/unit/ui/commit-conflicts-warning-test.tsx)
 - [ ] Evaluate whether any other repeated environment stubs should move into the
       shared test globals.
@@ -116,7 +116,7 @@ approach we are trying to settle on.
     branch-list behavior check would provide better signal.
   - Convert remaining direct `.click()` usage to shared helpers for consistency.
 - [ ] [app/test/unit/ui/repositories-list-test.tsx](../../app/test/unit/ui/repositories-list-test.tsx)
-  - Replace the remaining raw mouse event dispatch with shared interaction
+  - [x] Replace the remaining raw mouse event dispatch with shared interaction
     helpers.
   - Add one less-mocked behavior path that validates user-visible selection or
     click behavior rather than only the wrapper contract around
@@ -150,16 +150,16 @@ approach we are trying to settle on.
   - Separate parent-managed state assertions from dispatcher-routing assertions
     if that improves readability.
 - [ ] [app/test/unit/ui/dialog-test.tsx](../../app/test/unit/ui/dialog-test.tsx)
-  - Remove duplicated global shims.
-  - Replace the local dismiss-grace helper with a shared one.
+  - [x] Remove duplicated global shims.
+  - [x] Replace the local dismiss-grace helper with a shared one.
   - Continue shifting assertions toward focused button and heading lookups.
 - [ ] [app/test/unit/ui/dialog-backdrop-test.tsx](../../app/test/unit/ui/dialog-backdrop-test.tsx)
-  - Share the dismiss-grace helper with `dialog-test.tsx`.
+  - [x] Share the dismiss-grace helper with `dialog-test.tsx`.
   - Consider sharing backdrop-click setup if the same shape appears in more
     dialog tests.
 - [ ] [app/test/unit/ui/commit-conflicts-warning-test.tsx](../../app/test/unit/ui/commit-conflicts-warning-test.tsx)
-  - Remove duplicated dialog shim logic that now belongs in shared globals.
-  - Replace local submit dispatch and button text scans with the shared helper
+  - [x] Remove duplicated dialog shim logic that now belongs in shared globals.
+  - [x] Replace local submit dispatch and button text scans with the shared helper
     API.
   - Consider extracting a shared helper for rendered conflicted-file path
     assertions if the same filename/dirname pattern continues to appear.
@@ -181,11 +181,11 @@ approach we are trying to settle on.
   - Replace the local `setInputValue` helper with the shared input helper.
   - Consider adding a shared blur helper if the same pattern shows up elsewhere.
 - [ ] [app/test/unit/ui/continue-rebase-test.tsx](../../app/test/unit/ui/continue-rebase-test.tsx)
-  - Replace remaining raw mouse event dispatch with shared click helpers.
+  - [x] Replace remaining raw mouse event dispatch with shared click helpers.
   - Tighten the “Rebasing” state assertion around the button itself rather than
     general container text.
 - [ ] [app/test/unit/ui/pull-request-list-item-test.tsx](../../app/test/unit/ui/pull-request-list-item-test.tsx)
-  - Consider a shared drag/drop helper for mouseover and mouseup-based drop
+  - [x] Consider a shared drag/drop helper for mouseover and mouseup-based drop
     flows.
   - Replace broad row-text assertions with narrower title and subtitle element
     checks.
@@ -258,7 +258,7 @@ have consistency cleanup available if they are touched again.
     further.
   - Keep the API small enough that tests remain explicit and readable.
 - [ ] [app/test/globals.mts](../../app/test/globals.mts)
-  - Resolve the outstanding `requestSubmit` warning.
+  - [x] Resolve the outstanding `requestSubmit` warning.
   - Avoid growing this file with per-test behavior unless the behavior is truly
     cross-cutting.
 - [ ] [app/test/unit/ui/commit-conflicts-warning-actions-test.tsx](../../app/test/unit/ui/commit-conflicts-warning-actions-test.tsx)
@@ -268,7 +268,7 @@ have consistency cleanup available if they are touched again.
 - [ ] [app/test/unit/ui/dialog-content-footer-test.tsx](../../app/test/unit/ui/dialog-content-footer-test.tsx)
   - Tighten remaining content assertions if new shared text helpers land.
 - [ ] [app/test/unit/ui/dialog-test.tsx](../../app/test/unit/ui/dialog-test.tsx)
-  - See high-priority dialog cleanup items above.
+  - See remaining high-priority dialog cleanup items above.
 - [ ] [app/test/unit/ui/ok-cancel-button-group-test.tsx](../../app/test/unit/ui/ok-cancel-button-group-test.tsx)
   - Revisit only if a clearer group-level helper or shared button-group pattern
     emerges.

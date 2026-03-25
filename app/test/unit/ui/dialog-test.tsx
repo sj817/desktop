@@ -6,6 +6,7 @@ import {
   queryOrThrow,
   renderComponent,
   submit,
+  waitForDuration,
 } from '../../helpers/component-test-utils'
 import {
   Dialog,
@@ -64,10 +65,6 @@ function renderDialog(
 
   unmount = rendered.unmount
   return queryOrThrow<HTMLElement>(rendered.container, 'dialog')
-}
-
-async function waitForDismissGracePeriod() {
-  await new Promise(resolve => window.setTimeout(resolve, 300))
 }
 
 describe('Dialog', () => {
@@ -142,7 +139,7 @@ describe('Dialog', () => {
       true
     )
 
-    await waitForDismissGracePeriod()
+    await waitForDuration(300)
     keyDown(dialog, 'Escape')
 
     assert.equal(dismissed, true)
@@ -179,7 +176,7 @@ describe('Dialog', () => {
       true
     )
 
-    await waitForDismissGracePeriod()
+    await waitForDuration(300)
 
     submit(queryOrThrow<HTMLFormElement>(dialog, 'form'))
 

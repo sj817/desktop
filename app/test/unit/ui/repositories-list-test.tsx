@@ -15,6 +15,7 @@ import {
   RepositoryListGroup,
 } from '../../../src/ui/repositories-list/group-repositories'
 import {
+  click,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -243,11 +244,7 @@ describe('RepositoriesList', () => {
     })
     unmount = u
 
-    const button = queryOrThrow<HTMLButtonElement>(
-      container,
-      '.trigger-item-click'
-    )
-    button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    click(queryOrThrow<HTMLButtonElement>(container, '.trigger-item-click'))
 
     assert.deepEqual(recorded, ['clicked:true'])
     assert.deepEqual(selectionCalls, [repositories[0].id])

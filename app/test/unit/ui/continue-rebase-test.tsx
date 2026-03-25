@@ -1,7 +1,6 @@
 import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 
 import { RebaseConflictState } from '../../../src/lib/app-state'
 import { Repository } from '../../../src/models/repository'
@@ -12,6 +11,7 @@ import {
 import { ContinueRebase } from '../../../src/ui/changes/continue-rebase'
 import { Dispatcher } from '../../../src/ui/dispatcher'
 import {
+  click,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -66,9 +66,7 @@ describe('ContinueRebase', () => {
       'button.commit-button'
     )
 
-    act(() => {
-      button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    })
+    click(button)
 
     assert.equal(button.getAttribute('aria-disabled'), 'true')
     assert.equal(continueCalls, 0)
@@ -142,9 +140,7 @@ describe('ContinueRebase', () => {
       'button.commit-button'
     )
 
-    act(() => {
-      button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    })
+    click(button)
 
     assert.deepEqual(calls, [
       {

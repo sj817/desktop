@@ -33,12 +33,40 @@ export function renderComponent(element: React.ReactElement) {
   }
 }
 
+function shouldPreventDefaultClickActivation(element: Element): boolean {
+  if (element instanceof HTMLButtonElement) {
+    return element.form !== null && element.type !== 'button'
+  }
+
+  if (element instanceof HTMLInputElement) {
+    return (
+      element.form !== null &&
+      ['submit', 'reset', 'image'].includes(element.type)
+    )
+  }
+
+  return false
+}
+
 /**
  * Simulates a click event on the given element within an `act()` block.
  */
 export function click(element: Element) {
   act(() => {
-    element.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    if (shouldPreventDefaultClickActivation(element)) {
+      const preventDefault = (event: Event) => {
+        event.preventDefault()
+      }
+
+      element.addEventListener('click', preventDefault, {
+        capture: true,
+        once: true,
+      })
+    }
+
+    element.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true })
+    )
   })
 }
 
@@ -93,6 +121,78 @@ export function keyDown(
   act(() => {
     element.dispatchEvent(
       new KeyboardEvent('keydown', { key, bubbles: true, ...options })
+    )
+  })
+}
+
+/**
+ * Simulates a mouse down event on an element.
+ */
+export function mouseDown(
+  element: Element,
+  options: Partial<MouseEventInit> = {}
+) {
+  act(() => {
+    element.dispatchEvent(
+      new MouseEvent('mousedown', {
+        bubbles: true,
+        cancelable: true,
+        ...options,
+      })
+    )
+  })
+}
+
+/**
+ * Simulates a mouse up event on an element.
+ */
+export function mouseUp(
+  element: Element,
+  options: Partial<MouseEventInit> = {}
+) {
+  act(() => {
+    element.dispatchEvent(
+      new MouseEvent('mouseup', {
+        bubbles: true,
+        cancelable: true,
+        ...options,
+      })
+    )
+  })
+}
+
+/**
+ * Simulates a mouse over event on an element.
+ */
+export function mouseOver(
+  element: Element,
+  options: Partial<MouseEventInit> = {}
+) {
+  act(() => {
+    element.dispatchEvent(
+      new MouseEvent('mouseover', {
+        bubbles: true,
+        cancelable: true,
+        ...options,
+      })
+    )
+  })
+}
+
+/**
+ * Simulates a mouse out event on an element.
+ */
+export function mouseOut(
+  element: Element,
+  options: Partial<MouseEventInit> = {}
+) {
+  act(() => {
+    element.dispatchEvent(
+      new MouseEvent('mouseout', {
+        bubbles: true,
+        cancelable: true,
+        ...options,
+      })
     )
   })
 }
@@ -160,4 +260,11 @@ export function submit(form: HTMLFormElement) {
       new window.Event('submit', { bubbles: true, cancelable: true })
     )
   })
+}
+
+/**
+ * Waits for a short timer-driven UI grace period.
+ */
+export function waitForDuration(ms: number) {
+  return new Promise(resolve => window.setTimeout(resolve, ms))
 }

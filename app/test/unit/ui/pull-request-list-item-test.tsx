@@ -1,7 +1,6 @@
 import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 
 import { APICheckConclusion, APICheckStatus } from '../../../src/lib/api'
 import { ICombinedRefCheck } from '../../../src/lib/ci-checks/ci-checks'
@@ -13,6 +12,9 @@ import { Owner } from '../../../src/models/owner'
 import { PullRequestListItem } from '../../../src/ui/branches/pull-request-list-item'
 import { Dispatcher } from '../../../src/ui/dispatcher'
 import {
+  mouseOut,
+  mouseOver,
+  mouseUp,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -182,9 +184,7 @@ describe('PullRequestListItem', () => {
       value: () => ({ top: 37 }),
     })
 
-    act(() => {
-      row.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
-    })
+    mouseOver(row)
 
     assert.ok(
       queryOrThrow<HTMLDivElement>(
@@ -195,10 +195,8 @@ describe('PullRequestListItem', () => {
     assert.deepEqual(hoverCalls, [{ number: 9, top: 37 }])
     assert.deepEqual(enteredTargets, ['Improve test harness'])
 
-    act(() => {
-      row.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
-      row.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
-    })
+    mouseUp(row)
+    mouseOut(row)
 
     assert.deepEqual(dropCalls, [9])
     assert.equal(leaveEvents.length, 1)
