@@ -49,9 +49,10 @@ describe('CommitWarning', () => {
     }
 
     assert.ok(
-      queryOrThrow<SVGElement>(warning.container, '.warning-icon-container svg').classList.contains(
-        'warning-icon'
-      )
+      queryOrThrow<SVGElement>(
+        warning.container,
+        '.warning-icon-container svg'
+      ).classList.contains('warning-icon')
     )
     assert.ok(
       queryOrThrow<SVGElement>(
@@ -60,9 +61,10 @@ describe('CommitWarning', () => {
       ).classList.contains('information-icon')
     )
     assert.ok(
-      queryOrThrow<SVGElement>(error.container, '.warning-icon-container svg').classList.contains(
-        'error-icon'
-      )
+      queryOrThrow<SVGElement>(
+        error.container,
+        '.warning-icon-container svg'
+      ).classList.contains('error-icon')
     )
   })
 

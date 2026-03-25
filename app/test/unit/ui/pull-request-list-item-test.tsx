@@ -103,9 +103,10 @@ describe('PullRequestListItem', () => {
     queryByTextOrThrow(container, '.title', 'Improve test harness')
     queryByTextOrThrow(container, '.subtitle', expectedSubtitle)
     assert.ok(
-      queryOrThrow<SVGElement>(container, '.ci-status-container .ci-status').classList.contains(
-        'ci-status-success'
-      )
+      queryOrThrow<SVGElement>(
+        container,
+        '.ci-status-container .ci-status'
+      ).classList.contains('ci-status-success')
     )
   })
 

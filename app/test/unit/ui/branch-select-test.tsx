@@ -177,7 +177,11 @@ function renderBranchSelect(
   const defaultBranch = props.defaultBranch ?? createBranch('main')
   const recentBranch = createBranch('release/1.0')
   const featureBranch = createBranch('feature/login')
-  const branches = props.allBranches ?? [defaultBranch, recentBranch, featureBranch]
+  const branches = props.allBranches ?? [
+    defaultBranch,
+    recentBranch,
+    featureBranch,
+  ]
   const rendered = renderComponent(
     <BranchSelect
       repository={createRepository()}
@@ -226,10 +230,9 @@ describe('BranchSelect', () => {
     queryByTextOrThrow(container, '.branches-list-item .name', branches[1].name)
     queryByTextOrThrow(container, '.branches-list-item .name', branches[2].name)
     assert.equal(
-      queryOrThrow<HTMLDivElement>(container, '.button-content').textContent?.replace(
-        /\s+/g,
-        ' '
-      ).trim(),
+      queryOrThrow<HTMLDivElement>(container, '.button-content')
+        .textContent?.replace(/\s+/g, ' ')
+        .trim(),
       `base:${branches[0].name}`
     )
     assert.equal(
@@ -237,7 +240,10 @@ describe('BranchSelect', () => {
       branches[0].name
     )
     assert.equal(
-      queryOrThrow<HTMLDivElement>(container, '.post-filter').textContent?.trim(),
+      queryOrThrow<HTMLDivElement>(
+        container,
+        '.post-filter'
+      ).textContent?.trim(),
       ''
     )
   })
@@ -251,7 +257,10 @@ describe('BranchSelect', () => {
     assert.equal(latestSectionFilterListProps?.filterText, 'feature')
     queryByTextOrThrow(container, '.filter-text', 'feature')
     queryByTextOrThrow(container, '.branches-list-item .name', 'feature/login')
-    assert.equal(container.querySelectorAll('.branches-list-item .name').length, 1)
+    assert.equal(
+      container.querySelectorAll('.branches-list-item .name').length,
+      1
+    )
   })
 
   it('closes the popover, updates selection, and emits onChange when a rendered branch is clicked', () => {
@@ -281,10 +290,9 @@ describe('BranchSelect', () => {
       branches[2].name
     )
     assert.equal(
-      queryOrThrow<HTMLDivElement>(container, '.button-content').textContent?.replace(
-        /\s+/g,
-        ' '
-      ).trim(),
+      queryOrThrow<HTMLDivElement>(container, '.button-content')
+        .textContent?.replace(/\s+/g, ' ')
+        .trim(),
       `base:${branches[2].name}`
     )
   })

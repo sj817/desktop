@@ -369,11 +369,7 @@ describe('CommitMessageDialog', () => {
   })
 
   it('submits through a more realistic child form path', async () => {
-    const {
-      container,
-      unmount: u,
-      submitCalls,
-    } = renderCommitMessageDialog()
+    const { container, unmount: u, submitCalls } = renderCommitMessageDialog()
     unmount = u
 
     change(
@@ -381,7 +377,10 @@ describe('CommitMessageDialog', () => {
       'Ship dialog coverage'
     )
     change(
-      queryOrThrow<HTMLTextAreaElement>(container, 'textarea.commit-description'),
+      queryOrThrow<HTMLTextAreaElement>(
+        container,
+        'textarea.commit-description'
+      ),
       'Exercise the child form path'
     )
 

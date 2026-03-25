@@ -29,7 +29,11 @@ describe('DialogHeader', () => {
     )
     unmount = u
 
-    const heading = queryByTextOrThrow<HTMLHeadingElement>(container, 'h1', 'Test')
+    const heading = queryByTextOrThrow<HTMLHeadingElement>(
+      container,
+      'h1',
+      'Test'
+    )
     assert.equal(heading.id, 'test-title-id')
   })
 
@@ -57,7 +61,10 @@ describe('DialogHeader', () => {
     )
     unmount = u
 
-    const closeButton = queryOrThrow<HTMLButtonElement>(container, 'button.close')
+    const closeButton = queryOrThrow<HTMLButtonElement>(
+      container,
+      'button.close'
+    )
     assert.equal(closeButton.getAttribute('aria-label'), 'Close')
 
     click(closeButton)

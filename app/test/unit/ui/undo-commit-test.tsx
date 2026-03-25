@@ -55,7 +55,11 @@ describe('UndoCommit', () => {
     const root = queryOrThrow<HTMLDivElement>(container, '#undo-commit')
     assert.equal(root.getAttribute('role'), 'group')
     assert.equal(root.getAttribute('aria-label'), 'Undo commit')
-    assert.ok(queryOrThrow<HTMLDivElement>(container, '.ago').textContent?.startsWith('Committed'))
+    assert.ok(
+      queryOrThrow<HTMLDivElement>(container, '.ago').textContent?.startsWith(
+        'Committed'
+      )
+    )
     queryByTextOrThrow(container, '.summary', 'Refine smoke tests')
   })
 
