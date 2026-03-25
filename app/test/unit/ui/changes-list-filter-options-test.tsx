@@ -141,18 +141,26 @@ describe('ChangesListFilterOptions', () => {
     } = renderFilterOptions(createFilterState({ isIncludedInCommit: true }))
     unmount = u
 
-    click(queryOrThrow(container, 'button.filter-button'))
+    const button = queryOrThrow<HTMLButtonElement>(
+      container,
+      'button.filter-button'
+    )
 
-  queryByTextOrThrow(container, 'h3', 'Filter Options')
-  checkboxWithLabel(container, 'Included in commit (2)')
-  checkboxWithLabel(container, 'Excluded from commit (1)')
-  checkboxWithLabel(container, 'New files (1)')
-  checkboxWithLabel(container, 'Modified files (1)')
-  checkboxWithLabel(container, 'Deleted files (1)')
+    click(button)
 
-  click(buttonWithText(container, 'Clear filters'))
+    assert.equal(button.getAttribute('aria-expanded'), 'true')
+
+    queryByTextOrThrow(container, 'h3', 'Filter Options')
+    checkboxWithLabel(container, 'Included in commit (2)')
+    checkboxWithLabel(container, 'Excluded from commit (1)')
+    checkboxWithLabel(container, 'New files (1)')
+    checkboxWithLabel(container, 'Modified files (1)')
+    checkboxWithLabel(container, 'Deleted files (1)')
+
+    click(buttonWithText(container, 'Clear filters'))
 
     assert.equal(calls.clear, 1)
+    assert.equal(button.getAttribute('aria-expanded'), 'false')
     assert.equal(container.querySelector('.filter-popover'), null)
   })
 

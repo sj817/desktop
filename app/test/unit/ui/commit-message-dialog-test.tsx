@@ -16,6 +16,8 @@ import { FoldoutType } from '../../../src/lib/app-state'
 import { Dispatcher } from '../../../src/ui/dispatcher'
 import type { ICommitMessageProps } from '../../../src/ui/changes/commit-message'
 import {
+  click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -34,13 +36,11 @@ mock.module('../../../src/ui/changes/commit-message', {
 
       return (
         <div className="mock-commit-message">
-          <div className="dialog-props">
-            {JSON.stringify({
-              commitButtonText: props.commitButtonText,
-              showCoAuthoredBy: props.showCoAuthoredBy,
-              coAuthors: props.coAuthors.length,
-              commitSpellcheckEnabled: props.commitSpellcheckEnabled,
-            })}
+          <div className="commit-button-text">{props.commitButtonText}</div>
+          <div className="show-coauthors">{String(props.showCoAuthoredBy)}</div>
+          <div className="coauthor-count">{props.coAuthors.length}</div>
+          <div className="spellcheck-enabled">
+            {String(props.commitSpellcheckEnabled)}
           </div>
           <button
             type="button"
@@ -282,16 +282,11 @@ describe('CommitMessageDialog', () => {
     const { container, unmount: u } = renderCommitMessageDialog()
     unmount = u
 
-    const title = queryOrThrow<HTMLHeadingElement>(container, 'h1')
-    const propsSummary = queryOrThrow(container, '.dialog-props')
-
-    assert.equal(title.textContent, 'Commit Changes')
-    assert.ok(propsSummary.textContent?.includes('Commit Now'))
-    assert.ok(propsSummary.textContent?.includes('"showCoAuthoredBy":true'))
-    assert.ok(propsSummary.textContent?.includes('"coAuthors":1'))
-    assert.ok(
-      propsSummary.textContent?.includes('"commitSpellcheckEnabled":true')
-    )
+    queryByTextOrThrow(container, 'h1', 'Commit Changes')
+    queryByTextOrThrow(container, '.commit-button-text', 'Commit Now')
+    queryByTextOrThrow(container, '.show-coauthors', 'true')
+    queryByTextOrThrow(container, '.coauthor-count', '1')
+    queryByTextOrThrow(container, '.spellcheck-enabled', 'true')
   })
 
   it('updates the dialog-managed coauthor state through child callbacks', () => {
@@ -301,11 +296,13 @@ describe('CommitMessageDialog', () => {
     })
     unmount = u
 
-    queryOrThrow<HTMLButtonElement>(container, '.toggle-coauthors').click()
-    queryOrThrow<HTMLButtonElement>(container, '.update-coauthors').click()
+    click(queryOrThrow<HTMLButtonElement>(container, '.toggle-coauthors'))
+    click(queryOrThrow<HTMLButtonElement>(container, '.update-coauthors'))
 
     assert.equal(latestCommitMessageProps?.showCoAuthoredBy, true)
     assert.equal(latestCommitMessageProps?.coAuthors.length, 1)
+    queryByTextOrThrow(container, '.show-coauthors', 'true')
+    queryByTextOrThrow(container, '.coauthor-count', '1')
   })
 
   it('routes child callbacks through the dispatcher and submit handler', () => {
@@ -317,17 +314,14 @@ describe('CommitMessageDialog', () => {
     } = renderCommitMessageDialog()
     unmount = u
 
-    queryOrThrow<HTMLButtonElement>(
-      container,
-      '.confirm-unknown-authors'
-    ).click()
-    queryOrThrow<HTMLButtonElement>(container, '.refresh-author').click()
-    queryOrThrow<HTMLButtonElement>(container, '.show-popup').click()
-    queryOrThrow<HTMLButtonElement>(container, '.show-foldout').click()
-    queryOrThrow<HTMLButtonElement>(container, '.toggle-spellcheck').click()
-    queryOrThrow<HTMLButtonElement>(container, '.stop-amending').click()
-    queryOrThrow<HTMLButtonElement>(container, '.show-create-fork').click()
-    queryOrThrow<HTMLButtonElement>(container, '.create-commit').click()
+    click(queryOrThrow<HTMLButtonElement>(container, '.confirm-unknown-authors'))
+    click(queryOrThrow<HTMLButtonElement>(container, '.refresh-author'))
+    click(queryOrThrow<HTMLButtonElement>(container, '.show-popup'))
+    click(queryOrThrow<HTMLButtonElement>(container, '.show-foldout'))
+    click(queryOrThrow<HTMLButtonElement>(container, '.toggle-spellcheck'))
+    click(queryOrThrow<HTMLButtonElement>(container, '.stop-amending'))
+    click(queryOrThrow<HTMLButtonElement>(container, '.show-create-fork'))
+    click(queryOrThrow<HTMLButtonElement>(container, '.create-commit'))
 
     assert.deepEqual(calls, [
       'unknown:1',
@@ -353,7 +347,7 @@ describe('CommitMessageDialog', () => {
     })
     unmount = u
 
-    queryOrThrow<HTMLButtonElement>(container, '.show-create-fork').click()
+    click(queryOrThrow<HTMLButtonElement>(container, '.show-create-fork'))
 
     assert.deepEqual(calls, [])
   })

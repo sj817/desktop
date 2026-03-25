@@ -146,8 +146,8 @@ approach we are trying to settle on.
 - [ ] [app/test/unit/ui/commit-message-dialog-test.tsx](../../app/test/unit/ui/commit-message-dialog-test.tsx)
   - Keep the wrapper wiring test, but add a companion path with a more realistic
     child render if that can be done without making the test fragile.
-  - Avoid JSON-string prop summaries once a clearer assertion shape is available.
-  - Separate parent-managed state assertions from dispatcher-routing assertions
+  - [x] Avoid JSON-string prop summaries once a clearer assertion shape is available.
+  - [x] Separate parent-managed state assertions from dispatcher-routing assertions
     if that improves readability.
 - [ ] [app/test/unit/ui/dialog-test.tsx](../../app/test/unit/ui/dialog-test.tsx)
   - [x] Remove duplicated global shims.
@@ -166,9 +166,9 @@ approach we are trying to settle on.
 
 ## Medium-priority file-by-file work
 
-- [ ] [app/test/unit/ui/changes-list-filter-options-test.tsx](../../app/test/unit/ui/changes-list-filter-options-test.tsx)
+- [x] [app/test/unit/ui/changes-list-filter-options-test.tsx](../../app/test/unit/ui/changes-list-filter-options-test.tsx)
   - [x] Replace text-heavy popover assertions with narrower label or control lookups.
-  - Reduce CSS-only popover visibility checks where a more direct state assertion
+  - [x] Reduce CSS-only popover visibility checks where a more direct state assertion
     is available.
 - [x] [app/test/unit/ui/diff-options-test.tsx](../../app/test/unit/ui/diff-options-test.tsx)
   - [x] Add shared helper usage for radio and checkbox lookup.
@@ -180,9 +180,9 @@ approach we are trying to settle on.
 - [x] [app/test/unit/ui/diff-search-input-test.tsx](../../app/test/unit/ui/diff-search-input-test.tsx)
   - [x] Replace the local `setInputValue` helper with the shared input helper.
   - [x] Consider adding a shared blur helper if the same pattern shows up elsewhere.
-- [ ] [app/test/unit/ui/continue-rebase-test.tsx](../../app/test/unit/ui/continue-rebase-test.tsx)
+- [x] [app/test/unit/ui/continue-rebase-test.tsx](../../app/test/unit/ui/continue-rebase-test.tsx)
   - [x] Replace remaining raw mouse event dispatch with shared click helpers.
-  - Tighten the “Rebasing” state assertion around the button itself rather than
+  - [x] Tighten the “Rebasing” state assertion around the button itself rather than
     general container text.
 - [x] [app/test/unit/ui/pull-request-list-item-test.tsx](../../app/test/unit/ui/pull-request-list-item-test.tsx)
   - [x] Consider a shared drag/drop helper for mouseover and mouseup-based drop
@@ -198,10 +198,10 @@ approach we are trying to settle on.
 - [x] [app/test/unit/ui/ci-status-test.tsx](../../app/test/unit/ui/ci-status-test.tsx)
   - [x] Revisit whether status icon assertions can be made less dependent on the
     full CSS selector chain.
-- [ ] [app/test/unit/ui/no-branches-test.tsx](../../app/test/unit/ui/no-branches-test.tsx)
+- [x] [app/test/unit/ui/no-branches-test.tsx](../../app/test/unit/ui/no-branches-test.tsx)
   - [x] Replace broad empty-state text checks with narrower text or element lookup
     helpers.
-  - Decide whether keyboard shortcut assertions should be derived from shared
+  - [x] Decide whether keyboard shortcut assertions should be derived from shared
     platform expectations instead of repeated literal arrays.
 - [x] [app/test/unit/ui/no-pull-requests-test.tsx](../../app/test/unit/ui/no-pull-requests-test.tsx)
   - [x] Apply the same narrower empty-state assertion style as `no-branches-test`.

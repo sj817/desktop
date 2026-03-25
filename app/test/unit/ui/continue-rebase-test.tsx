@@ -12,6 +12,7 @@ import { ContinueRebase } from '../../../src/ui/changes/continue-rebase'
 import { Dispatcher } from '../../../src/ui/dispatcher'
 import {
   click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -91,7 +92,7 @@ describe('ContinueRebase', () => {
     )
     assert.equal(button.getAttribute('aria-disabled'), 'true')
     assert.ok(queryOrThrow(container, '.warning-untracked-files'))
-    assert.ok(button.textContent?.includes('Rebasing'))
+    queryByTextOrThrow(container, 'button.commit-button', 'Rebasing')
     assert.ok(container.querySelector('svg.spin'))
   })
 

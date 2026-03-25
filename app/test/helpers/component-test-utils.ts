@@ -315,6 +315,16 @@ export function pathTextWithSegments(
 }
 
 /**
+ * Returns platform-specific expected keyboard shortcut labels.
+ */
+export function platformShortcutLabels(
+  darwinLabels: ReadonlyArray<string>,
+  otherLabels: ReadonlyArray<string>
+): ReadonlyArray<string> {
+  return __DARWIN__ ? darwinLabels : otherLabels
+}
+
+/**
  * Queries for a checkbox by its rendered label text and asserts it exists.
  */
 export function checkboxWithLabel(

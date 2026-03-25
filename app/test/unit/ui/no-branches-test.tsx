@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import {
   click,
+  platformShortcutLabels,
   queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
@@ -64,11 +65,10 @@ describe('NoBranches', () => {
       k.textContent?.trim()
     )
 
-    if (__DARWIN__) {
-      assert.deepEqual(shortcuts, ['⌘', '⇧', 'N'])
-    } else {
-      assert.deepEqual(shortcuts, ['Ctrl', 'Shift', 'N'])
-    }
+    assert.deepEqual(
+      shortcuts,
+      platformShortcutLabels(['⌘', '⇧', 'N'], ['Ctrl', 'Shift', 'N'])
+    )
   })
 
   it('renders a custom no-branches message when branch creation is unavailable', () => {
