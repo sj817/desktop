@@ -187,11 +187,11 @@ approach we are trying to settle on.
 - [ ] [app/test/unit/ui/pull-request-list-item-test.tsx](../../app/test/unit/ui/pull-request-list-item-test.tsx)
   - [x] Consider a shared drag/drop helper for mouseover and mouseup-based drop
     flows.
-  - Replace broad row-text assertions with narrower title and subtitle element
+  - [x] Replace broad row-text assertions with narrower title and subtitle element
     checks.
 - [ ] [app/test/unit/ui/branch-list-item-test.tsx](../../app/test/unit/ui/branch-list-item-test.tsx)
   - [x] Reuse the same drag/drop helper approach chosen for pull-request list items.
-  - Tighten text assertions around the title and description elements.
+  - [x] Tighten text assertions around the title and description elements.
 - [ ] [app/test/unit/ui/pull-request-badge-test.tsx](../../app/test/unit/ui/pull-request-badge-test.tsx)
   - [x] Prefer narrower queries for badge state and CI-status rendering rather than
     CSS-only existence checks.

@@ -15,6 +15,7 @@ import {
   mouseOut,
   mouseOver,
   mouseUp,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -99,10 +100,12 @@ describe('PullRequestListItem', () => {
 
     const row = queryOrThrow<HTMLDivElement>(container, '.pull-request-item')
     assert.ok(row.classList.contains('open'))
-    assert.ok(container.textContent?.includes('Improve test harness'))
-    assert.ok(container.textContent?.includes(expectedSubtitle))
+    queryByTextOrThrow(container, '.title', 'Improve test harness')
+    queryByTextOrThrow(container, '.subtitle', expectedSubtitle)
     assert.ok(
-      container.querySelector('.ci-status-container .ci-status-success')
+      queryOrThrow<SVGElement>(container, '.ci-status-container .ci-status').classList.contains(
+        'ci-status-success'
+      )
     )
   })
 

@@ -8,6 +8,7 @@ import { BranchListItem } from '../../../src/ui/branches/branch-list-item'
 import {
   mouseOver,
   mouseUp,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -32,7 +33,7 @@ describe('BranchListItem', () => {
     )
     unmount = u
 
-    assert.ok(container.textContent?.includes('feature/tests'))
+    queryByTextOrThrow(container, '.name', 'feature/tests')
     assert.equal(container.querySelector('.description'), null)
   })
 
