@@ -7,6 +7,7 @@ import { AppFileStatusKind } from '../../../src/models/status'
 import { DiffHeader } from '../../../src/ui/diff/diff-header'
 import {
   click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -68,8 +69,7 @@ describe('DiffHeader', () => {
     )
     unmount = u
 
-    const pathLabel = queryOrThrow(container, '.path-label-component')
-    assert.ok(pathLabel.textContent?.includes('src/diff-view.tsx'))
+    queryByTextOrThrow(container, '.path-label-component', 'src/diff-view.tsx')
 
     const statusIcon = queryOrThrow(container, '.status.status-modified')
     assert.equal(statusIcon.getAttribute('aria-label'), 'Modified')
@@ -148,10 +148,10 @@ describe('DiffHeader', () => {
     click(button)
 
     assert.equal(button.getAttribute('aria-expanded'), 'true')
-    assert.ok(
-      container.textContent?.includes(
-        __DARWIN__ ? 'Diff Settings' : 'Diff Options'
-      )
+    queryByTextOrThrow(
+      container,
+      'h3',
+      __DARWIN__ ? 'Diff Settings' : 'Diff Options'
     )
     assert.deepEqual(calls, ['opened'])
 

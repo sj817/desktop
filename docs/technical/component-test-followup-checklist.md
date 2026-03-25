@@ -167,16 +167,16 @@ approach we are trying to settle on.
 ## Medium-priority file-by-file work
 
 - [ ] [app/test/unit/ui/changes-list-filter-options-test.tsx](../../app/test/unit/ui/changes-list-filter-options-test.tsx)
-  - Replace text-heavy popover assertions with narrower label or control lookups.
+  - [x] Replace text-heavy popover assertions with narrower label or control lookups.
   - Reduce CSS-only popover visibility checks where a more direct state assertion
     is available.
 - [ ] [app/test/unit/ui/diff-options-test.tsx](../../app/test/unit/ui/diff-options-test.tsx)
-  - Add shared helper usage for radio and checkbox lookup.
-  - Replace broad container text assertions for option labels where practical.
+  - [x] Add shared helper usage for radio and checkbox lookup.
+  - [x] Replace broad container text assertions for option labels where practical.
 - [ ] [app/test/unit/ui/diff-header-test.tsx](../../app/test/unit/ui/diff-header-test.tsx)
-  - Tighten path, status, and options assertions around specific elements rather
+  - [x] Tighten path, status, and options assertions around specific elements rather
     than container-wide text.
-  - Reuse any diff-options helper patterns created above.
+  - [x] Reuse any diff-options helper patterns created above.
 - [ ] [app/test/unit/ui/diff-search-input-test.tsx](../../app/test/unit/ui/diff-search-input-test.tsx)
   - [x] Replace the local `setInputValue` helper with the shared input helper.
   - [x] Consider adding a shared blur helper if the same pattern shows up elsewhere.

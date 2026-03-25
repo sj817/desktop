@@ -4,8 +4,11 @@ import * as React from 'react'
 
 import { DiffOptions } from '../../../src/ui/diff/diff-options'
 import {
+  checkboxWithLabel,
   click,
+  queryByTextOrThrow,
   queryOrThrow,
+  radioButtonWithLabel,
   renderComponent,
 } from '../../helpers/component-test-utils'
 
@@ -64,10 +67,10 @@ describe('DiffOptions', () => {
     click(button)
 
     assert.equal(button.getAttribute('aria-expanded'), 'true')
-    assert.ok(
-      container.textContent?.includes(
-        __DARWIN__ ? 'Diff Settings' : 'Diff Options'
-      )
+    queryByTextOrThrow(
+      container,
+      'h3',
+      __DARWIN__ ? 'Diff Settings' : 'Diff Options'
     )
     assert.equal(calls.opened, 1)
 
@@ -82,15 +85,15 @@ describe('DiffOptions', () => {
 
     click(queryOrThrow(container, '.diff-options-component button'))
 
-    assert.ok(
-      container.textContent?.includes(
-        'Interacting with individual lines or hunks will be disabled while hiding whitespace.'
-      )
+    queryByTextOrThrow(
+      container,
+      '.secondary-text',
+      'Interacting with individual lines or hunks will be disabled while hiding whitespace.'
     )
 
-    const checkbox = queryOrThrow<HTMLInputElement>(
+    const checkbox = checkboxWithLabel(
       container,
-      'input[type="checkbox"]'
+      __DARWIN__ ? 'Hide Whitespace Changes' : 'Hide whitespace changes'
     )
 
     click(checkbox)
@@ -113,23 +116,9 @@ describe('DiffOptions', () => {
 
     click(queryOrThrow(container, '.diff-options-component button'))
 
-    assert.equal(
-      container.textContent?.includes(
-        'Interacting with individual lines or hunks will be disabled while hiding whitespace.'
-      ),
-      false
-    )
+    assert.equal(container.querySelector('.secondary-text'), null)
 
-    const radios = Array.from(
-      container.querySelectorAll<HTMLInputElement>('input[type="radio"]')
-    )
-    const unifiedRadio = radios.find(radio => radio.value === 'Unified')
-    const splitRadio = radios.find(radio => radio.value === 'Split')
-
-    assert.ok(unifiedRadio)
-    assert.ok(splitRadio)
-
-    click(unifiedRadio!)
+    click(radioButtonWithLabel(container, 'Unified'))
 
     assert.deepEqual(calls.split, [false])
 
@@ -149,13 +138,7 @@ describe('DiffOptions', () => {
 
     click(queryOrThrow(container, '.diff-options-component button'))
 
-    const splitRadio = Array.from(
-      container.querySelectorAll<HTMLInputElement>('input[type="radio"]')
-    ).find(radio => radio.value === 'Split')
-
-    assert.ok(splitRadio)
-
-    click(splitRadio!)
+    click(radioButtonWithLabel(container, 'Split'))
 
     assert.deepEqual(calls.split, [true])
 

@@ -10,7 +10,10 @@ import {
 import { ChangesListFilterOptions } from '../../../src/ui/changes/changes-list-filter-options'
 import { IChangesListItem } from '../../../src/ui/changes/filter-changes-list'
 import {
+  buttonWithText,
+  checkboxWithLabel,
   click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -140,13 +143,14 @@ describe('ChangesListFilterOptions', () => {
 
     click(queryOrThrow(container, 'button.filter-button'))
 
-    assert.ok(container.textContent?.includes('Included in commit (2)'))
-    assert.ok(container.textContent?.includes('Excluded from commit (1)'))
-    assert.ok(container.textContent?.includes('New files (1)'))
-    assert.ok(container.textContent?.includes('Modified files (1)'))
-    assert.ok(container.textContent?.includes('Deleted files (1)'))
+  queryByTextOrThrow(container, 'h3', 'Filter Options')
+  checkboxWithLabel(container, 'Included in commit (2)')
+  checkboxWithLabel(container, 'Excluded from commit (1)')
+  checkboxWithLabel(container, 'New files (1)')
+  checkboxWithLabel(container, 'Modified files (1)')
+  checkboxWithLabel(container, 'Deleted files (1)')
 
-    click(queryOrThrow(container, '.filter-options-footer button'))
+  click(buttonWithText(container, 'Clear filters'))
 
     assert.equal(calls.clear, 1)
     assert.equal(container.querySelector('.filter-popover'), null)
@@ -158,21 +162,7 @@ describe('ChangesListFilterOptions', () => {
 
     click(queryOrThrow(container, 'button.filter-button'))
 
-    const labels = Array.from(container.querySelectorAll('label'))
-    const modifiedLabel = labels.find(label =>
-      label.textContent?.includes('Modified files (1)')
-    )
-
-    if (modifiedLabel === undefined) {
-      throw new Error('Could not find modified files filter label')
-    }
-
-    click(
-      queryOrThrow(
-        modifiedLabel.parentElement as HTMLElement,
-        'input[type="checkbox"]'
-      )
-    )
+    click(checkboxWithLabel(container, 'Modified files (1)'))
 
     assert.equal(calls.modified, 1)
     assert.equal(container.querySelector('.filter-popover'), null)

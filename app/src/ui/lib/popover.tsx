@@ -96,6 +96,7 @@ export class Popover extends React.Component<IPopoverProps, IPopoverState> {
   private contentDivRef = React.createRef<HTMLDivElement>()
   private tipDivRef = React.createRef<HTMLDivElement>()
   private floatingCleanUp: (() => void) | null = null
+  private mounted = false
 
   public constructor(props: IPopoverProps) {
     super(props)
@@ -183,10 +184,15 @@ export class Popover extends React.Component<IPopoverProps, IPopoverState> {
       middleware,
     })
 
+    if (!this.mounted) {
+      return
+    }
+
     this.setState({ position })
   }
 
   public componentDidMount() {
+    this.mounted = true
     document.addEventListener('click', this.onDocumentClick)
     document.addEventListener('mousedown', this.onDocumentMouseDown)
     this.setupPosition()
@@ -199,8 +205,11 @@ export class Popover extends React.Component<IPopoverProps, IPopoverState> {
   }
 
   public componentWillUnmount() {
+    this.mounted = false
     document.removeEventListener('click', this.onDocumentClick)
     document.removeEventListener('mousedown', this.onDocumentMouseDown)
+    this.floatingCleanUp?.()
+    this.floatingCleanUp = null
   }
 
   private onDocumentClick = (event: MouseEvent) => {

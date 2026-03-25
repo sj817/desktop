@@ -261,6 +261,50 @@ export function buttonWithText(
 }
 
 /**
+ * Queries for a checkbox by its rendered label text and asserts it exists.
+ */
+export function checkboxWithLabel(
+  container: HTMLElement,
+  text: string
+): HTMLInputElement {
+  const checkbox = queryByTextOrThrow<HTMLLabelElement>(
+    container,
+    '.checkbox-component label',
+    text
+  ).parentElement?.querySelector<HTMLInputElement>('input[type="checkbox"]')
+
+  if (checkbox === null || checkbox === undefined) {
+    throw new Error(
+      `Could not find checkbox for label "${text}" in:\n${container.innerHTML}`
+    )
+  }
+
+  return checkbox
+}
+
+/**
+ * Queries for a radio button by its rendered label text and asserts it exists.
+ */
+export function radioButtonWithLabel(
+  container: HTMLElement,
+  text: string
+): HTMLInputElement {
+  const radio = queryByTextOrThrow<HTMLLabelElement>(
+    container,
+    '.radio-button-component label',
+    text
+  ).querySelector<HTMLInputElement>('input[type="radio"]')
+
+  if (radio === null || radio === undefined) {
+    throw new Error(
+      `Could not find radio button for label "${text}" in:\n${container.innerHTML}`
+    )
+  }
+
+  return radio
+}
+
+/**
  * Dispatches a submit event on a form within an `act()` block.
  */
 export function submit(form: HTMLFormElement) {
