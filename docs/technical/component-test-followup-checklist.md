@@ -40,7 +40,7 @@ Everything below is still outstanding.
 - [ ] Decide whether the shared `submit()` helper should prefer
       `form.requestSubmit()` when available and fall back to dispatching a
       cancelable `submit` event only when necessary.
-- [ ] Add a shared helper for typing into inputs and textareas so tests stop
+- [x] Add a shared helper for typing into inputs and textareas so tests stop
       open-coding property-descriptor setters.
   - Replace local input helpers in tests such as
     [app/test/unit/ui/diff-search-input-test.tsx](../../app/test/unit/ui/diff-search-input-test.tsx)
@@ -48,8 +48,8 @@ Everything below is still outstanding.
     [app/test/unit/ui/commit-message-test.tsx](../../app/test/unit/ui/commit-message-test.tsx).
 - [ ] Add shared helpers for the remaining common interaction patterns that still
       show up repeatedly in UI tests.
-  - blur/focus helpers
-  - hover and mouseup helpers for drag/drop paths
+  - [x] blur/focus helpers
+  - [x] hover and mouseup helpers for drag/drop paths
   - a helper for temporary viewport or bounding-rect stubbing when layout is part
     of the behavior under test
   - optional text-based helpers for links, headings, and other common elements
@@ -137,7 +137,7 @@ approach we are trying to settle on.
   - Re-evaluate the breadth of mocked child components and keep only the ones
     that are true boundaries for the behavior under test.
 - [ ] [app/test/unit/ui/commit-message-test.tsx](../../app/test/unit/ui/commit-message-test.tsx)
-  - Add shared input and textarea helpers so the test does not need local value
+  - [x] Add shared input and textarea helpers so the test does not need local value
     mutation plumbing.
   - Revisit the current mocking breadth and identify one real-child path worth
     covering with less mocking.
@@ -178,8 +178,8 @@ approach we are trying to settle on.
     than container-wide text.
   - Reuse any diff-options helper patterns created above.
 - [ ] [app/test/unit/ui/diff-search-input-test.tsx](../../app/test/unit/ui/diff-search-input-test.tsx)
-  - Replace the local `setInputValue` helper with the shared input helper.
-  - Consider adding a shared blur helper if the same pattern shows up elsewhere.
+  - [x] Replace the local `setInputValue` helper with the shared input helper.
+  - [x] Consider adding a shared blur helper if the same pattern shows up elsewhere.
 - [ ] [app/test/unit/ui/continue-rebase-test.tsx](../../app/test/unit/ui/continue-rebase-test.tsx)
   - [x] Replace remaining raw mouse event dispatch with shared click helpers.
   - Tighten the “Rebasing” state assertion around the button itself rather than
@@ -190,7 +190,7 @@ approach we are trying to settle on.
   - Replace broad row-text assertions with narrower title and subtitle element
     checks.
 - [ ] [app/test/unit/ui/branch-list-item-test.tsx](../../app/test/unit/ui/branch-list-item-test.tsx)
-  - Reuse the same drag/drop helper approach chosen for pull-request list items.
+  - [x] Reuse the same drag/drop helper approach chosen for pull-request list items.
   - Tighten text assertions around the title and description elements.
 - [ ] [app/test/unit/ui/pull-request-badge-test.tsx](../../app/test/unit/ui/pull-request-badge-test.tsx)
   - Prefer narrower queries for badge state and CI-status rendering rather than

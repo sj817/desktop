@@ -1,7 +1,6 @@
 import { afterEach, before, describe, it, mock } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 
 import { IAutocompletionProvider } from '../../../src/ui/autocompletion/autocompletion-provider'
 import type { IAutocompletingTextInputProps } from '../../../src/ui/autocompletion/autocompleting-text-input'
@@ -312,16 +311,6 @@ function createUnknownAuthor(username: string): UnknownAuthor {
   }
 }
 
-function changeTextArea(element: HTMLTextAreaElement, value: string) {
-  act(() => {
-    Object.getOwnPropertyDescriptor(
-      HTMLTextAreaElement.prototype,
-      'value'
-    )?.set?.call(element, value)
-    element.dispatchEvent(new Event('change', { bubbles: true }))
-  })
-}
-
 function renderCommitMessage(
   props: {
     anyFilesSelected?: boolean
@@ -420,7 +409,7 @@ describe('CommitMessage', () => {
       queryOrThrow<HTMLInputElement>(container, 'input.summary-field'),
       'Ship commit coverage'
     )
-    changeTextArea(
+    change(
       queryOrThrow<HTMLTextAreaElement>(
         container,
         'textarea.description-field'

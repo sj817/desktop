@@ -126,6 +126,15 @@ export function keyDown(
 }
 
 /**
+ * Simulates a blur event on an element.
+ */
+export function blur(element: Element) {
+  act(() => {
+    element.dispatchEvent(new FocusEvent('blur', { bubbles: true }))
+  })
+}
+
+/**
  * Simulates a mouse down event on an element.
  */
 export function mouseDown(

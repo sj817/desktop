@@ -1,10 +1,11 @@
 import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 
 import { DiffSearchInput } from '../../../src/ui/diff/diff-search-input'
 import {
+  blur,
+  change,
   keyDown,
   queryOrThrow,
   renderComponent,
@@ -17,16 +18,6 @@ afterEach(() => {
   unmount = undefined
 })
 
-function setInputValue(input: HTMLInputElement, value: string) {
-  act(() => {
-    Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      'value'
-    )?.set?.call(input, value)
-    input.dispatchEvent(new window.Event('change', { bubbles: true }))
-  })
-}
-
 describe('DiffSearchInput', () => {
   it('renders the search input and clear button state', () => {
     const { container, unmount: u } = renderComponent(
@@ -38,7 +29,7 @@ describe('DiffSearchInput', () => {
     assert.equal(input.placeholder, 'Search…')
     assert.equal(container.querySelector('.clear-button'), null)
 
-    setInputValue(input, 'bundle')
+    change(input, 'bundle')
 
     assert.equal(input.value, 'bundle')
     assert.ok(container.querySelector('.clear-button'))
@@ -63,7 +54,7 @@ describe('DiffSearchInput', () => {
     unmount = u
 
     const input = queryOrThrow<HTMLInputElement>(container, 'input')
-    setInputValue(input, 'README')
+    change(input, 'README')
     keyDown(input, 'Enter')
 
     assert.deepEqual(searches, [{ query: 'README', direction: 'next' }])
@@ -88,7 +79,7 @@ describe('DiffSearchInput', () => {
     unmount = u
 
     const input = queryOrThrow<HTMLInputElement>(container, 'input')
-    setInputValue(input, 'README')
+    change(input, 'README')
     keyDown(input, 'Enter', { shiftKey: true })
 
     assert.deepEqual(searches, [{ query: 'README', direction: 'previous' }])
@@ -112,7 +103,7 @@ describe('DiffSearchInput', () => {
     const input = queryOrThrow<HTMLInputElement>(container, 'input')
 
     keyDown(input, 'Escape')
-    input.dispatchEvent(new FocusEvent('blur', { bubbles: true }))
+    blur(input)
 
     assert.deepEqual(events, ['close', 'close'])
   })

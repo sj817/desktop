@@ -1,12 +1,13 @@
 import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 
 import { dragAndDropManager } from '../../../src/lib/drag-and-drop-manager'
 import { DragType, DropTargetType } from '../../../src/models/drag-drop'
 import { BranchListItem } from '../../../src/ui/branches/branch-list-item'
 import {
+  mouseOver,
+  mouseUp,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -66,9 +67,7 @@ describe('BranchListItem', () => {
 
     const row = queryOrThrow<HTMLDivElement>(container, '.branches-list-item')
 
-    act(() => {
-      row.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
-    })
+    mouseOver(row)
 
     assert.ok(
       queryOrThrow<HTMLDivElement>(
@@ -78,9 +77,7 @@ describe('BranchListItem', () => {
     )
     assert.deepEqual(enteredTargets, ['release/1.0'])
 
-    act(() => {
-      row.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
-    })
+    mouseUp(row)
 
     assert.equal(droppedOnBranch, 'release/1.0')
   })
@@ -110,9 +107,7 @@ describe('BranchListItem', () => {
 
     const row = queryOrThrow<HTMLDivElement>(container, '.branches-list-item')
 
-    act(() => {
-      row.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
-    })
+    mouseUp(row)
 
     assert.equal(currentBranchDrops, 1)
     assert.equal(otherBranchDrops, 0)

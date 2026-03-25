@@ -12,6 +12,7 @@ import {
   RepositoryListGroup,
 } from '../../../src/ui/repositories-list/group-repositories'
 import {
+  click,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -195,7 +196,7 @@ describe('RepositoriesList search', () => {
     )
     assert.ok(container.querySelector('.new-repository-button'))
 
-    queryOrThrow<HTMLButtonElement>(container, '.trigger-filter-change').click()
+    click(queryOrThrow<HTMLButtonElement>(container, '.trigger-filter-change'))
 
     assert.deepEqual(filterCalls, ['desktop'])
   })
