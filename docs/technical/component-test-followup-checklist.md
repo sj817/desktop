@@ -147,8 +147,8 @@ approach we are trying to settle on.
     covering with less mocking.
   - Keep the co-author and submit-path coverage, but move the assertions toward
     visible behavior where possible.
-- [ ] [app/test/unit/ui/commit-message-dialog-test.tsx](../../app/test/unit/ui/commit-message-dialog-test.tsx)
-  - Keep the wrapper wiring test, but add a companion path with a more realistic
+- [x] [app/test/unit/ui/commit-message-dialog-test.tsx](../../app/test/unit/ui/commit-message-dialog-test.tsx)
+  - [x] Keep the wrapper wiring test, but add a companion path with a more realistic
     child render if that can be done without making the test fragile.
   - [x] Avoid JSON-string prop summaries once a clearer assertion shape is available.
   - [x] Separate parent-managed state assertions from dispatcher-routing assertions

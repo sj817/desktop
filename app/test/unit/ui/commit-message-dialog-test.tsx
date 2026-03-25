@@ -16,6 +16,7 @@ import { FoldoutType } from '../../../src/lib/app-state'
 import { Dispatcher } from '../../../src/ui/dispatcher'
 import type { ICommitMessageProps } from '../../../src/ui/changes/commit-message'
 import {
+  change,
   click,
   queryByTextOrThrow,
   queryOrThrow,
@@ -33,6 +34,12 @@ mock.module('../../../src/ui/changes/commit-message', {
   namedExports: {
     CommitMessage: (props: ICommitMessageProps) => {
       latestCommitMessageProps = props
+      const [summary, setSummary] = React.useState(
+        props.commitMessage?.summary ?? ''
+      )
+      const [description, setDescription] = React.useState(
+        props.commitMessage?.description ?? ''
+      )
 
       return (
         <div className="mock-commit-message">
@@ -42,6 +49,28 @@ mock.module('../../../src/ui/changes/commit-message', {
           <div className="spellcheck-enabled">
             {String(props.commitSpellcheckEnabled)}
           </div>
+          <input
+            className="commit-summary"
+            value={summary}
+            onChange={event => setSummary(event.currentTarget.value)}
+          />
+          <textarea
+            className="commit-description"
+            value={description}
+            onChange={event => setDescription(event.currentTarget.value)}
+          />
+          <button
+            type="button"
+            className="submit-commit-message"
+            onClick={() =>
+              props.onCreateCommit({
+                summary,
+                description,
+              })
+            }
+          >
+            {props.commitButtonText}
+          </button>
           <button
             type="button"
             className="toggle-coauthors"
@@ -314,7 +343,9 @@ describe('CommitMessageDialog', () => {
     } = renderCommitMessageDialog()
     unmount = u
 
-    click(queryOrThrow<HTMLButtonElement>(container, '.confirm-unknown-authors'))
+    click(
+      queryOrThrow<HTMLButtonElement>(container, '.confirm-unknown-authors')
+    )
     click(queryOrThrow<HTMLButtonElement>(container, '.refresh-author'))
     click(queryOrThrow<HTMLButtonElement>(container, '.show-popup'))
     click(queryOrThrow<HTMLButtonElement>(container, '.show-foldout'))
@@ -334,6 +365,35 @@ describe('CommitMessageDialog', () => {
     ])
     assert.deepEqual(submitCalls, [
       { summary: 'Ship it', description: 'Wrapper test' },
+    ])
+  })
+
+  it('submits through a more realistic child form path', async () => {
+    const {
+      container,
+      unmount: u,
+      submitCalls,
+    } = renderCommitMessageDialog()
+    unmount = u
+
+    change(
+      queryOrThrow<HTMLInputElement>(container, 'input.commit-summary'),
+      'Ship dialog coverage'
+    )
+    change(
+      queryOrThrow<HTMLTextAreaElement>(container, 'textarea.commit-description'),
+      'Exercise the child form path'
+    )
+
+    click(queryOrThrow<HTMLButtonElement>(container, '.submit-commit-message'))
+
+    await Promise.resolve()
+
+    assert.deepEqual(submitCalls, [
+      {
+        summary: 'Ship dialog coverage',
+        description: 'Exercise the child form path',
+      },
     ])
   })
 
