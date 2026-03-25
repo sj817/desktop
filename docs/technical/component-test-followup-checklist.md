@@ -118,10 +118,10 @@ approach we are trying to settle on.
 - [ ] [app/test/unit/ui/repositories-list-test.tsx](../../app/test/unit/ui/repositories-list-test.tsx)
   - [x] Replace the remaining raw mouse event dispatch with shared interaction
     helpers.
-  - Add one less-mocked behavior path that validates user-visible selection or
+  - [x] Add one less-mocked behavior path that validates user-visible selection or
     click behavior rather than only the wrapper contract around
     `SectionFilterList`.
-  - Tighten grouped-repository text assertions so they are less dependent on the
+  - [x] Tighten grouped-repository text assertions so they are less dependent on the
     full flattened container text.
 - [ ] [app/test/unit/ui/repositories-list-search-test.tsx](../../app/test/unit/ui/repositories-list-search-test.tsx)
   - [x] Reduce broad `textContent` assertions and switch to narrower lookups for
@@ -199,12 +199,12 @@ approach we are trying to settle on.
   - Revisit whether status icon assertions can be made less dependent on the
     full CSS selector chain.
 - [ ] [app/test/unit/ui/no-branches-test.tsx](../../app/test/unit/ui/no-branches-test.tsx)
-  - Replace broad empty-state text checks with narrower text or element lookup
+  - [x] Replace broad empty-state text checks with narrower text or element lookup
     helpers.
   - Decide whether keyboard shortcut assertions should be derived from shared
     platform expectations instead of repeated literal arrays.
 - [ ] [app/test/unit/ui/no-pull-requests-test.tsx](../../app/test/unit/ui/no-pull-requests-test.tsx)
-  - Apply the same narrower empty-state assertion style as `no-branches-test`.
+  - [x] Apply the same narrower empty-state assertion style as `no-branches-test`.
   - Replace the remaining link selector assertions with text-based helpers if a
     shared link helper is added.
 - [ ] [app/test/unit/ui/repository-list-item-test.tsx](../../app/test/unit/ui/repository-list-item-test.tsx)

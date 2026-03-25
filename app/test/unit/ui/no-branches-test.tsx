@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import {
   click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -27,13 +28,16 @@ describe('NoBranches', () => {
     )
     unmount = u
 
-    assert.ok(
-      container.textContent?.includes("Sorry, I can't find that branch")
+    queryByTextOrThrow(container, '.title', "Sorry, I can't find that branch")
+    queryByTextOrThrow(
+      container,
+      '.subtitle',
+      'Do you want to create a new branch instead?'
     )
-    assert.ok(
-      container.textContent?.includes(
-        'Do you want to create a new branch instead?'
-      )
+    queryByTextOrThrow(
+      container,
+      '.create-branch-button',
+      __DARWIN__ ? 'Create New Branch' : 'Create new branch'
     )
 
     const button = queryOrThrow<HTMLButtonElement>(
@@ -79,7 +83,7 @@ describe('NoBranches', () => {
     )
     unmount = u
 
-    assert.ok(container.textContent?.includes('No matching branches found'))
+    queryByTextOrThrow(container, '.no-branches', 'No matching branches found')
     assert.equal(container.querySelector('.create-branch-button'), null)
   })
 })

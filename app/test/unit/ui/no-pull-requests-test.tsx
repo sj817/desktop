@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import {
   click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -33,11 +34,15 @@ describe('NoPullRequests', () => {
     )
     unmount = u
 
-    assert.ok(
-      container.textContent?.includes("Sorry, I can't find that pull request!")
+    queryByTextOrThrow(
+      container,
+      '.title',
+      "Sorry, I can't find that pull request!"
     )
-    assert.ok(
-      container.textContent?.includes('Would you like to create a new branch')
+    queryByTextOrThrow(
+      container,
+      '.call-to-action',
+      'Would you like to create a new branch and get going on your next project?'
     )
 
     click(queryOrThrow(container, 'a.link-button-component'))
@@ -64,17 +69,13 @@ describe('NoPullRequests', () => {
     )
     unmount = u
 
-    assert.ok(container.textContent?.includes("You're all set!"))
-    assert.ok(
-      container.textContent?.includes('No open pull requests in desktop')
-    )
-    assert.ok(
-      queryOrThrow(container, '.ref-component').textContent?.includes('desktop')
-    )
-    assert.ok(
-      container.textContent?.includes(
-        'Would you like to create a pull request from the current branch?'
-      )
+    queryByTextOrThrow(container, '.title', "You're all set!")
+    queryByTextOrThrow(container, '.no-prs', 'No open pull requests in desktop')
+    queryByTextOrThrow(container, '.ref-component', 'desktop')
+    queryByTextOrThrow(
+      container,
+      '.call-to-action',
+      'Would you like to create a pull request from the current branch?'
     )
 
     click(queryOrThrow(container, 'a.link-button-component'))
@@ -99,9 +100,11 @@ describe('NoPullRequests', () => {
     )
     unmount = u
 
-    assert.ok(container.textContent?.includes('Hang tight'))
-    assert.ok(
-      container.textContent?.includes('Loading pull requests as fast as I can!')
+    queryByTextOrThrow(container, '.title', 'Hang tight')
+    queryByTextOrThrow(
+      container,
+      '.call-to-action',
+      'Loading pull requests as fast as I can!'
     )
     assert.equal(container.querySelector('a.link-button-component'), null)
   })

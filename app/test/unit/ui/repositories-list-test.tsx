@@ -16,6 +16,7 @@ import {
 } from '../../../src/ui/repositories-list/group-repositories'
 import {
   click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -161,7 +162,11 @@ function renderRepositoriesList(
 
   const rendered = renderComponent(
     <RepositoriesList
-      selectedRepository={props.selectedRepository ?? repositories[0]}
+      selectedRepository={
+        props.selectedRepository !== undefined
+          ? props.selectedRepository
+          : repositories[0]
+      }
       repositories={repositories}
       recentRepositories={props.recentRepositories ?? []}
       localRepositoryStateLookup={localRepositoryStateLookup}
@@ -200,9 +205,11 @@ describe('RepositoriesList', () => {
     const { container, unmount: u, repositories } = renderRepositoriesList()
     unmount = u
 
-    assert.ok(container.textContent?.includes('desktop'))
-    assert.ok(container.textContent?.includes('Other'))
-    assert.ok(container.textContent?.includes('local-repo'))
+    queryByTextOrThrow(container, '.filter-list-group-header', 'desktop')
+    queryByTextOrThrow(container, '.filter-list-group-header', 'Other')
+    queryByTextOrThrow(container, '.repository-list-item .name', 'desktop')
+    queryByTextOrThrow(container, '.repository-list-item .name', 'local-repo')
+    queryByTextOrThrow(container, '.selected-item', repositories[0].name)
     assert.equal(
       latestSectionFilterListProps?.selectedItem?.repository.id,
       repositories[0].id
@@ -223,11 +230,31 @@ describe('RepositoriesList', () => {
     })
     unmount = u
 
-    assert.ok(
-      container.textContent?.includes("Sorry, I can't find that repository")
+    queryByTextOrThrow(
+      container,
+      '.no-results-found .title',
+      "Sorry, I can't find that repository"
     )
-    assert.ok(container.querySelector('.new-repository-button'))
+    queryByTextOrThrow(container, '.new-repository-button', 'Add')
     assert.deepEqual(filterCalls, [])
+  })
+
+  it('updates the rendered selected item when keyboard selection changes', () => {
+    const { container, unmount: u } = renderRepositoriesList({
+      selectedRepository: null,
+    })
+    unmount = u
+
+    assert.equal(
+      queryOrThrow<HTMLDivElement>(container, '.selected-item').textContent,
+      ''
+    )
+
+    click(
+      queryOrThrow<HTMLButtonElement>(container, '.trigger-selection-change')
+    )
+
+    queryByTextOrThrow(container, '.selected-item', 'desktop')
   })
 
   it('records indicator clicks and notifies selection changes for clicked repositories', () => {
