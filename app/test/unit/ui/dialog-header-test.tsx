@@ -1,7 +1,12 @@
 import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
-import { renderComponent } from '../../helpers/component-test-utils'
+import {
+  click,
+  queryByTextOrThrow,
+  queryOrThrow,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 import { DialogHeader } from '../../../src/ui/dialog/header'
 
 let unmount: () => void
@@ -15,9 +20,7 @@ describe('DialogHeader', () => {
     )
     unmount = u
 
-    const heading = container.querySelector('h1')
-    assert.ok(heading)
-    assert.equal(heading!.textContent, 'My Dialog')
+    queryByTextOrThrow(container, 'h1', 'My Dialog')
   })
 
   it('sets the title id', () => {
@@ -26,8 +29,8 @@ describe('DialogHeader', () => {
     )
     unmount = u
 
-    const heading = container.querySelector('h1')
-    assert.equal(heading!.id, 'test-title-id')
+    const heading = queryByTextOrThrow<HTMLHeadingElement>(container, 'h1', 'Test')
+    assert.equal(heading.id, 'test-title-id')
   })
 
   it('renders a JSX title', () => {
@@ -37,35 +40,43 @@ describe('DialogHeader', () => {
     )
     unmount = u
 
-    const customTitle = container.querySelector('.custom-title')
-    assert.ok(customTitle)
-    assert.equal(customTitle!.textContent, 'Custom')
+    queryByTextOrThrow(container, '.custom-title', 'Custom')
   })
 
   it('renders a close button when showCloseButton is true', () => {
-    const handleClose = () => {}
+    let closeClicks = 0
     const { container, unmount: u } = renderComponent(
       <DialogHeader
         title="Test"
         titleId="close-btn-test"
         showCloseButton={true}
-        onCloseButtonClick={handleClose}
+        onCloseButtonClick={() => {
+          closeClicks += 1
+        }}
       />
     )
     unmount = u
 
-    // The close button should exist when showCloseButton is true
-    assert.ok(container.innerHTML.length > 0)
+    const closeButton = queryOrThrow<HTMLButtonElement>(container, 'button.close')
+    assert.equal(closeButton.getAttribute('aria-label'), 'Close')
+
+    click(closeButton)
+
+    assert.equal(closeClicks, 1)
   })
 
-  it('does not render a close button by default', () => {
+  it('renders a close button by default', () => {
     const { container, unmount: u } = renderComponent(
       <DialogHeader title="Test" titleId="no-close-btn" />
     )
     unmount = u
 
-    // No close button should be present by default
-    const heading = container.querySelector('h1')
-    assert.ok(heading)
+    queryByTextOrThrow(container, 'h1', 'Test')
+    assert.equal(
+      queryOrThrow<HTMLButtonElement>(container, 'button.close').getAttribute(
+        'aria-label'
+      ),
+      'Close'
+    )
   })
 })

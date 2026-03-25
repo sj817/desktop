@@ -261,6 +261,16 @@ export function buttonWithText(
 }
 
 /**
+ * Queries for a link with matching normalized text content and asserts it exists.
+ */
+export function linkWithText(
+  container: HTMLElement,
+  text: string
+): HTMLAnchorElement {
+  return queryByTextOrThrow<HTMLAnchorElement>(container, 'a', text)
+}
+
+/**
  * Queries for a checkbox by its rendered label text and asserts it exists.
  */
 export function checkboxWithLabel(

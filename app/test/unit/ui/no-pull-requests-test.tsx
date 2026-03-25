@@ -4,8 +4,8 @@ import * as React from 'react'
 
 import {
   click,
+  linkWithText,
   queryByTextOrThrow,
-  queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
 import { NoPullRequests } from '../../../src/ui/branches/no-pull-requests'
@@ -45,7 +45,7 @@ describe('NoPullRequests', () => {
       'Would you like to create a new branch and get going on your next project?'
     )
 
-    click(queryOrThrow(container, 'a.link-button-component'))
+    click(linkWithText(container, 'create a new branch'))
 
     assert.equal(branchClicks, 1)
   })
@@ -78,7 +78,7 @@ describe('NoPullRequests', () => {
       'Would you like to create a pull request from the current branch?'
     )
 
-    click(queryOrThrow(container, 'a.link-button-component'))
+    click(linkWithText(container, 'create a pull request'))
 
     assert.equal(pullRequestClicks, 1)
   })

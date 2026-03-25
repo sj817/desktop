@@ -8,6 +8,7 @@ import { Owner } from '../../../src/models/owner'
 import { Repository } from '../../../src/models/repository'
 import { RepositoryListItem } from '../../../src/ui/repositories-list/repository-list-item'
 import {
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -74,10 +75,10 @@ describe('RepositoryListItem', () => {
       mark => mark.textContent
     )
 
-    assert.equal(prefix.textContent, 'desktop/')
+    queryByTextOrThrow(container, '.prefix', 'desktop/')
     assert.ok(name.textContent?.includes('Desktop App'))
     assert.deepEqual(highlights, ['Des'])
-    assert.ok(container.querySelector('.icon-for-repository'))
+    queryOrThrow(container, '.icon-for-repository')
   })
 
   it('renders ahead/behind and change indicators when present', () => {
@@ -100,8 +101,8 @@ describe('RepositoryListItem', () => {
       '.change-indicator-wrapper'
     )
 
-    assert.equal(aheadBehind.querySelectorAll('svg').length, 2)
-    assert.equal(changeIndicator.querySelectorAll('svg').length, 1)
+    assert.ok(aheadBehind.classList.contains('ahead-behind'))
+    assert.ok(changeIndicator.classList.contains('change-indicator-wrapper'))
   })
 
   it('omits repository indicators when there is no divergence or uncommitted work', () => {

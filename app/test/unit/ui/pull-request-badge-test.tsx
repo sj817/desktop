@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import {
   click,
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -119,6 +120,7 @@ describe('PullRequestBadge', () => {
 
     const button = queryOrThrow<HTMLButtonElement>(container, 'button.pr-badge')
 
+    queryByTextOrThrow(container, '.number', '#18')
     assert.equal(button.getAttribute('aria-disabled'), 'true')
     click(button)
 
@@ -143,10 +145,12 @@ describe('PullRequestBadge', () => {
     unmount = u
 
     const button = queryOrThrow<HTMLButtonElement>(container, 'button.pr-badge')
+    const status = queryOrThrow<SVGElement>(container, 'svg.ci-status')
 
+    queryByTextOrThrow(container, '.number', '#7')
     assert.equal(button.getAttribute('aria-disabled'), null)
     assert.equal(button.getAttribute('aria-expanded'), 'true')
-    assert.ok(container.querySelector('.ci-status'))
+    assert.ok(status.classList.contains('ci-status-success'))
 
     click(button)
 

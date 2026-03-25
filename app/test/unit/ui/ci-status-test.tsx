@@ -9,7 +9,10 @@ import { GitHubRepository } from '../../../src/models/github-repository'
 import { Owner } from '../../../src/models/owner'
 import { CIStatus } from '../../../src/ui/branches/ci-status'
 import { Dispatcher } from '../../../src/ui/dispatcher'
-import { renderComponent } from '../../helpers/component-test-utils'
+import {
+  queryOrThrow,
+  renderComponent,
+} from '../../helpers/component-test-utils'
 
 let unmount: (() => void) | undefined
 
@@ -133,10 +136,9 @@ describe('CIStatus', () => {
     )
     unmount = u
 
-    const icon = container.querySelector(
-      'svg.ci-status.ci-status-success.extra-class'
-    )
-    assert.ok(icon)
+    const icon = queryOrThrow<SVGElement>(container, 'svg.ci-status')
+    assert.ok(icon.classList.contains('ci-status-success'))
+    assert.ok(icon.classList.contains('extra-class'))
   })
 
   it('updates its rendered status when the subscription callback fires', () => {
@@ -158,7 +160,8 @@ describe('CIStatus', () => {
       dispatcher.emit(ref, createCombinedCheck(APICheckConclusion.Failure))
     })
 
-    assert.ok(container.querySelector('svg.ci-status.ci-status-failure'))
+    const icon = queryOrThrow<SVGElement>(container, 'svg.ci-status')
+    assert.ok(icon.classList.contains('ci-status-failure'))
     assert.equal(observed.length, 2)
     assert.equal(observed[1]?.conclusion, APICheckConclusion.Failure)
   })

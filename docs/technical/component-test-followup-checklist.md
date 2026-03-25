@@ -52,7 +52,7 @@ Everything below is still outstanding.
   - [x] hover and mouseup helpers for drag/drop paths
   - a helper for temporary viewport or bounding-rect stubbing when layout is part
     of the behavior under test
-  - optional text-based helpers for links, headings, and other common elements
+  - [x] optional text-based helpers for links, headings, and other common elements
 - [x] Add a shared helper for dialog dismissal grace periods instead of
       re-declaring `waitForDismissGracePeriod()` in individual files.
 - [ ] Audit all manual `dispatchEvent(new MouseEvent('click', ...))` usages in
@@ -193,10 +193,10 @@ approach we are trying to settle on.
   - [x] Reuse the same drag/drop helper approach chosen for pull-request list items.
   - Tighten text assertions around the title and description elements.
 - [ ] [app/test/unit/ui/pull-request-badge-test.tsx](../../app/test/unit/ui/pull-request-badge-test.tsx)
-  - Prefer narrower queries for badge state and CI-status rendering rather than
+  - [x] Prefer narrower queries for badge state and CI-status rendering rather than
     CSS-only existence checks.
 - [ ] [app/test/unit/ui/ci-status-test.tsx](../../app/test/unit/ui/ci-status-test.tsx)
-  - Revisit whether status icon assertions can be made less dependent on the
+  - [x] Revisit whether status icon assertions can be made less dependent on the
     full CSS selector chain.
 - [ ] [app/test/unit/ui/no-branches-test.tsx](../../app/test/unit/ui/no-branches-test.tsx)
   - [x] Replace broad empty-state text checks with narrower text or element lookup
@@ -205,10 +205,10 @@ approach we are trying to settle on.
     platform expectations instead of repeated literal arrays.
 - [ ] [app/test/unit/ui/no-pull-requests-test.tsx](../../app/test/unit/ui/no-pull-requests-test.tsx)
   - [x] Apply the same narrower empty-state assertion style as `no-branches-test`.
-  - Replace the remaining link selector assertions with text-based helpers if a
+  - [x] Replace the remaining link selector assertions with text-based helpers if a
     shared link helper is added.
 - [ ] [app/test/unit/ui/repository-list-item-test.tsx](../../app/test/unit/ui/repository-list-item-test.tsx)
-  - Revisit icon and indicator assertions to make sure they are not over-coupled
+  - [x] Revisit icon and indicator assertions to make sure they are not over-coupled
     to internal markup.
 - [ ] [app/test/unit/ui/changed-file-test.tsx](../../app/test/unit/ui/changed-file-test.tsx)
   - Consider a shared helper for path-label assertions where dirname and filename
@@ -223,7 +223,7 @@ approach we are trying to settle on.
   - Consider centralizing viewport and `requestAnimationFrame` setup if more
     resize-related tests are added.
 - [ ] [app/test/unit/ui/dialog-header-test.tsx](../../app/test/unit/ui/dialog-header-test.tsx)
-  - Tighten heading and close-button assertions if a shared heading or button
+  - [x] Tighten heading and close-button assertions if a shared heading or button
     helper is added.
 
 ## Lower-priority opportunistic cleanup
