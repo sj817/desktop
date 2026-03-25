@@ -380,6 +380,33 @@ export function submit(form: HTMLFormElement) {
 }
 
 /**
+ * Stubs HTMLElement#getBoundingClientRect with a stable rect and returns a restore callback.
+ */
+export function stubElementBoundingRect(width: number, height: number = 24) {
+  const originalGetBoundingClientRect =
+    HTMLElement.prototype.getBoundingClientRect
+
+  HTMLElement.prototype.getBoundingClientRect = () =>
+    ({
+      width,
+      height,
+      top: 0,
+      left: 0,
+      bottom: height,
+      right: width,
+      x: 0,
+      y: 0,
+      toJSON() {
+        return this
+      },
+    } as DOMRect)
+
+  return () => {
+    HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect
+  }
+}
+
+/**
  * Waits for a short timer-driven UI grace period.
  */
 export function waitForDuration(ms: number) {

@@ -12,22 +12,19 @@ import {
   queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
+  stubElementBoundingRect,
   submit,
 } from '../../helpers/component-test-utils'
 
 let unmount: (() => void) | undefined
-let originalGetBoundingClientRect:
-  | typeof HTMLElement.prototype.getBoundingClientRect
-  | undefined
+let restoreBoundingRectStub: (() => void) | undefined
 
 afterEach(() => {
   unmount?.()
   unmount = undefined
 
-  if (originalGetBoundingClientRect !== undefined) {
-    HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect
-    originalGetBoundingClientRect = undefined
-  }
+  restoreBoundingRectStub?.()
+  restoreBoundingRectStub = undefined
 })
 
 function createRepository() {
@@ -43,21 +40,7 @@ function createCommitContext(): ICommitContext {
 
 describe('OversizedFiles', () => {
   it('renders the oversized file paths and Git LFS recommendation', () => {
-    originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect
-    HTMLElement.prototype.getBoundingClientRect = () =>
-      ({
-        width: 480,
-        height: 24,
-        top: 0,
-        left: 0,
-        bottom: 24,
-        right: 480,
-        x: 0,
-        y: 0,
-        toJSON() {
-          return this
-        },
-      } as DOMRect)
+    restoreBoundingRectStub = stubElementBoundingRect(480)
 
     const { container, unmount: u } = renderComponent(
       <OversizedFiles
@@ -113,10 +96,7 @@ describe('OversizedFiles', () => {
     unmount = u
 
     assert.ok(
-      buttonWithText(
-        container,
-        __DARWIN__ ? 'Commit Anyway' : 'Commit anyway'
-      )
+      buttonWithText(container, __DARWIN__ ? 'Commit Anyway' : 'Commit anyway')
     )
     assert.ok(buttonWithText(container, 'Cancel'))
   })

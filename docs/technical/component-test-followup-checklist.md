@@ -53,12 +53,12 @@ Everything below is still outstanding.
       show up repeatedly in UI tests.
   - [x] blur/focus helpers
   - [x] hover and mouseup helpers for drag/drop paths
-  - a helper for temporary viewport or bounding-rect stubbing when layout is part
+  - [x] a helper for temporary viewport or bounding-rect stubbing when layout is part
     of the behavior under test
   - [x] optional text-based helpers for links, headings, and other common elements
 - [x] Add a shared helper for dialog dismissal grace periods instead of
       re-declaring `waitForDismissGracePeriod()` in individual files.
-- [ ] Audit all manual `dispatchEvent(new MouseEvent('click', ...))` usages in
+- [x] Audit all manual `dispatchEvent(new MouseEvent('click', ...))` usages in
       `app/test/unit/ui` and replace them with the shared click helper unless the
       lower-level event shape is itself what the test is proving.
 - [x] Decide whether to keep the helper layer intentionally CSS-selector-based or

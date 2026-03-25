@@ -16,23 +16,20 @@ import {
   queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
+  stubElementBoundingRect,
   submit,
   waitForDuration,
 } from '../../helpers/component-test-utils'
 
 let unmount: (() => void) | undefined
-let originalGetBoundingClientRect:
-  | typeof HTMLElement.prototype.getBoundingClientRect
-  | undefined
+let restoreBoundingRectStub: (() => void) | undefined
 
 afterEach(() => {
   unmount?.()
   unmount = undefined
 
-  if (originalGetBoundingClientRect !== undefined) {
-    HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect
-    originalGetBoundingClientRect = undefined
-  }
+  restoreBoundingRectStub?.()
+  restoreBoundingRectStub = undefined
 })
 
 function createRepository() {
@@ -46,27 +43,9 @@ function createCommitContext(): ICommitContext {
   }
 }
 
-function stubElementWidth(width: number) {
-  originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect
-  HTMLElement.prototype.getBoundingClientRect = () =>
-    ({
-      width,
-      height: 24,
-      top: 0,
-      left: 0,
-      bottom: 24,
-      right: width,
-      x: 0,
-      y: 0,
-      toJSON() {
-        return this
-      },
-    } as DOMRect)
-}
-
 describe('CommitConflictsWarning', () => {
   it('renders the conflicted files and destructive commit action', () => {
-    stubElementWidth(480)
+    restoreBoundingRectStub = stubElementBoundingRect(480)
 
     const files = [
       createMockFileChange('src/conflicted.ts', AppFileStatusKind.Conflicted),
