@@ -286,11 +286,11 @@ of `app/test/unit/ui` exhaustive.
 
 ## Validation and process checklist
 
-- [ ] After each helper-layer change, rerun the smallest affected subset of UI
+- [x] After each helper-layer change, rerun the smallest affected subset of UI
       tests before widening scope.
-- [ ] Once the next major batch lands, run the full UI component suite under
+- [x] Once the next major batch lands, run the full UI component suite under
       `app/test/unit/ui`.
-- [ ] Before considering the branch complete, run the broader unit test suite to
+- [x] Before considering the branch complete, run the broader unit test suite to
       confirm no shared harness changes regress unrelated tests.
 - [ ] Keep PR notes or a short design comment up to date with the testing-tier
       decisions made during this follow-up.
