@@ -53,9 +53,22 @@ mock.module('../../../src/ui/lib/section-filter-list', {
       const rows = React.Children.toArray(
         filteredGroups.flatMap(group => [
           props.renderGroupHeader?.(group.identifier),
-          ...group.items.map(item =>
-            props.renderItem(item, { title: [], subtitle: [] })
-          ),
+          ...group.items.map(item => (
+            <button
+              key={item.id}
+              type="button"
+              className="branch-row"
+              data-branch-name={item.branch.name}
+              onClick={event =>
+                props.onItemClick?.(item, {
+                  kind: 'mouseclick',
+                  event,
+                })
+              }
+            >
+              {props.renderItem(item, { title: [], subtitle: [] })}
+            </button>
+          )),
         ])
       )
 
@@ -64,20 +77,6 @@ mock.module('../../../src/ui/lib/section-filter-list', {
           <div className="selected-item">
             {props.selectedItem?.branch.name ?? ''}
           </div>
-          <button
-            type="button"
-            className="trigger-item-click"
-            onClick={event =>
-              filteredGroups.length > 0
-                ? props.onItemClick?.(filteredGroups[0].items[0], {
-                    kind: 'mouseclick',
-                    event,
-                  })
-                : null
-            }
-          >
-            Trigger Item Click
-          </button>
           <button
             type="button"
             className="trigger-selection-change"
@@ -257,7 +256,7 @@ describe('BranchList', () => {
     )
   })
 
-  it('maps item click and selection change callbacks back to Branch values', () => {
+  it('maps rendered row clicks and selection changes back to Branch values', () => {
     const clicks = new Array<string>()
     const selections = new Array<string | null>()
     const {
@@ -278,7 +277,12 @@ describe('BranchList', () => {
       throw new Error('Expected default branch to be present')
     }
 
-    click(queryOrThrow<HTMLButtonElement>(container, '.trigger-item-click'))
+    click(
+      queryOrThrow<HTMLButtonElement>(
+        container,
+        `.branch-row[data-branch-name="${defaultBranch.name}"]`
+      )
+    )
     click(
       queryOrThrow<HTMLButtonElement>(container, '.trigger-selection-change')
     )
@@ -326,7 +330,9 @@ describe('BranchList', () => {
       element => element.textContent?.trim() ?? ''
     )
 
-    assert.deepEqual(headers, [__DARWIN__ ? 'Recent Branches' : 'Recent branches'])
+    assert.deepEqual(headers, [
+      __DARWIN__ ? 'Recent Branches' : 'Recent branches',
+    ])
     assert.deepEqual(branches, ['release/1.0'])
   })
 

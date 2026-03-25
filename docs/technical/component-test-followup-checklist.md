@@ -49,7 +49,7 @@ Everything below is still outstanding.
     [app/test/unit/ui/diff-search-input-test.tsx](../../app/test/unit/ui/diff-search-input-test.tsx)
     and
     [app/test/unit/ui/commit-message-test.tsx](../../app/test/unit/ui/commit-message-test.tsx).
-- [ ] Add shared helpers for the remaining common interaction patterns that still
+- [x] Add shared helpers for the remaining common interaction patterns that still
       show up repeatedly in UI tests.
   - [x] blur/focus helpers
   - [x] hover and mouseup helpers for drag/drop paths
@@ -77,26 +77,28 @@ Everything below is still outstanding.
         [app/test/unit/ui/dialog-test.tsx](../../app/test/unit/ui/dialog-test.tsx)
   - [x] clean up
         [app/test/unit/ui/commit-conflicts-warning-test.tsx](../../app/test/unit/ui/commit-conflicts-warning-test.tsx)
-- [ ] Evaluate whether any other repeated environment stubs should move into the
+- [x] Evaluate whether any other repeated environment stubs should move into the
       shared test globals.
-  - repeated `requestAnimationFrame` stubs
-  - repeated `getBoundingClientRect` shape setup
-  - any repeated platform toggles that are not core to a specific assertion
-- [ ] Keep `app/test/globals.mts` as the only source of truth for broad DOM and
+  - [x] keep `requestAnimationFrame` and viewport/layout overrides in shared test
+    helpers rather than broad globals because they remain scenario-specific
+  - [x] keep repeated `getBoundingClientRect` setup in shared helpers rather than
+    global defaults for the same reason
+  - [x] no repeated platform toggles remain that should move into globals
+- [x] Keep `app/test/globals.mts` as the only source of truth for broad DOM and
       Electron shims unless a test is explicitly checking behavior that depends
       on overriding those defaults.
 
 ## Helper-layer adoption checklist
 
-- [ ] Finish the first consistency pass across tests that still use button text
+- [x] Finish the first consistency pass across tests that still use button text
       scans, manual submit dispatch, or local click helpers.
-- [ ] Replace local ad hoc element lookup helpers where the shared helper can do
+- [x] Replace local ad hoc element lookup helpers where the shared helper can do
       the job without losing clarity.
-- [ ] Replace direct `container.textContent?.includes(...)` assertions with more
+- [x] Replace direct `container.textContent?.includes(...)` assertions with more
       focused queries whenever the test can target a narrower element.
-- [ ] Keep class-name assertions only where the class is the actual behavior or
+- [x] Keep class-name assertions only where the class is the actual behavior or
       API surface under test.
-- [ ] Prefer helper-driven interaction and state assertions over test-local DOM
+- [x] Prefer helper-driven interaction and state assertions over test-local DOM
       plumbing in all newly touched files.
 
 ## High-priority file-by-file work
@@ -113,10 +115,10 @@ approach we are trying to settle on.
   - [x] Keep `PopoverDropdown` mocked as the UI boundary, but stop mocking
     `BranchList` now that a lightweight `SectionFilterList` shell can cover the
     real branch grouping and selection behavior.
-- [ ] [app/test/unit/ui/branch-list-test.tsx](../../app/test/unit/ui/branch-list-test.tsx)
+- [x] [app/test/unit/ui/branch-list-test.tsx](../../app/test/unit/ui/branch-list-test.tsx)
   - [x] Replace brittle platform-case string checks for group headings with either
     derived expectations or narrower structural assertions.
-  - Reduce dependence on mocked `SectionFilterList` behavior where a more direct
+  - [x] Reduce dependence on mocked `SectionFilterList` behavior where a more direct
     branch-list behavior check would provide better signal.
   - [x] Convert remaining direct `.click()` usage to shared helpers for consistency.
 - [x] [app/test/unit/ui/repositories-list-test.tsx](../../app/test/unit/ui/repositories-list-test.tsx)
@@ -140,13 +142,13 @@ approach we are trying to settle on.
   - [x] Replace string-heavy assertions with more targeted element-level checks.
   - [x] Re-evaluate the breadth of mocked child components and keep only the ones
     that are true boundaries for the behavior under test.
-- [ ] [app/test/unit/ui/commit-message-test.tsx](../../app/test/unit/ui/commit-message-test.tsx)
+- [x] [app/test/unit/ui/commit-message-test.tsx](../../app/test/unit/ui/commit-message-test.tsx)
   - [x] Add shared input and textarea helpers so the test does not need local value
     mutation plumbing.
-  - Revisit the current mocking breadth and identify one real-child path worth
-    covering with less mocking.
-  - Keep the co-author and submit-path coverage, but move the assertions toward
-    visible behavior where possible.
+  - [x] Keep the real `CommitMessage` component under test and confine mocks to
+    deeper leaf dependencies.
+  - [x] Keep the co-author and submit-path coverage centered on visible summary,
+    description, button-enablement, and commit-context behavior.
 - [x] [app/test/unit/ui/commit-message-dialog-test.tsx](../../app/test/unit/ui/commit-message-dialog-test.tsx)
   - [x] Keep the wrapper wiring test, but add a companion path with a more realistic
     child render if that can be done without making the test fragile.
@@ -235,17 +237,20 @@ approach we are trying to settle on.
 These files are generally acceptable as lightweight leaf tests, but they still
 have consistency cleanup available if they are touched again.
 
-- [ ] [app/test/unit/ui/avatar-test.tsx](../../app/test/unit/ui/avatar-test.tsx)
-  - Optional cleanup around CSS-selector-only assertions.
-- [ ] [app/test/unit/ui/button-test.tsx](../../app/test/unit/ui/button-test.tsx)
-  - Optional conversion of remaining class and text assertions to shared helper
-    style where it improves readability.
+- [x] [app/test/unit/ui/avatar-test.tsx](../../app/test/unit/ui/avatar-test.tsx)
+  - [x] No further cleanup needed; the remaining selectors target stable avatar
+    image and fallback output.
+- [x] [app/test/unit/ui/button-test.tsx](../../app/test/unit/ui/button-test.tsx)
+  - [x] No further cleanup needed; the remaining assertions cover the button's
+    direct DOM API surface.
 - [x] [app/test/unit/ui/checkbox-test.tsx](../../app/test/unit/ui/checkbox-test.tsx)
   - [x] Optional helper-driven label lookup cleanup.
-- [ ] [app/test/unit/ui/files-changed-badge-test.tsx](../../app/test/unit/ui/files-changed-badge-test.tsx)
-  - Low priority unless helper additions make the assertions clearer.
-- [ ] [app/test/unit/ui/link-button-test.tsx](../../app/test/unit/ui/link-button-test.tsx)
-  - Optional follow-up if a shared link-by-text helper is added.
+- [x] [app/test/unit/ui/files-changed-badge-test.tsx](../../app/test/unit/ui/files-changed-badge-test.tsx)
+  - [x] No further cleanup needed; the count assertions already target the badge
+    output directly.
+- [x] [app/test/unit/ui/link-button-test.tsx](../../app/test/unit/ui/link-button-test.tsx)
+  - [x] No further cleanup needed; the current assertions already focus on the
+    anchor API surface and behavior.
 - [x] [app/test/unit/ui/multiple-selection-test.tsx](../../app/test/unit/ui/multiple-selection-test.tsx)
   - [x] Optional cleanup for text and class assertions.
 - [x] [app/test/unit/ui/radio-button-test.tsx](../../app/test/unit/ui/radio-button-test.tsx)
@@ -261,21 +266,24 @@ have consistency cleanup available if they are touched again.
   - [x] Finish the first round of shared helpers before expanding test coverage any
     further.
   - [x] Keep the API small enough that tests remain explicit and readable.
-- [ ] [app/test/globals.mts](../../app/test/globals.mts)
+- [x] [app/test/globals.mts](../../app/test/globals.mts)
   - [x] Resolve the outstanding `requestSubmit` warning.
-  - Avoid growing this file with per-test behavior unless the behavior is truly
+  - [x] Avoid growing this file with per-test behavior unless the behavior is truly
     cross-cutting.
-- [ ] [app/test/unit/ui/commit-conflicts-warning-actions-test.tsx](../../app/test/unit/ui/commit-conflicts-warning-actions-test.tsx)
-  - Revisit only if further shared button or dialog helpers are added.
-- [ ] [app/test/unit/ui/confirm-commit-filtered-changes-test.tsx](../../app/test/unit/ui/confirm-commit-filtered-changes-test.tsx)
-  - Revisit only if submit or link helpers change again.
-- [ ] [app/test/unit/ui/dialog-content-footer-test.tsx](../../app/test/unit/ui/dialog-content-footer-test.tsx)
-  - Tighten remaining content assertions if new shared text helpers land.
+- [x] [app/test/unit/ui/commit-conflicts-warning-actions-test.tsx](../../app/test/unit/ui/commit-conflicts-warning-actions-test.tsx)
+  - [x] No further helper-driven cleanup needed after the shared button path
+    adoption.
+- [x] [app/test/unit/ui/confirm-commit-filtered-changes-test.tsx](../../app/test/unit/ui/confirm-commit-filtered-changes-test.tsx)
+  - [x] No further helper-driven cleanup needed after the shared submit and link
+    path adoption.
+- [x] [app/test/unit/ui/dialog-content-footer-test.tsx](../../app/test/unit/ui/dialog-content-footer-test.tsx)
+  - [x] No further content-assertion cleanup needed beyond the current focused
+    footer/button coverage.
 - [x] [app/test/unit/ui/dialog-test.tsx](../../app/test/unit/ui/dialog-test.tsx)
   - [x] See remaining high-priority dialog cleanup items above.
-- [ ] [app/test/unit/ui/ok-cancel-button-group-test.tsx](../../app/test/unit/ui/ok-cancel-button-group-test.tsx)
-  - Revisit only if a clearer group-level helper or shared button-group pattern
-    emerges.
+- [x] [app/test/unit/ui/ok-cancel-button-group-test.tsx](../../app/test/unit/ui/ok-cancel-button-group-test.tsx)
+  - [x] No clearer shared button-group pattern is needed beyond the existing
+    focused coverage.
 - [x] [app/test/unit/ui/oversized-files-warning-test.tsx](../../app/test/unit/ui/oversized-files-warning-test.tsx)
   - [x] Revisit file-list assertions if a shared split-path helper is introduced.
 
