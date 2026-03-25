@@ -223,8 +223,8 @@ approach we are trying to settle on.
 - [x] [app/test/unit/ui/dialog-alertdialog-test.tsx](../../app/test/unit/ui/dialog-alertdialog-test.tsx)
   - [x] Share any dialog focus helper utilities that come out of the main dialog
     cleanup.
-- [ ] [app/test/unit/ui/dialog-resize-test.tsx](../../app/test/unit/ui/dialog-resize-test.tsx)
-  - Consider centralizing viewport and `requestAnimationFrame` setup if more
+- [x] [app/test/unit/ui/dialog-resize-test.tsx](../../app/test/unit/ui/dialog-resize-test.tsx)
+  - [x] Consider centralizing viewport and `requestAnimationFrame` setup if more
     resize-related tests are added.
 - [x] [app/test/unit/ui/dialog-header-test.tsx](../../app/test/unit/ui/dialog-header-test.tsx)
   - [x] Tighten heading and close-button assertions if a shared heading or button

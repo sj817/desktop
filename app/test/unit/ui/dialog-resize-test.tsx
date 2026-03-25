@@ -6,31 +6,26 @@ import { act } from 'react-dom/test-utils'
 import {
   queryOrThrow,
   renderComponent,
+  stubAnimationFrame,
+  stubWindowInnerHeight,
 } from '../../helpers/component-test-utils'
 import { Dialog, DialogStackContext } from '../../../src/ui/dialog/dialog'
 import { getTitleBarHeight } from '../../../src/ui/window/title-bar'
 
 let unmount: (() => void) | undefined
-
-const originalRequestAnimationFrame = globalThis.requestAnimationFrame
-const originalCancelAnimationFrame = globalThis.cancelAnimationFrame
-const originalInnerHeight = window.innerHeight
+let restoreAnimationFrameStub: (() => void) | undefined
+let restoreWindowHeightStub: (() => void) | undefined
 
 afterEach(() => {
   unmount?.()
   unmount = undefined
   document.body.innerHTML = ''
 
-  Object.assign(globalThis, {
-    requestAnimationFrame: originalRequestAnimationFrame,
-    cancelAnimationFrame: originalCancelAnimationFrame,
-  })
+  restoreAnimationFrameStub?.()
+  restoreAnimationFrameStub = undefined
 
-  Object.defineProperty(window, 'innerHeight', {
-    configurable: true,
-    writable: true,
-    value: originalInnerHeight,
-  })
+  restoreWindowHeightStub?.()
+  restoreWindowHeightStub = undefined
 })
 
 function renderDialog(): HTMLElement {
@@ -44,16 +39,6 @@ function renderDialog(): HTMLElement {
 
   unmount = rendered.unmount
   return queryOrThrow<HTMLElement>(rendered.container, 'dialog')
-}
-
-function stubAnimationFrame() {
-  Object.assign(globalThis, {
-    requestAnimationFrame: (callback: FrameRequestCallback) => {
-      callback(0)
-      return 1
-    },
-    cancelAnimationFrame: () => {},
-  })
 }
 
 function stubDialogDimensions(
@@ -73,12 +58,8 @@ function stubDialogDimensions(
 
 describe('Dialog Resize Behavior', () => {
   it('repositions the dialog upward when a resize would push it below the viewport', () => {
-    stubAnimationFrame()
-    Object.defineProperty(window, 'innerHeight', {
-      configurable: true,
-      writable: true,
-      value: 400,
-    })
+    restoreAnimationFrameStub = stubAnimationFrame()
+    restoreWindowHeightStub = stubWindowInnerHeight(400)
 
     const dialog = renderDialog()
     stubDialogDimensions(dialog, 260, 160)
@@ -92,12 +73,8 @@ describe('Dialog Resize Behavior', () => {
   })
 
   it('does not reposition dialogs that are taller than the available viewport', () => {
-    stubAnimationFrame()
-    Object.defineProperty(window, 'innerHeight', {
-      configurable: true,
-      writable: true,
-      value: 300,
-    })
+    restoreAnimationFrameStub = stubAnimationFrame()
+    restoreWindowHeightStub = stubWindowInnerHeight(300)
 
     const dialog = renderDialog()
     stubDialogDimensions(dialog, 120, 1000)

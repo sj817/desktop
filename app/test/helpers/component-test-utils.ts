@@ -407,6 +407,50 @@ export function stubElementBoundingRect(width: number, height: number = 24) {
 }
 
 /**
+ * Stubs requestAnimationFrame and cancelAnimationFrame to run synchronously.
+ */
+export function stubAnimationFrame() {
+  const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+  const originalCancelAnimationFrame = globalThis.cancelAnimationFrame
+
+  Object.assign(globalThis, {
+    requestAnimationFrame: (callback: FrameRequestCallback) => {
+      callback(0)
+      return 1
+    },
+    cancelAnimationFrame: () => {},
+  })
+
+  return () => {
+    Object.assign(globalThis, {
+      requestAnimationFrame: originalRequestAnimationFrame,
+      cancelAnimationFrame: originalCancelAnimationFrame,
+    })
+  }
+}
+
+/**
+ * Stubs window.innerHeight and returns a restore callback.
+ */
+export function stubWindowInnerHeight(height: number) {
+  const originalInnerHeight = window.innerHeight
+
+  Object.defineProperty(window, 'innerHeight', {
+    configurable: true,
+    writable: true,
+    value: height,
+  })
+
+  return () => {
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      writable: true,
+      value: originalInnerHeight,
+    })
+  }
+}
+
+/**
  * Waits for a short timer-driven UI grace period.
  */
 export function waitForDuration(ms: number) {
