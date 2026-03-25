@@ -37,9 +37,12 @@ Everything below is still outstanding.
     [app/test/helpers/component-test-utils.ts](../../app/test/helpers/component-test-utils.ts),
     or both.
   - Re-run the currently passing targeted suites and confirm the warning is gone.
-- [ ] Decide whether the shared `submit()` helper should prefer
-      `form.requestSubmit()` when available and fall back to dispatching a
-      cancelable `submit` event only when necessary.
+- [x] Decide whether the shared `submit()` helper should prefer
+  `form.requestSubmit()` when available and fall back to dispatching a
+  cancelable `submit` event only when necessary.
+  - [x] Keep the helper on the synthetic cancelable `submit` event path by
+    default, and only use native submission when a test explicitly needs
+    browser submission semantics.
 - [x] Add a shared helper for typing into inputs and textareas so tests stop
       open-coding property-descriptor setters.
   - Replace local input helpers in tests such as
@@ -58,12 +61,12 @@ Everything below is still outstanding.
 - [ ] Audit all manual `dispatchEvent(new MouseEvent('click', ...))` usages in
       `app/test/unit/ui` and replace them with the shared click helper unless the
       lower-level event shape is itself what the test is proving.
-- [ ] Decide whether to keep the helper layer intentionally CSS-selector-based or
-      to add a very small semantic query layer without bringing in a second test
-      framework.
-  - If staying selector-based, document that decision explicitly.
-  - If adding semantic queries, keep the scope small and purpose-built for this
-    repo.
+- [x] Decide whether to keep the helper layer intentionally CSS-selector-based or
+  to add a very small semantic query layer without bringing in a second test
+  framework.
+  - [x] Stay selector-based by default and keep semantic helpers small and
+    purpose-built for repeated repo-specific patterns.
+  - [x] Document that decision explicitly.
 
 ## Shared environment cleanup
 
@@ -102,13 +105,14 @@ These are the files that should be addressed next because they either carry the
 most mocking, duplicate shared harness logic, or are central to the UI testing
 approach we are trying to settle on.
 
-- [ ] [app/test/unit/ui/branch-select-test.tsx](../../app/test/unit/ui/branch-select-test.tsx)
-  - Keep the existing wrapper coverage, but add a companion test that exercises
+- [x] [app/test/unit/ui/branch-select-test.tsx](../../app/test/unit/ui/branch-select-test.tsx)
+  - [x] Keep the existing wrapper coverage, but add a companion test that exercises
     a less-mocked branch selection flow.
   - [x] Reduce reliance on broad `container.textContent` checks for popover and
     selected-branch assertions.
-  - Decide whether the current amount of mocking around `BranchList` and
-    `PopoverDropdown` is still justified once helper ergonomics improve.
+  - [x] Keep `PopoverDropdown` mocked as the UI boundary, but stop mocking
+    `BranchList` now that a lightweight `SectionFilterList` shell can cover the
+    real branch grouping and selection behavior.
 - [ ] [app/test/unit/ui/branch-list-test.tsx](../../app/test/unit/ui/branch-list-test.tsx)
   - [x] Replace brittle platform-case string checks for group headings with either
     derived expectations or narrower structural assertions.
@@ -236,20 +240,20 @@ have consistency cleanup available if they are touched again.
 - [ ] [app/test/unit/ui/button-test.tsx](../../app/test/unit/ui/button-test.tsx)
   - Optional conversion of remaining class and text assertions to shared helper
     style where it improves readability.
-- [ ] [app/test/unit/ui/checkbox-test.tsx](../../app/test/unit/ui/checkbox-test.tsx)
-  - Optional helper-driven label lookup cleanup.
+- [x] [app/test/unit/ui/checkbox-test.tsx](../../app/test/unit/ui/checkbox-test.tsx)
+  - [x] Optional helper-driven label lookup cleanup.
 - [ ] [app/test/unit/ui/files-changed-badge-test.tsx](../../app/test/unit/ui/files-changed-badge-test.tsx)
   - Low priority unless helper additions make the assertions clearer.
 - [ ] [app/test/unit/ui/link-button-test.tsx](../../app/test/unit/ui/link-button-test.tsx)
   - Optional follow-up if a shared link-by-text helper is added.
-- [ ] [app/test/unit/ui/multiple-selection-test.tsx](../../app/test/unit/ui/multiple-selection-test.tsx)
-  - Optional cleanup for text and class assertions.
-- [ ] [app/test/unit/ui/radio-button-test.tsx](../../app/test/unit/ui/radio-button-test.tsx)
-  - Optional label lookup cleanup.
+- [x] [app/test/unit/ui/multiple-selection-test.tsx](../../app/test/unit/ui/multiple-selection-test.tsx)
+  - [x] Optional cleanup for text and class assertions.
+- [x] [app/test/unit/ui/radio-button-test.tsx](../../app/test/unit/ui/radio-button-test.tsx)
+  - [x] Optional label lookup cleanup.
 - [ ] [app/test/unit/ui/text-box-test.tsx](../../app/test/unit/ui/text-box-test.tsx)
   - Optional cleanup if a shared input helper lands.
-- [ ] [app/test/unit/ui/undo-commit-test.tsx](../../app/test/unit/ui/undo-commit-test.tsx)
-  - Optional narrowing of container-text assertions.
+- [x] [app/test/unit/ui/undo-commit-test.tsx](../../app/test/unit/ui/undo-commit-test.tsx)
+  - [x] Optional narrowing of container-text assertions.
 
 ## Focused follow-up for files already touched on this branch
 
@@ -292,11 +296,11 @@ of `app/test/unit/ui` exhaustive.
       `app/test/unit/ui`.
 - [x] Before considering the branch complete, run the broader unit test suite to
       confirm no shared harness changes regress unrelated tests.
-- [ ] Keep PR notes or a short design comment up to date with the testing-tier
-      decisions made during this follow-up.
+- [x] Keep PR notes or a short design comment up to date with the testing-tier
+  decisions made during this follow-up.
   - wrapper tests that intentionally mock child components
   - behavior tests that should render more of the real subtree
   - leaf tests that are intentionally lightweight and mostly isolated
-- [ ] Decide whether any of the conclusions from this branch should be folded
-      into [docs/technical/adding-tests.md](./adding-tests.md) once the approach
-      is stable.
+- [x] Decide whether any of the conclusions from this branch should be folded
+  into [docs/technical/adding-tests.md](./adding-tests.md) once the approach
+  is stable.

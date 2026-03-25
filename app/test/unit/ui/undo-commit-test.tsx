@@ -7,6 +7,7 @@ import { Commit } from '../../../src/models/commit'
 import { CommitIdentity } from '../../../src/models/commit-identity'
 import { UndoCommit } from '../../../src/ui/changes/undo-commit'
 import {
+  queryByTextOrThrow,
   click,
   queryOrThrow,
   renderComponent,
@@ -54,9 +55,8 @@ describe('UndoCommit', () => {
     const root = queryOrThrow<HTMLDivElement>(container, '#undo-commit')
     assert.equal(root.getAttribute('role'), 'group')
     assert.equal(root.getAttribute('aria-label'), 'Undo commit')
-    assert.ok(container.textContent?.includes('Committed'))
-    assert.ok(container.textContent?.includes('Refine smoke tests'))
-    assert.ok(queryOrThrow(container, '.summary'))
+    assert.ok(queryOrThrow<HTMLDivElement>(container, '.ago').textContent?.startsWith('Committed'))
+    queryByTextOrThrow(container, '.summary', 'Refine smoke tests')
   })
 
   it('invokes onUndo when the undo button is clicked', () => {

@@ -2,6 +2,7 @@ import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
 import {
+  queryByTextOrThrow,
   renderComponent,
   click,
   queryOrThrow,
@@ -67,9 +68,7 @@ describe('RadioButton', () => {
     )
     unmount = u
 
-    const label = container.querySelector('label')
-    assert.ok(label)
-    assert.ok(label!.textContent?.includes('Option One'))
+    queryByTextOrThrow(container, 'label', 'Option One')
   })
 
   it('calls onSelected when clicked', () => {
@@ -110,8 +109,6 @@ describe('RadioButton', () => {
     )
     unmount = u
 
-    const label = container.querySelector('label')
-    assert.ok(label)
-    assert.ok(label!.textContent?.includes('Child label text'))
+    queryByTextOrThrow(container, 'label', 'Child label text')
   })
 })

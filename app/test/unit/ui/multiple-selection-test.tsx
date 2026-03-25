@@ -3,6 +3,7 @@ import assert from 'node:assert'
 import * as React from 'react'
 
 import {
+  queryByTextOrThrow,
   queryOrThrow,
   renderComponent,
 } from '../../helpers/component-test-utils'
@@ -19,7 +20,7 @@ describe('MultipleSelection', () => {
     )
     unmount = u
 
-    assert.ok(container.textContent?.includes('4 files selected'))
+    queryByTextOrThrow(container, '#no-changes > div', '4 files selected')
   })
 
   it('renders the blankslate container styling and id', () => {

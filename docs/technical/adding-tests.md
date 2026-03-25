@@ -70,6 +70,38 @@ but here are some guidelines to help you figure out what to test.
 As you're writing your tests, don't forget to `yarn test:unit` to verify that
 your tests are working as expected.
 
+### UI component tests
+
+UI component tests in [app/test/unit/ui](../../app/test/unit/ui) run through
+the same Node-based test runner and JSDOM setup as the rest of the unit suite.
+When adding or updating these tests, keep the following conventions in mind.
+
+- Prefer the shared helpers in
+  [app/test/helpers/component-test-utils.ts](../../app/test/helpers/component-test-utils.ts)
+  for common interactions such as clicking, changing form fields, submitting
+  forms, focusing elements, and looking up common controls.
+- Keep assertions focused on the smallest user-visible element that carries the
+  behavior being tested. Prefer checking a specific button, heading, label, or
+  row over flattening large container text.
+- Keep the helper layer small and explicit. We intentionally use targeted CSS
+  selectors plus a few purpose-built helpers for repeated patterns instead of
+  adding a second general-purpose component testing framework.
+- Use lightweight wrapper tests when the contract under test is prop wiring or
+  callback routing across a clear component boundary.
+- Add a less-mocked behavior path when a wrapper test would otherwise hide the
+  meaningful UI behavior, such as real grouping, filtering, or selection.
+- Keep leaf tests lightweight when the component is mostly presentational and
+  the value is in checking the rendered output or a small interaction surface.
+- Prefer the shared `submit()` helper for form submission in JSDOM. It
+  dispatches the same cancelable submit event our tests need without depending
+  on `requestSubmit()` behavior that is noisy or incomplete in the test
+  environment. Reach for native submission only when the browser-specific path
+  is itself part of the behavior under test.
+- Put broad DOM and Electron shims in
+  [app/test/globals.mts](../../app/test/globals.mts) only when they are truly
+  cross-cutting. Test-local environment overrides should stay local when the
+  override is part of the scenario being exercised.
+
 ## Specific Testing Scenarios
 
 ### State updates in `AppStore`

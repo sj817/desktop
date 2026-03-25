@@ -2,6 +2,7 @@ import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert'
 import * as React from 'react'
 import {
+  queryByTextOrThrow,
   renderComponent,
   click,
   queryOrThrow,
@@ -59,9 +60,7 @@ describe('Checkbox', () => {
     )
     unmount = u
 
-    const label = container.querySelector('label')
-    assert.ok(label)
-    assert.ok(label!.textContent?.includes('Accept terms'))
+    queryByTextOrThrow(container, 'label', 'Accept terms')
   })
 
   it('does not render a label when omitted', () => {

@@ -6,7 +6,11 @@ import { Branch, BranchType } from '../../../src/models/branch'
 import { GitHubRepository } from '../../../src/models/github-repository'
 import { Owner } from '../../../src/models/owner'
 import { Repository } from '../../../src/models/repository'
-import type { IBranchListProps } from '../../../src/ui/branches/branch-list'
+import {
+  BranchGroupIdentifier,
+  IBranchListItem,
+} from '../../../src/ui/branches/group-branches'
+import type { ISectionFilterListProps } from '../../../src/ui/lib/section-filter-list'
 import type { IPopoverDropdownProps } from '../../../src/ui/lib/popover-dropdown'
 import {
   click,
@@ -19,63 +23,87 @@ interface IPopoverDropdownHandle {
   closePopover(): void
 }
 
-let latestBranchListProps: IBranchListProps | null = null
+let latestSectionFilterListProps: ISectionFilterListProps<
+  IBranchListItem,
+  BranchGroupIdentifier
+> | null = null
 let closePopoverCalls = 0
 let BranchSelect: typeof import('../../../src/ui/branches/branch-select').BranchSelect
 let unmount: (() => void) | undefined
 
-mock.module('../../../src/ui/branches/branch-list', {
+mock.module('../../../src/ui/lib/section-filter-list', {
   namedExports: {
-    BranchList: (props: IBranchListProps) => {
-      latestBranchListProps = props
-      const renderedBranch = props.renderBranch(
-        {
-          text: [props.selectedBranch?.name ?? ''],
-          id: props.selectedBranch?.name ?? 'selected-branch',
-          branch: props.selectedBranch ?? props.allBranches[0],
-        },
-        { title: [], subtitle: [] },
-        undefined
-      )
+    SectionFilterList: React.forwardRef<
+      { selectNextItem: () => void },
+      ISectionFilterListProps<IBranchListItem, BranchGroupIdentifier>
+    >((props, ref) => {
+      latestSectionFilterListProps = props
 
-      return (
-        <div className="mock-branch-list">
-          <div className="filter-text">{props.filterText}</div>
-          <div className="selected-branch">
-            {props.selectedBranch?.name ?? ''}
-          </div>
-          <div className="can-create-new-branch">
-            {String(props.canCreateNewBranch)}
-          </div>
-          <div className="rendered-branch">{renderedBranch}</div>
-          <div className="no-branches-message">
-            {props.noBranchesMessage ?? null}
-          </div>
-          <button
-            type="button"
-            className="change-filter"
-            onClick={() => props.onFilterTextChanged('feature')}
-          >
-            Change Filter
-          </button>
-          <button
-            type="button"
-            className="select-second-branch"
-            onClick={event => {
-              const branch = props.allBranches[1]
-              if (branch !== undefined) {
-                props.onItemClick?.(branch, {
+      React.useImperativeHandle(ref, () => ({
+        selectNextItem: () => {},
+      }))
+
+      const filterText = (props.filterText ?? '').toLowerCase()
+      const filteredGroups =
+        filterText.length === 0
+          ? props.groups
+          : props.groups
+              .map(group => ({
+                ...group,
+                items: group.items.filter(item =>
+                  item.text.join(' ').toLowerCase().includes(filterText)
+                ),
+              }))
+              .filter(group => group.items.length > 0)
+
+      const rows = React.Children.toArray(
+        filteredGroups.flatMap(group => [
+          props.renderGroupHeader?.(group.identifier),
+          ...group.items.map(item => (
+            <div
+              key={item.id}
+              className="branch-row"
+              data-branch-name={item.branch.name}
+              onClick={event =>
+                props.onItemClick?.(item, {
                   kind: 'mouseclick',
                   event,
                 })
               }
-            }}
+            >
+              {props.renderItem(item, { title: [], subtitle: [] })}
+            </div>
+          )),
+        ])
+      )
+
+      return (
+        <div className="mock-section-filter-list branches-list">
+          <div className="filter-text">{props.filterText}</div>
+          <div className="selected-branch">
+            {props.selectedItem?.branch.name ?? ''}
+          </div>
+          <button
+            type="button"
+            className="change-filter"
+            onClick={() => props.onFilterTextChanged?.('feature')}
           >
-            Select Branch
+            Change Filter
           </button>
+          <div className="rendered-rows">{rows}</div>
+          <div className="no-items">
+            {filteredGroups.length === 0 ? props.renderNoItems?.() : null}
+          </div>
+          <div className="post-filter">{props.renderPostFilter?.()}</div>
         </div>
       )
-    },
+    }),
+  },
+})
+
+mock.module('../../../src/lib/git/log', {
+  namedExports: {
+    getAuthors: async () => new Promise(() => {}),
   },
 })
 
@@ -109,7 +137,7 @@ before(async () => {
 afterEach(() => {
   unmount?.()
   unmount = undefined
-  latestBranchListProps = null
+  latestSectionFilterListProps = null
   closePopoverCalls = 0
 })
 
@@ -140,17 +168,24 @@ function renderBranchSelect(
   props: {
     onChange?: (branch: Branch) => void
     noBranchesMessage?: string
+    branch?: Branch | null
+    defaultBranch?: Branch | null
+    allBranches?: ReadonlyArray<Branch>
+    recentBranches?: ReadonlyArray<Branch>
   } = {}
 ) {
-  const branches = [createBranch('main'), createBranch('feature/login')]
+  const defaultBranch = props.defaultBranch ?? createBranch('main')
+  const recentBranch = createBranch('release/1.0')
+  const featureBranch = createBranch('feature/login')
+  const branches = props.allBranches ?? [defaultBranch, recentBranch, featureBranch]
   const rendered = renderComponent(
     <BranchSelect
       repository={createRepository()}
-      branch={branches[0]}
-      defaultBranch={branches[0]}
-      currentBranch={branches[0]}
+      branch={props.branch ?? defaultBranch}
+      defaultBranch={defaultBranch}
+      currentBranch={defaultBranch ?? branches[0]}
       allBranches={branches}
-      recentBranches={[branches[1]]}
+      recentBranches={props.recentBranches ?? [recentBranch]}
       onChange={props.onChange}
       noBranchesMessage={props.noBranchesMessage}
     />
@@ -160,7 +195,7 @@ function renderBranchSelect(
 }
 
 describe('BranchSelect', () => {
-  it('renders the current selected branch in the popover button and forwards props to BranchList', () => {
+  it('renders the current selected branch in the popover button and shows the grouped real branch list', () => {
     const {
       container,
       unmount: u,
@@ -172,30 +207,54 @@ describe('BranchSelect', () => {
 
     queryByTextOrThrow(container, '.content-title', 'Choose a base branch')
     queryByTextOrThrow(container, '.popover-dropdown-button-label', 'base:')
-    assert.ok(
-      queryOrThrow<HTMLDivElement>(container, '.button-content').textContent?.includes(
-        branches[0].name
-      )
+    queryByTextOrThrow(
+      container,
+      '.filter-list-group-header',
+      __DARWIN__ ? 'Default Branch' : 'Default branch'
     )
-    assert.equal(latestBranchListProps?.selectedBranch?.name, branches[0].name)
-    assert.equal(latestBranchListProps?.canCreateNewBranch, false)
+    queryByTextOrThrow(
+      container,
+      '.filter-list-group-header',
+      __DARWIN__ ? 'Recent Branches' : 'Recent branches'
+    )
+    queryByTextOrThrow(
+      container,
+      '.filter-list-group-header',
+      __DARWIN__ ? 'Other Branches' : 'Other branches'
+    )
+    queryByTextOrThrow(container, '.branches-list-item .name', branches[0].name)
+    queryByTextOrThrow(container, '.branches-list-item .name', branches[1].name)
+    queryByTextOrThrow(container, '.branches-list-item .name', branches[2].name)
     assert.equal(
-      latestBranchListProps?.noBranchesMessage,
-      'No branches available'
+      queryOrThrow<HTMLDivElement>(container, '.button-content').textContent?.replace(
+        /\s+/g,
+        ' '
+      ).trim(),
+      `base:${branches[0].name}`
+    )
+    assert.equal(
+      latestSectionFilterListProps?.selectedItem?.branch.name,
+      branches[0].name
+    )
+    assert.equal(
+      queryOrThrow<HTMLDivElement>(container, '.post-filter').textContent?.trim(),
+      ''
     )
   })
 
-  it('updates the filter text passed to BranchList', () => {
+  it('updates the filter text passed to BranchList and narrows the real branch rows', () => {
     const { container, unmount: u } = renderBranchSelect()
     unmount = u
 
     click(queryOrThrow<HTMLButtonElement>(container, '.change-filter'))
 
-    assert.equal(latestBranchListProps?.filterText, 'feature')
+    assert.equal(latestSectionFilterListProps?.filterText, 'feature')
     queryByTextOrThrow(container, '.filter-text', 'feature')
+    queryByTextOrThrow(container, '.branches-list-item .name', 'feature/login')
+    assert.equal(container.querySelectorAll('.branches-list-item .name').length, 1)
   })
 
-  it('closes the popover, updates selection, and emits onChange when a branch is clicked', () => {
+  it('closes the popover, updates selection, and emits onChange when a rendered branch is clicked', () => {
     const changes = new Array<string>()
     const {
       container,
@@ -208,15 +267,25 @@ describe('BranchSelect', () => {
     })
     unmount = u
 
-    click(queryOrThrow<HTMLButtonElement>(container, '.select-second-branch'))
+    click(
+      queryOrThrow<HTMLDivElement>(
+        container,
+        '.branch-row[data-branch-name="feature/login"]'
+      )
+    )
 
     assert.equal(closePopoverCalls, 1)
-    assert.deepEqual(changes, [branches[1].name])
-    assert.equal(latestBranchListProps?.selectedBranch?.name, branches[1].name)
-    assert.ok(
-      queryOrThrow<HTMLDivElement>(container, '.button-content').textContent?.includes(
-        branches[1].name
-      )
+    assert.deepEqual(changes, [branches[2].name])
+    assert.equal(
+      latestSectionFilterListProps?.selectedItem?.branch.name,
+      branches[2].name
+    )
+    assert.equal(
+      queryOrThrow<HTMLDivElement>(container, '.button-content').textContent?.replace(
+        /\s+/g,
+        ' '
+      ).trim(),
+      `base:${branches[2].name}`
     )
   })
 })
