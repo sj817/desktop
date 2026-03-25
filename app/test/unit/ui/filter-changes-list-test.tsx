@@ -10,7 +10,6 @@ import { CommitIdentity } from '../../../src/models/commit-identity'
 import { RepoRulesInfo } from '../../../src/models/repo-rules'
 import { Repository } from '../../../src/models/repository'
 import { WorkingDirectoryStatus } from '../../../src/models/status'
-import type { IChangesListFilterOptionsProps } from '../../../src/ui/changes/changes-list-filter-options'
 import type { IChangedFileProps } from '../../../src/ui/changes/changed-file'
 import type { IChangesListItem } from '../../../src/ui/changes/filter-changes-list'
 import { Dispatcher } from '../../../src/ui/dispatcher'
@@ -20,6 +19,7 @@ import type { ILinkButtonProps } from '../../../src/ui/lib/link-button'
 import type { ITextBoxProps } from '../../../src/ui/lib/text-box'
 import type { IAugmentedSectionFilterListProps } from '../../../src/ui/lib/augmented-filter-list'
 import {
+  checkboxWithLabel,
   change,
   click,
   queryByTextOrThrow,
@@ -98,29 +98,6 @@ mock.module('../../../src/ui/changes/commit-message', {
   },
 })
 
-mock.module('../../../src/ui/changes/changes-list-filter-options', {
-  namedExports: {
-    ChangesListFilterOptions: (props: IChangesListFilterOptionsProps) => (
-      <div className="mock-filter-options">
-        <button
-          type="button"
-          className="filter-included"
-          onClick={props.onFilterToIncludedInCommit}
-        >
-          Filter Included
-        </button>
-        <button
-          type="button"
-          className="clear-all-filters"
-          onClick={props.onClearAllFilters}
-        >
-          Clear All Filters
-        </button>
-      </div>
-    ),
-  },
-})
-
 mock.module('../../../src/ui/lib/text-box', {
   namedExports: {
     TextBox: React.forwardRef<IFocusableHandle, ITextBoxProps>((props, ref) => {
@@ -146,15 +123,21 @@ mock.module('../../../src/ui/lib/checkbox', {
       (props, ref) => {
         React.useImperativeHandle(ref, () => ({ focus: () => {} }))
         return (
-          <label className={props.className}>
-            <input
-              type="checkbox"
-              checked={false}
-              disabled={props.disabled}
-              onChange={props.onChange}
-            />
-            <span id="changes-list-check-all-label">{props.label}</span>
-          </label>
+          <div
+            className={['checkbox-component', props.className]
+              .filter(Boolean)
+              .join(' ')}
+          >
+            <label>
+              <input
+                type="checkbox"
+                checked={false}
+                disabled={props.disabled}
+                onChange={props.onChange}
+              />
+              <span id="changes-list-check-all-label">{props.label}</span>
+            </label>
+          </div>
         )
       }
     ),
@@ -169,6 +152,9 @@ mock.module('../../../src/ui/lib/button', {
         className={props.className}
         onClick={props.onClick}
         onKeyDown={props.onKeyDown}
+        aria-expanded={props.ariaExpanded}
+        aria-label={props.ariaLabel}
+        ref={props.onButtonRef}
       >
         {props.children}
       </button>
@@ -443,6 +429,27 @@ describe('FilterChangesList', () => {
       'new:false',
       'modified:false',
       'deleted:false',
+      'included:true',
+    ])
+  })
+
+  it('opens the real filter options UI and toggles the included-in-commit filter', () => {
+    const { container, unmount: u, calls } = renderFilterChangesList()
+    unmount = u
+
+    const filterButton = queryOrThrow<HTMLButtonElement>(
+      container,
+      'button.filter-button'
+    )
+
+    click(filterButton)
+
+    queryByTextOrThrow(container, 'h3', 'Filter Options')
+    click(checkboxWithLabel(container, 'Included in commit (1)'))
+
+    assert.equal(container.querySelector('.filter-popover'), null)
+    assert.deepEqual(calls, [
+      'metric:appliesIncludedInCommitFilterCount',
       'included:true',
     ])
   })

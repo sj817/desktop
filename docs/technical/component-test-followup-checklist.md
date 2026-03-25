@@ -132,13 +132,13 @@ approach we are trying to settle on.
     visible repository rows and empty-state controls.
   - [x] Reuse the shared search/filter list shell pattern from the main
     repositories list work.
-- [ ] [app/test/unit/ui/filter-changes-list-test.tsx](../../app/test/unit/ui/filter-changes-list-test.tsx)
-  - Split the current coverage into clearly labeled wrapper tests versus
+- [x] [app/test/unit/ui/filter-changes-list-test.tsx](../../app/test/unit/ui/filter-changes-list-test.tsx)
+  - [x] Split the current coverage into clearly labeled wrapper tests versus
     behavior-focused tests.
-  - Add at least one less-mocked path for filter clearing or hidden-change
+  - [x] Add at least one less-mocked path for filter clearing or hidden-change
     adjustment.
   - [x] Replace string-heavy assertions with more targeted element-level checks.
-  - Re-evaluate the breadth of mocked child components and keep only the ones
+  - [x] Re-evaluate the breadth of mocked child components and keep only the ones
     that are true boundaries for the behavior under test.
 - [ ] [app/test/unit/ui/commit-message-test.tsx](../../app/test/unit/ui/commit-message-test.tsx)
   - [x] Add shared input and textarea helpers so the test does not need local value
