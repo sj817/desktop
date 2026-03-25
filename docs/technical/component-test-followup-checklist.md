@@ -115,7 +115,7 @@ approach we are trying to settle on.
   - Reduce dependence on mocked `SectionFilterList` behavior where a more direct
     branch-list behavior check would provide better signal.
   - [x] Convert remaining direct `.click()` usage to shared helpers for consistency.
-- [ ] [app/test/unit/ui/repositories-list-test.tsx](../../app/test/unit/ui/repositories-list-test.tsx)
+- [x] [app/test/unit/ui/repositories-list-test.tsx](../../app/test/unit/ui/repositories-list-test.tsx)
   - [x] Replace the remaining raw mouse event dispatch with shared interaction
     helpers.
   - [x] Add one less-mocked behavior path that validates user-visible selection or
@@ -170,32 +170,32 @@ approach we are trying to settle on.
   - [x] Replace text-heavy popover assertions with narrower label or control lookups.
   - Reduce CSS-only popover visibility checks where a more direct state assertion
     is available.
-- [ ] [app/test/unit/ui/diff-options-test.tsx](../../app/test/unit/ui/diff-options-test.tsx)
+- [x] [app/test/unit/ui/diff-options-test.tsx](../../app/test/unit/ui/diff-options-test.tsx)
   - [x] Add shared helper usage for radio and checkbox lookup.
   - [x] Replace broad container text assertions for option labels where practical.
-- [ ] [app/test/unit/ui/diff-header-test.tsx](../../app/test/unit/ui/diff-header-test.tsx)
+- [x] [app/test/unit/ui/diff-header-test.tsx](../../app/test/unit/ui/diff-header-test.tsx)
   - [x] Tighten path, status, and options assertions around specific elements rather
     than container-wide text.
   - [x] Reuse any diff-options helper patterns created above.
-- [ ] [app/test/unit/ui/diff-search-input-test.tsx](../../app/test/unit/ui/diff-search-input-test.tsx)
+- [x] [app/test/unit/ui/diff-search-input-test.tsx](../../app/test/unit/ui/diff-search-input-test.tsx)
   - [x] Replace the local `setInputValue` helper with the shared input helper.
   - [x] Consider adding a shared blur helper if the same pattern shows up elsewhere.
 - [ ] [app/test/unit/ui/continue-rebase-test.tsx](../../app/test/unit/ui/continue-rebase-test.tsx)
   - [x] Replace remaining raw mouse event dispatch with shared click helpers.
   - Tighten the “Rebasing” state assertion around the button itself rather than
     general container text.
-- [ ] [app/test/unit/ui/pull-request-list-item-test.tsx](../../app/test/unit/ui/pull-request-list-item-test.tsx)
+- [x] [app/test/unit/ui/pull-request-list-item-test.tsx](../../app/test/unit/ui/pull-request-list-item-test.tsx)
   - [x] Consider a shared drag/drop helper for mouseover and mouseup-based drop
     flows.
   - [x] Replace broad row-text assertions with narrower title and subtitle element
     checks.
-- [ ] [app/test/unit/ui/branch-list-item-test.tsx](../../app/test/unit/ui/branch-list-item-test.tsx)
+- [x] [app/test/unit/ui/branch-list-item-test.tsx](../../app/test/unit/ui/branch-list-item-test.tsx)
   - [x] Reuse the same drag/drop helper approach chosen for pull-request list items.
   - [x] Tighten text assertions around the title and description elements.
-- [ ] [app/test/unit/ui/pull-request-badge-test.tsx](../../app/test/unit/ui/pull-request-badge-test.tsx)
+- [x] [app/test/unit/ui/pull-request-badge-test.tsx](../../app/test/unit/ui/pull-request-badge-test.tsx)
   - [x] Prefer narrower queries for badge state and CI-status rendering rather than
     CSS-only existence checks.
-- [ ] [app/test/unit/ui/ci-status-test.tsx](../../app/test/unit/ui/ci-status-test.tsx)
+- [x] [app/test/unit/ui/ci-status-test.tsx](../../app/test/unit/ui/ci-status-test.tsx)
   - [x] Revisit whether status icon assertions can be made less dependent on the
     full CSS selector chain.
 - [ ] [app/test/unit/ui/no-branches-test.tsx](../../app/test/unit/ui/no-branches-test.tsx)
@@ -203,17 +203,17 @@ approach we are trying to settle on.
     helpers.
   - Decide whether keyboard shortcut assertions should be derived from shared
     platform expectations instead of repeated literal arrays.
-- [ ] [app/test/unit/ui/no-pull-requests-test.tsx](../../app/test/unit/ui/no-pull-requests-test.tsx)
+- [x] [app/test/unit/ui/no-pull-requests-test.tsx](../../app/test/unit/ui/no-pull-requests-test.tsx)
   - [x] Apply the same narrower empty-state assertion style as `no-branches-test`.
   - [x] Replace the remaining link selector assertions with text-based helpers if a
     shared link helper is added.
-- [ ] [app/test/unit/ui/repository-list-item-test.tsx](../../app/test/unit/ui/repository-list-item-test.tsx)
+- [x] [app/test/unit/ui/repository-list-item-test.tsx](../../app/test/unit/ui/repository-list-item-test.tsx)
   - [x] Revisit icon and indicator assertions to make sure they are not over-coupled
     to internal markup.
-- [ ] [app/test/unit/ui/changed-file-test.tsx](../../app/test/unit/ui/changed-file-test.tsx)
+- [x] [app/test/unit/ui/changed-file-test.tsx](../../app/test/unit/ui/changed-file-test.tsx)
   - [x] Consider a shared helper for path-label assertions where dirname and filename
     are split across child nodes.
-- [ ] [app/test/unit/ui/commit-warning-test.tsx](../../app/test/unit/ui/commit-warning-test.tsx)
+- [x] [app/test/unit/ui/commit-warning-test.tsx](../../app/test/unit/ui/commit-warning-test.tsx)
   - [x] Revisit whether icon assertions should stay CSS-only or move toward a more
     explicit warning-type contract.
 - [ ] [app/test/unit/ui/dialog-alertdialog-test.tsx](../../app/test/unit/ui/dialog-alertdialog-test.tsx)
@@ -222,7 +222,7 @@ approach we are trying to settle on.
 - [ ] [app/test/unit/ui/dialog-resize-test.tsx](../../app/test/unit/ui/dialog-resize-test.tsx)
   - Consider centralizing viewport and `requestAnimationFrame` setup if more
     resize-related tests are added.
-- [ ] [app/test/unit/ui/dialog-header-test.tsx](../../app/test/unit/ui/dialog-header-test.tsx)
+- [x] [app/test/unit/ui/dialog-header-test.tsx](../../app/test/unit/ui/dialog-header-test.tsx)
   - [x] Tighten heading and close-button assertions if a shared heading or button
     helper is added.
 
