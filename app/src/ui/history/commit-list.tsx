@@ -502,7 +502,10 @@ export class CommitList extends React.Component<
       author: { date },
     } = commit
 
-    const absoluteDate = formatDate(date)
+    const absoluteDate = formatDate(date, {
+      dateStyle: 'full',
+      timeStyle: 'short',
+    })
 
     const authorList = avatarUsers.map((user, i) => {
       return (

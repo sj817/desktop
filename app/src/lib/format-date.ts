@@ -21,6 +21,24 @@ interface IFormatDateOptions {
   readonly date?: boolean
   /** Whether to include the time portion. Defaults to true. */
   readonly time?: boolean
+
+  /**
+   * @deprecated Will be removed in a future release. Temporarily supported for
+   *             backward compatibility with existing code when
+   *             enableFormattingPreferences is disabled. As soon as formatting
+   *             preferences is shipped to production, this option will be
+   *             removed.
+   */
+  readonly dateStyle?: 'full' | 'long' | 'medium' | 'short'
+
+  /**
+   * @deprecated Will be removed in a future release. Temporarily supported for
+   *             backward compatibility with existing code when
+   *             enableFormattingPreferences is disabled. As soon as formatting
+   *             preferences is shipped to production, this option will be
+   *             removed.
+   */
+  readonly timeStyle?: 'full' | 'long' | 'medium' | 'short'
 }
 
 /**
@@ -31,17 +49,14 @@ interface IFormatDateOptions {
  */
 export function formatDate(
   value: Date,
-  { date = true, time = true }: IFormatDateOptions = {}
+  { date = true, time = true, dateStyle, timeStyle }: IFormatDateOptions = {}
 ): string {
   if (isNaN(value.valueOf())) {
     return 'Invalid date'
   }
 
   if (!enableFormattingPreferences()) {
-    return getDateFormatter('en-US', {
-      dateStyle: date ? 'full' : undefined,
-      timeStyle: time ? 'short' : undefined,
-    }).format(value)
+    return getDateFormatter('en-US', { dateStyle, timeStyle }).format(value)
   }
 
   let formatString: string

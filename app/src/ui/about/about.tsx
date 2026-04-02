@@ -174,7 +174,10 @@ export class About extends React.Component<IAboutProps> {
           </p>
         )
 
-        const absoluteDate = formatDate(lastSuccessfulCheck)
+        const absoluteDate = formatDate(lastSuccessfulCheck, {
+          dateStyle: 'full',
+          timeStyle: 'short',
+        })
 
         return (
           <UpdateInfo

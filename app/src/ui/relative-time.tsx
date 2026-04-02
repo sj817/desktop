@@ -51,7 +51,10 @@ export function getRelativeTimeInfoFromDate(
   const diff = then.getTime() - Date.now()
   const duration = Math.abs(diff)
 
-  const absoluteText = formatDate(then)
+  const absoluteText = formatDate(then, {
+    dateStyle: 'full',
+    timeStyle: 'short',
+  })
 
   const relativeText = formatRelative(diff)
 
@@ -60,7 +63,10 @@ export function getRelativeTimeInfoFromDate(
   if (diff > 0 && duration > MINUTE) {
     return {
       absoluteText,
-      relativeText: absoluteText,
+      relativeText: formatDate(then, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }),
       duration,
     }
   } else if (duration < MINUTE) {
@@ -82,7 +88,7 @@ export function getRelativeTimeInfoFromDate(
       // More than a week ago, just the date will suffice
       return {
         absoluteText,
-        relativeText: formatDate(then, { time: false }),
+        relativeText: formatDate(then, { time: false, dateStyle: 'medium' }),
       }
     }
   }
