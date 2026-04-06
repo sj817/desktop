@@ -1,0 +1,301 @@
+// ---------------------------------------------------------------------------
+// Copilot Inline Hint (in conflicts dialog)
+// ---------------------------------------------------------------------------
+
+.copilot-inline-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-half);
+  padding: var(--spacing-half) 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary-color);
+
+  .octicon {
+    fill: var(--color-scale-purple-4, #8b5cf6);
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Copilot Conflict Suggestion Card
+// ---------------------------------------------------------------------------
+
+.copilot-conflict-suggestion {
+  border-left: 3px solid var(--color-scale-purple-4, #8b5cf6);
+  background: var(--box-alt-background-color);
+  border-radius: var(--border-radius);
+  padding: var(--spacing);
+  margin: var(--spacing-half) 0;
+
+  &.accepted {
+    border-left-color: var(--color-scale-green-4, #22c55e);
+    background: var(--diff-add-background-color);
+  }
+
+  .suggestion-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+    margin-bottom: var(--spacing-half);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+  }
+
+  .suggestion-icon-copilot {
+    fill: var(--color-scale-purple-4, #8b5cf6);
+    width: 16px;
+    height: 16px;
+  }
+
+  .suggestion-icon-check {
+    fill: var(--color-scale-green-4, #22c55e);
+    width: 16px;
+    height: 16px;
+  }
+
+  .suggestion-title {
+    color: var(--text-color);
+  }
+
+  .suggestion-code-block {
+    background: var(--diff-gutter-background-color);
+    border: var(--base-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-half) var(--spacing);
+    margin-bottom: var(--spacing-half);
+    overflow-x: auto;
+
+    pre {
+      margin: 0;
+      font-family: var(--font-family-monospace);
+      font-size: var(--font-size-sm);
+    }
+
+    code {
+      color: var(--diff-text-color);
+    }
+
+    .suggestion-code-line {
+      line-height: 1.5;
+      white-space: pre;
+    }
+  }
+
+  .suggestion-reasoning {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-half);
+    margin-bottom: var(--spacing);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary-color);
+    line-height: 1.4;
+
+    .reasoning-icon {
+      flex-shrink: 0;
+    }
+  }
+
+  .suggestion-actions {
+    display: flex;
+    gap: var(--spacing-half);
+
+    .suggestion-accept-button {
+      background: var(--color-scale-purple-4, #8b5cf6);
+      color: var(--box-background-color);
+      border: none;
+      font-size: var(--font-size-sm);
+
+      &:hover {
+        background: var(--color-scale-purple-5, #7c3aed);
+      }
+    }
+
+    .suggestion-dismiss-button {
+      background: transparent;
+      color: var(--text-secondary-color);
+      border: var(--base-border);
+      font-size: var(--font-size-sm);
+
+      &:hover {
+        color: var(--text-color);
+        background: var(--box-alt-background-color);
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Suggestion Overlay Container
+// ---------------------------------------------------------------------------
+
+.copilot-conflict-suggestion-overlay {
+  margin: var(--spacing-half) 0;
+
+  .overlay-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+    padding: var(--spacing-half) var(--spacing);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary-color);
+    border-bottom: var(--base-border);
+  }
+
+  .overlay-header-icon {
+    fill: var(--color-scale-purple-4, #8b5cf6);
+    width: 16px;
+    height: 16px;
+  }
+
+  .overlay-header-text {
+    flex: 1;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .overlay-resolve-all-link {
+    background: none;
+    border: none;
+    color: var(--link-button-color);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    padding: 0;
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--link-button-hover-color);
+    }
+  }
+
+  .overlay-suggestions {
+    padding: var(--spacing-half);
+  }
+
+  .copilot-overlay-all-resolved {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+    padding: var(--spacing);
+    color: var(--color-scale-green-4, #22c55e);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+
+    .all-resolved-icon {
+      fill: var(--color-scale-green-4, #22c55e);
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Inline Suggestion Demo
+// ---------------------------------------------------------------------------
+
+.copilot-inline-suggestion-demo {
+  padding: var(--spacing-double);
+  max-width: 800px;
+
+  .demo-header {
+    margin-bottom: var(--spacing-double);
+
+    h3 {
+      margin: 0 0 var(--spacing-half) 0;
+      font-size: var(--font-size-lg);
+      color: var(--text-color);
+    }
+
+    .demo-subtitle {
+      margin: 0;
+      color: var(--text-secondary-color);
+      font-size: var(--font-size-sm);
+    }
+  }
+
+  .demo-file-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-half) var(--spacing);
+    background: var(--box-alt-background-color);
+    border: var(--base-border);
+    border-bottom: none;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    font-size: var(--font-size-sm);
+
+    .demo-file-path {
+      font-family: var(--font-family-monospace);
+      color: var(--text-color);
+    }
+
+    .demo-file-badge {
+      background: var(--color-scale-yellow-3, #fbbf24);
+      color: var(--box-background-color);
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: var(--font-size-xs, 11px);
+      font-weight: 600;
+    }
+  }
+
+  .demo-diff-container {
+    border: var(--base-border);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    overflow: hidden;
+    font-family: var(--font-family-monospace);
+    font-size: var(--font-size-sm);
+  }
+
+  .mock-diff-lines {
+    margin: 0;
+    padding: 0;
+  }
+
+  .mock-diff-line {
+    display: flex;
+    line-height: 1.6;
+    padding: 0 var(--spacing-half);
+
+    &.mock-diff-line-context {
+      background: var(--background-color);
+      color: var(--diff-text-color);
+    }
+
+    &.mock-diff-line-marker {
+      background: var(--diff-gutter-background-color);
+      color: var(--text-secondary-color);
+      font-weight: 600;
+    }
+
+    &.mock-diff-line-ours {
+      background: var(--diff-delete-background-color, #ffeef0);
+      color: var(--diff-text-color);
+    }
+
+    &.mock-diff-line-theirs {
+      background: var(--diff-add-background-color, #e6ffec);
+      color: var(--diff-text-color);
+    }
+  }
+
+  .mock-line-number {
+    width: 40px;
+    text-align: right;
+    padding-right: var(--spacing-half);
+    color: var(--text-secondary-color);
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .mock-line-content {
+    flex: 1;
+    white-space: pre;
+  }
+
+  .demo-suggestion-inline {
+    border-top: var(--base-border);
+    border-bottom: var(--base-border);
+    background: var(--box-alt-background-color);
+  }
+}

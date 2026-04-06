@@ -21,6 +21,8 @@ import {
 import { ManualConflictResolution } from '../../../models/manual-conflict-resolution'
 import { OkCancelButtonGroup } from '../../dialog/ok-cancel-button-group'
 import { DialogSuccess } from '../../dialog/success'
+import { Octicon } from '../../octicons'
+import * as octicons from '../../octicons/octicons.generated'
 
 interface IConflictsDialogProps {
   readonly dispatcher: Dispatcher
@@ -122,6 +124,18 @@ export class ConflictsDialog extends React.Component<
   private openThisRepositoryInShell = () =>
     this.props.openRepositoryInShell(this.props.repository)
 
+  /** Renders a subtle hint about Copilot inline suggestions. */
+  private renderCopilotHint(): JSX.Element {
+    return (
+      <div className="copilot-inline-hint">
+        <Octicon symbol={octicons.copilot} />
+        <span>
+          You can also view inline Copilot suggestions in the Changes tab
+        </span>
+      </div>
+    )
+  }
+
   private setIsFileResolutionOptionsMenuOpen = (
     isFileResolutionOptionsMenuOpen: boolean
   ) => {
@@ -176,6 +190,7 @@ export class ConflictsDialog extends React.Component<
       <>
         {renderUnmergedFilesSummary(conflictedFilesCount)}
         {this.renderUnmergedFiles(unmergedFiles)}
+        {this.renderCopilotHint()}
         {renderShellLink(this.openThisRepositoryInShell)}
       </>
     )
