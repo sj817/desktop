@@ -17,6 +17,7 @@ export enum BannerType {
   SuccessfulReorder = 'SuccessfulReorder',
   ConflictsFound = 'ConflictsFound',
   OSVersionNoLongerSupported = 'OSVersionNoLongerSupported',
+  CopilotConflictsResolved = 'CopilotConflictsResolved',
 }
 
 export type Banner =
@@ -122,3 +123,14 @@ export type Banner =
       readonly onOpenConflictsDialog: () => void
     }
   | { readonly type: BannerType.OSVersionNoLongerSupported }
+  | {
+      readonly type: BannerType.CopilotConflictsResolved
+      /** Number of conflicts resolved by Copilot */
+      readonly conflictsResolved: number
+      /** Number of files that contained conflicts */
+      readonly filesResolved: number
+      /** Callback to undo all Copilot resolutions */
+      readonly onUndoAll: () => void
+      /** Callback to view the resolution summary */
+      readonly onViewSummary: () => void
+    }

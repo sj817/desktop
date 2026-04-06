@@ -1,3 +1,5 @@
 export { Banner } from './banner'
 export { UpdateAvailable } from './update-available'
 export { renderBanner } from './render-banner'
+export { CopilotResolutionBanner } from './copilot-resolution-banner'
+export { CopilotResolutionSummary } from './copilot-resolution-summary'

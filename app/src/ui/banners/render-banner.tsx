@@ -19,6 +19,7 @@ import { SuccessfulSquash } from './successful-squash'
 import { SuccessBanner } from './success-banner'
 import { ConflictsFoundBanner } from './conflicts-found-banner'
 import { OSVersionNoLongerSupportedBanner } from './os-version-no-longer-supported-banner'
+import { CopilotResolutionBanner } from './copilot-resolution-banner'
 
 export function renderBanner(
   banner: Banner,
@@ -171,6 +172,17 @@ export function renderBanner(
       )
     case BannerType.OSVersionNoLongerSupported:
       return <OSVersionNoLongerSupportedBanner onDismissed={onDismissed} />
+    case BannerType.CopilotConflictsResolved:
+      return (
+        <CopilotResolutionBanner
+          key="copilot-resolution"
+          conflictsResolved={banner.conflictsResolved}
+          filesResolved={banner.filesResolved}
+          onUndoAll={banner.onUndoAll}
+          onViewSummary={banner.onViewSummary}
+          onDismissed={onDismissed}
+        />
+      )
     default:
       return assertNever(banner, `Unknown popup type: ${banner}`)
   }

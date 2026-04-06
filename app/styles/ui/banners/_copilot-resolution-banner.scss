@@ -1,0 +1,28 @@
+#copilot-resolution-banner {
+  .banner-message {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+
+    span {
+      max-width: 100%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin: 0 1ex;
+    }
+
+    a {
+      margin-left: var(--spacing-half);
+      white-space: nowrap;
+    }
+  }
+
+  .copilot-icon {
+    color: var(--color-btn-primary-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    flex-grow: 0;
+  }
+}

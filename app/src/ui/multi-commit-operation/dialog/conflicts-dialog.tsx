@@ -21,6 +21,8 @@ import {
 import { ManualConflictResolution } from '../../../models/manual-conflict-resolution'
 import { OkCancelButtonGroup } from '../../dialog/ok-cancel-button-group'
 import { DialogSuccess } from '../../dialog/success'
+import { Octicon } from '../../octicons'
+import * as octicons from '../../octicons/octicons.generated'
 
 interface IConflictsDialogProps {
   readonly dispatcher: Dispatcher
@@ -164,6 +166,14 @@ export class ConflictsDialog extends React.Component<
     )
   }
 
+  /**
+   * Simulates Copilot resolving all conflicts and dismisses the dialog.
+   * In a real implementation, this would invoke the Copilot SDK.
+   */
+  private onResolveAllWithCopilot = () => {
+    this.props.onDismissed()
+  }
+
   private renderContent(
     unmergedFiles: ReadonlyArray<WorkingDirectoryFileChange>,
     conflictedFilesCount: number
@@ -174,6 +184,18 @@ export class ConflictsDialog extends React.Component<
 
     return (
       <>
+        {conflictedFilesCount > 0 && (
+          <div className="copilot-resolve-all">
+            <button
+              className="button-component copilot-resolve-all-button"
+              onClick={this.onResolveAllWithCopilot}
+              type="button"
+            >
+              <Octicon symbol={octicons.copilot} />
+              Resolve All with Copilot
+            </button>
+          </div>
+        )}
         {renderUnmergedFilesSummary(conflictedFilesCount)}
         {this.renderUnmergedFiles(unmergedFiles)}
         {renderShellLink(this.openThisRepositoryInShell)}
