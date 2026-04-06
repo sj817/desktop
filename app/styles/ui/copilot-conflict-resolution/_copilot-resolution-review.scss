@@ -1,0 +1,195 @@
+// Copilot Conflict Resolution - Review Dialog Styles
+
+#copilot-resolution-review-dialog {
+  .copilot-resolution-banner {
+    background-color: var(--box-selected-active-background-color);
+    color: var(--text-color);
+    padding: var(--spacing-half) var(--spacing);
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 1px solid var(--box-border-color);
+  }
+
+  .copilot-resolution-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-double);
+
+    p {
+      font-style: italic;
+      color: var(--text-secondary-color);
+    }
+  }
+
+  .copilot-resolution-file-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing);
+  }
+}
+
+// Conflicts dialog footer with Copilot button
+#conflicts-dialog .conflicts-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  .resolve-with-copilot-button {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+
+    .octicon {
+      flex-shrink: 0;
+    }
+  }
+}
+
+// File card
+.copilot-resolution-file-card {
+  border: 1px solid var(--box-border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  background-color: var(--box-background-color);
+  transition: opacity 0.2s ease;
+
+  &.file-card-accepted {
+    opacity: 0.6;
+    border-color: var(--color-success);
+
+    .file-card-path .file-card-icon.check-icon {
+      color: var(--color-success);
+    }
+  }
+
+  .file-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--spacing);
+    gap: var(--spacing);
+  }
+
+  .file-card-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .file-card-path {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+    font-weight: 600;
+    font-family: var(--font-family-monospace);
+    font-size: var(--font-size-sm);
+
+    .file-card-icon {
+      flex-shrink: 0;
+    }
+
+    .file-path-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .file-card-summary {
+    margin-top: var(--spacing-third);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary-color);
+  }
+
+  .file-card-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+
+    .accept-button {
+      color: var(--color-success);
+    }
+  }
+
+  .preview-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-third);
+    width: 100%;
+    padding: var(--spacing-half) var(--spacing);
+    border: none;
+    border-top: 1px solid var(--box-border-color);
+    background: none;
+    color: var(--link-button-color);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    text-align: left;
+
+    &:hover {
+      background-color: var(--box-hover-background-color);
+    }
+
+    .octicon {
+      flex-shrink: 0;
+    }
+  }
+
+  .file-card-preview {
+    border-top: 1px solid var(--box-border-color);
+  }
+
+  .file-card-reasoning {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-half);
+    padding: var(--spacing);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary-color);
+    background-color: var(--box-alt-background-color);
+    border-top: 1px solid var(--box-border-color);
+
+    .reasoning-icon {
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Diff preview
+.copilot-resolution-diff-preview {
+  .diff-content {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family-monospace);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+
+  .diff-line {
+    padding: 1px var(--spacing);
+    white-space: pre;
+  }
+
+  .diff-line-added {
+    background-color: var(--diff-add-background-color, #e6ffec);
+    color: var(--diff-add-text-color, #24292f);
+  }
+
+  .diff-line-removed {
+    background-color: var(--diff-delete-background-color, #ffebe9);
+    color: var(--diff-delete-text-color, #24292f);
+  }
+
+  .diff-line-context {
+    background-color: transparent;
+  }
+
+  .diff-line-prefix {
+    display: inline-block;
+    width: 1.5em;
+    user-select: none;
+    color: var(--text-secondary-color);
+  }
+}

@@ -21,6 +21,9 @@ import {
 import { ManualConflictResolution } from '../../../models/manual-conflict-resolution'
 import { OkCancelButtonGroup } from '../../dialog/ok-cancel-button-group'
 import { DialogSuccess } from '../../dialog/success'
+import { CopilotResolutionReviewDialog } from '../../copilot-conflict-resolution'
+import { Octicon, copilot } from '../../octicons'
+import { Button } from '../../lib/button'
 
 interface IConflictsDialogProps {
   readonly dispatcher: Dispatcher
@@ -47,6 +50,7 @@ interface IConflictsDialogState {
   readonly isCommitting: boolean
   readonly isAborting: boolean
   readonly isFileResolutionOptionsMenuOpen: boolean
+  readonly showCopilotReview: boolean
 }
 
 /**
@@ -67,6 +71,7 @@ export class ConflictsDialog extends React.Component<
       isCommitting: false,
       isAborting: false,
       isFileResolutionOptionsMenuOpen: false,
+      showCopilotReview: false,
     }
   }
 
@@ -126,6 +131,14 @@ export class ConflictsDialog extends React.Component<
     isFileResolutionOptionsMenuOpen: boolean
   ) => {
     this.setState({ isFileResolutionOptionsMenuOpen })
+  }
+
+  private onResolveWithCopilotClick = () => {
+    this.setState({ showCopilotReview: true })
+  }
+
+  private onCopilotReviewDismissed = () => {
+    this.setState({ showCopilotReview: false })
   }
 
   /**
@@ -255,15 +268,30 @@ export class ConflictsDialog extends React.Component<
           {this.renderContent(unmergedFiles, conflictedFiles.length)}
         </DialogContent>
         <DialogFooter>
-          <OkCancelButtonGroup
-            okButtonText={submitButton}
-            okButtonDisabled={conflictedFiles.length > 0}
-            okButtonTitle={tooltipString}
-            cancelButtonText={abortButton}
-            onCancelButtonClick={this.onAbort}
-            cancelButtonDisabled={this.state.isAborting}
-          />
+          <div className="conflicts-dialog-footer">
+            <Button
+              className="resolve-with-copilot-button"
+              onClick={this.onResolveWithCopilotClick}
+              disabled={conflictedFiles.length === 0}
+            >
+              <Octicon symbol={copilot} />
+              <span>Resolve with Copilot</span>
+            </Button>
+            <OkCancelButtonGroup
+              okButtonText={submitButton}
+              okButtonDisabled={conflictedFiles.length > 0}
+              okButtonTitle={tooltipString}
+              cancelButtonText={abortButton}
+              onCancelButtonClick={this.onAbort}
+              cancelButtonDisabled={this.state.isAborting}
+            />
+          </div>
         </DialogFooter>
+        {this.state.showCopilotReview && (
+          <CopilotResolutionReviewDialog
+            onDismissed={this.onCopilotReviewDismissed}
+          />
+        )}
       </Dialog>
     )
   }
