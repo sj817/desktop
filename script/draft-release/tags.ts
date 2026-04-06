@@ -7,11 +7,13 @@ import { sort as semverSort } from 'semver'
 import { sh } from '../sh'
 
 /**
- * Returns the latest release tag, according to git and semver
- * (ignores test releases)
+ * Returns the latest release version string, according to git tags and semver.
  *
- * @param options there's only one option `excludeBetaReleases`,
- *                which is a boolean
+ * The returned value does not include the `release-` prefix from the git tag.
+ *
+ * @param options Options for excluding prerelease tags from consideration.
+ * @param options.excludeBetaReleases Whether to exclude beta releases.
+ * @param options.excludeTestReleases Whether to exclude test releases.
  */
 export async function getLatestRelease(options: {
   excludeBetaReleases: boolean
