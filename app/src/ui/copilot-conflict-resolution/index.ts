@@ -1,0 +1,7 @@
+export { CopilotResolutionReviewDialog } from './copilot-resolution-review-dialog'
+export { CopilotResolutionFileCard } from './copilot-resolution-file-card'
+export { ResolutionCompareTabs } from './resolution-compare-tabs'
+export { ResolutionCodePreview } from './resolution-code-preview'
+export type { ResolutionTab } from './resolution-compare-tabs'
+export type { ResolutionChoice } from './copilot-resolution-file-card'
+export type { IMockConflictFile } from './mock-conflict-data'

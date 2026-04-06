@@ -21,6 +21,10 @@ import {
 import { ManualConflictResolution } from '../../../models/manual-conflict-resolution'
 import { OkCancelButtonGroup } from '../../dialog/ok-cancel-button-group'
 import { DialogSuccess } from '../../dialog/success'
+import { Button } from '../../lib/button'
+import { Octicon } from '../../octicons'
+import * as octicons from '../../octicons/octicons.generated'
+import { CopilotResolutionReviewDialog } from '../../copilot-conflict-resolution'
 
 interface IConflictsDialogProps {
   readonly dispatcher: Dispatcher
@@ -47,6 +51,7 @@ interface IConflictsDialogState {
   readonly isCommitting: boolean
   readonly isAborting: boolean
   readonly isFileResolutionOptionsMenuOpen: boolean
+  readonly showCopilotReviewDialog: boolean
 }
 
 /**
@@ -67,6 +72,7 @@ export class ConflictsDialog extends React.Component<
       isCommitting: false,
       isAborting: false,
       isFileResolutionOptionsMenuOpen: false,
+      showCopilotReviewDialog: false,
     }
   }
 
@@ -121,6 +127,14 @@ export class ConflictsDialog extends React.Component<
 
   private openThisRepositoryInShell = () =>
     this.props.openRepositoryInShell(this.props.repository)
+
+  private onOpenCopilotReview = () => {
+    this.setState({ showCopilotReviewDialog: true })
+  }
+
+  private onDismissCopilotReview = () => {
+    this.setState({ showCopilotReviewDialog: false })
+  }
 
   private setIsFileResolutionOptionsMenuOpen = (
     isFileResolutionOptionsMenuOpen: boolean
@@ -241,30 +255,52 @@ export class ConflictsDialog extends React.Component<
         : undefined
 
     return (
-      <Dialog
-        id="conflicts-dialog"
-        dismissDisabled={this.state.isCommitting}
-        onDismissed={this.props.onDismissed}
-        onSubmit={this.onSubmit}
-        title={headerTitle}
-        loading={this.state.isCommitting}
-        disabled={this.state.isCommitting}
-      >
-        {this.renderBanner(conflictedFiles.length)}
-        <DialogContent>
-          {this.renderContent(unmergedFiles, conflictedFiles.length)}
-        </DialogContent>
-        <DialogFooter>
-          <OkCancelButtonGroup
-            okButtonText={submitButton}
-            okButtonDisabled={conflictedFiles.length > 0}
-            okButtonTitle={tooltipString}
-            cancelButtonText={abortButton}
-            onCancelButtonClick={this.onAbort}
-            cancelButtonDisabled={this.state.isAborting}
-          />
-        </DialogFooter>
-      </Dialog>
+      <>
+        <Dialog
+          id="conflicts-dialog"
+          dismissDisabled={this.state.isCommitting}
+          onDismissed={this.props.onDismissed}
+          onSubmit={this.onSubmit}
+          title={headerTitle}
+          loading={this.state.isCommitting}
+          disabled={this.state.isCommitting}
+        >
+          {this.renderBanner(conflictedFiles.length)}
+          <DialogContent>
+            {this.renderContent(unmergedFiles, conflictedFiles.length)}
+          </DialogContent>
+          <DialogFooter>
+            <Button
+              className="resolve-with-copilot-button"
+              onClick={this.onOpenCopilotReview}
+            >
+              <Octicon symbol={octicons.copilot} />
+              Resolve with Copilot
+            </Button>
+            <OkCancelButtonGroup
+              okButtonText={submitButton}
+              okButtonDisabled={conflictedFiles.length > 0}
+              okButtonTitle={tooltipString}
+              cancelButtonText={abortButton}
+              onCancelButtonClick={this.onAbort}
+              cancelButtonDisabled={this.state.isAborting}
+            />
+          </DialogFooter>
+        </Dialog>
+        {this.renderCopilotReviewDialog()}
+      </>
+    )
+  }
+
+  private renderCopilotReviewDialog(): JSX.Element | null {
+    if (!this.state.showCopilotReviewDialog) {
+      return null
+    }
+
+    return (
+      <CopilotResolutionReviewDialog
+        onDismissed={this.onDismissCopilotReview}
+      />
     )
   }
 }
