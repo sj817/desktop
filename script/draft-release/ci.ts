@@ -10,7 +10,8 @@
  * Commands:
  *   version <channel>
  *     Discovers the previous release tag and computes the next version.
- *     Outputs GitHub Actions `::set-output` lines:
+ *     Writes GitHub Actions outputs to `$GITHUB_OUTPUT` when running in Actions
+ *     and prints the same key=value pairs to stdout for log visibility:
  *       previous, next, latest-beta (production only)
  *
  *   changelog-entries <previous-version>
