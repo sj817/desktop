@@ -81,6 +81,8 @@ export const renderUnmergedFile: React.FunctionComponent<{
   ) => void
   /** whether this is the first conflicted file in the dialog (for focus management) */
   readonly isFirstConflictedFile?: boolean
+  /** Callback to resolve a file with Copilot (POC) */
+  readonly onCopilotResolve?: (path: string) => void
 }> = props => {
   if (
     isConflictWithMarkers(props.status) &&
@@ -100,6 +102,7 @@ export const renderUnmergedFile: React.FunctionComponent<{
       setIsFileResolutionOptionsMenuOpen:
         props.setIsFileResolutionOptionsMenuOpen,
       isFirstConflictedFile: props.isFirstConflictedFile,
+      onCopilotResolve: props.onCopilotResolve,
     })
   }
   if (
@@ -114,6 +117,7 @@ export const renderUnmergedFile: React.FunctionComponent<{
       ourBranch: props.ourBranch,
       theirBranch: props.theirBranch,
       isFirstConflictedFile: props.isFirstConflictedFile,
+      onCopilotResolve: props.onCopilotResolve,
     })
   }
   return renderResolvedFile({
@@ -180,6 +184,7 @@ const renderManualConflictedFile: React.FunctionComponent<{
   readonly theirBranch?: string
   readonly dispatcher: Dispatcher
   readonly isFirstConflictedFile?: boolean
+  readonly onCopilotResolve?: (path: string) => void
 }> = props => {
   const onDropdownClick = makeManualConflictDropdownClickHandler(
     props.path,
@@ -187,7 +192,8 @@ const renderManualConflictedFile: React.FunctionComponent<{
     props.repository,
     props.dispatcher,
     props.ourBranch,
-    props.theirBranch
+    props.theirBranch,
+    props.onCopilotResolve
   )
 
   const onDropdownKeyDown = makeManualConflictDropdownOnKeyDownHandler(
@@ -196,7 +202,8 @@ const renderManualConflictedFile: React.FunctionComponent<{
     props.repository,
     props.dispatcher,
     props.ourBranch,
-    props.theirBranch
+    props.theirBranch,
+    props.onCopilotResolve
   )
 
   const { ourBranch, theirBranch } = props
@@ -268,6 +275,7 @@ const renderConflictedFileWithConflictMarkers: React.FunctionComponent<{
     isFileResolutionOptionsMenuOpen: boolean
   ) => void
   readonly isFirstConflictedFile?: boolean
+  readonly onCopilotResolve?: (path: string) => void
 }> = props => {
   const humanReadableConflicts = calculateConflicts(
     props.status.conflictMarkerCount
@@ -286,7 +294,8 @@ const renderConflictedFileWithConflictMarkers: React.FunctionComponent<{
     props.status,
     props.ourBranch,
     props.theirBranch,
-    props.setIsFileResolutionOptionsMenuOpen
+    props.setIsFileResolutionOptionsMenuOpen,
+    props.onCopilotResolve
   )
 
   const onDropdownKeyDown = makeManualConflictDropdownOnKeyDownHandler(
@@ -340,7 +349,8 @@ const makeManualConflictDropdownClickHandler = (
   repository: Repository,
   dispatcher: Dispatcher,
   ourBranch?: string,
-  theirBranch?: string
+  theirBranch?: string,
+  onCopilotResolve?: (path: string) => void
 ) => {
   return () => {
     showContextualMenu(
@@ -350,7 +360,8 @@ const makeManualConflictDropdownClickHandler = (
         dispatcher,
         status,
         ourBranch,
-        theirBranch
+        theirBranch,
+        onCopilotResolve
       )
     )
   }
@@ -363,7 +374,8 @@ const makeManualConflictDropdownOnKeyDownHandler = (
   repository: Repository,
   dispatcher: Dispatcher,
   ourBranch?: string,
-  theirBranch?: string
+  theirBranch?: string,
+  onCopilotResolve?: (path: string) => void
 ) => {
   return (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (event.key === 'ArrowDown') {
@@ -373,7 +385,8 @@ const makeManualConflictDropdownOnKeyDownHandler = (
         repository,
         dispatcher,
         ourBranch,
-        theirBranch
+        theirBranch,
+        onCopilotResolve
       )()
     }
   }
@@ -403,7 +416,8 @@ const makeMarkerConflictDropdownClickHandler = (
   theirBranch: string | undefined,
   setIsFileResolutionOptionsMenuOpen: (
     isFileResolutionOptionsMenuOpen: boolean
-  ) => void
+  ) => void,
+  onCopilotResolve?: (path: string) => void
 ) => {
   return () => {
     const absoluteFilePath = join(repository.path, relativeFilePath)
@@ -425,7 +439,8 @@ const makeMarkerConflictDropdownClickHandler = (
         dispatcher,
         status,
         ourBranch,
-        theirBranch
+        theirBranch,
+        onCopilotResolve
       ),
     ]
     setIsFileResolutionOptionsMenuOpen(true)
@@ -441,9 +456,10 @@ function getManualResolutionMenuItems(
   dispatcher: Dispatcher,
   status: ConflictedFileStatus,
   ourBranch?: string,
-  theirBranch?: string
+  theirBranch?: string,
+  onCopilotResolve?: (path: string) => void
 ): ReadonlyArray<IMenuItem> {
-  return [
+  const items: IMenuItem[] = [
     {
       label: getLabelForManualResolutionOption(status.entry.us, ourBranch),
       action: () =>
@@ -464,6 +480,18 @@ function getManualResolutionMenuItems(
         ),
     },
   ]
+
+  if (onCopilotResolve !== undefined) {
+    items.push(
+      { type: 'separator' },
+      {
+        label: 'Resolve with Copilot',
+        action: () => onCopilotResolve(relativeFilePath),
+      }
+    )
+  }
+
+  return items
 }
 
 function resolvedFileStatusString(

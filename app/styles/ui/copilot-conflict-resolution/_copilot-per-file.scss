@@ -1,0 +1,30 @@
+// Styles for Copilot-powered conflict resolution (POC)
+
+dialog#conflicts-dialog {
+  .copilot-resolve-all-container {
+    margin-bottom: var(--spacing);
+
+    .copilot-resolve-all-button {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-half);
+      width: 100%;
+      justify-content: center;
+
+      .octicon {
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  li.copilot-resolved-file {
+    .copilot-icon {
+      color: var(--color-new);
+    }
+
+    .copilot-resolution-summary {
+      color: var(--color-new);
+      font-style: italic;
+    }
+  }
+}

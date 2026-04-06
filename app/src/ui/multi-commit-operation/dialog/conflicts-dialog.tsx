@@ -21,6 +21,17 @@ import {
 import { ManualConflictResolution } from '../../../models/manual-conflict-resolution'
 import { OkCancelButtonGroup } from '../../dialog/ok-cancel-button-group'
 import { DialogSuccess } from '../../dialog/success'
+import { Octicon } from '../../octicons'
+import * as octicons from '../../octicons/octicons.generated'
+import { Button } from '../../lib/button'
+import { CopilotFileResolutionState } from '../../copilot-conflict-resolution/copilot-file-resolution-state'
+
+/** Mock summaries for Copilot resolution (POC) */
+const copilotMockSummaries: ReadonlyArray<string> = [
+  'Combined changes from both branches',
+  'Kept incoming changes with local modifications preserved',
+  'Merged import statements and updated function signatures',
+]
 
 interface IConflictsDialogProps {
   readonly dispatcher: Dispatcher
@@ -47,6 +58,10 @@ interface IConflictsDialogState {
   readonly isCommitting: boolean
   readonly isAborting: boolean
   readonly isFileResolutionOptionsMenuOpen: boolean
+  /** Tracks files resolved by Copilot: path → mock summary (POC) */
+  readonly copilotResolutions: ReadonlyMap<string, string>
+  /** Counter to cycle through mock summaries */
+  readonly copilotSummaryIndex: number
 }
 
 /**
@@ -67,6 +82,8 @@ export class ConflictsDialog extends React.Component<
       isCommitting: false,
       isAborting: false,
       isFileResolutionOptionsMenuOpen: false,
+      copilotResolutions: new Map<string, string>(),
+      copilotSummaryIndex: 0,
     }
   }
 
@@ -128,6 +145,51 @@ export class ConflictsDialog extends React.Component<
     this.setState({ isFileResolutionOptionsMenuOpen })
   }
 
+  /** Resolves a single file with Copilot (POC mock) */
+  private onCopilotResolve = (path: string) => {
+    const summary =
+      copilotMockSummaries[
+        this.state.copilotSummaryIndex % copilotMockSummaries.length
+      ]
+    const updated = new Map(this.state.copilotResolutions)
+    updated.set(path, summary)
+    this.setState({
+      copilotResolutions: updated,
+      copilotSummaryIndex: this.state.copilotSummaryIndex + 1,
+    })
+  }
+
+  /** Undoes Copilot resolution for a single file */
+  private onUndoCopilotResolve = (path: string) => {
+    const updated = new Map(this.state.copilotResolutions)
+    updated.delete(path)
+    this.setState({ copilotResolutions: updated })
+  }
+
+  /** Resolves all currently conflicted files with Copilot (POC mock) */
+  private onResolveAllWithCopilot = () => {
+    const { workingDirectory, manualResolutions } = this.props
+    const conflictedFiles = getConflictedFiles(
+      workingDirectory,
+      manualResolutions
+    )
+    const updated = new Map(this.state.copilotResolutions)
+    let idx = this.state.copilotSummaryIndex
+
+    for (const file of conflictedFiles) {
+      if (!updated.has(file.path)) {
+        const summary = copilotMockSummaries[idx % copilotMockSummaries.length]
+        updated.set(file.path, summary)
+        idx++
+      }
+    }
+
+    this.setState({
+      copilotResolutions: updated,
+      copilotSummaryIndex: idx,
+    })
+  }
+
   /**
    *  Renders the list of conflicts in the dialog
    */
@@ -139,6 +201,17 @@ export class ConflictsDialog extends React.Component<
       <ul className="unmerged-file-statuses">
         {files.map(f => {
           if (isConflictedFile(f.status)) {
+            const copilotSummary = this.state.copilotResolutions.get(f.path)
+            if (copilotSummary !== undefined) {
+              return (
+                <CopilotFileResolutionState
+                  key={f.path}
+                  path={f.path}
+                  summary={copilotSummary}
+                  onUndo={this.onUndoCopilotResolve}
+                />
+              )
+            }
             const isFirst = isFirstUnmergedFile
             isFirstUnmergedFile = false
             return renderUnmergedFile({
@@ -156,6 +229,7 @@ export class ConflictsDialog extends React.Component<
               setIsFileResolutionOptionsMenuOpen:
                 this.setIsFileResolutionOptionsMenuOpen,
               isFirstConflictedFile: isFirst,
+              onCopilotResolve: this.onCopilotResolve,
             })
           }
           return null
@@ -172,13 +246,41 @@ export class ConflictsDialog extends React.Component<
       return renderAllResolved()
     }
 
+    const unresolvedByCopilotCount =
+      this.getUnresolvedByCopilotCount(unmergedFiles)
+
     return (
       <>
         {renderUnmergedFilesSummary(conflictedFilesCount)}
+        {unresolvedByCopilotCount > 0 && (
+          <div className="copilot-resolve-all-container">
+            <Button
+              className="copilot-resolve-all-button"
+              onClick={this.onResolveAllWithCopilot}
+            >
+              <Octicon symbol={octicons.copilot} />
+              Resolve All with Copilot
+            </Button>
+          </div>
+        )}
         {this.renderUnmergedFiles(unmergedFiles)}
         {renderShellLink(this.openThisRepositoryInShell)}
       </>
     )
+  }
+
+  /**
+   * Returns the count of conflicted files not yet resolved by Copilot.
+   */
+  private getUnresolvedByCopilotCount(
+    unmergedFiles: ReadonlyArray<WorkingDirectoryFileChange>
+  ): number {
+    return unmergedFiles.filter(
+      f =>
+        isConflictedFile(f.status) &&
+        !this.state.copilotResolutions.has(f.path) &&
+        !this.props.manualResolutions.has(f.path)
+    ).length
   }
 
   /**
