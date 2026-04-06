@@ -21,6 +21,10 @@ import {
 import { ManualConflictResolution } from '../../../models/manual-conflict-resolution'
 import { OkCancelButtonGroup } from '../../dialog/ok-cancel-button-group'
 import { DialogSuccess } from '../../dialog/success'
+import { Button } from '../../lib/button'
+import { Octicon } from '../../octicons'
+import * as octicons from '../../octicons/octicons.generated'
+import { CopilotResolutionSummaryDialog } from '../../copilot-conflict-resolution'
 
 interface IConflictsDialogProps {
   readonly dispatcher: Dispatcher
@@ -47,6 +51,7 @@ interface IConflictsDialogState {
   readonly isCommitting: boolean
   readonly isAborting: boolean
   readonly isFileResolutionOptionsMenuOpen: boolean
+  readonly showCopilotResolutionSummary: boolean
 }
 
 /**
@@ -67,6 +72,7 @@ export class ConflictsDialog extends React.Component<
       isCommitting: false,
       isAborting: false,
       isFileResolutionOptionsMenuOpen: false,
+      showCopilotResolutionSummary: false,
     }
   }
 
@@ -126,6 +132,18 @@ export class ConflictsDialog extends React.Component<
     isFileResolutionOptionsMenuOpen: boolean
   ) => {
     this.setState({ isFileResolutionOptionsMenuOpen })
+  }
+
+  private onResolveWithCopilot = () => {
+    this.setState({ showCopilotResolutionSummary: true })
+  }
+
+  private onDismissCopilotResolution = () => {
+    this.setState({ showCopilotResolutionSummary: false })
+  }
+
+  private onAcceptAllResolutions = () => {
+    this.setState({ showCopilotResolutionSummary: false })
   }
 
   /**
@@ -241,30 +259,49 @@ export class ConflictsDialog extends React.Component<
         : undefined
 
     return (
-      <Dialog
-        id="conflicts-dialog"
-        dismissDisabled={this.state.isCommitting}
-        onDismissed={this.props.onDismissed}
-        onSubmit={this.onSubmit}
-        title={headerTitle}
-        loading={this.state.isCommitting}
-        disabled={this.state.isCommitting}
-      >
-        {this.renderBanner(conflictedFiles.length)}
-        <DialogContent>
-          {this.renderContent(unmergedFiles, conflictedFiles.length)}
-        </DialogContent>
-        <DialogFooter>
-          <OkCancelButtonGroup
-            okButtonText={submitButton}
-            okButtonDisabled={conflictedFiles.length > 0}
-            okButtonTitle={tooltipString}
-            cancelButtonText={abortButton}
-            onCancelButtonClick={this.onAbort}
-            cancelButtonDisabled={this.state.isAborting}
+      <>
+        <Dialog
+          id="conflicts-dialog"
+          dismissDisabled={this.state.isCommitting}
+          onDismissed={this.props.onDismissed}
+          onSubmit={this.onSubmit}
+          title={headerTitle}
+          loading={this.state.isCommitting}
+          disabled={this.state.isCommitting}
+        >
+          {this.renderBanner(conflictedFiles.length)}
+          <DialogContent>
+            {this.renderContent(unmergedFiles, conflictedFiles.length)}
+          </DialogContent>
+          <DialogFooter>
+            <div className="conflicts-footer-with-copilot">
+              <Button
+                className="copilot-resolve-all-button"
+                onClick={this.onResolveWithCopilot}
+                disabled={conflictedFiles.length === 0}
+                type="button"
+              >
+                <Octicon symbol={octicons.copilot} />
+                {' Resolve with Copilot'}
+              </Button>
+              <OkCancelButtonGroup
+                okButtonText={submitButton}
+                okButtonDisabled={conflictedFiles.length > 0}
+                okButtonTitle={tooltipString}
+                cancelButtonText={abortButton}
+                onCancelButtonClick={this.onAbort}
+                cancelButtonDisabled={this.state.isAborting}
+              />
+            </div>
+          </DialogFooter>
+        </Dialog>
+        {this.state.showCopilotResolutionSummary && (
+          <CopilotResolutionSummaryDialog
+            onDismissed={this.onDismissCopilotResolution}
+            onAcceptAll={this.onAcceptAllResolutions}
           />
-        </DialogFooter>
-      </Dialog>
+        )}
+      </>
     )
   }
 }
