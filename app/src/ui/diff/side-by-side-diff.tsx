@@ -72,6 +72,8 @@ import { findDOMNode } from 'react-dom'
 import escapeRegExp from 'lodash/escapeRegExp'
 import ReactDOM from 'react-dom'
 import { AriaLiveContainer } from '../accessibility/aria-live-container'
+import { DiffConflictBanner } from './diff-conflict-banner'
+import { IConflictRegion } from './conflict-resolution-widget'
 
 const DefaultRowHeight = 20
 
@@ -150,6 +152,9 @@ interface ISideBySideDiffProps {
 
   /** Called when the user changes the hide whitespace in diffs setting. */
   readonly onHideWhitespaceInDiffChanged: (checked: boolean) => void
+
+  /** Conflict regions detected in this file (POC: for Copilot resolution banner) */
+  readonly conflictRegions?: ReadonlyArray<IConflictRegion>
 }
 
 interface ISideBySideDiffState {
@@ -614,6 +619,7 @@ export class SideBySideDiff extends React.Component<
         onKeyDown={this.onKeyDown}
       >
         <DiffContentsWarning diff={diff} />
+        {this.renderConflictBanner()}
         {isSearching && (
           <DiffSearchInput
             onSearch={this.onSearch}
@@ -979,6 +985,16 @@ export class SideBySideDiff extends React.Component<
 
   private clearListRowsHeightCache = () => {
     listRowsHeightCache.clearAll()
+  }
+
+  /** Renders the Copilot conflict resolution banner if conflicts are present. */
+  private renderConflictBanner(): JSX.Element | null {
+    const conflicts = this.props.conflictRegions
+    if (conflicts === undefined || conflicts.length === 0) {
+      return null
+    }
+
+    return <DiffConflictBanner conflicts={conflicts} />
   }
 
   private async initDiffSyntaxMode() {

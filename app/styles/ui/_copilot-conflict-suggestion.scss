@@ -1,0 +1,208 @@
+// Styles for the Copilot conflict resolution banner and widgets
+// in the diff viewer (POC).
+
+.diff-conflict-banner {
+  border-bottom: var(--base-border);
+  background-color: var(--box-alt-background-color);
+  max-height: 50vh;
+  overflow-y: auto;
+
+  .conflict-banner-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+    padding: var(--spacing) var(--spacing-double);
+    border-bottom: var(--base-border);
+
+    .banner-copilot-icon {
+      color: var(--text-secondary-color);
+      flex-shrink: 0;
+    }
+
+    .banner-title {
+      font-weight: var(--font-weight-semibold);
+      flex-grow: 1;
+    }
+
+    .resolve-all-button {
+      flex-shrink: 0;
+    }
+  }
+
+  .conflict-banner-list {
+    .conflict-banner-item {
+      border-bottom: var(--base-border);
+
+      &.resolved {
+        opacity: 0.7;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    .conflict-banner-item-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-half);
+      padding: var(--spacing-half) var(--spacing-double);
+      width: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: var(--font-size);
+      color: var(--text-color);
+      text-align: left;
+
+      &:hover {
+        background-color: var(--list-item-hover-background-color);
+      }
+
+      .resolved-icon {
+        color: var(--color-new);
+      }
+
+      .chevron-icon {
+        color: var(--text-secondary-color);
+      }
+
+      .conflict-branches {
+        margin-left: auto;
+        color: var(--text-secondary-color);
+        font-size: var(--font-size-sm);
+      }
+    }
+  }
+}
+
+.conflict-resolution-widget {
+  padding: var(--spacing) var(--spacing-double);
+  background-color: var(--background-color);
+
+  &.accepted {
+    padding: var(--spacing-half) var(--spacing-double);
+
+    .widget-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-half);
+      color: var(--color-new);
+    }
+
+    .accepted-icon {
+      color: var(--color-new);
+    }
+  }
+
+  .widget-header {
+    margin-bottom: var(--spacing-half);
+
+    .conflict-label {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary-color);
+    }
+  }
+
+  .widget-tabs {
+    display: flex;
+    gap: 1px;
+    margin-bottom: var(--spacing);
+    background-color: var(--box-border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+
+    .widget-tab {
+      flex: 1;
+      padding: var(--spacing-half) var(--spacing);
+      border: none;
+      background-color: var(--box-alt-background-color);
+      color: var(--text-secondary-color);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-third);
+
+      &:hover {
+        background-color: var(--list-item-hover-background-color);
+      }
+
+      &.active {
+        background-color: var(--background-color);
+        color: var(--text-color);
+      }
+
+      &.copilot-tab.active {
+        color: var(--color-new);
+      }
+    }
+  }
+
+  .tab-content {
+    border: var(--base-border);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+
+    .tab-content-label {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-half);
+      padding: var(--spacing-half) var(--spacing);
+      background-color: var(--box-alt-background-color);
+      border-bottom: var(--base-border);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary-color);
+    }
+
+    &.copilot-tab-content .tab-content-label {
+      color: var(--color-new);
+    }
+  }
+
+  .conflict-code-block {
+    margin: 0;
+    padding: var(--spacing-half) var(--spacing);
+    background-color: var(--diff-add-background-color);
+    overflow-x: auto;
+    font-family: var(--font-family-monospace);
+    font-size: var(--font-size-sm);
+
+    code {
+      display: block;
+    }
+
+    .conflict-code-line {
+      line-height: 20px;
+      white-space: pre;
+    }
+  }
+
+  .copilot-reasoning {
+    display: flex;
+    gap: var(--spacing-half);
+    padding: var(--spacing-half) var(--spacing);
+    background-color: var(--box-alt-background-color);
+    border-top: var(--base-border);
+    font-size: var(--font-size-sm);
+
+    .reasoning-icon {
+      flex-shrink: 0;
+    }
+
+    .reasoning-text {
+      color: var(--text-secondary-color);
+      line-height: 1.4;
+    }
+  }
+
+  .widget-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--spacing);
+    gap: var(--spacing-half);
+  }
+}

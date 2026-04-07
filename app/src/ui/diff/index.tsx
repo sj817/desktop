@@ -10,6 +10,7 @@ import {
   AppFileStatusKind,
   isManualConflict,
   isConflictedFileStatus,
+  isConflictWithMarkers,
 } from '../../models/status'
 import {
   DiffSelection,
@@ -33,6 +34,8 @@ import { IFileContents } from './syntax-highlighting'
 import { SubmoduleDiff } from './submodule-diff'
 import { Octicon } from '../octicons'
 import * as OcticonSymbol from '../octicons/octicons.generated'
+import { extractConflictRegions } from './diff-conflict-banner'
+import { IConflictRegion } from './conflict-resolution-widget'
 
 // image used when no diff is displayed
 const NoDiffImage = encodePathAsUrl(__dirname, 'static/ufo-alert.svg')
@@ -284,6 +287,8 @@ export class Diff extends React.Component<IDiffProps, IDiffState> {
   }
 
   private renderTextDiff(diff: ITextDiff) {
+    const conflicts = this.getConflictRegions(diff)
+
     return (
       <SideBySideDiff
         file={this.props.file}
@@ -298,8 +303,25 @@ export class Diff extends React.Component<IDiffProps, IDiffState> {
         }
         onHideWhitespaceInDiffChanged={this.props.onHideWhitespaceInDiffChanged}
         showDiffCheckMarks={this.props.showDiffCheckMarks}
+        conflictRegions={conflicts}
       />
     )
+  }
+
+  /**
+   * Extracts conflict regions from the diff if the file is in a conflicted
+   * state with markers. Returns an empty array for non-conflicted files.
+   */
+  private getConflictRegions(diff: ITextDiff): ReadonlyArray<IConflictRegion> {
+    const { file } = this.props
+    if (
+      !isConflictedFileStatus(file.status) ||
+      !isConflictWithMarkers(file.status)
+    ) {
+      return []
+    }
+
+    return extractConflictRegions(diff.hunks)
   }
 
   private showLargeDiff = () => {
