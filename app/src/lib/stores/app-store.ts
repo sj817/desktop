@@ -132,8 +132,8 @@ import {
   IConstrainedValue,
   ICompareState,
   CommitOptions,
-  ICopilotModel,
 } from '../app-state'
+import type { ModelInfo } from '@github/copilot-sdk'
 import {
   findEditorOrDefault,
   getAvailableEditors,
@@ -636,7 +636,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
   private showChangesFilter: boolean = false
 
   private selectedCopilotModel: string | null = null
-  private copilotModels: ReadonlyArray<ICopilotModel> = []
+  private copilotModels: ReadonlyArray<ModelInfo> = []
 
   public constructor(
     private readonly gitHubUserStore: GitHubUserStore,
@@ -5676,11 +5676,17 @@ export class AppStore extends TypedBaseStore<IAppState> {
       }
 
       try {
+        const modelInfo =
+          this.selectedCopilotModel !== null
+            ? this.copilotModels.find(
+                m => m.id === this.selectedCopilotModel
+              ) ?? null
+            : null
         const response = enableCopilotSdkCommitMessageGeneration(account)
           ? await this.copilotStore.generateCommitMessage(
               diff,
               repository.path,
-              this.selectedCopilotModel
+              modelInfo
             )
           : await API.fromAccount(account).getDiffChangesCommitMessage(diff)
 
@@ -8594,7 +8600,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
   /** This shouldn't be called directly. See 'Dispatcher'. */
   public async _fetchCopilotModels(): Promise<void> {
     const models = await this.copilotStore.listModels()
-    this.copilotModels = models.map(m => ({ id: m.id, name: m.name }))
+    this.copilotModels = [...models]
     this.emitUpdate()
   }
 

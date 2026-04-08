@@ -42,8 +42,8 @@ import { Prompts } from './prompts'
 import { Repository } from '../../models/repository'
 import { Notifications } from './notifications'
 import { Accessibility } from './accessibility'
+import type { ModelInfo } from '@github/copilot-sdk'
 import { CopilotPreferences } from './copilot'
-import { ICopilotModel } from '../../lib/app-state'
 import {
   ICustomIntegration,
   TargetPathArgument,
@@ -94,7 +94,7 @@ interface IPreferencesProps {
   readonly underlineLinks: boolean
   readonly showDiffCheckMarks: boolean
   readonly selectedCopilotModel: string | null
-  readonly copilotModels: ReadonlyArray<ICopilotModel>
+  readonly copilotModels: ReadonlyArray<ModelInfo>
   readonly copilotAvailable: boolean
 }
 

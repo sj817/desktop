@@ -1,3 +1,4 @@
+import type { ModelInfo } from '@github/copilot-sdk'
 import { Account } from '../models/account'
 import { CommitIdentity } from '../models/commit-identity'
 import { IDiff, ImageDiffType } from '../models/diff'
@@ -55,12 +56,6 @@ import { IAPIRepoRuleset } from './api'
 import { ICustomIntegration } from './custom-integration'
 import { Emoji } from './emoji'
 import { IUpdateState } from '../ui/lib/update-store'
-
-/** Lightweight representation of a Copilot model for the UI. */
-export interface ICopilotModel {
-  readonly id: string
-  readonly name: string
-}
 
 export enum SelectionType {
   Repository,
@@ -402,7 +397,7 @@ export interface IAppState {
   readonly selectedCopilotModel: string | null
 
   /** The list of available Copilot models fetched from the SDK. */
-  readonly copilotModels: ReadonlyArray<ICopilotModel>
+  readonly copilotModels: ReadonlyArray<ModelInfo>
 
   /** Whether Copilot is available (i.e. a GitHub.com account is signed in). */
   readonly copilotAvailable: boolean

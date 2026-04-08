@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { DialogContent } from '../dialog'
 import { Select } from '../lib/select'
-import { ICopilotModel } from '../../lib/app-state'
+import type { ModelInfo } from '@github/copilot-sdk'
 import { DefaultCopilotModel } from '../../lib/stores/copilot-store'
 
 interface ICopilotPreferencesProps {
   readonly selectedCopilotModel: string | null
-  readonly copilotModels: ReadonlyArray<ICopilotModel>
+  readonly copilotModels: ReadonlyArray<ModelInfo>
   readonly copilotAvailable: boolean
   readonly onSelectedCopilotModelChanged: (model: string | null) => void
 }
