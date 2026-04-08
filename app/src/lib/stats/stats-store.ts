@@ -254,8 +254,6 @@ const DefaultDailyMeasures: IDailyMeasures = {
   generateCommitMessageCount: 0,
   generateCommitMessageUsedVerbatimCount: 0,
   copilotConflictResolutionInvokedCount: 0,
-  copilotConflictResolutionAcceptedCount: 0,
-  copilotConflictResolutionRejectedCount: 0,
   copilotConflictResolutionManualFallbackCount: 0,
   pushBlockedBySecretScanningCount: 0,
   secretsDetectedOnPushCount: 0,
@@ -1155,14 +1153,6 @@ export class StatsStore implements IStatsStore {
   /** Record that the user invoked Copilot conflict resolution */
   public recordCopilotConflictResolutionInvoked = () =>
     this.increment('copilotConflictResolutionInvokedCount')
-
-  /** Record that the user accepted all Copilot conflict resolutions */
-  public recordCopilotConflictResolutionAccepted = () =>
-    this.increment('copilotConflictResolutionAcceptedCount')
-
-  /** Record that the user rejected all Copilot conflict resolutions */
-  public recordCopilotConflictResolutionRejected = () =>
-    this.increment('copilotConflictResolutionRejectedCount')
 
   /** Record that the user fell back to manual resolution after invoking Copilot */
   public recordCopilotConflictResolutionManualFallback = () =>

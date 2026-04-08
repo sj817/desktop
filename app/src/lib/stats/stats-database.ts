@@ -640,12 +640,6 @@ export interface IDailyMeasures {
   /** Number of times user invoked Copilot conflict resolution */
   readonly copilotConflictResolutionInvokedCount: number
 
-  /** Number of times user accepted all Copilot conflict resolutions */
-  readonly copilotConflictResolutionAcceptedCount: number
-
-  /** Number of times user rejected all Copilot conflict resolutions */
-  readonly copilotConflictResolutionRejectedCount: number
-
   /** Number of times user fell back to manual resolution after invoking Copilot */
   readonly copilotConflictResolutionManualFallbackCount: number
 
