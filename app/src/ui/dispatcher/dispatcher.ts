@@ -52,6 +52,7 @@ import { ILaunchStats, StatsStore } from '../../lib/stats'
 import { AppStore } from '../../lib/stores/app-store'
 import { RepositoryStateCache } from '../../lib/stores/repository-state-cache'
 import { getTipSha } from '../../lib/tip'
+import { IFileResolution } from '../../lib/copilot-conflict-resolution'
 
 import { Account } from '../../models/account'
 import { AppMenu, ExecutableMenuItem } from '../../models/app-menu'
@@ -1102,6 +1103,41 @@ export class Dispatcher {
     filesSelected: ReadonlyArray<WorkingDirectoryFileChange>
   ) {
     return this.appStore._generateCommitMessage(repository, filesSelected)
+  }
+
+  /**
+   * Initiate Copilot-powered conflict resolution. Shows the loading popup
+   * and invokes the backend resolution engine.
+   *
+   * This shouldn't be called directly. See `Dispatcher`.
+   */
+  public startCopilotConflictResolution(repository: Repository): Promise<void> {
+    return this.appStore._startCopilotConflictResolution(repository)
+  }
+
+  /**
+   * Apply the accepted Copilot conflict resolutions by writing the resolved
+   * content to disk and refreshing repository status.
+   *
+   * This shouldn't be called directly. See `Dispatcher`.
+   */
+  public async applyCopilotConflictResolutions(
+    repository: Repository,
+    resolutions: ReadonlyArray<IFileResolution>
+  ): Promise<void> {
+    return this.appStore._applyCopilotConflictResolutions(
+      repository,
+      resolutions
+    )
+  }
+
+  /**
+   * Dismiss the Copilot conflict resolution popup.
+   *
+   * This shouldn't be called directly. See `Dispatcher`.
+   */
+  public dismissCopilotConflictResolution(): void {
+    this.appStore._closePopup(PopupType.CopilotConflictResolution)
   }
 
   /** Remove the given account from the app. */

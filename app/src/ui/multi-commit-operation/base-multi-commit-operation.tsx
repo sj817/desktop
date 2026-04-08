@@ -62,6 +62,15 @@ export abstract class BaseMultiCommitOperation extends React.Component<IMultiCom
   protected abstract renderChooseBranch: () => JSX.Element | null
   protected abstract renderCreateBranch: () => JSX.Element | null
 
+  /**
+   * Override in subclasses that support Copilot conflict resolution (Merge).
+   * Returns a callback to initiate Copilot resolution, or undefined if not
+   * supported for this operation type.
+   */
+  protected getOnResolveWithCopilot(): (() => void) | undefined {
+    return undefined
+  }
+
   protected onFlowEnded = () => {
     this.props.dispatcher.closePopup(PopupType.MultiCommitOperation)
     this.props.dispatcher.endMultiCommitOperation(this.props.repository)
@@ -214,6 +223,7 @@ export abstract class BaseMultiCommitOperation extends React.Component<IMultiCom
             openFileInExternalEditor={openFileInExternalEditor}
             openRepositoryInShell={openRepositoryInShell}
             someConflictsHaveBeenResolved={this.setConflictsHaveBeenResolved}
+            onResolveWithCopilot={this.getOnResolveWithCopilot()}
           />
         )
       }

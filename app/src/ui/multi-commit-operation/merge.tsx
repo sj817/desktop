@@ -11,6 +11,14 @@ import { BaseMultiCommitOperation } from './base-multi-commit-operation'
 import { MergeChooseBranchDialog } from './choose-branch/merge-choose-branch-dialog'
 
 export abstract class Merge extends BaseMultiCommitOperation {
+  protected override getOnResolveWithCopilot(): (() => void) | undefined {
+    return () => {
+      this.props.dispatcher.startCopilotConflictResolution(
+        this.props.repository
+      )
+    }
+  }
+
   protected onContinueAfterConflicts = async (): Promise<void> => {
     const {
       repository,

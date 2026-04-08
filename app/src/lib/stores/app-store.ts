@@ -140,6 +140,8 @@ import {
   launchExternalEditor,
 } from '../editors'
 import { assertNever, fatalError, forceUnwrap } from '../fatal-error'
+import { IFileResolution } from '../copilot-conflict-resolution'
+import { applyCopilotResolutionsToWorkingDirectory } from '../copilot-conflict-resolution-apply'
 
 import { formatCommitMessage } from '../format-commit-message'
 import {
@@ -257,6 +259,7 @@ import { ManualConflictResolution } from '../../models/manual-conflict-resolutio
 import { BranchPruner } from './helpers/branch-pruner'
 import {
   enableCopilotSdkCommitMessageGeneration,
+  enableCopilotConflictResolution,
   enableCustomIntegration,
 } from '../feature-flag'
 import { Banner, BannerType } from '../../models/banner'
@@ -5687,6 +5690,90 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
       return true
     })
+  }
+
+  /**
+   * Start Copilot-powered conflict resolution for the given repository.
+   *
+   * Shows the loading popup, then (when the backend resolution engine from
+   * PR #21921 is available) calls the resolution API. For now, this creates
+   * the popup infrastructure so the UI can be tested end-to-end once the
+   * backend lands.
+   *
+   * This shouldn't be called directly. See `Dispatcher`.
+   */
+  public async _startCopilotConflictResolution(
+    repository: Repository
+  ): Promise<void> {
+    if (!enableCopilotConflictResolution()) {
+      return
+    }
+
+    // Show loading popup
+    await this._showPopup({
+      type: PopupType.CopilotConflictResolution,
+      repository,
+      loading: true,
+      response: null,
+      error: null,
+    })
+
+    // TODO: Once PR #21921 (CopilotStore.resolveConflicts / AppStore
+    // ._resolveConflictsWithCopilot) merges, call the backend here:
+    //
+    //   try {
+    //     const response = await this._resolveConflictsWithCopilot(repository)
+    //     this.popupManager.updatePopup({
+    //       type: PopupType.CopilotConflictResolution,
+    //       repository,
+    //       loading: false,
+    //       response,
+    //       error: null,
+    //     })
+    //   } catch (e) {
+    //     const message = e instanceof Error ? e.message : String(e)
+    //     this.popupManager.updatePopup({
+    //       type: PopupType.CopilotConflictResolution,
+    //       repository,
+    //       loading: false,
+    //       response: null,
+    //       error: message,
+    //     })
+    //   }
+    //   this.emitUpdate()
+  }
+
+  /**
+   * Apply accepted Copilot conflict resolutions by writing the resolved
+   * content to the working directory and refreshing the repository.
+   *
+   * This validates all file paths before writing to prevent path-traversal
+   * attacks, then writes the resolved content, and refreshes the repo status
+   * so the conflicts dialog reflects the updated state.
+   *
+   * This shouldn't be called directly. See `Dispatcher`.
+   */
+  public async _applyCopilotConflictResolutions(
+    repository: Repository,
+    resolutions: ReadonlyArray<IFileResolution>
+  ): Promise<void> {
+    const written = await applyCopilotResolutionsToWorkingDirectory(
+      repository.path,
+      resolutions
+    )
+
+    log.info(
+      `[AppStore] Applied ${written} Copilot conflict resolution(s) to ${repository.name}`
+    )
+
+    // TODO: Once PR #21919 (telemetry) merges, record metrics:
+    //   this.statsStore.increment('copilotConflictResolutionAcceptedCount')
+
+    // Close the resolution popup
+    this._closePopup(PopupType.CopilotConflictResolution)
+
+    // Refresh repo so the conflicts dialog picks up resolved files
+    await this._refreshRepository(repository)
   }
 
   /**

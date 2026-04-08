@@ -1,0 +1,239 @@
+// Styles for Copilot conflict resolution dialogs
+
+#copilot-conflict-resolution-dialog {
+  .dialog-content {
+    max-height: 500px;
+    min-width: 550px;
+  }
+}
+
+// Loading dialog
+.copilot-conflict-loading-content {
+  text-align: center;
+  padding: var(--spacing-double) 0;
+
+  p {
+    margin: var(--spacing) 0;
+  }
+
+  .copilot-conflict-loading-description {
+    color: var(--text-secondary-color);
+    font-size: var(--font-size-sm);
+  }
+}
+
+.copilot-error-icon {
+  color: var(--error-color);
+}
+
+// Resolution review dialog
+.copilot-conflict-resolution {
+  .copilot-icon {
+    vertical-align: middle;
+    margin-right: var(--spacing-half);
+  }
+
+  .copilot-conflict-apply-error {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+    padding: var(--spacing);
+    margin-bottom: var(--spacing);
+    background-color: var(--error-color);
+    color: var(--box-background-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+  }
+
+  .copilot-conflict-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing);
+    padding-bottom: var(--spacing);
+    margin-bottom: var(--spacing);
+    border-bottom: var(--base-border);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary-color);
+
+    .status-accepted {
+      color: var(--color-new);
+    }
+
+    .status-rejected {
+      color: var(--error-color);
+    }
+
+    .status-pending {
+      color: var(--text-secondary-color);
+    }
+  }
+
+  .copilot-conflict-filter {
+    margin-bottom: var(--spacing);
+  }
+
+  .copilot-conflict-file-list {
+    overflow-y: auto;
+    max-height: 380px;
+  }
+
+  .copilot-conflict-no-results {
+    text-align: center;
+    padding: var(--spacing-double);
+    color: var(--text-secondary-color);
+    font-style: italic;
+  }
+
+  // File item card
+  .copilot-conflict-file-item {
+    padding: var(--spacing);
+    border: var(--base-border);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-half);
+    transition: opacity 0.15s ease-in-out;
+
+    &.file-status-accepted {
+      opacity: 0.7;
+      border-color: var(--color-new);
+      background-color: var(--diff-add-background-color);
+    }
+
+    &.file-status-rejected {
+      opacity: 0.5;
+      border-color: var(--error-color);
+      background-color: var(--diff-delete-background-color);
+      text-decoration: line-through;
+    }
+  }
+
+  .copilot-conflict-file-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing);
+  }
+
+  .copilot-conflict-file-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .copilot-conflict-expand-toggle {
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-secondary-color);
+    flex-shrink: 0;
+
+    &:hover {
+      color: var(--text-color);
+    }
+  }
+
+  .copilot-conflict-file-path {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .copilot-conflict-file-name {
+    font-weight: var(--font-weight-semibold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .copilot-conflict-dir-path {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // Confidence badges
+  .copilot-conflict-confidence {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: capitalize;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &.confidence-high {
+      background-color: var(--color-new);
+      color: var(--box-background-color);
+    }
+
+    &.confidence-medium {
+      background-color: var(--color-modified);
+      color: var(--box-background-color);
+    }
+
+    &.confidence-low {
+      background-color: var(--error-color);
+      color: var(--box-background-color);
+    }
+  }
+
+  // Accept/reject action buttons
+  .copilot-conflict-file-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-third);
+    flex-shrink: 0;
+  }
+
+  .copilot-conflict-accept-button {
+    color: var(--color-new);
+  }
+
+  .copilot-conflict-reject-button {
+    color: var(--error-color);
+  }
+
+  .copilot-conflict-undo-button {
+    color: var(--text-secondary-color);
+  }
+
+  // Reasoning text
+  .copilot-conflict-reasoning {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary-color);
+    padding: var(--spacing-half) 0 0 calc(16px + var(--spacing-half));
+    line-height: 1.4;
+  }
+
+  // Expanded content preview
+  .copilot-conflict-preview {
+    margin-top: var(--spacing-half);
+    border: var(--base-border);
+    border-radius: var(--border-radius);
+    overflow: auto;
+    max-height: 300px;
+  }
+
+  .copilot-conflict-resolved-content {
+    margin: 0;
+    padding: var(--spacing);
+    font-family: var(--font-family-monospace);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    white-space: pre;
+    overflow-x: auto;
+    background-color: var(--box-alt-background-color);
+    tab-size: 4;
+  }
+}
+
+// "Resolve with Copilot" button in the conflicts dialog footer
+#conflicts-dialog .dialog-footer .copilot-resolve-button {
+  margin-right: auto;
+}

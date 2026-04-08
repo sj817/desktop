@@ -21,6 +21,10 @@ import {
 import { ManualConflictResolution } from '../../../models/manual-conflict-resolution'
 import { OkCancelButtonGroup } from '../../dialog/ok-cancel-button-group'
 import { DialogSuccess } from '../../dialog/success'
+import { enableCopilotConflictResolution } from '../../../lib/feature-flag'
+import { Octicon } from '../../octicons'
+import * as octicons from '../../octicons/octicons.generated'
+import { Button } from '../../lib/button'
 
 interface IConflictsDialogProps {
   readonly dispatcher: Dispatcher
@@ -41,6 +45,18 @@ interface IConflictsDialogProps {
   readonly openFileInExternalEditor: (path: string) => void
   readonly openRepositoryInShell: (repository: Repository) => void
   readonly someConflictsHaveBeenResolved?: () => void
+  /**
+   * Optional callback to initiate Copilot-powered conflict resolution.
+   * When provided, a "Resolve with Copilot" button is shown in the footer.
+   * This should only be provided for merge operations when the feature flag
+   * is enabled.
+   */
+  readonly onResolveWithCopilot?: () => void
+  /**
+   * Whether a Copilot resolution request is currently in flight.
+   * When true, the "Resolve with Copilot" button shows a loading state.
+   */
+  readonly isCopilotResolutionInProgress?: boolean
 }
 
 interface IConflictsDialogState {
@@ -220,6 +236,39 @@ export class ConflictsDialog extends React.Component<
     )
   }
 
+  /**
+   * Renders the "Resolve with Copilot" button when the feature is available.
+   * The button is shown only when:
+   * - The onResolveWithCopilot callback is provided (parent decided it's appropriate)
+   * - The feature flag is enabled
+   * - There are still conflicted files to resolve
+   */
+  private renderCopilotButton(conflictedFilesCount: number): JSX.Element | null {
+    const { onResolveWithCopilot, isCopilotResolutionInProgress } = this.props
+
+    if (
+      onResolveWithCopilot === undefined ||
+      !enableCopilotConflictResolution() ||
+      conflictedFilesCount === 0
+    ) {
+      return null
+    }
+
+    return (
+      <Button
+        className="copilot-resolve-button"
+        onClick={onResolveWithCopilot}
+        disabled={isCopilotResolutionInProgress === true}
+        tooltip="Use Copilot to suggest resolutions for conflicted files"
+      >
+        <Octicon symbol={octicons.copilot} />
+        {isCopilotResolutionInProgress
+          ? ' Resolving…'
+          : ' Resolve with Copilot'}
+      </Button>
+    )
+  }
+
   public render() {
     const {
       workingDirectory,
@@ -255,6 +304,7 @@ export class ConflictsDialog extends React.Component<
           {this.renderContent(unmergedFiles, conflictedFiles.length)}
         </DialogContent>
         <DialogFooter>
+          {this.renderCopilotButton(conflictedFiles.length)}
           <OkCancelButtonGroup
             okButtonText={submitButton}
             okButtonDisabled={conflictedFiles.length > 0}
