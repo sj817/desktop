@@ -254,12 +254,9 @@ const DefaultDailyMeasures: IDailyMeasures = {
   generateCommitMessageCount: 0,
   generateCommitMessageUsedVerbatimCount: 0,
   copilotConflictResolutionInvokedCount: 0,
-  copilotConflictResolutionSucceededCount: 0,
-  copilotConflictResolutionFailedCount: 0,
   copilotConflictResolutionAcceptedCount: 0,
   copilotConflictResolutionRejectedCount: 0,
   copilotConflictResolutionManualFallbackCount: 0,
-  copilotConflictResolutionFilesResolvedCount: 0,
   pushBlockedBySecretScanningCount: 0,
   secretsDetectedOnPushCount: 0,
   secretsDetectedOnPushBypassedCount: 0,
@@ -1159,14 +1156,6 @@ export class StatsStore implements IStatsStore {
   public recordCopilotConflictResolutionInvoked = () =>
     this.increment('copilotConflictResolutionInvokedCount')
 
-  /** Record that Copilot successfully returned conflict resolutions */
-  public recordCopilotConflictResolutionSucceeded = () =>
-    this.increment('copilotConflictResolutionSucceededCount')
-
-  /** Record that Copilot conflict resolution failed (error, timeout) */
-  public recordCopilotConflictResolutionFailed = () =>
-    this.increment('copilotConflictResolutionFailedCount')
-
   /** Record that the user accepted all Copilot conflict resolutions */
   public recordCopilotConflictResolutionAccepted = () =>
     this.increment('copilotConflictResolutionAcceptedCount')
@@ -1178,10 +1167,6 @@ export class StatsStore implements IStatsStore {
   /** Record that the user fell back to manual resolution after invoking Copilot */
   public recordCopilotConflictResolutionManualFallback = () =>
     this.increment('copilotConflictResolutionManualFallbackCount')
-
-  /** Record files resolved by Copilot conflict resolution */
-  public recordCopilotConflictResolutionFilesResolved = (count: number = 1) =>
-    this.increment('copilotConflictResolutionFilesResolvedCount', count)
 
   public increment = (k: keyof NumericMeasures, n = 1) =>
     this.updateDailyMeasures(

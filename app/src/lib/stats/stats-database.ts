@@ -640,12 +640,6 @@ export interface IDailyMeasures {
   /** Number of times user invoked Copilot conflict resolution */
   readonly copilotConflictResolutionInvokedCount: number
 
-  /** Number of times Copilot successfully returned conflict resolutions */
-  readonly copilotConflictResolutionSucceededCount: number
-
-  /** Number of times Copilot conflict resolution failed (errors, timeouts) */
-  readonly copilotConflictResolutionFailedCount: number
-
   /** Number of times user accepted all Copilot conflict resolutions */
   readonly copilotConflictResolutionAcceptedCount: number
 
@@ -654,9 +648,6 @@ export interface IDailyMeasures {
 
   /** Number of times user fell back to manual resolution after invoking Copilot */
   readonly copilotConflictResolutionManualFallbackCount: number
-
-  /** Total number of individual files resolved by Copilot across all invocations */
-  readonly copilotConflictResolutionFilesResolvedCount: number
 
   /** The number of times a push was blocked by secret scanning */
   readonly pushBlockedBySecretScanningCount: number
