@@ -1,9 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import {
-  parseCopilotConflictResolution,
-  isValidConfidence,
-} from '../../src/lib/copilot-conflict-resolution'
+import { parseCopilotConflictResolution } from '../../src/lib/copilot-conflict-resolution'
 
 describe('parseCopilotConflictResolution', () => {
   it('parses valid JSON with all required fields', () => {
@@ -13,7 +10,6 @@ describe('parseCopilotConflictResolution', () => {
           path: 'src/index.ts',
           resolvedContent: 'console.log("hello")',
           reasoning: 'Kept the newer implementation',
-          confidence: 'high',
         },
       ],
     })
@@ -27,7 +23,6 @@ describe('parseCopilotConflictResolution', () => {
       result.resolutions[0].reasoning,
       'Kept the newer implementation'
     )
-    assert.equal(result.resolutions[0].confidence, 'high')
   })
 
   it('strips ```json wrapper and parses', () => {
@@ -37,7 +32,6 @@ describe('parseCopilotConflictResolution', () => {
           path: 'README.md',
           resolvedContent: '# Hello',
           reasoning: 'Combined both headings',
-          confidence: 'medium',
         },
       ],
     })
@@ -55,14 +49,13 @@ describe('parseCopilotConflictResolution', () => {
           path: 'a.txt',
           resolvedContent: 'content',
           reasoning: 'reason',
-          confidence: 'low',
         },
       ],
     })
     const input = '```\n' + json + '\n```'
 
     const result = parseCopilotConflictResolution(input)
-    assert.equal(result.resolutions[0].confidence, 'low')
+    assert.equal(result.resolutions[0].path, 'a.txt')
   })
 
   it('parses multiple resolutions', () => {
@@ -72,13 +65,11 @@ describe('parseCopilotConflictResolution', () => {
           path: 'file1.ts',
           resolvedContent: 'content1',
           reasoning: 'reason1',
-          confidence: 'high',
         },
         {
           path: 'file2.ts',
           resolvedContent: 'content2',
           reasoning: 'reason2',
-          confidence: 'low',
         },
       ],
     })
@@ -145,7 +136,6 @@ describe('parseCopilotConflictResolution', () => {
               {
                 resolvedContent: 'content',
                 reasoning: 'reason',
-                confidence: 'high',
               },
             ],
           })
@@ -167,7 +157,6 @@ describe('parseCopilotConflictResolution', () => {
                 path: '  ',
                 resolvedContent: 'content',
                 reasoning: 'reason',
-                confidence: 'high',
               },
             ],
           })
@@ -188,7 +177,6 @@ describe('parseCopilotConflictResolution', () => {
               {
                 path: 'file.ts',
                 reasoning: 'reason',
-                confidence: 'high',
               },
             ],
           })
@@ -209,7 +197,6 @@ describe('parseCopilotConflictResolution', () => {
               {
                 path: 'file.ts',
                 resolvedContent: 'content',
-                confidence: 'high',
               },
             ],
           })
@@ -231,7 +218,6 @@ describe('parseCopilotConflictResolution', () => {
                 path: 'file.ts',
                 resolvedContent: 'content',
                 reasoning: '',
-                confidence: 'high',
               },
             ],
           })
@@ -243,46 +229,6 @@ describe('parseCopilotConflictResolution', () => {
     )
   })
 
-  it('throws when confidence is invalid', () => {
-    assert.throws(
-      () =>
-        parseCopilotConflictResolution(
-          JSON.stringify({
-            resolutions: [
-              {
-                path: 'file.ts',
-                resolvedContent: 'content',
-                reasoning: 'reason',
-                confidence: 'very-high',
-              },
-            ],
-          })
-        ),
-      {
-        message:
-          'Copilot returned an invalid conflict resolution payload: "confidence" at index 0 must be one of: high, medium, low',
-      }
-    )
-  })
-
-  it('accepts all valid confidence values', () => {
-    for (const confidence of ['high', 'medium', 'low']) {
-      const input = JSON.stringify({
-        resolutions: [
-          {
-            path: 'file.ts',
-            resolvedContent: 'content',
-            reasoning: 'reason',
-            confidence,
-          },
-        ],
-      })
-
-      const result = parseCopilotConflictResolution(input)
-      assert.equal(result.resolutions[0].confidence, confidence)
-    }
-  })
-
   it('ignores extra fields (forward-compatible)', () => {
     const input = JSON.stringify({
       resolutions: [
@@ -290,7 +236,6 @@ describe('parseCopilotConflictResolution', () => {
           path: 'file.ts',
           resolvedContent: 'content',
           reasoning: 'reason',
-          confidence: 'high',
           extraField: 'should be ignored',
         },
       ],
@@ -315,33 +260,11 @@ describe('parseCopilotConflictResolution', () => {
           path: 'file.ts',
           resolvedContent: '',
           reasoning: 'File should be empty after resolution',
-          confidence: 'high',
         },
       ],
     })
 
     const result = parseCopilotConflictResolution(input)
     assert.equal(result.resolutions[0].resolvedContent, '')
-  })
-})
-
-describe('isValidConfidence', () => {
-  it('returns true for high', () => {
-    assert.equal(isValidConfidence('high'), true)
-  })
-
-  it('returns true for medium', () => {
-    assert.equal(isValidConfidence('medium'), true)
-  })
-
-  it('returns true for low', () => {
-    assert.equal(isValidConfidence('low'), true)
-  })
-
-  it('returns false for other strings', () => {
-    assert.equal(isValidConfidence('very-high'), false)
-    assert.equal(isValidConfidence(''), false)
-    assert.equal(isValidConfidence('HIGH'), false)
-    assert.equal(isValidConfidence('none'), false)
   })
 })
