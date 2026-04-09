@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as Path from 'path'
+import { promises as fs } from 'fs'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Octicon } from '../octicons'
@@ -8,14 +9,25 @@ import { Button } from '../lib/button'
 import { TextBox } from '../lib/text-box'
 import { Dispatcher } from '../dispatcher'
 import { Repository } from '../../models/repository'
+import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
 import {
   ICopilotConflictResolutionResponse,
   IFileResolution,
   ConflictResolutionConfidence,
 } from '../../lib/copilot-conflict-resolution'
 
-/** Per-file acceptance status in the review dialog. */
-type FileResolutionStatus = 'pending' | 'accepted' | 'rejected'
+/**
+ * How the user wants to resolve each file.
+ *
+ * - copilot: use Copilot's suggested content
+ * - ours:    accept the existing (current branch) version
+ * - theirs:  accept the incoming (other branch) version
+ * - skip:    leave unresolved for manual handling
+ */
+type FileResolutionChoice = 'copilot' | 'ours' | 'theirs' | 'skip'
+
+/** Which preview tab is active for a given file. */
+type PreviewTab = 'copilot' | 'conflict'
 
 interface ICopilotConflictResolutionDialogProps {
   readonly dispatcher: Dispatcher
@@ -25,22 +37,33 @@ interface ICopilotConflictResolutionDialogProps {
 }
 
 interface ICopilotConflictResolutionDialogState {
-  /** Accept/reject status per file path. */
-  readonly fileStatuses: ReadonlyMap<string, FileResolutionStatus>
-  /** Which files have their resolved-content preview expanded. */
+  /** Resolution choice per file path. */
+  readonly fileChoices: ReadonlyMap<string, FileResolutionChoice>
+  /** Which files have their preview expanded. */
   readonly expandedFiles: ReadonlySet<string>
+  /** Active preview tab per file. */
+  readonly activePreviewTab: ReadonlyMap<string, PreviewTab>
+  /** Cached original file contents (with conflict markers). */
+  readonly originalContents: ReadonlyMap<string, string>
+  /** Files currently loading their original content. */
+  readonly loadingOriginal: ReadonlySet<string>
+  /** Files that failed to load original content. */
+  readonly loadErrors: ReadonlyMap<string, string>
   /** Text used to filter the file list by path. */
   readonly filterText: string
-  /** Whether we're currently writing accepted resolutions to disk. */
+  /** Whether we're currently applying resolutions. */
   readonly isApplying: boolean
   /** Error message to display if applying fails. */
   readonly applyError: string | null
 }
 
 /**
- * Dialog for reviewing and accepting/rejecting Copilot's conflict resolution
- * suggestions. Shows each conflicted file with its reasoning, confidence level,
- * and an expandable preview of the resolved content.
+ * Dialog for reviewing and applying Copilot's conflict resolution suggestions.
+ *
+ * Each file can be resolved via Copilot's suggestion, by accepting the
+ * existing (ours) or incoming (theirs) version, or skipped for manual
+ * resolution later. An expandable preview lets the user compare Copilot's
+ * output with the original conflict markers.
  */
 export class CopilotConflictResolutionDialog extends React.Component<
   ICopilotConflictResolutionDialogProps,
@@ -49,14 +72,18 @@ export class CopilotConflictResolutionDialog extends React.Component<
   public constructor(props: ICopilotConflictResolutionDialogProps) {
     super(props)
 
-    const fileStatuses = new Map<string, FileResolutionStatus>()
+    const fileChoices = new Map<string, FileResolutionChoice>()
     for (const resolution of props.resolutions.resolutions) {
-      fileStatuses.set(resolution.path, 'pending')
+      fileChoices.set(resolution.path, 'copilot')
     }
 
     this.state = {
-      fileStatuses,
+      fileChoices,
       expandedFiles: new Set<string>(),
+      activePreviewTab: new Map<string, PreviewTab>(),
+      originalContents: new Map<string, string>(),
+      loadingOriginal: new Set<string>(),
+      loadErrors: new Map<string, string>(),
       filterText: '',
       isApplying: false,
       applyError: null,
@@ -66,16 +93,15 @@ export class CopilotConflictResolutionDialog extends React.Component<
   public render() {
     const { resolutions } = this.props.resolutions
     const filteredResolutions = this.getFilteredResolutions()
-    const acceptedCount = this.getCountByStatus('accepted')
-    const rejectedCount = this.getCountByStatus('rejected')
-    const pendingCount = this.getCountByStatus('pending')
+    const resolvedCount = this.getResolvedCount()
+    const skippedCount = this.getCountByChoice('skip')
 
     return (
       <Dialog
         id="copilot-conflict-resolution-dialog"
         title={this.renderTitle()}
         onDismissed={this.props.onDismissed}
-        onSubmit={this.onAcceptAll}
+        onSubmit={this.onApply}
         loading={this.state.isApplying}
         disabled={this.state.isApplying}
         className="copilot-conflict-resolution"
@@ -90,17 +116,16 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
           <div className="copilot-conflict-summary">
             <span>
-              {resolutions.length} file{resolutions.length !== 1 ? 's' : ''}{' '}
-              resolved
+              {resolutions.length} conflicted file
+              {resolutions.length !== 1 ? 's' : ''}
             </span>
-            {acceptedCount > 0 && (
-              <span className="status-accepted">{acceptedCount} accepted</span>
+            {resolvedCount > 0 && (
+              <span className="status-accepted">
+                {resolvedCount} will be resolved
+              </span>
             )}
-            {rejectedCount > 0 && (
-              <span className="status-rejected">{rejectedCount} rejected</span>
-            )}
-            {pendingCount > 0 && (
-              <span className="status-pending">{pendingCount} pending</span>
+            {skippedCount > 0 && (
+              <span className="status-skipped">{skippedCount} skipped</span>
             )}
           </div>
 
@@ -128,9 +153,11 @@ export class CopilotConflictResolutionDialog extends React.Component<
         </DialogContent>
         <DialogFooter>
           <OkCancelButtonGroup
-            okButtonText={this.getApplyButtonText(acceptedCount, pendingCount)}
-            okButtonDisabled={acceptedCount === 0 && pendingCount === 0}
-            cancelButtonText="Cancel"
+            okButtonText={this.getApplyButtonText()}
+            okButtonDisabled={resolvedCount === 0}
+            cancelButtonText={
+              resolvedCount === 0 && skippedCount > 0 ? 'Close' : 'Cancel'
+            }
             onCancelButtonClick={this.props.onDismissed}
           />
         </DialogFooter>
@@ -149,7 +176,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
   private renderFileResolution(resolution: IFileResolution): JSX.Element {
     const { path } = resolution
-    const status = this.state.fileStatuses.get(path) ?? 'pending'
+    const choice = this.state.fileChoices.get(path) ?? 'copilot'
     const isExpanded = this.state.expandedFiles.has(path)
     const fileName = Path.basename(path)
     const dirPath = Path.dirname(path)
@@ -157,7 +184,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
     return (
       <div
         key={path}
-        className={`copilot-conflict-file-item file-status-${status}`}
+        className={`copilot-conflict-file-item file-choice-${choice}`}
         role="listitem"
       >
         <div className="copilot-conflict-file-header">
@@ -182,50 +209,117 @@ export class CopilotConflictResolutionDialog extends React.Component<
             </div>
             {this.renderConfidenceBadge(resolution.confidence)}
           </div>
-
-          <div className="copilot-conflict-file-actions">
-            {status !== 'accepted' && (
-              <Button
-                className="copilot-conflict-accept-button"
-                onClick={this.onSetFileStatus(path, 'accepted')}
-                tooltip="Accept this resolution"
-                size="small"
-              >
-                <Octicon symbol={octicons.check} />
-                {' Accept'}
-              </Button>
-            )}
-            {status !== 'rejected' && (
-              <Button
-                className="copilot-conflict-reject-button"
-                onClick={this.onSetFileStatus(path, 'rejected')}
-                tooltip="Reject this resolution"
-                size="small"
-              >
-                <Octicon symbol={octicons.x} />
-                {' Reject'}
-              </Button>
-            )}
-            {status !== 'pending' && (
-              <Button
-                className="copilot-conflict-undo-button"
-                onClick={this.onSetFileStatus(path, 'pending')}
-                tooltip="Undo decision"
-                size="small"
-              >
-                Undo
-              </Button>
-            )}
-          </div>
         </div>
 
         <div className="copilot-conflict-reasoning">{resolution.reasoning}</div>
 
-        {isExpanded && (
-          <div className="copilot-conflict-preview">
-            <pre className="copilot-conflict-resolved-content">
-              <code>{resolution.resolvedContent}</code>
-            </pre>
+        {this.renderResolutionPicker(path, choice)}
+
+        {isExpanded && this.renderPreview(resolution, path)}
+      </div>
+    )
+  }
+
+  private renderResolutionPicker(
+    path: string,
+    choice: FileResolutionChoice
+  ): JSX.Element {
+    return (
+      <div className="copilot-conflict-resolution-picker" role="radiogroup">
+        <Button
+          className={`picker-option ${choice === 'copilot' ? 'selected' : ''}`}
+          onClick={this.onSetChoice(path, 'copilot')}
+          ariaPressed={choice === 'copilot'}
+          size="small"
+          tooltip="Use Copilot's suggested resolution"
+        >
+          <Octicon symbol={octicons.copilot} />
+          {' Copilot'}
+        </Button>
+        <Button
+          className={`picker-option ${choice === 'ours' ? 'selected' : ''}`}
+          onClick={this.onSetChoice(path, 'ours')}
+          ariaPressed={choice === 'ours'}
+          size="small"
+          tooltip="Keep the existing version from your branch"
+        >
+          <Octicon symbol={octicons.gitBranch} />
+          {' Ours'}
+        </Button>
+        <Button
+          className={`picker-option ${choice === 'theirs' ? 'selected' : ''}`}
+          onClick={this.onSetChoice(path, 'theirs')}
+          ariaPressed={choice === 'theirs'}
+          size="small"
+          tooltip="Accept the incoming version from the other branch"
+        >
+          <Octicon symbol={octicons.gitMerge} />
+          {' Theirs'}
+        </Button>
+        <Button
+          className={`picker-option picker-skip ${
+            choice === 'skip' ? 'selected' : ''
+          }`}
+          onClick={this.onSetChoice(path, 'skip')}
+          ariaPressed={choice === 'skip'}
+          size="small"
+          tooltip="Skip — resolve this file manually later"
+        >
+          {' Skip'}
+        </Button>
+      </div>
+    )
+  }
+
+  private renderPreview(
+    resolution: IFileResolution,
+    path: string
+  ): JSX.Element {
+    const activeTab = this.state.activePreviewTab.get(path) ?? 'copilot'
+    const isLoadingOriginal = this.state.loadingOriginal.has(path)
+    const originalContent = this.state.originalContents.get(path)
+    const loadError = this.state.loadErrors.get(path)
+
+    return (
+      <div className="copilot-conflict-preview">
+        <div className="copilot-conflict-preview-tabs">
+          <Button
+            className={`preview-tab ${activeTab === 'copilot' ? 'active' : ''}`}
+            onClick={this.onSetPreviewTab(path, 'copilot')}
+            size="small"
+          >
+            Copilot's Resolution
+          </Button>
+          <Button
+            className={`preview-tab ${
+              activeTab === 'conflict' ? 'active' : ''
+            }`}
+            onClick={this.onSetPreviewTab(path, 'conflict')}
+            size="small"
+          >
+            Original Conflict
+          </Button>
+        </div>
+
+        {activeTab === 'copilot' && (
+          <pre className="copilot-conflict-resolved-content">
+            <code>{resolution.resolvedContent}</code>
+          </pre>
+        )}
+
+        {activeTab === 'conflict' && (
+          <div className="copilot-conflict-original-content">
+            {isLoadingOriginal && (
+              <p className="loading-original">Loading original file…</p>
+            )}
+            {loadError !== undefined && (
+              <p className="load-error">{loadError}</p>
+            )}
+            {originalContent !== undefined && (
+              <pre className="copilot-conflict-original-code">
+                <code>{originalContent}</code>
+              </pre>
+            )}
           </div>
         )}
       </div>
@@ -254,25 +348,33 @@ export class CopilotConflictResolutionDialog extends React.Component<
     return resolutions.filter(r => r.path.toLowerCase().includes(lowerFilter))
   }
 
-  private getCountByStatus(status: FileResolutionStatus): number {
+  /** Count files that will actually be resolved (not skipped). */
+  private getResolvedCount(): number {
     let count = 0
-    for (const s of this.state.fileStatuses.values()) {
-      if (s === status) {
+    for (const choice of this.state.fileChoices.values()) {
+      if (choice !== 'skip') {
         count++
       }
     }
     return count
   }
 
-  private getApplyButtonText(
-    acceptedCount: number,
-    pendingCount: number
-  ): string {
-    const total = acceptedCount + pendingCount
-    if (total === 0) {
+  private getCountByChoice(target: FileResolutionChoice): number {
+    let count = 0
+    for (const choice of this.state.fileChoices.values()) {
+      if (choice === target) {
+        count++
+      }
+    }
+    return count
+  }
+
+  private getApplyButtonText(): string {
+    const resolved = this.getResolvedCount()
+    if (resolved === 0) {
       return 'Apply'
     }
-    return `Accept & Apply ${total} file${total !== 1 ? 's' : ''}`
+    return `Apply ${resolved} resolution${resolved !== 1 ? 's' : ''}`
   }
 
   private onFilterTextChanged = (value: string) => {
@@ -291,46 +393,131 @@ export class CopilotConflictResolutionDialog extends React.Component<
     })
   }
 
-  private onSetFileStatus =
-    (path: string, status: FileResolutionStatus) => () => {
+  private onSetChoice = (path: string, choice: FileResolutionChoice) => () => {
+    this.setState(prevState => {
+      const fileChoices = new Map(prevState.fileChoices)
+      fileChoices.set(path, choice)
+      return { fileChoices }
+    })
+  }
+
+  private onSetPreviewTab = (path: string, tab: PreviewTab) => () => {
+    this.setState(prevState => {
+      const activePreviewTab = new Map(prevState.activePreviewTab)
+      activePreviewTab.set(path, tab)
+      return { activePreviewTab }
+    })
+
+    // Load original content on first switch to conflict tab
+    if (tab === 'conflict' && !this.state.originalContents.has(path)) {
+      this.loadOriginalContent(path)
+    }
+  }
+
+  private async loadOriginalContent(path: string): Promise<void> {
+    if (this.state.loadingOriginal.has(path)) {
+      return
+    }
+
+    this.setState(prevState => ({
+      loadingOriginal: new Set(prevState.loadingOriginal).add(path),
+    }))
+
+    try {
+      const absPath = Path.join(this.props.repository.path, path)
+      const content = await fs.readFile(absPath, 'utf8')
       this.setState(prevState => {
-        const fileStatuses = new Map(prevState.fileStatuses)
-        fileStatuses.set(path, status)
-        return { fileStatuses }
+        const originalContents = new Map(prevState.originalContents)
+        originalContents.set(path, content)
+        const loadingOriginal = new Set(prevState.loadingOriginal)
+        loadingOriginal.delete(path)
+        return { originalContents, loadingOriginal }
+      })
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e)
+      this.setState(prevState => {
+        const loadErrors = new Map(prevState.loadErrors)
+        loadErrors.set(path, `Could not load file: ${message}`)
+        const loadingOriginal = new Set(prevState.loadingOriginal)
+        loadingOriginal.delete(path)
+        return { loadErrors, loadingOriginal }
       })
     }
+  }
 
   /**
-   * Accept all pending files and apply all accepted resolutions.
+   * Apply all chosen resolutions.
    *
-   * "Accept All" marks pending files as accepted, then writes every accepted
-   * file's resolved content to disk.
+   * - 'copilot' files: write Copilot's content to disk
+   * - 'ours' / 'theirs' files: set manual conflict resolution
+   * - 'skip' files: left untouched
    */
-  private onAcceptAll = async () => {
-    // Mark all pending as accepted
-    const fileStatuses = new Map(this.state.fileStatuses)
-    for (const [path, status] of fileStatuses) {
-      if (status === 'pending') {
-        fileStatuses.set(path, 'accepted')
+  private onApply = async () => {
+    this.setState({ isApplying: true, applyError: null })
+
+    const { dispatcher, repository } = this.props
+    const { resolutions } = this.props.resolutions
+
+    const copilotResolutions: Array<IFileResolution> = []
+    const manualChoices: Array<{
+      path: string
+      resolution: ManualConflictResolution
+    }> = []
+
+    for (const resolution of resolutions) {
+      const choice = this.state.fileChoices.get(resolution.path) ?? 'skip'
+
+      switch (choice) {
+        case 'copilot':
+          copilotResolutions.push(resolution)
+          break
+        case 'ours':
+          manualChoices.push({
+            path: resolution.path,
+            resolution: ManualConflictResolution.ours,
+          })
+          break
+        case 'theirs':
+          manualChoices.push({
+            path: resolution.path,
+            resolution: ManualConflictResolution.theirs,
+          })
+          break
+        case 'skip':
+          break
       }
     }
-    this.setState({ fileStatuses, isApplying: true, applyError: null })
 
-    const acceptedResolutions = this.props.resolutions.resolutions.filter(
-      r => fileStatuses.get(r.path) === 'accepted'
-    )
-
-    if (acceptedResolutions.length === 0) {
+    if (copilotResolutions.length === 0 && manualChoices.length === 0) {
       this.props.onDismissed()
       return
     }
 
     try {
-      await this.props.dispatcher.applyCopilotConflictResolutions(
-        this.props.repository,
-        acceptedResolutions
-      )
-      this.props.onDismissed()
+      // Set manual resolutions for ours/theirs choices
+      for (const { path, resolution } of manualChoices) {
+        dispatcher.updateManualConflictResolution(repository, path, resolution)
+      }
+
+      // Clear any stale manual resolutions for copilot-resolved files
+      for (const resolution of copilotResolutions) {
+        dispatcher.updateManualConflictResolution(
+          repository,
+          resolution.path,
+          null
+        )
+      }
+
+      // Write Copilot resolutions to disk
+      if (copilotResolutions.length > 0) {
+        await dispatcher.applyCopilotConflictResolutions(
+          repository,
+          copilotResolutions
+        )
+      } else {
+        // No Copilot files to write, but we still need to close and refresh
+        dispatcher.dismissCopilotConflictResolution()
+      }
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e)
       this.setState({ isApplying: false, applyError: message })

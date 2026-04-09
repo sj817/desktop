@@ -5783,8 +5783,8 @@ export class AppStore extends TypedBaseStore<IAppState> {
       const message = rawMessage.includes('CLI server exited')
         ? 'The Copilot service encountered an error. Please try again.'
         : rawMessage.length > 300
-          ? rawMessage.slice(0, 300) + '…'
-          : rawMessage
+        ? rawMessage.slice(0, 300) + '…'
+        : rawMessage
 
       log.warn(`[AppStore] Copilot conflict resolution failed: ${rawMessage}`)
 
