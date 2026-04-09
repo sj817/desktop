@@ -34,6 +34,10 @@
 
 // Loading dialog footer with cancel button
 #copilot-conflict-resolution-loading {
+  // Match the standard conflicts dialog width so there's no size jump
+  // when switching from the conflicts dialog to the loading state.
+  width: 500px;
+
   .copilot-loading-footer {
     display: flex;
     align-items: center;
