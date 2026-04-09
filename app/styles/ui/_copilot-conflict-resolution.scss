@@ -45,24 +45,54 @@
     font-size: var(--font-size-sm);
   }
 
-  .copilot-conflict-summary {
+  // ---------------------------------------------------------------
+  // Top-level dialog tabs (Summary / Changes)
+  // ---------------------------------------------------------------
+  .copilot-dialog-tabs {
     display: flex;
-    align-items: center;
-    gap: var(--spacing);
-    padding-bottom: var(--spacing);
-    margin-bottom: var(--spacing);
     border-bottom: var(--base-border);
-    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing);
+  }
+
+  .copilot-dialog-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-third);
+    padding: var(--spacing-half) var(--spacing);
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
     color: var(--text-secondary-color);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: color 0.1s, border-color 0.1s;
 
-    .status-accepted {
-      color: var(--color-new);
+    &:hover {
+      color: var(--text-color);
     }
 
-    .status-skipped {
+    &.active {
+      color: var(--text-color);
+      font-weight: var(--font-weight-semibold);
+      border-bottom-color: var(--button-primary-background);
+    }
+
+    .tab-badge {
+      font-size: var(--font-size-xs);
+      padding: 0 6px;
+      border-radius: 10px;
+      background-color: var(--box-alt-background-color);
       color: var(--text-secondary-color);
-      font-style: italic;
+      font-weight: var(--font-weight-semibold);
     }
+  }
+
+  // ---------------------------------------------------------------
+  // Summary tab
+  // ---------------------------------------------------------------
+  .copilot-summary-tab {
+    display: flex;
+    flex-direction: column;
   }
 
   .copilot-conflict-filter {
@@ -81,7 +111,7 @@
     font-style: italic;
   }
 
-  // File item card
+  // File item card (Summary tab)
   .copilot-conflict-file-item {
     padding: var(--spacing);
     border: var(--base-border);
@@ -107,19 +137,6 @@
     gap: var(--spacing-half);
     flex: 1;
     min-width: 0;
-  }
-
-  .copilot-conflict-expand-toggle {
-    padding: 0;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: var(--text-secondary-color);
-    flex-shrink: 0;
-
-    &:hover {
-      color: var(--text-color);
-    }
   }
 
   .copilot-conflict-file-path {
@@ -177,7 +194,6 @@
     align-items: center;
     gap: var(--spacing-third);
     padding: var(--spacing-half) 0;
-    margin-left: calc(16px + var(--spacing-half));
 
     .picker-option {
       display: inline-flex;
@@ -213,35 +229,153 @@
   .copilot-conflict-reasoning {
     font-size: var(--font-size-sm);
     color: var(--text-secondary-color);
-    padding: var(--spacing-half) 0 0 calc(16px + var(--spacing-half));
+    padding: var(--spacing-half) 0 0;
     line-height: 1.4;
   }
 
-  // Expanded content preview
-  .copilot-conflict-preview {
-    margin-top: var(--spacing-half);
+  // ---------------------------------------------------------------
+  // Changes  sidebar + content viewer layouttab
+  // ---------------------------------------------------------------
+  .copilot-changes-tab {
+    display: flex;
+    gap: 1px;
+    background-color: var(--box-border-color);
     border: var(--base-border);
     border-radius: var(--border-radius);
     overflow: hidden;
+    min-height: 350px;
+    max-height: 420px;
   }
 
-  .copilot-conflict-preview-tabs {
+  // File sidebar
+  .copilot-changes-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    min-width: 160px;
+    max-width: 240px;
+    overflow-y: auto;
+    background-color: var(--box-background-color);
+  }
+
+  .copilot-changes-file-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-third);
+    padding: var(--spacing-half) var(--spacing);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    text-align: left;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--box-border-color);
+    transition: background-color 0.1s;
+
+    &:hover {
+      background-color: var(--list-hover-background-color);
+    }
+
+    &.selected {
+      background-color: var(--list-active-background-color);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    &.file-choice-skip {
+      opacity: 0.55;
+    }
+
+    .changes-file-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .choice-icon {
+      flex-shrink: 0;
+    }
+
+    .choice-copilot {
+      color: var(--button-primary-background);
+    }
+
+    .choice-ours {
+      color: var(--color-new);
+    }
+
+    .choice-theirs {
+      color: var(--color-modified);
+    }
+
+    .choice-skip {
+      color: var(--text-secondary-color);
+    }
+  }
+
+  // Content viewer
+  .copilot-changes-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--box-background-color);
+  }
+
+  .copilot-changes-no-selection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: var(--text-secondary-color);
+    font-style: italic;
+  }
+
+  .copilot-changes-viewer {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .copilot-changes-viewer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing);
+    padding: var(--spacing-half) var(--spacing);
+    border-bottom: var(--base-border);
+
+    .copilot-changes-viewer-path {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+  }
+
+  // Content view toggle tabs (Copilot / Original Conflict)
+  .copilot-changes-view-tabs {
     display: flex;
     border-bottom: var(--base-border);
     background-color: var(--box-alt-background-color);
 
-    .preview-tab {
+    .view-tab {
       flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-third);
       padding: var(--spacing-half) var(--spacing);
       border: none;
-      border-radius: 0;
+      border-bottom: 2px solid transparent;
       background: transparent;
       color: var(--text-secondary-color);
       font-size: var(--font-size-sm);
       cursor: pointer;
-      text-align: center;
       transition: color 0.1s, border-color 0.1s;
-      border-bottom: 2px solid transparent;
 
       &:hover {
         color: var(--text-color);
@@ -255,21 +389,12 @@
     }
   }
 
-  .copilot-conflict-resolved-content,
-  .copilot-conflict-original-code {
-    margin: 0;
-    padding: var(--spacing);
-    font-family: var(--font-family-monospace);
-    font-size: var(--font-size-sm);
-    line-height: 1.5;
-    white-space: pre;
+  // Code display
+  .copilot-changes-code-container {
+    flex: 1;
     overflow: auto;
-    max-height: 300px;
     background-color: var(--box-alt-background-color);
-    tab-size: 4;
-  }
 
-  .copilot-conflict-original-content {
     .loading-original {
       text-align: center;
       padding: var(--spacing);
@@ -281,6 +406,21 @@
       padding: var(--spacing);
       color: var(--error-color);
       font-size: var(--font-size-sm);
+    }
+  }
+
+  .copilot-changes-code {
+    margin: 0;
+    padding: var(--spacing);
+    font-family: var(--font-family-monospace);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    white-space: pre;
+    tab-size: 4;
+
+    &.conflict-code {
+      // Subtle visual distinction for original conflict content
+      background-color: transparent;
     }
   }
 }
