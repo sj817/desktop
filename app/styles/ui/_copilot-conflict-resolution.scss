@@ -6,11 +6,6 @@
   height: 100%;
   max-width: calc(100% - var(--spacing-double) * 4);
   max-height: calc(100% - var(--spacing-double) * 4);
-
-  .dialog-content {
-    min-width: 550px;
-    flex-grow: 1;
-  }
 }
 
 // Loading dialog
@@ -37,6 +32,16 @@
   .copilot-icon {
     vertical-align: middle;
     margin-right: var(--spacing-half);
+  }
+
+  // Content container — replaces DialogContent for proper flex height chain.
+  // Matches the open-pull-request-content pattern.
+  .copilot-conflict-resolution-content {
+    padding: var(--spacing);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex-grow: 1;
   }
 
   .copilot-conflict-apply-error {
@@ -326,6 +331,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-height: 0;
     overflow: hidden;
     background-color: var(--box-background-color);
   }
@@ -343,6 +349,7 @@
     display: flex;
     flex-direction: column;
     flex: 1;
+    min-height: 0;
     overflow: hidden;
   }
 
@@ -389,7 +396,8 @@
   // Diff container (side-by-side diff viewer)
   .copilot-changes-diff-container {
     flex: 1;
-    overflow: auto;
+    min-height: 0;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
   }

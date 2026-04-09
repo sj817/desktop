@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as Path from 'path'
 import { promises as fs } from 'fs'
-import { Dialog, DialogContent, DialogFooter } from '../dialog'
+import { Dialog, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
@@ -138,7 +138,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
         disabled={this.state.isApplying}
         className="copilot-conflict-resolution"
       >
-        <DialogContent>
+        <div className="copilot-conflict-resolution-content">
           {this.state.applyError !== null && (
             <div className="copilot-conflict-apply-error">
               <Octicon symbol={octicons.alert} />
@@ -151,7 +151,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
           {this.state.activeTab === 'summary'
             ? this.renderSummaryTab()
             : this.renderChangesTab()}
-        </DialogContent>
+        </div>
         <DialogFooter>
           <OkCancelButtonGroup
             okButtonText={this.getApplyButtonText()}
