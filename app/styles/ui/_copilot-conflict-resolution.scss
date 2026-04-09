@@ -19,15 +19,86 @@
   color: var(--error-color);
 }
 
-// Copilot conflict resolution  mirrors the standard conflicts dialogdialog
-// with additions for Copilot suggestions
+// Copilot conflict resolution dialog — mirrors the standard conflicts dialog
+// with Copilot suggestions + a Changes tab with diff viewer
 #copilot-conflicts-dialog {
+  // Near-fullscreen sizing to match the PR preview dialog
+  &.copilot-conflict-resolution {
+    width: calc(100vw - 100px);
+    max-width: 1200px;
+    height: calc(100vh - 100px);
+    max-height: 900px;
+
+    .dialog-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding: 0;
+    }
+  }
+
   .copilot-icon {
     vertical-align: middle;
     margin-right: var(--spacing-half);
   }
 
-  // Copilot suggestion banner
+  // Main content area (replaces DialogContent for flex height chain)
+  .copilot-conflict-resolution-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  // -- Tab bar --------------------------------------------------------
+
+  .copilot-dialog-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--box-border-color);
+    padding: 0 var(--spacing);
+    flex-shrink: 0;
+  }
+
+  .copilot-dialog-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-third);
+    padding: var(--spacing-half) var(--spacing);
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--text-secondary-color);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+
+    &:hover {
+      color: var(--text-color);
+    }
+
+    &.active {
+      color: var(--text-color);
+      border-bottom-color: var(--link-button-color);
+    }
+
+    .tab-badge {
+      font-size: var(--font-size-xs);
+      padding: 1px 6px;
+      border-radius: 10px;
+      background-color: var(--box-border-color);
+    }
+  }
+
+  // -- Summary tab ----------------------------------------------------
+
+  .copilot-summary-tab {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing);
+  }
+
   .copilot-suggestion-banner {
     display: flex;
     align-items: center;
@@ -44,14 +115,234 @@
     }
   }
 
-  // Per-file "Apply" button for Copilot suggestions
   .copilot-apply-button {
     .octicon {
       margin-right: 2px;
     }
   }
 
-  // Footer layout with checkbox on the left and buttons on the right
+  // -- Changes tab ----------------------------------------------------
+
+  .copilot-changes-tab {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+  }
+
+  .copilot-changes-sidebar {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    background-color: var(--box-alt-background-color);
+    border-right: 1px solid var(--box-border-color);
+  }
+
+  .copilot-changes-file-entry {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+    padding: var(--spacing-half) var(--spacing);
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    color: var(--text-color);
+    border-left: 2px solid transparent;
+
+    &:hover {
+      background-color: var(--box-selected-background-color);
+    }
+
+    &.selected {
+      background-color: var(--box-selected-active-background-color);
+      border-left-color: var(--link-button-color);
+    }
+
+    &.resolved {
+      opacity: 0.6;
+    }
+
+    .choice-icon {
+      flex-shrink: 0;
+    }
+
+    .choice-copilot {
+      color: var(--link-button-color);
+    }
+
+    .choice-resolved {
+      color: var(--color-new);
+    }
+
+    .choice-unresolved {
+      color: var(--text-secondary-color);
+    }
+
+    .changes-file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .copilot-changes-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .copilot-changes-viewer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .copilot-changes-viewer-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing);
+    padding: var(--spacing-half) var(--spacing);
+    border-bottom: 1px solid var(--box-border-color);
+    flex-shrink: 0;
+  }
+
+  .copilot-changes-viewer-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .copilot-changes-viewer-title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing);
+  }
+
+  .copilot-changes-viewer-path {
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .copilot-changes-viewer-reasoning {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-third);
+    margin-top: var(--spacing-third);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary-color);
+    line-height: 1.3;
+
+    .octicon {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+  }
+
+  // Variant picker (Copilot / Ours / Theirs)
+  .copilot-variant-picker {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+
+    .picker-option {
+      font-size: var(--font-size-xs);
+      padding: 2px 8px;
+      border-radius: var(--border-radius);
+
+      &.selected {
+        background-color: var(--link-button-color);
+        color: var(--box-background-color);
+      }
+    }
+  }
+
+  .copilot-changes-diff-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .copilot-changes-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-half);
+    padding: var(--spacing-double);
+    color: var(--text-secondary-color);
+
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+  }
+
+  .copilot-changes-no-diff,
+  .copilot-changes-no-selection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: var(--text-secondary-color);
+    font-style: italic;
+  }
+
+  // Fallback when diff generation fails
+  .copilot-changes-fallback {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing);
+  }
+
+  .copilot-changes-fallback-warning {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+    padding: var(--spacing-half);
+    margin-bottom: var(--spacing);
+    color: var(--error-color);
+    font-size: var(--font-size-sm);
+  }
+
+  .copilot-changes-fallback-panels {
+    display: flex;
+    gap: var(--spacing);
+  }
+
+  .copilot-changes-fallback-panel {
+    flex: 1;
+    min-width: 0;
+
+    .fallback-panel-header {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--spacing-half);
+    }
+  }
+
+  .copilot-changes-code {
+    font-family: var(--font-family-monospace);
+    font-size: var(--font-size-xs);
+    background-color: var(--box-alt-background-color);
+    border: 1px solid var(--box-border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-half);
+    overflow: auto;
+    max-height: 300px;
+    white-space: pre;
+    margin: 0;
+  }
+
+  // -- Footer ---------------------------------------------------------
+
   .copilot-conflicts-footer {
     display: flex;
     align-items: center;
@@ -67,5 +358,14 @@
     .back-to-manual-button {
       font-size: var(--font-size-sm);
     }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

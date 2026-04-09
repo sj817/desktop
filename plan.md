@@ -1,47 +1,82 @@
-# Resolve with Copilot UI — Implementation Plan
+# Rework: Copilot Conflict Resolution UI → Replacement Mode
 
 ## Problem Statement
 
-GitHub Desktop needs a user-facing UI for Copilot-powered merge conflict resolution. The backend infrastructure (feature flag, context building, response parsing, telemetry) is being built in PRs #21917-#21921. This PR builds the complete UI layer that ties them all together.
+The current Copilot conflict resolution uses a popup dialog approach (separate from the
+conflicts dialog). The new approach makes Copilot an alternative conflict resolution
+*mode* that replaces the standard conflicts dialog, with Copilot suggestions appearing
+as additional per-file options alongside ours/theirs.
+
+**Before:** Conflicts dialog → popup → apply → back to conflicts dialog
+**After:** Conflicts dialog → click "Resolve with Copilot" → Copilot mode replaces
+dialog → "Continue merge/rebase" to proceed
 
 ## Proposed Approach
 
-Use the **dialog-based flow** (POC 1 from UX spike): a new popup type that progresses through loading → review → apply states. This follows existing patterns like the Generate Commit Message feature (popup-based, loading state, then result).
+### Core Architecture
 
-### Key design decisions:
-1. **Popup-based** (not inline in conflicts dialog) — keeps the resolution review in a focused modal
-2. **State managed via popup props** — loading/response/error passed through popup discriminated union
-3. **File writes via Dispatcher** — resolved content written to disk through proper state management
-4. **React class components** — consistent with existing codebase (no hooks)
+Copilot resolution becomes a **mode** within the existing `ShowConflicts` step.
+State is tracked on `IMultiCommitOperationState` (not a popup). When in Copilot mode,
+`BaseMultiCommitOperation` renders a `CopilotConflictResolutionDialog` instead of the
+standard `ConflictsDialog`.
 
-## Files to Create/Modify
+### State Design
 
-### New Files
-1. `app/src/ui/copilot-conflict-resolution/copilot-conflict-resolution-dialog.tsx` — Main resolution review dialog
-2. `app/src/ui/copilot-conflict-resolution/copilot-conflict-resolution-loading.tsx` — Loading state dialog
-3. `app/src/ui/copilot-conflict-resolution/index.ts` — Barrel exports
-4. `app/styles/ui/_copilot-conflict-resolution.scss` — Component styles
+Add `copilotConflictResolutionState` to `IMultiCommitOperationState`:
 
-### Modified Files
-5. `app/src/models/popup.ts` — Add `PopupType.CopilotConflictResolution` and `PopupType.CopilotConflictResolutionLoading`
-6. `app/src/ui/app.tsx` — Render new popup types in switch
-7. `app/src/ui/multi-commit-operation/dialog/conflicts-dialog.tsx` — Add "Resolve with Copilot" button
-8. `app/src/ui/dispatcher/dispatcher.ts` — Add `startCopilotConflictResolution()` and `applyCopilotConflictResolutions()`
-9. `app/src/lib/stores/app-store.ts` — Add `_startCopilotConflictResolution()` and `_applyCopilotConflictResolutions()`
-10. `app/styles/_ui.scss` — Import new stylesheet
+```typescript
+type ICopilotConflictResolutionState =
+  | { readonly kind: 'loading' }
+  | { readonly kind: 'ready'; readonly response: ICopilotConflictResolutionResponse }
+  | { readonly kind: 'error'; readonly error: string }
+```
 
-## Risk Assessment
+### "Always resolve with Copilot" Preference
 
-**Risk tier**: Medium
-- New UI surface only, follows established dialog patterns
-- No destructive git operations — writes resolved content to working directory files only
-- Feature-flagged behind `enableCopilotConflictResolution()` (dev-only for now)
-- Depends on unmerged PRs — import errors expected until dependencies land
+Follow the `confirmCommitMessageOverride` pattern — `getBoolean`/`setBoolean` on
+localStorage, private field on AppStore, dispatcher wrapper, checkbox in dialog.
+
+## Files to Modify
+
+### Remove popup approach
+1. `app/src/models/popup.ts` — Remove `CopilotConflictResolution` popup type
+2. `app/src/ui/app.tsx` — Remove popup rendering case + imports
+
+### Add state
+3. `app/src/lib/app-state.ts` — Add `ICopilotConflictResolutionState` + field on
+   `IMultiCommitOperationState` + `alwaysResolveCopilotConflicts` on `IAppState`
+
+### Rework store + dispatcher
+4. `app/src/lib/stores/app-store.ts` — Rework `_startCopilotConflictResolution` to set
+   state on multi-commit operation. Add preference. Expose in getAppState().
+5. `app/src/ui/dispatcher/dispatcher.ts` — Update methods for mode-based approach.
+   Add `setCopilotConflictResolutionState`, `setAlwaysResolveCopilotConflicts`.
+
+### Rework multi-commit operation UI
+6. `app/src/ui/multi-commit-operation/base-multi-commit-operation.tsx` — In ShowConflicts,
+   check copilot state and render Copilot dialog when active.
+7. `app/src/ui/multi-commit-operation/merge.tsx` — Update getOnResolveWithCopilot.
+
+### Rewrite Copilot dialog
+8. `app/src/ui/copilot-conflict-resolution/copilot-conflict-resolution-dialog.tsx` —
+   Complete rewrite mirroring conflicts-dialog.tsx structure.
+9. `app/src/ui/copilot-conflict-resolution/copilot-conflict-resolution-loading.tsx` —
+   Keep but adapt for inline rendering.
+10. `app/styles/ui/_copilot-conflict-resolution.scss` — Complete rewrite.
 
 ## Acceptance Criteria
 
-- **Given** the feature flag is enabled and a merge conflict exists, **When** the conflicts dialog opens, **Then** a "Resolve with Copilot" button is visible
-- **Given** the user clicks "Resolve with Copilot", **When** the loading dialog shows, **Then** a spinner and cancel button are visible
-- **Given** Copilot returns resolutions, **When** the review dialog opens, **Then** each file shows path, reasoning, confidence, and accept/reject buttons
-- **Given** the user accepts some files and rejects others, **When** they click "Apply", **Then** only accepted files' content is written to disk
-- **Given** more than 5 files are shown, **When** the user types in the filter box, **Then** the list filters by file path
+- **Given** a merge with conflicts, **When** the user clicks "Resolve with Copilot",
+  **Then** a loading state replaces the dialog and Copilot analyzes conflicts
+- **Given** Copilot has returned suggestions, **When** the dialog renders,
+  **Then** each file shows dropdown with "Use Copilot's suggestion", ours, theirs, editor
+- **Given** user selects "Use Copilot's suggestion" for a file,
+  **Then** resolved content is written to disk and file shows as resolved
+- **Given** all conflicts resolved, **When** user clicks "Continue merge",
+  **Then** `finishConflictedMerge()` is called
+- **Given** "Always resolve with Copilot" is checked and persisted,
+  **When** new conflicts arise, **Then** Copilot mode activates automatically
+
+## Risk Assessment
+
+**Risk tier**: Medium — UI + state changes, feature-flagged, no destructive git operations
