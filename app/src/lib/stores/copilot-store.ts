@@ -250,7 +250,7 @@ export class CopilotStore {
     try {
       session = await client.createSession({
         model: 'gpt-5-mini',
-        reasoningEffort: 'medium',
+        reasoningEffort: 'low',
         systemMessage: {
           mode: 'append',
           content: ConflictResolutionSystemPrompt,

@@ -5777,7 +5777,17 @@ export class AppStore extends TypedBaseStore<IAppState> {
         return
       }
 
-      const message = e instanceof Error ? e.message : String(e)
+      const rawMessage = e instanceof Error ? e.message : String(e)
+
+      // Sanitize the error for display — CLI crashes can dump minified JS
+      const message = rawMessage.includes('CLI server exited')
+        ? 'The Copilot service encountered an error. Please try again.'
+        : rawMessage.length > 300
+          ? rawMessage.slice(0, 300) + '…'
+          : rawMessage
+
+      log.warn(`[AppStore] Copilot conflict resolution failed: ${rawMessage}`)
+
       this.popupManager.updatePopup({
         ...this.popupManager.currentPopup,
         type: PopupType.CopilotConflictResolution,
