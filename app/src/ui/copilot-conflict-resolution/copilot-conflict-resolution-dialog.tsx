@@ -535,13 +535,68 @@ export class CopilotConflictResolutionDialog extends React.Component<
             </Button>
           </div>
         )}
-        {isResolved && (
-          <div className="green-circle">
-            <Octicon symbol={octicons.check} />
-          </div>
+        {this.renderResolutionIndicator(
+          isCopilotAccepted,
+          manualResolution,
+          resolvedExternally
         )}
       </li>
     )
+  }
+
+  /** Render the right-side indicator showing how a file is resolved. */
+  private renderResolutionIndicator(
+    isCopilotAccepted: boolean,
+    manualResolution: ManualConflictResolution | undefined,
+    resolvedExternally: boolean
+  ): JSX.Element | null {
+    if (isCopilotAccepted) {
+      return (
+        <div
+          className="resolution-indicator copilot"
+          role="img"
+          aria-label="Copilot suggestion"
+        >
+          <Octicon symbol={octicons.copilot} />
+        </div>
+      )
+    }
+
+    if (manualResolution === ManualConflictResolution.ours) {
+      return (
+        <div
+          className="resolution-indicator current"
+          role="img"
+          aria-label="Using current changes"
+        >
+          <Octicon symbol={octicons.chevronLeft} />
+          <Octicon symbol={octicons.chevronLeft} />
+        </div>
+      )
+    }
+
+    if (manualResolution === ManualConflictResolution.theirs) {
+      return (
+        <div
+          className="resolution-indicator incoming"
+          role="img"
+          aria-label="Using incoming changes"
+        >
+          <Octicon symbol={octicons.chevronRight} />
+          <Octicon symbol={octicons.chevronRight} />
+        </div>
+      )
+    }
+
+    if (resolvedExternally) {
+      return (
+        <div className="resolution-indicator resolved-externally">
+          <Octicon symbol={octicons.check} />
+        </div>
+      )
+    }
+
+    return null
   }
 
   /** Show the contextual menu for choosing a file resolution strategy. */

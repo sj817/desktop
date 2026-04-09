@@ -98,6 +98,42 @@
     padding: var(--spacing-double);
   }
 
+  // Resolution indicators (replace the generic green-circle in copilot mode)
+  .resolution-indicator {
+    margin-left: auto;
+    flex-shrink: 0;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+
+    &.copilot {
+      color: var(--link-button-color);
+    }
+
+    &.current .octicon,
+    &.incoming .octicon {
+      // Squeeze the two chevrons together to look like << or >>
+      margin: 0 -3px;
+    }
+
+    &.current {
+      color: var(--color-new);
+    }
+
+    &.incoming {
+      color: var(--link-button-color);
+    }
+
+    &.resolved-externally {
+      background-color: var(--color-new);
+      color: var(--background-color);
+      border-radius: 50%;
+    }
+  }
+
   // -- Changes tab ----------------------------------------------------
 
   .copilot-changes-tab {
