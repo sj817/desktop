@@ -29,7 +29,6 @@ describe('applyCopilotResolutionsToWorkingDirectory', () => {
         path: 'src/app.ts',
         resolvedContent: 'resolved content for app.ts',
         reasoning: 'Combined both changes',
-        confidence: 'high',
       },
     ]
 
@@ -54,13 +53,11 @@ describe('applyCopilotResolutionsToWorkingDirectory', () => {
         path: 'src/a.ts',
         resolvedContent: 'new a',
         reasoning: 'reason a',
-        confidence: 'high',
       },
       {
         path: 'src/b.ts',
         resolvedContent: 'new b',
         reasoning: 'reason b',
-        confidence: 'medium',
       },
     ]
 
@@ -88,7 +85,6 @@ describe('applyCopilotResolutionsToWorkingDirectory', () => {
         path: '/etc/passwd',
         resolvedContent: 'malicious content',
         reasoning: 'reason',
-        confidence: 'high',
       },
     ]
 
@@ -106,7 +102,6 @@ describe('applyCopilotResolutionsToWorkingDirectory', () => {
         path: '../../../etc/hosts',
         resolvedContent: 'malicious content',
         reasoning: 'reason',
-        confidence: 'high',
       },
     ]
 
@@ -124,7 +119,6 @@ describe('applyCopilotResolutionsToWorkingDirectory', () => {
         path: 'src/../../outside',
         resolvedContent: 'malicious content',
         reasoning: 'reason',
-        confidence: 'low',
       },
     ]
 
@@ -144,13 +138,11 @@ describe('applyCopilotResolutionsToWorkingDirectory', () => {
         path: 'src/good.ts',
         resolvedContent: 'should not be written',
         reasoning: 'reason',
-        confidence: 'high',
       },
       {
         path: '../escape',
         resolvedContent: 'malicious',
         reasoning: 'reason',
-        confidence: 'high',
       },
     ]
 

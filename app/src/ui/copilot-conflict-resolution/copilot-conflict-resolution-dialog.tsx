@@ -20,7 +20,6 @@ import { getBlobContents } from '../../lib/git/show'
 import {
   ICopilotConflictResolutionResponse,
   IFileResolution,
-  ConflictResolutionConfidence,
 } from '../../lib/copilot-conflict-resolution'
 
 /**
@@ -265,7 +264,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
                 <span className="copilot-conflict-dir-path">{dirPath}/</span>
               )}
             </div>
-            {this.renderConfidenceBadge(resolution.confidence)}
           </div>
           {this.renderSummaryActions(path, isSkipped)}
         </div>
@@ -356,7 +354,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
       >
         {this.renderChoiceIcon(choice)}
         <span className="changes-file-name">{fileName}</span>
-        {this.renderConfidenceBadge(resolution.confidence)}
       </button>
     )
   }
@@ -405,7 +402,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
           <div className="copilot-changes-viewer-info">
             <div className="copilot-changes-viewer-title-row">
               <span className="copilot-changes-viewer-path">{path}</span>
-              {this.renderConfidenceBadge(resolution.confidence)}
               <DiffOptions
                 isInteractiveDiff={false}
                 hideWhitespaceChanges={false}
@@ -579,16 +575,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
           {' Skip'}
         </Button>
       </div>
-    )
-  }
-
-  private renderConfidenceBadge(
-    confidence: ConflictResolutionConfidence
-  ): JSX.Element {
-    return (
-      <span className={'copilot-conflict-confidence confidence-' + confidence}>
-        {confidence}
-      </span>
     )
   }
 

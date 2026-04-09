@@ -172,33 +172,6 @@
     text-overflow: ellipsis;
   }
 
-  // Confidence badges
-  .copilot-conflict-confidence {
-    display: inline-block;
-    padding: 1px 6px;
-    border-radius: 10px;
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
-    text-transform: capitalize;
-    white-space: nowrap;
-    flex-shrink: 0;
-
-    &.confidence-high {
-      background-color: var(--color-new);
-      color: var(--box-background-color);
-    }
-
-    &.confidence-medium {
-      background-color: var(--color-modified);
-      color: var(--box-background-color);
-    }
-
-    &.confidence-low {
-      background-color: var(--error-color);
-      color: var(--box-background-color);
-    }
-  }
-
   // Resolution picker (Copilot / Ours / Theirs / Skip)
   .copilot-conflict-resolution-picker {
     display: flex;

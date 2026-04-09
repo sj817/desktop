@@ -73,7 +73,6 @@ Your response must be a JSON object with a "resolutions" array. Each element has
 - "path": the file path (exactly as given)
 - "resolvedContent": the full resolved file content (not a diff — the entire file)
 - "reasoning": a single sentence explaining how you resolved the conflict
-- "confidence": "high", "medium", or "low" based on how confident you are
 
 Do not use markdown fences. Return only the raw JSON object.
 `

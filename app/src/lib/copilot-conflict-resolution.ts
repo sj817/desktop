@@ -6,9 +6,6 @@
  * from that module to avoid duplication.
  */
 
-/** Confidence level for a Copilot conflict resolution suggestion. */
-export type ConflictResolutionConfidence = 'high' | 'medium' | 'low'
-
 /** A single file's resolution as suggested by Copilot. */
 export interface IFileResolution {
   /** The repo-relative path of the conflicted file. */
@@ -19,23 +16,11 @@ export interface IFileResolution {
 
   /** A short, human-readable explanation of how Copilot resolved the conflict. */
   readonly reasoning: string
-
-  /** Copilot's self-assessed confidence in this resolution. */
-  readonly confidence: ConflictResolutionConfidence
 }
 
 /** The complete response from Copilot conflict resolution. */
 export interface ICopilotConflictResolutionResponse {
   readonly resolutions: ReadonlyArray<IFileResolution>
-}
-
-const validConfidenceValues = new Set<string>(['high', 'medium', 'low'])
-
-/** Typeguard for confidence values. */
-export function isValidConfidence(
-  value: string
-): value is ConflictResolutionConfidence {
-  return validConfidenceValues.has(value)
 }
 
 /**
@@ -99,17 +84,11 @@ export function parseCopilotConflictResolution(
         `Resolution for "${r.path}" must have a "reasoning" string`
       )
     }
-    if (typeof r.confidence !== 'string' || !isValidConfidence(r.confidence)) {
-      throw new Error(
-        `Resolution for "${r.path}" must have a valid "confidence" (high, medium, or low)`
-      )
-    }
 
     resolutions.push({
       path: r.path,
       resolvedContent: r.resolvedContent,
       reasoning: r.reasoning,
-      confidence: r.confidence,
     })
   }
 
