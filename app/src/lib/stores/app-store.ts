@@ -5735,6 +5735,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
     if (textConflictPaths.length === 0) {
       this.popupManager.updatePopup({
+        ...this.popupManager.currentPopup,
         type: PopupType.CopilotConflictResolution,
         repository,
         loading: false,
@@ -5760,6 +5761,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       }
 
       this.popupManager.updatePopup({
+        ...this.popupManager.currentPopup,
         type: PopupType.CopilotConflictResolution,
         repository,
         loading: false,
@@ -5777,6 +5779,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
       const message = e instanceof Error ? e.message : String(e)
       this.popupManager.updatePopup({
+        ...this.popupManager.currentPopup,
         type: PopupType.CopilotConflictResolution,
         repository,
         loading: false,
