@@ -40,16 +40,25 @@ import {
   IFileResolution,
 } from '../../lib/copilot-conflict-resolution'
 import {
+  CopyFilePathLabel,
+  CopyRelativeFilePathLabel,
+  DefaultEditorLabel,
+  isSafeFileExtension,
   OpenWithDefaultProgramLabel,
   RevealInFileManagerLabel,
 } from '../lib/context-menu'
 import { openFile } from '../lib/open-file'
 import { revealInFileManager } from '../../lib/app-shell'
+import { pathExists } from '../lib/path-exists'
 import { DialogPreferredFocusClassName } from '../dialog'
 import { SideBySideDiff } from '../diff/side-by-side-diff'
 import { DiffOptions } from '../diff/diff-options'
 import { Resizable } from '../resizable'
 import { TabBar } from '../tab-bar'
+import { FileList } from '../history/file-list'
+import { ClickSource } from '../lib/list'
+import { clamp } from '../../lib/clamp'
+import { clipboard } from 'electron'
 import { generateDiffFromStrings } from '../../lib/diff-from-strings'
 import { getBlobContents } from '../../lib/git/show'
 
@@ -176,6 +185,23 @@ export class CopilotConflictResolutionDialog extends React.Component<
     }
   }
 
+  public componentDidMount() {
+    // Auto-accept all files that have Copilot suggestions. If the user wants
+    // a different resolution they can change it via the dropdown.
+    const { copilotResponse, acceptedCopilotResolutions, repository } =
+      this.props
+    const unaccepted = copilotResponse.resolutions.filter(
+      r => !acceptedCopilotResolutions.has(r.path)
+    )
+    for (const r of unaccepted) {
+      this.props.dispatcher.updateAcceptedCopilotResolution(
+        repository,
+        r.path,
+        true
+      )
+    }
+  }
+
   public componentWillUnmount() {
     const {
       workingDirectory,
@@ -256,13 +282,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
       )
     }
   }
-
-  private onSelectChangesFile =
-    (path: string) => (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault()
-      this.setState({ selectedFilePath: path })
-      this.loadDiffForFile(path, this.state.selectedVariant)
-    }
 
   private onSelectVariant =
     (variant: DiffVariant) => (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -453,12 +472,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
       return null
     }
 
-    const {
-      manualResolutions,
-      resolvedExternalEditor,
-      ourBranch,
-      theirBranch,
-    } = this.props
+    const { manualResolutions, resolvedExternalEditor } = this.props
 
     const manualResolution = manualResolutions.get(file.path)
     const copilotResolution = this.getCopilotResolution(file.path)
@@ -473,66 +487,8 @@ export class CopilotConflictResolutionDialog extends React.Component<
     }
 
     const isTextConflict = isConflictWithMarkers(file.status)
-    const disabled = resolvedExternalEditor === null
 
-    const onDropdownClick = () => {
-      const absoluteFilePath = Path.join(this.props.repository.path, file.path)
-      const items: IMenuItem[] = []
-
-      if (copilotResolution !== undefined && isTextConflict) {
-        items.push({
-          label: 'Use Copilot\u2019s suggestion',
-          action: () => this.onUseCopilotSuggestion(file.path),
-        })
-        items.push({ type: 'separator' })
-      }
-
-      items.push({
-        label: OpenWithDefaultProgramLabel,
-        action: () => openFile(absoluteFilePath, this.props.dispatcher),
-      })
-      items.push({
-        label: RevealInFileManagerLabel,
-        action: () => revealInFileManager(this.props.repository, file.path),
-      })
-
-      if (isConflictedFile(file.status)) {
-        items.push({ type: 'separator' })
-        items.push({
-          label: getLabelForManualResolutionOption(
-            file.status.entry.us,
-            ourBranch
-          ),
-          action: () => {
-            this.onUndoCopilotSuggestion(file.path)
-            this.props.dispatcher.updateManualConflictResolution(
-              this.props.repository,
-              file.path,
-              ManualConflictResolution.ours
-            )
-          },
-        })
-        items.push({
-          label: getLabelForManualResolutionOption(
-            file.status.entry.them,
-            theirBranch
-          ),
-          action: () => {
-            this.onUndoCopilotSuggestion(file.path)
-            this.props.dispatcher.updateManualConflictResolution(
-              this.props.repository,
-              file.path,
-              ManualConflictResolution.theirs
-            )
-          },
-        })
-      }
-
-      this.setIsFileResolutionOptionsMenuOpen(true)
-      showContextualMenu(items).then(() => {
-        this.setIsFileResolutionOptionsMenuOpen(false)
-      })
-    }
+    const onDropdownClick = () => this.showFileResolutionMenu(file, false)
 
     let subtitle = 'Manual conflict'
     let subtitleClassName = 'file-conflicts-status'
@@ -545,15 +501,16 @@ export class CopilotConflictResolutionDialog extends React.Component<
       subtitle = conflicts === 1 ? '1 conflict' : conflicts + ' conflicts'
     }
 
-    const openEditorButtonClassName = isFirstConflictedFile
+    const editorButtonClassName = isFirstConflictedFile
       ? `small-button button-group-item ${DialogPreferredFocusClassName}`
       : 'small-button button-group-item'
 
-    const onApplyCopilot = () => this.onUseCopilotSuggestion(file.path)
     const onOpenEditor = () =>
       this.props.openFileInExternalEditor(
         Path.join(this.props.repository.path, file.path)
       )
+
+    const editorDisabled = resolvedExternalEditor === null
 
     return (
       <li key={file.path} className="unmerged-file-status-conflicts">
@@ -563,29 +520,19 @@ export class CopilotConflictResolutionDialog extends React.Component<
           <div className={subtitleClassName}>{subtitle}</div>
         </div>
         <div className="action-buttons">
-          {copilotResolution !== undefined && isTextConflict && (
-            <Button
-              className="small-button button-group-item copilot-apply-button"
-              // eslint-disable-next-line react/jsx-no-bind
-              onClick={onApplyCopilot}
-            >
-              <Octicon symbol={octicons.copilot} />
-              {' Apply'}
-            </Button>
-          )}
           {isTextConflict && (
             <Button
               // eslint-disable-next-line react/jsx-no-bind
               onClick={onOpenEditor}
-              disabled={disabled}
+              disabled={editorDisabled}
               tooltip={
-                disabled
+                editorDisabled
                   ? __DARWIN__
                     ? 'No editor configured in Preferences > Advanced'
                     : 'No editor configured in Options > Advanced'
                   : undefined
               }
-              className={openEditorButtonClassName}
+              className={editorButtonClassName}
             >
               {`Open in ${resolvedExternalEditor || 'editor'}`}
             </Button>
@@ -660,7 +607,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
     const copilotResolution = this.getCopilotResolution(file.path)
     const reasoning = copilotResolution?.reasoning ?? 'Copilot suggestion'
 
-    const onUndo = () => this.onUndoCopilotSuggestion(file.path)
+    const onDropdownClick = () => this.showFileResolutionMenu(file, true)
 
     return (
       <li key={file.path} className="unmerged-file-status-resolved">
@@ -671,14 +618,17 @@ export class CopilotConflictResolutionDialog extends React.Component<
             {reasoning}
           </div>
         </div>
-        <Button
-          className="undo-button"
-          // eslint-disable-next-line react/jsx-no-bind
-          onClick={onUndo}
-          ariaDescribedBy={file.path}
-        >
-          Undo
-        </Button>
+        <div className="action-buttons">
+          <Button
+            // eslint-disable-next-line react/jsx-no-bind
+            onClick={onDropdownClick}
+            className="small-button button-group-item arrow-menu"
+            ariaLabel="File resolution options"
+            ariaHaspopup="menu"
+          >
+            <Octicon symbol={octicons.triangleDown} />
+          </Button>
+        </div>
         <div className="green-circle">
           <Octicon symbol={octicons.check} />
         </div>
@@ -686,85 +636,256 @@ export class CopilotConflictResolutionDialog extends React.Component<
     )
   }
 
+  /** Show the contextual menu for choosing a file resolution strategy. */
+  private showFileResolutionMenu(
+    file: WorkingDirectoryFileChange,
+    isCopilotAccepted: boolean
+  ): void {
+    if (!isConflictedFile(file.status)) {
+      return
+    }
+
+    const { ourBranch, theirBranch } = this.props
+    const absoluteFilePath = Path.join(this.props.repository.path, file.path)
+    const copilotResolution = this.getCopilotResolution(file.path)
+    const manualResolution = this.props.manualResolutions.get(file.path)
+    const isTextConflict = isConflictWithMarkers(file.status)
+
+    const items: IMenuItem[] = []
+
+    // Resolution strategy checkboxes
+    if (copilotResolution !== undefined && isTextConflict) {
+      items.push({
+        type: 'checkbox',
+        label: 'Use Copilot\u2019s suggestion',
+        checked: isCopilotAccepted,
+        action: () => {
+          if (!isCopilotAccepted) {
+            // Clear manual resolution if any, accept Copilot
+            this.props.dispatcher.updateManualConflictResolution(
+              this.props.repository,
+              file.path,
+              null
+            )
+            this.onUseCopilotSuggestion(file.path)
+          }
+        },
+      })
+    }
+
+    items.push({
+      type: 'checkbox',
+      label: getLabelForManualResolutionOption(file.status.entry.us, ourBranch),
+      checked:
+        !isCopilotAccepted &&
+        manualResolution === ManualConflictResolution.ours,
+      action: () => {
+        this.onUndoCopilotSuggestion(file.path)
+        this.props.dispatcher.updateManualConflictResolution(
+          this.props.repository,
+          file.path,
+          ManualConflictResolution.ours
+        )
+      },
+    })
+
+    items.push({
+      type: 'checkbox',
+      label: getLabelForManualResolutionOption(
+        file.status.entry.them,
+        theirBranch
+      ),
+      checked:
+        !isCopilotAccepted &&
+        manualResolution === ManualConflictResolution.theirs,
+      action: () => {
+        this.onUndoCopilotSuggestion(file.path)
+        this.props.dispatcher.updateManualConflictResolution(
+          this.props.repository,
+          file.path,
+          ManualConflictResolution.theirs
+        )
+      },
+    })
+
+    items.push({ type: 'separator' })
+
+    items.push({
+      label: `Open in ${this.props.resolvedExternalEditor || 'editor'}`,
+      action: () => this.props.openFileInExternalEditor(absoluteFilePath),
+      enabled: this.props.resolvedExternalEditor !== null,
+    })
+
+    items.push({
+      label: OpenWithDefaultProgramLabel,
+      action: () => openFile(absoluteFilePath, this.props.dispatcher),
+    })
+    items.push({
+      label: RevealInFileManagerLabel,
+      action: () => revealInFileManager(this.props.repository, file.path),
+    })
+
+    this.setIsFileResolutionOptionsMenuOpen(true)
+    showContextualMenu(items).then(() => {
+      this.setIsFileResolutionOptionsMenuOpen(false)
+    })
+  }
+
   // -- Changes tab (diff viewer) --------------------------------------
+
+  /**
+   * Convert conflicted working-directory files to CommittedFileChange instances
+   * so we can reuse the standard FileList component.
+   */
+  private getConflictedCommittedFiles(
+    unmergedFiles: ReadonlyArray<WorkingDirectoryFileChange>
+  ): ReadonlyArray<CommittedFileChange> {
+    return unmergedFiles
+      .filter(f => isConflictedFile(f.status))
+      .map(f => new CommittedFileChange(f.path, f.status, 'HEAD', 'HEAD~1'))
+  }
+
+  private getSelectedCommittedFile(
+    files: ReadonlyArray<CommittedFileChange>
+  ): CommittedFileChange | null {
+    const { selectedFilePath } = this.state
+    if (selectedFilePath === null) {
+      return null
+    }
+    return files.find(f => f.path === selectedFilePath) ?? null
+  }
+
+  private onChangesFileSelected = (file: CommittedFileChange) => {
+    this.setState({ selectedFilePath: file.path })
+    this.loadDiffForFile(file.path, this.state.selectedVariant)
+  }
+
+  private onChangesFileDoubleClick = (row: number, _source: ClickSource) => {
+    const files = this.getConflictedCommittedFiles(
+      getUnmergedFiles(this.props.workingDirectory)
+    )
+    const file = files[row]
+    if (file !== undefined) {
+      const fullPath = Path.join(this.props.repository.path, file.path)
+      this.props.openFileInExternalEditor(fullPath)
+    }
+  }
+
+  private onChangesFileContextMenu = async (
+    file: CommittedFileChange,
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    event.preventDefault()
+
+    const { repository } = this.props
+    const fullPath = Path.join(repository.path, file.path)
+    const fileExistsOnDisk = await pathExists(fullPath)
+    if (!fileExistsOnDisk) {
+      showContextualMenu([
+        {
+          label: __DARWIN__
+            ? 'File Does Not Exist on Disk'
+            : 'File does not exist on disk',
+          enabled: false,
+        },
+      ])
+      return
+    }
+
+    const { resolvedExternalEditor: externalEditorLabel } = this.props
+    const extension = Path.extname(file.path)
+    const isSafeExtension = isSafeFileExtension(extension)
+
+    const openInExternalEditor =
+      externalEditorLabel !== null
+        ? `${DefaultEditorLabel} ${externalEditorLabel}`
+        : DefaultEditorLabel
+
+    const items: ReadonlyArray<IMenuItem> = [
+      {
+        label: CopyFilePathLabel,
+        action: () => clipboard.writeText(fullPath),
+      },
+      {
+        label: CopyRelativeFilePathLabel,
+        action: () => clipboard.writeText(file.path),
+      },
+      { type: 'separator' },
+      {
+        label: RevealInFileManagerLabel,
+        action: () => revealInFileManager(repository, file.path),
+      },
+      {
+        label: openInExternalEditor,
+        action: () => this.props.openFileInExternalEditor(fullPath),
+        enabled: externalEditorLabel !== null,
+      },
+      {
+        label: OpenWithDefaultProgramLabel,
+        action: () => openFile(fullPath, this.props.dispatcher),
+        enabled: isSafeExtension,
+      },
+    ]
+
+    showContextualMenu(items)
+  }
 
   private renderChangesTab(
     unmergedFiles: ReadonlyArray<WorkingDirectoryFileChange>
   ): JSX.Element {
-    const { selectedFilePath } = this.state
-    const selectedResolution = selectedFilePath
-      ? this.getCopilotResolution(selectedFilePath)
+    const files = this.getConflictedCommittedFiles(unmergedFiles)
+    const selectedFile = this.getSelectedCommittedFile(files)
+    const selectedResolution = this.state.selectedFilePath
+      ? this.getCopilotResolution(this.state.selectedFilePath)
       : undefined
+    const conflictCount = files.length
 
     return (
       <div className="copilot-changes-tab">
-        <Resizable
-          width={this.state.sidebarWidth}
-          minimumWidth={MinSidebarWidth}
-          maximumWidth={MaxSidebarWidth}
-          onResize={this.onSidebarResize}
-          onReset={this.onSidebarReset}
-          description="Conflict file list"
-        >
-          <div className="copilot-changes-sidebar">
-            {unmergedFiles.map(f => {
-              if (!isConflictedFile(f.status)) {
-                return null
-              }
-              const manualRes = this.props.manualResolutions.get(f.path)
-              const isResolved = !hasUnresolvedConflicts(f.status, manualRes)
-              return this.renderChangesFileItem(f.path, isResolved)
-            })}
+        <div className="files-changed-header">
+          <div className="commits-displayed">
+            {conflictCount === 1
+              ? '1 conflicted file'
+              : `${conflictCount} conflicted files`}
           </div>
-        </Resizable>
-        <div className="copilot-changes-content">
-          {selectedResolution !== undefined
-            ? this.renderChangesViewer(selectedResolution)
-            : this.renderNoFileSelected()}
+          <DiffOptions
+            isInteractiveDiff={false}
+            hideWhitespaceChanges={false}
+            onHideWhitespaceChangesChanged={this.onNoOp}
+            showSideBySideDiff={this.state.showSideBySideDiff}
+            onShowSideBySideDiffChanged={this.onShowSideBySideDiffChanged}
+            onDiffOptionsOpened={this.onNoOp}
+          />
+        </div>
+        <div className="files-diff-viewer">
+          <Resizable
+            width={this.state.sidebarWidth}
+            minimumWidth={MinSidebarWidth}
+            maximumWidth={MaxSidebarWidth}
+            onResize={this.onSidebarResize}
+            onReset={this.onSidebarReset}
+            description="Conflict file list"
+          >
+            <FileList
+              files={files}
+              onSelectedFileChanged={this.onChangesFileSelected}
+              selectedFile={selectedFile}
+              availableWidth={clamp({
+                value: this.state.sidebarWidth,
+                min: MinSidebarWidth,
+                max: MaxSidebarWidth,
+              })}
+              onContextMenu={this.onChangesFileContextMenu}
+              onRowDoubleClick={this.onChangesFileDoubleClick}
+            />
+          </Resizable>
+          <div className="copilot-changes-content">
+            {selectedResolution !== undefined
+              ? this.renderChangesViewer(selectedResolution)
+              : this.renderNoFileSelected()}
+          </div>
         </div>
       </div>
-    )
-  }
-
-  private renderChangesFileItem(
-    filePath: string,
-    isResolved: boolean
-  ): JSX.Element {
-    const isSelected = this.state.selectedFilePath === filePath
-    const fileName = Path.basename(filePath)
-    const hasCopilotSuggestion =
-      this.getCopilotResolution(filePath) !== undefined
-
-    return (
-      <button
-        key={filePath}
-        className={
-          'copilot-changes-file-entry' +
-          (isSelected ? ' selected' : '') +
-          (isResolved ? ' resolved' : '')
-        }
-        onClick={this.onSelectChangesFile(filePath)}
-        type="button"
-        aria-label={filePath}
-      >
-        {isResolved ? (
-          <Octicon
-            symbol={octicons.check}
-            className="choice-icon choice-resolved"
-          />
-        ) : hasCopilotSuggestion ? (
-          <Octicon
-            symbol={octicons.copilot}
-            className="choice-icon choice-copilot"
-          />
-        ) : (
-          <Octicon
-            symbol={octicons.fileCode}
-            className="choice-icon choice-unresolved"
-          />
-        )}
-        <span className="changes-file-name">{fileName}</span>
-      </button>
     )
   }
 
@@ -782,14 +903,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
           <div className="copilot-changes-viewer-info">
             <div className="copilot-changes-viewer-title-row">
               <span className="copilot-changes-viewer-path">{path}</span>
-              <DiffOptions
-                isInteractiveDiff={false}
-                hideWhitespaceChanges={false}
-                onHideWhitespaceChangesChanged={this.onNoOp}
-                showSideBySideDiff={this.state.showSideBySideDiff}
-                onShowSideBySideDiffChanged={this.onShowSideBySideDiffChanged}
-                onDiffOptionsOpened={this.onNoOp}
-              />
             </div>
             <div className="copilot-changes-viewer-reasoning">
               <Octicon symbol={octicons.copilot} />
