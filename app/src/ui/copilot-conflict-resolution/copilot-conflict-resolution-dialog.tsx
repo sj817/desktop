@@ -13,7 +13,10 @@ import { ManualConflictResolution } from '../../models/manual-conflict-resolutio
 import { ITextDiff } from '../../models/diff'
 import { CommittedFileChange, AppFileStatusKind } from '../../models/status'
 import { SideBySideDiff } from '../diff/side-by-side-diff'
+import { DiffOptions } from '../diff/diff-options'
+import { Resizable } from '../resizable'
 import { generateDiffFromStrings } from '../../lib/diff-from-strings'
+import { getBlobContents } from '../../lib/git/show'
 import {
   ICopilotConflictResolutionResponse,
   IFileResolution,
@@ -33,6 +36,20 @@ type FileResolutionChoice = 'copilot' | 'ours' | 'theirs' | 'skip'
 /** Top-level dialog view. */
 type DialogTab = 'summary' | 'changes'
 
+/** Key for caching diffs by file path and resolution variant. */
+type DiffCacheKey = string
+
+const DefaultSidebarWidth = 250
+const MinSidebarWidth = 150
+const MaxSidebarWidth = 400
+
+function diffCacheKey(
+  path: string,
+  variant: FileResolutionChoice
+): DiffCacheKey {
+  return path + '::' + variant
+}
+
 interface ICopilotConflictResolutionDialogProps {
   readonly dispatcher: Dispatcher
   readonly repository: Repository
@@ -47,12 +64,12 @@ interface ICopilotConflictResolutionDialogState {
   readonly activeTab: DialogTab
   /** Selected file in the Changes tab. */
   readonly selectedFilePath: string | null
-  /** Cached diffs: original conflict content vs Copilot resolution. */
-  readonly fileDiffs: ReadonlyMap<string, ITextDiff>
-  /** Files currently generating diffs. */
-  readonly loadingDiffs: ReadonlySet<string>
-  /** Files that failed to generate diffs (fallback to plain text). */
-  readonly diffErrors: ReadonlyMap<string, string>
+  /** Cached diffs keyed by path::variant. */
+  readonly fileDiffs: ReadonlyMap<DiffCacheKey, ITextDiff>
+  /** Diff cache keys currently loading. */
+  readonly loadingDiffs: ReadonlySet<DiffCacheKey>
+  /** Diff cache keys that failed with an error. */
+  readonly diffErrors: ReadonlyMap<DiffCacheKey, string>
   /** Cached original file contents for plain-text fallback. */
   readonly originalContents: ReadonlyMap<string, string>
   /** Text used to filter the file list (Summary tab). */
@@ -61,14 +78,18 @@ interface ICopilotConflictResolutionDialogState {
   readonly isApplying: boolean
   /** Error message to display if applying fails. */
   readonly applyError: string | null
+  /** Whether to show side-by-side or unified diff. */
+  readonly showSideBySideDiff: boolean
+  /** Width of the file sidebar in the Changes tab. */
+  readonly sidebarWidth: number
 }
 
 /**
  * Dialog for reviewing and applying Copilot's conflict resolution suggestions.
  *
  * Offers two views via top-level tabs:
- * - **Summary**: compact file list with resolution pickers for fast decisions
- * - **Changes**: file sidebar + side-by-side diff viewer for detailed inspection
+ * - **Summary**: compact file list for quick accept/skip decisions
+ * - **Changes**: resizable file sidebar + side-by-side diff viewer
  */
 export class CopilotConflictResolutionDialog extends React.Component<
   ICopilotConflictResolutionDialogProps,
@@ -91,13 +112,15 @@ export class CopilotConflictResolutionDialog extends React.Component<
       fileChoices,
       activeTab: 'summary',
       selectedFilePath: firstPath,
-      fileDiffs: new Map<string, ITextDiff>(),
-      loadingDiffs: new Set<string>(),
-      diffErrors: new Map<string, string>(),
+      fileDiffs: new Map<DiffCacheKey, ITextDiff>(),
+      loadingDiffs: new Set<DiffCacheKey>(),
+      diffErrors: new Map<DiffCacheKey, string>(),
       originalContents: new Map<string, string>(),
       filterText: '',
       isApplying: false,
       applyError: null,
+      showSideBySideDiff: true,
+      sidebarWidth: DefaultSidebarWidth,
     }
   }
 
@@ -222,13 +245,16 @@ export class CopilotConflictResolutionDialog extends React.Component<
   private renderSummaryRow(resolution: IFileResolution): JSX.Element {
     const { path } = resolution
     const choice = this.state.fileChoices.get(path) ?? 'copilot'
+    const isSkipped = choice === 'skip'
     const fileName = Path.basename(path)
     const dirPath = Path.dirname(path)
 
     return (
       <div
         key={path}
-        className={'copilot-conflict-file-item file-choice-' + choice}
+        className={
+          'copilot-conflict-file-item' + (isSkipped ? ' file-choice-skip' : '')
+        }
         role="listitem"
       >
         <div className="copilot-conflict-file-header">
@@ -241,11 +267,38 @@ export class CopilotConflictResolutionDialog extends React.Component<
             </div>
             {this.renderConfidenceBadge(resolution.confidence)}
           </div>
+          {this.renderSummaryActions(path, isSkipped)}
         </div>
 
         <div className="copilot-conflict-reasoning">{resolution.reasoning}</div>
+      </div>
+    )
+  }
 
-        {this.renderResolutionPicker(path, choice)}
+  /** Simple accept/skip toggle for the Summary tab. */
+  private renderSummaryActions(path: string, isSkipped: boolean): JSX.Element {
+    return (
+      <div className="copilot-summary-actions">
+        {isSkipped ? (
+          <Button
+            className="summary-action-use"
+            onClick={this.onSetChoice(path, 'copilot')}
+            size="small"
+            tooltip="Use Copilot's suggested resolution"
+          >
+            <Octicon symbol={octicons.copilot} />
+            {' Use Copilot'}
+          </Button>
+        ) : (
+          <Button
+            className="summary-action-skip"
+            onClick={this.onSetChoice(path, 'skip')}
+            size="small"
+            tooltip="Skip this file and handle it manually"
+          >
+            {' Skip'}
+          </Button>
+        )}
       </div>
     )
   }
@@ -261,9 +314,18 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
     return (
       <div className="copilot-changes-tab">
-        <div className="copilot-changes-sidebar">
-          {resolutions.map(r => this.renderChangesFileItem(r))}
-        </div>
+        <Resizable
+          width={this.state.sidebarWidth}
+          minimumWidth={MinSidebarWidth}
+          maximumWidth={MaxSidebarWidth}
+          onResize={this.onSidebarResize}
+          onReset={this.onSidebarReset}
+          description="Conflict file list"
+        >
+          <div className="copilot-changes-sidebar">
+            {resolutions.map(r => this.renderChangesFileItem(r))}
+          </div>
+        </Resizable>
         <div className="copilot-changes-content">
           {selectedResolution !== undefined
             ? this.renderChangesViewer(selectedResolution)
@@ -332,14 +394,32 @@ export class CopilotConflictResolutionDialog extends React.Component<
   private renderChangesViewer(resolution: IFileResolution): JSX.Element {
     const { path } = resolution
     const choice = this.state.fileChoices.get(path) ?? 'copilot'
-    const diff = this.state.fileDiffs.get(path)
-    const isLoading = this.state.loadingDiffs.has(path)
-    const diffError = this.state.diffErrors.get(path)
+    const cacheKey = diffCacheKey(path, choice)
+    const diff = this.state.fileDiffs.get(cacheKey)
+    const isLoading = this.state.loadingDiffs.has(cacheKey)
+    const diffError = this.state.diffErrors.get(cacheKey)
 
     return (
       <div className="copilot-changes-viewer">
         <div className="copilot-changes-viewer-header">
-          <span className="copilot-changes-viewer-path">{path}</span>
+          <div className="copilot-changes-viewer-info">
+            <div className="copilot-changes-viewer-title-row">
+              <span className="copilot-changes-viewer-path">{path}</span>
+              {this.renderConfidenceBadge(resolution.confidence)}
+              <DiffOptions
+                isInteractiveDiff={false}
+                hideWhitespaceChanges={false}
+                onHideWhitespaceChangesChanged={this.onNoOp}
+                showSideBySideDiff={this.state.showSideBySideDiff}
+                onShowSideBySideDiffChanged={this.onShowSideBySideDiffChanged}
+                onDiffOptionsOpened={this.onNoOp}
+              />
+            </div>
+            <div className="copilot-changes-viewer-reasoning">
+              <Octicon symbol={octicons.copilot} />
+              <span>{resolution.reasoning}</span>
+            </div>
+          </div>
           {this.renderResolutionPicker(path, choice)}
         </div>
 
@@ -354,17 +434,31 @@ export class CopilotConflictResolutionDialog extends React.Component<
             this.renderDiffFallback(resolution, diffError)}
           {diff !== undefined &&
             !isLoading &&
-            this.renderSideBySideDiff(path, diff)}
+            this.renderDiffContent(path, diff, choice)}
         </div>
       </div>
     )
   }
 
-  private renderSideBySideDiff(filePath: string, diff: ITextDiff): JSX.Element {
+  private renderDiffContent(
+    filePath: string,
+    diff: ITextDiff,
+    choice: FileResolutionChoice
+  ): JSX.Element {
+    if (choice === 'skip') {
+      return (
+        <div className="copilot-changes-skip-message">
+          <Octicon symbol={octicons.skip} />
+          <p>This file is skipped and will remain unresolved.</p>
+          <p>Switch to Changes tab options above to pick a resolution.</p>
+        </div>
+      )
+    }
+
     if (diff.hunks.length === 0) {
       return (
         <div className="copilot-changes-no-diff">
-          <p>No changes detected between the original and resolved content.</p>
+          <p>No changes between the original and the selected resolution.</p>
         </div>
       )
     }
@@ -381,7 +475,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
         file={file}
         diff={diff}
         fileContents={null}
-        showSideBySideDiff={true}
+        showSideBySideDiff={this.state.showSideBySideDiff}
         hideWhitespaceInDiff={false}
         showDiffCheckMarks={false}
         onHideWhitespaceInDiffChanged={this.onNoOp}
@@ -434,6 +528,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
   // -- Shared rendering -----------------------------------------------
 
+  /** Full resolution picker (Copilot/Ours/Theirs/Skip) for Changes tab. */
   private renderResolutionPicker(
     path: string,
     choice: FileResolutionChoice
@@ -548,7 +643,9 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
     // Load diff for the selected file when entering the Changes tab
     if (tab === 'changes' && this.state.selectedFilePath !== null) {
-      this.ensureDiffLoaded(this.state.selectedFilePath)
+      const choice =
+        this.state.fileChoices.get(this.state.selectedFilePath) ?? 'copilot'
+      this.ensureDiffLoaded(this.state.selectedFilePath, choice)
     }
   }
 
@@ -558,7 +655,8 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
   private onSelectFile = (path: string) => () => {
     this.setState({ selectedFilePath: path })
-    this.ensureDiffLoaded(path)
+    const choice = this.state.fileChoices.get(path) ?? 'copilot'
+    this.ensureDiffLoaded(path, choice)
   }
 
   private onSetChoice = (path: string, choice: FileResolutionChoice) => () => {
@@ -567,22 +665,50 @@ export class CopilotConflictResolutionDialog extends React.Component<
       fileChoices.set(path, choice)
       return { fileChoices }
     })
+
+    // If this is the selected file in the Changes tab, load the new variant
+    if (this.state.selectedFilePath === path && choice !== 'skip') {
+      this.ensureDiffLoaded(path, choice)
+    }
+  }
+
+  private onShowSideBySideDiffChanged = (showSideBySideDiff: boolean) => {
+    this.setState({ showSideBySideDiff })
+  }
+
+  private onSidebarResize = (width: number) => {
+    this.setState({ sidebarWidth: width })
+  }
+
+  private onSidebarReset = () => {
+    this.setState({ sidebarWidth: DefaultSidebarWidth })
   }
 
   /**
-   * Generate and cache a diff for the given file path.
+   * Generate and cache a diff for the given file path and resolution variant.
    *
-   * Reads the original conflict file from disk, then uses
-   * git diff --no-index to produce a proper ITextDiff comparing
-   * the original content against Copilot's resolution.
+   * For 'copilot': diffs original conflict file vs Copilot's resolution.
+   * For 'ours'/'theirs': diffs original vs git stage 2/3 content.
+   * For 'skip': no diff needed.
    */
-  private async ensureDiffLoaded(path: string): Promise<void> {
-    if (this.state.fileDiffs.has(path) || this.state.loadingDiffs.has(path)) {
+  private async ensureDiffLoaded(
+    path: string,
+    variant: FileResolutionChoice
+  ): Promise<void> {
+    if (variant === 'skip') {
+      return
+    }
+
+    const cacheKey = diffCacheKey(path, variant)
+    if (
+      this.state.fileDiffs.has(cacheKey) ||
+      this.state.loadingDiffs.has(cacheKey)
+    ) {
       return
     }
 
     this.setState(prevState => ({
-      loadingDiffs: new Set(prevState.loadingDiffs).add(path),
+      loadingDiffs: new Set(prevState.loadingDiffs).add(cacheKey),
     }))
 
     const resolution = this.props.resolutions.resolutions.find(
@@ -598,37 +724,64 @@ export class CopilotConflictResolutionDialog extends React.Component<
       const originalContent = await fs.readFile(absPath, 'utf8')
 
       // Cache original content for fallback display
-      this.setState(prevState => {
-        const originalContents = new Map(prevState.originalContents)
-        originalContents.set(path, originalContent)
-        return { originalContents }
-      })
+      if (!this.state.originalContents.has(path)) {
+        this.setState(prevState => {
+          const originalContents = new Map(prevState.originalContents)
+          originalContents.set(path, originalContent)
+          return { originalContents }
+        })
+      }
 
-      // Generate the diff via git diff --no-index
+      // Get the resolved content based on variant
+      let resolvedContent: string
+      switch (variant) {
+        case 'copilot':
+          resolvedContent = resolution.resolvedContent
+          break
+        case 'ours':
+          resolvedContent = await this.getStageContent(path, ':2')
+          break
+        case 'theirs':
+          resolvedContent = await this.getStageContent(path, ':3')
+          break
+      }
+
+      // Generate the diff
       const diff = await generateDiffFromStrings(
         this.props.repository,
         originalContent,
-        resolution.resolvedContent,
+        resolvedContent,
         path
       )
 
       this.setState(prevState => {
         const fileDiffs = new Map(prevState.fileDiffs)
-        fileDiffs.set(path, diff)
+        fileDiffs.set(cacheKey, diff)
         const loadingDiffs = new Set(prevState.loadingDiffs)
-        loadingDiffs.delete(path)
+        loadingDiffs.delete(cacheKey)
         return { fileDiffs, loadingDiffs }
       })
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e)
       this.setState(prevState => {
         const diffErrors = new Map(prevState.diffErrors)
-        diffErrors.set(path, message)
+        diffErrors.set(cacheKey, message)
         const loadingDiffs = new Set(prevState.loadingDiffs)
-        loadingDiffs.delete(path)
+        loadingDiffs.delete(cacheKey)
         return { diffErrors, loadingDiffs }
       })
     }
+  }
+
+  /** Retrieve file content from a merge stage (':2' for ours, ':3' for theirs). */
+  private async getStageContent(
+    filePath: string,
+    stage: ':2' | ':3'
+  ): Promise<string> {
+    // getBlobContents constructs `git show ${commitish}:${path}`
+    // For merge stages: `git show :2:path` where ':2' is the commitish
+    const buffer = await getBlobContents(this.props.repository, stage, filePath)
+    return buffer.toString('utf8')
   }
 
   // -- Apply ----------------------------------------------------------
