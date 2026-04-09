@@ -29,12 +29,7 @@ import { Button } from '../lib/button'
 import { Checkbox, CheckboxValue } from '../lib/checkbox'
 import { showContextualMenu } from '../../lib/menu-item'
 import { IMenuItem } from '../../lib/menu-item'
-import {
-  renderUnmergedFilesSummary,
-  renderShellLink,
-  renderAllResolved,
-} from '../lib/conflicts'
-import { DialogSuccess } from '../dialog/success'
+import { renderAllResolved } from '../lib/conflicts'
 import {
   ICopilotConflictResolutionResponse,
   IFileResolution,
@@ -113,7 +108,6 @@ interface ICopilotConflictResolutionDialogProps {
 interface ICopilotConflictResolutionDialogState {
   readonly isCommitting: boolean
   readonly isAborting: boolean
-  readonly isFileResolutionOptionsMenuOpen: boolean
 
   /** Active top-level tab. */
   readonly activeTab: DialogTab
@@ -154,9 +148,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
   ICopilotConflictResolutionDialogProps,
   ICopilotConflictResolutionDialogState
 > {
-  /** Tracks whether we've ever seen resolved files, for the "undone" banner */
-  private hasSeenResolvedFiles = false
-
   public constructor(props: ICopilotConflictResolutionDialogProps) {
     super(props)
 
@@ -171,7 +162,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
     this.state = {
       isCommitting: false,
       isAborting: false,
-      isFileResolutionOptionsMenuOpen: false,
       activeTab: 'summary',
       selectedFilePath: firstConflicted?.path ?? null,
       selectedVariant: 'copilot',
@@ -254,12 +244,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
   private openThisRepositoryInShell = () =>
     this.props.openRepositoryInShell(this.props.repository)
-
-  private setIsFileResolutionOptionsMenuOpen = (
-    isFileResolutionOptionsMenuOpen: boolean
-  ) => {
-    this.setState({ isFileResolutionOptionsMenuOpen })
-  }
 
   private onAlwaysResolveCopilotConflictsChanged = (
     event: React.FormEvent<HTMLInputElement>
@@ -428,9 +412,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
     return (
       <div className="copilot-summary-tab">
-        {renderUnmergedFilesSummary(conflictedFilesCount)}
         {this.renderUnmergedFiles(unmergedFiles)}
-        {renderShellLink(this.openThisRepositoryInShell)}
       </div>
     )
   }
@@ -511,9 +493,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
       ? 'unmerged-file-status-resolved'
       : 'unmerged-file-status-conflicts'
 
-    const onDropdownClick = () =>
-      this.showFileResolutionMenu(file, isCopilotAccepted)
-
     return (
       <li key={file.path} className={liClassName}>
         <Octicon symbol={octicons.fileCode} className="file-octicon" />
@@ -521,86 +500,110 @@ export class CopilotConflictResolutionDialog extends React.Component<
           <PathText path={file.path} />
           <div className={subtitleClassName}>{subtitle}</div>
         </div>
-        {!resolvedExternally && (
-          <div className="action-buttons">
-            <Button
-              // eslint-disable-next-line react/jsx-no-bind
-              onClick={onDropdownClick}
-              className="small-button button-group-item arrow-menu"
-              ariaLabel="File resolution options"
-              ariaHaspopup="menu"
-              ariaExpanded={this.state.isFileResolutionOptionsMenuOpen}
-            >
-              <Octicon symbol={octicons.triangleDown} />
-            </Button>
-          </div>
-        )}
-        {this.renderResolutionIndicator(
-          isCopilotAccepted,
-          manualResolution,
-          resolvedExternally
-        )}
+        <div className="action-buttons">
+          {!resolvedExternally
+            ? this.renderResolutionPill(
+                file,
+                isCopilotAccepted,
+                manualResolution
+              )
+            : this.renderExternallyResolvedBadge()}
+          {this.renderFileActionsKebab(file)}
+        </div>
       </li>
     )
   }
 
-  /** Render the right-side indicator showing how a file is resolved. */
-  private renderResolutionIndicator(
+  /** Clickable pill showing the active resolution strategy. */
+  private renderResolutionPill(
+    file: WorkingDirectoryFileChange,
     isCopilotAccepted: boolean,
-    manualResolution: ManualConflictResolution | undefined,
-    resolvedExternally: boolean
-  ): JSX.Element | null {
+    manualResolution: ManualConflictResolution | undefined
+  ): JSX.Element {
+    let icon: React.ReactNode
+    let label: string
+    let pillClass: string
+
     if (isCopilotAccepted) {
-      return (
-        <div
-          className="resolution-indicator copilot"
-          role="img"
-          aria-label="Copilot suggestion"
-        >
-          <Octicon symbol={octicons.copilot} />
-        </div>
-      )
-    }
-
-    if (manualResolution === ManualConflictResolution.ours) {
-      return (
-        <div
-          className="resolution-indicator current"
-          role="img"
-          aria-label="Using current changes"
-        >
+      icon = <Octicon symbol={octicons.copilot} />
+      label = 'Copilot'
+      pillClass = 'resolution-pill copilot'
+    } else if (manualResolution === ManualConflictResolution.ours) {
+      icon = (
+        <span className="chevron-pair">
           <Octicon symbol={octicons.chevronLeft} />
           <Octicon symbol={octicons.chevronLeft} />
-        </div>
+        </span>
       )
-    }
-
-    if (manualResolution === ManualConflictResolution.theirs) {
-      return (
-        <div
-          className="resolution-indicator incoming"
-          role="img"
-          aria-label="Using incoming changes"
-        >
+      label = 'Current'
+      pillClass = 'resolution-pill current'
+    } else if (manualResolution === ManualConflictResolution.theirs) {
+      icon = (
+        <span className="chevron-pair">
           <Octicon symbol={octicons.chevronRight} />
           <Octicon symbol={octicons.chevronRight} />
-        </div>
+        </span>
       )
+      label = 'Incoming'
+      pillClass = 'resolution-pill incoming'
+    } else {
+      icon = null
+      label = 'Resolve'
+      pillClass = 'resolution-pill unresolved'
     }
 
-    if (resolvedExternally) {
-      return (
-        <div className="resolution-indicator resolved-externally">
-          <Octicon symbol={octicons.check} />
-        </div>
-      )
-    }
+    const onClick = () => this.showResolutionPicker(file, isCopilotAccepted)
 
-    return null
+    return (
+      <Button
+        // eslint-disable-next-line react/jsx-no-bind
+        onClick={onClick}
+        className={pillClass}
+        ariaLabel={`Resolution: ${label}`}
+        ariaHaspopup="menu"
+      >
+        {icon}
+        <span className="resolution-pill-label">{label}</span>
+        <Octicon symbol={octicons.triangleDown} />
+      </Button>
+    )
   }
 
-  /** Show the contextual menu for choosing a file resolution strategy. */
-  private showFileResolutionMenu(
+  /** Badge for files resolved outside Desktop (no dropdown). */
+  private renderExternallyResolvedBadge(): JSX.Element {
+    return (
+      <div
+        className="resolution-pill resolved-externally"
+        role="img"
+        aria-label="Resolved externally"
+      >
+        <Octicon symbol={octicons.check} />
+        <span className="resolution-pill-label">Resolved</span>
+      </div>
+    )
+  }
+
+  /** Kebab menu for file actions (open in editor, reveal, etc.). */
+  private renderFileActionsKebab(
+    file: WorkingDirectoryFileChange
+  ): JSX.Element {
+    const onClick = () => this.showFileActionsMenu(file)
+
+    return (
+      <Button
+        // eslint-disable-next-line react/jsx-no-bind
+        onClick={onClick}
+        className="file-actions-kebab"
+        ariaLabel="More file actions"
+        ariaHaspopup="menu"
+      >
+        <Octicon symbol={octicons.kebabHorizontal} />
+      </Button>
+    )
+  }
+
+  /** Resolution picker menu (Copilot / Current / Incoming). */
+  private showResolutionPicker(
     file: WorkingDirectoryFileChange,
     isCopilotAccepted: boolean
   ): void {
@@ -609,14 +612,12 @@ export class CopilotConflictResolutionDialog extends React.Component<
     }
 
     const { ourBranch, theirBranch } = this.props
-    const absoluteFilePath = Path.join(this.props.repository.path, file.path)
     const copilotResolution = this.getCopilotResolution(file.path)
     const manualResolution = this.props.manualResolutions.get(file.path)
     const isTextConflict = isConflictWithMarkers(file.status)
 
     const items: IMenuItem[] = []
 
-    // Resolution strategy checkboxes
     if (copilotResolution !== undefined && isTextConflict) {
       items.push({
         type: 'checkbox',
@@ -624,7 +625,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
         checked: isCopilotAccepted,
         action: () => {
           if (!isCopilotAccepted) {
-            // Clear manual resolution if any, accept Copilot
             this.props.dispatcher.updateManualConflictResolution(
               this.props.repository,
               file.path,
@@ -671,27 +671,35 @@ export class CopilotConflictResolutionDialog extends React.Component<
       },
     })
 
-    items.push({ type: 'separator' })
+    showContextualMenu(items)
+  }
 
-    items.push({
-      label: `Open in ${this.props.resolvedExternalEditor || 'editor'}`,
-      action: () => this.props.openFileInExternalEditor(absoluteFilePath),
-      enabled: this.props.resolvedExternalEditor !== null,
-    })
+  /** File actions menu (open in editor, reveal, copy path, etc.). */
+  private showFileActionsMenu(file: WorkingDirectoryFileChange): void {
+    const absoluteFilePath = Path.join(this.props.repository.path, file.path)
 
-    items.push({
-      label: OpenWithDefaultProgramLabel,
-      action: () => openFile(absoluteFilePath, this.props.dispatcher),
-    })
-    items.push({
-      label: RevealInFileManagerLabel,
-      action: () => revealInFileManager(this.props.repository, file.path),
-    })
+    const items: IMenuItem[] = [
+      {
+        label: `Open in ${this.props.resolvedExternalEditor || 'editor'}`,
+        action: () => this.props.openFileInExternalEditor(absoluteFilePath),
+        enabled: this.props.resolvedExternalEditor !== null,
+      },
+      {
+        label: OpenWithDefaultProgramLabel,
+        action: () => openFile(absoluteFilePath, this.props.dispatcher),
+      },
+      {
+        label: RevealInFileManagerLabel,
+        action: () => revealInFileManager(this.props.repository, file.path),
+      },
+      { type: 'separator' },
+      {
+        label: __DARWIN__ ? 'Open in Terminal' : 'Open in command line',
+        action: () => this.openThisRepositoryInShell(),
+      },
+    ]
 
-    this.setIsFileResolutionOptionsMenuOpen(true)
-    showContextualMenu(items).then(() => {
-      this.setIsFileResolutionOptionsMenuOpen(false)
-    })
+    showContextualMenu(items)
   }
 
   // -- Changes tab (diff viewer) --------------------------------------
@@ -1000,41 +1008,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
     )
   }
 
-  // -- Banner ---------------------------------------------------------
-
-  public renderBanner(conflictedFilesCount: number) {
-    const { workingDirectory, manualResolutions } = this.props
-    const countResolved = getResolvedFiles(
-      workingDirectory,
-      manualResolutions
-    ).length
-
-    if (countResolved > 0) {
-      this.hasSeenResolvedFiles = true
-    }
-
-    if (countResolved === 0 && !this.hasSeenResolvedFiles) {
-      return
-    }
-
-    if (countResolved === 0) {
-      return <DialogSuccess>All resolutions have been undone.</DialogSuccess>
-    }
-
-    if (conflictedFilesCount === 0) {
-      return (
-        <DialogSuccess>All conflicted files have been resolved.</DialogSuccess>
-      )
-    }
-
-    const conflictPluralized = countResolved === 1 ? 'file has' : 'files have'
-    return (
-      <DialogSuccess>
-        {countResolved} conflicted {conflictPluralized} been resolved.
-      </DialogSuccess>
-    )
-  }
-
   // -- Top-level tabs -------------------------------------------------
 
   private renderDialogTabs(
@@ -1096,7 +1069,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
         disabled={this.state.isCommitting}
         className="copilot-conflict-resolution"
       >
-        {this.renderBanner(conflictedFiles.length)}
         <div className="copilot-conflict-resolution-content">
           {this.renderDialogTabs(conflictedFiles.length, unmergedFiles.length)}
 
