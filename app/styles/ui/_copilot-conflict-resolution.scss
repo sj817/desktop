@@ -356,56 +356,87 @@
     }
   }
 
-  // Content view toggle tabs (Copilot / Original Conflict)
-  .copilot-changes-view-tabs {
+  // Diff container (side-by-side diff viewer)
+  .copilot-changes-diff-container {
+    flex: 1;
+    overflow: auto;
     display: flex;
-    border-bottom: var(--base-border);
-    background-color: var(--box-alt-background-color);
+    flex-direction: column;
+  }
 
-    .view-tab {
-      flex: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--spacing-third);
-      padding: var(--spacing-half) var(--spacing);
-      border: none;
-      border-bottom: 2px solid transparent;
-      background: transparent;
-      color: var(--text-secondary-color);
-      font-size: var(--font-size-sm);
-      cursor: pointer;
-      transition: color 0.1s, border-color 0.1s;
+  .copilot-changes-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-half);
+    padding: var(--spacing-double);
+    color: var(--text-secondary-color);
 
-      &:hover {
-        color: var(--text-color);
-      }
-
-      &.active {
-        color: var(--text-color);
-        font-weight: var(--font-weight-semibold);
-        border-bottom-color: var(--button-primary-background);
-      }
+    .spin {
+      animation: spin 1s linear infinite;
     }
   }
 
-  // Code display
-  .copilot-changes-code-container {
-    flex: 1;
-    overflow: auto;
-    background-color: var(--box-alt-background-color);
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
-    .loading-original {
-      text-align: center;
-      padding: var(--spacing);
-      color: var(--text-secondary-color);
+  .copilot-changes-no-diff {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: var(--spacing-double);
+    color: var(--text-secondary-color);
+    font-style: italic;
+  }
+
+  // Plain-text fallback when diff generation fails
+  .copilot-changes-fallback {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .copilot-changes-fallback-warning {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-half);
+    padding: var(--spacing-half) var(--spacing);
+    background-color: var(--color-modified);
+    color: var(--box-background-color);
+    font-size: var(--font-size-sm);
+  }
+
+  .copilot-changes-fallback-panels {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .copilot-changes-fallback-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    border-right: var(--base-border);
+
+    &:last-child {
+      border-right: none;
     }
 
-    .load-error {
-      text-align: center;
-      padding: var(--spacing);
-      color: var(--error-color);
+    .fallback-panel-header {
+      padding: var(--spacing-half) var(--spacing);
       font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      background-color: var(--box-alt-background-color);
+      border-bottom: var(--base-border);
     }
   }
 
@@ -417,11 +448,6 @@
     line-height: 1.5;
     white-space: pre;
     tab-size: 4;
-
-    &.conflict-code {
-      // Subtle visual distinction for original conflict content
-      background-color: transparent;
-    }
   }
 }
 

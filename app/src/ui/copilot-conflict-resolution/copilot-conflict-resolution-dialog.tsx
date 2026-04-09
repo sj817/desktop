@@ -10,6 +10,10 @@ import { TextBox } from '../lib/text-box'
 import { Dispatcher } from '../dispatcher'
 import { Repository } from '../../models/repository'
 import { ManualConflictResolution } from '../../models/manual-conflict-resolution'
+import { ITextDiff } from '../../models/diff'
+import { CommittedFileChange, AppFileStatusKind } from '../../models/status'
+import { SideBySideDiff } from '../diff/side-by-side-diff'
+import { generateDiffFromStrings } from '../../lib/diff-from-strings'
 import {
   ICopilotConflictResolutionResponse,
   IFileResolution,
@@ -29,9 +33,6 @@ type FileResolutionChoice = 'copilot' | 'ours' | 'theirs' | 'skip'
 /** Top-level dialog view. */
 type DialogTab = 'summary' | 'changes'
 
-/** Which content to show in the Changes tab viewer. */
-type ContentView = 'copilot' | 'conflict'
-
 interface ICopilotConflictResolutionDialogProps {
   readonly dispatcher: Dispatcher
   readonly repository: Repository
@@ -46,17 +47,17 @@ interface ICopilotConflictResolutionDialogState {
   readonly activeTab: DialogTab
   /** Selected file in the Changes tab. */
   readonly selectedFilePath: string | null
-  /** Which content view is active in the Changes tab. */
-  readonly contentView: ContentView
-  /** Cached original file contents (with conflict markers). */
+  /** Cached diffs: original conflict content vs Copilot resolution. */
+  readonly fileDiffs: ReadonlyMap<string, ITextDiff>
+  /** Files currently generating diffs. */
+  readonly loadingDiffs: ReadonlySet<string>
+  /** Files that failed to generate diffs (fallback to plain text). */
+  readonly diffErrors: ReadonlyMap<string, string>
+  /** Cached original file contents for plain-text fallback. */
   readonly originalContents: ReadonlyMap<string, string>
-  /** Files currently loading their original content. */
-  readonly loadingOriginal: ReadonlySet<string>
-  /** Files that failed to load original content. */
-  readonly loadErrors: ReadonlyMap<string, string>
   /** Text used to filter the file list (Summary tab). */
   readonly filterText: string
-  /** Whether we're currently applying resolutions. */
+  /** Whether we are currently applying resolutions. */
   readonly isApplying: boolean
   /** Error message to display if applying fails. */
   readonly applyError: string | null
@@ -67,7 +68,7 @@ interface ICopilotConflictResolutionDialogState {
  *
  * Offers two views via top-level tabs:
  * - **Summary**: compact file list with resolution pickers for fast decisions
- * - **Changes**: file sidebar + content viewer for detailed inspection
+ * - **Changes**: file sidebar + side-by-side diff viewer for detailed inspection
  */
 export class CopilotConflictResolutionDialog extends React.Component<
   ICopilotConflictResolutionDialogProps,
@@ -90,10 +91,10 @@ export class CopilotConflictResolutionDialog extends React.Component<
       fileChoices,
       activeTab: 'summary',
       selectedFilePath: firstPath,
-      contentView: 'copilot',
+      fileDiffs: new Map<string, ITextDiff>(),
+      loadingDiffs: new Set<string>(),
+      diffErrors: new Map<string, string>(),
       originalContents: new Map<string, string>(),
-      loadingOriginal: new Set<string>(),
-      loadErrors: new Map<string, string>(),
       filterText: '',
       isApplying: false,
       applyError: null,
@@ -161,9 +162,9 @@ export class CopilotConflictResolutionDialog extends React.Component<
     return (
       <div className="copilot-dialog-tabs">
         <button
-          className={`copilot-dialog-tab ${
-            activeTab === 'summary' ? 'active' : ''
-          }`}
+          className={
+            'copilot-dialog-tab' + (activeTab === 'summary' ? ' active' : '')
+          }
           onClick={this.onSwitchTab('summary')}
           type="button"
         >
@@ -174,9 +175,9 @@ export class CopilotConflictResolutionDialog extends React.Component<
           </span>
         </button>
         <button
-          className={`copilot-dialog-tab ${
-            activeTab === 'changes' ? 'active' : ''
-          }`}
+          className={
+            'copilot-dialog-tab' + (activeTab === 'changes' ? ' active' : '')
+          }
           onClick={this.onSwitchTab('changes')}
           type="button"
         >
@@ -227,7 +228,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
     return (
       <div
         key={path}
-        className={`copilot-conflict-file-item file-choice-${choice}`}
+        className={'copilot-conflict-file-item file-choice-' + choice}
         role="listitem"
       >
         <div className="copilot-conflict-file-header">
@@ -253,7 +254,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
   private renderChangesTab(): JSX.Element {
     const { resolutions } = this.props.resolutions
-    const { selectedFilePath, contentView } = this.state
+    const { selectedFilePath } = this.state
     const selectedResolution = resolutions.find(
       r => r.path === selectedFilePath
     )
@@ -265,7 +266,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
         </div>
         <div className="copilot-changes-content">
           {selectedResolution !== undefined
-            ? this.renderChangesViewer(selectedResolution, contentView)
+            ? this.renderChangesViewer(selectedResolution)
             : this.renderNoFileSelected()}
         </div>
       </div>
@@ -281,9 +282,12 @@ export class CopilotConflictResolutionDialog extends React.Component<
     return (
       <button
         key={path}
-        className={`copilot-changes-file-entry ${
-          isSelected ? 'selected' : ''
-        } file-choice-${choice}`}
+        className={
+          'copilot-changes-file-entry' +
+          (isSelected ? ' selected' : '') +
+          ' file-choice-' +
+          choice
+        }
         onClick={this.onSelectFile(path)}
         type="button"
         aria-label={path}
@@ -325,15 +329,12 @@ export class CopilotConflictResolutionDialog extends React.Component<
     }
   }
 
-  private renderChangesViewer(
-    resolution: IFileResolution,
-    view: ContentView
-  ): JSX.Element {
+  private renderChangesViewer(resolution: IFileResolution): JSX.Element {
     const { path } = resolution
     const choice = this.state.fileChoices.get(path) ?? 'copilot'
-    const isLoadingOriginal = this.state.loadingOriginal.has(path)
-    const originalContent = this.state.originalContents.get(path)
-    const loadError = this.state.loadErrors.get(path)
+    const diff = this.state.fileDiffs.get(path)
+    const isLoading = this.state.loadingDiffs.has(path)
+    const diffError = this.state.diffErrors.get(path)
 
     return (
       <div className="copilot-changes-viewer">
@@ -342,46 +343,82 @@ export class CopilotConflictResolutionDialog extends React.Component<
           {this.renderResolutionPicker(path, choice)}
         </div>
 
-        <div className="copilot-changes-view-tabs">
-          <button
-            className={`view-tab ${view === 'copilot' ? 'active' : ''}`}
-            onClick={this.onSetContentView('copilot')}
-            type="button"
-          >
-            <Octicon symbol={octicons.copilot} />
-            {" Copilot's Resolution"}
-          </button>
-          <button
-            className={`view-tab ${view === 'conflict' ? 'active' : ''}`}
-            onClick={this.onSetContentView('conflict')}
-            type="button"
-          >
-            <Octicon symbol={octicons.alert} />
-            {' Original Conflict'}
-          </button>
+        <div className="copilot-changes-diff-container">
+          {isLoading && (
+            <div className="copilot-changes-loading">
+              <Octicon symbol={octicons.sync} className="spin" />
+              <span>Generating diff...</span>
+            </div>
+          )}
+          {diffError !== undefined &&
+            this.renderDiffFallback(resolution, diffError)}
+          {diff !== undefined &&
+            !isLoading &&
+            this.renderSideBySideDiff(path, diff)}
         </div>
+      </div>
+    )
+  }
 
-        <div className="copilot-changes-code-container">
-          {view === 'copilot' && (
+  private renderSideBySideDiff(filePath: string, diff: ITextDiff): JSX.Element {
+    if (diff.hunks.length === 0) {
+      return (
+        <div className="copilot-changes-no-diff">
+          <p>No changes detected between the original and resolved content.</p>
+        </div>
+      )
+    }
+
+    const file = new CommittedFileChange(
+      filePath,
+      { kind: AppFileStatusKind.Modified },
+      'HEAD',
+      'HEAD'
+    )
+
+    return (
+      <SideBySideDiff
+        file={file}
+        diff={diff}
+        fileContents={null}
+        showSideBySideDiff={true}
+        hideWhitespaceInDiff={false}
+        showDiffCheckMarks={false}
+        onHideWhitespaceInDiffChanged={this.onNoOp}
+      />
+    )
+  }
+
+  /** Plain-text fallback when diff generation fails. */
+  private renderDiffFallback(
+    resolution: IFileResolution,
+    error: string
+  ): JSX.Element {
+    const originalContent = this.state.originalContents.get(resolution.path)
+
+    return (
+      <div className="copilot-changes-fallback">
+        <div className="copilot-changes-fallback-warning">
+          <Octicon symbol={octicons.alert} />
+          <span>Could not generate diff: {error}</span>
+        </div>
+        <div className="copilot-changes-fallback-panels">
+          <div className="copilot-changes-fallback-panel">
+            <div className="fallback-panel-header">
+              Original (with conflicts)
+            </div>
+            <pre className="copilot-changes-code">
+              <code>{originalContent ?? 'Loading...'}</code>
+            </pre>
+          </div>
+          <div className="copilot-changes-fallback-panel">
+            <div className="fallback-panel-header">
+              {"Copilot's Resolution"}
+            </div>
             <pre className="copilot-changes-code">
               <code>{resolution.resolvedContent}</code>
             </pre>
-          )}
-          {view === 'conflict' && (
-            <>
-              {isLoadingOriginal && (
-                <p className="loading-original">Loading original file…</p>
-              )}
-              {loadError !== undefined && (
-                <p className="load-error">{loadError}</p>
-              )}
-              {originalContent !== undefined && (
-                <pre className="copilot-changes-code conflict-code">
-                  <code>{originalContent}</code>
-                </pre>
-              )}
-            </>
-          )}
+          </div>
         </div>
       </div>
     )
@@ -390,7 +427,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
   private renderNoFileSelected(): JSX.Element {
     return (
       <div className="copilot-changes-no-selection">
-        <p>Select a file to view its content</p>
+        <p>Select a file to view its changes</p>
       </div>
     )
   }
@@ -404,7 +441,9 @@ export class CopilotConflictResolutionDialog extends React.Component<
     return (
       <div className="copilot-conflict-resolution-picker" role="radiogroup">
         <Button
-          className={`picker-option ${choice === 'copilot' ? 'selected' : ''}`}
+          className={
+            'picker-option' + (choice === 'copilot' ? ' selected' : '')
+          }
           onClick={this.onSetChoice(path, 'copilot')}
           ariaPressed={choice === 'copilot'}
           size="small"
@@ -414,7 +453,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
           {' Copilot'}
         </Button>
         <Button
-          className={`picker-option ${choice === 'ours' ? 'selected' : ''}`}
+          className={'picker-option' + (choice === 'ours' ? ' selected' : '')}
           onClick={this.onSetChoice(path, 'ours')}
           ariaPressed={choice === 'ours'}
           size="small"
@@ -424,7 +463,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
           {' Ours'}
         </Button>
         <Button
-          className={`picker-option ${choice === 'theirs' ? 'selected' : ''}`}
+          className={'picker-option' + (choice === 'theirs' ? ' selected' : '')}
           onClick={this.onSetChoice(path, 'theirs')}
           ariaPressed={choice === 'theirs'}
           size="small"
@@ -434,9 +473,9 @@ export class CopilotConflictResolutionDialog extends React.Component<
           {' Theirs'}
         </Button>
         <Button
-          className={`picker-option picker-skip ${
-            choice === 'skip' ? 'selected' : ''
-          }`}
+          className={
+            'picker-option picker-skip' + (choice === 'skip' ? ' selected' : '')
+          }
           onClick={this.onSetChoice(path, 'skip')}
           ariaPressed={choice === 'skip'}
           size="small"
@@ -452,7 +491,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
     confidence: ConflictResolutionConfidence
   ): JSX.Element {
     return (
-      <span className={`copilot-conflict-confidence confidence-${confidence}`}>
+      <span className={'copilot-conflict-confidence confidence-' + confidence}>
         {confidence}
       </span>
     )
@@ -497,13 +536,20 @@ export class CopilotConflictResolutionDialog extends React.Component<
     if (resolved === 0) {
       return 'Apply'
     }
-    return `Apply ${resolved} resolution${resolved !== 1 ? 's' : ''}`
+    return 'Apply ' + resolved + ' resolution' + (resolved !== 1 ? 's' : '')
   }
 
   // -- Event handlers -------------------------------------------------
 
+  private onNoOp = () => {}
+
   private onSwitchTab = (tab: DialogTab) => () => {
     this.setState({ activeTab: tab })
+
+    // Load diff for the selected file when entering the Changes tab
+    if (tab === 'changes' && this.state.selectedFilePath !== null) {
+      this.ensureDiffLoaded(this.state.selectedFilePath)
+    }
   }
 
   private onFilterTextChanged = (value: string) => {
@@ -512,24 +558,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
   private onSelectFile = (path: string) => () => {
     this.setState({ selectedFilePath: path })
-
-    // Pre-load original content for the Changes tab conflict view
-    if (!this.state.originalContents.has(path)) {
-      this.loadOriginalContent(path)
-    }
-  }
-
-  private onSetContentView = (view: ContentView) => () => {
-    this.setState({ contentView: view })
-
-    // Load original content if switching to conflict view
-    if (
-      view === 'conflict' &&
-      this.state.selectedFilePath !== null &&
-      !this.state.originalContents.has(this.state.selectedFilePath)
-    ) {
-      this.loadOriginalContent(this.state.selectedFilePath)
-    }
+    this.ensureDiffLoaded(path)
   }
 
   private onSetChoice = (path: string, choice: FileResolutionChoice) => () => {
@@ -540,33 +569,64 @@ export class CopilotConflictResolutionDialog extends React.Component<
     })
   }
 
-  private async loadOriginalContent(path: string): Promise<void> {
-    if (this.state.loadingOriginal.has(path)) {
+  /**
+   * Generate and cache a diff for the given file path.
+   *
+   * Reads the original conflict file from disk, then uses
+   * git diff --no-index to produce a proper ITextDiff comparing
+   * the original content against Copilot's resolution.
+   */
+  private async ensureDiffLoaded(path: string): Promise<void> {
+    if (this.state.fileDiffs.has(path) || this.state.loadingDiffs.has(path)) {
       return
     }
 
     this.setState(prevState => ({
-      loadingOriginal: new Set(prevState.loadingOriginal).add(path),
+      loadingDiffs: new Set(prevState.loadingDiffs).add(path),
     }))
 
+    const resolution = this.props.resolutions.resolutions.find(
+      r => r.path === path
+    )
+    if (resolution === undefined) {
+      return
+    }
+
     try {
+      // Read the original file (with conflict markers) from disk
       const absPath = Path.join(this.props.repository.path, path)
-      const content = await fs.readFile(absPath, 'utf8')
+      const originalContent = await fs.readFile(absPath, 'utf8')
+
+      // Cache original content for fallback display
       this.setState(prevState => {
         const originalContents = new Map(prevState.originalContents)
-        originalContents.set(path, content)
-        const loadingOriginal = new Set(prevState.loadingOriginal)
-        loadingOriginal.delete(path)
-        return { originalContents, loadingOriginal }
+        originalContents.set(path, originalContent)
+        return { originalContents }
+      })
+
+      // Generate the diff via git diff --no-index
+      const diff = await generateDiffFromStrings(
+        this.props.repository,
+        originalContent,
+        resolution.resolvedContent,
+        path
+      )
+
+      this.setState(prevState => {
+        const fileDiffs = new Map(prevState.fileDiffs)
+        fileDiffs.set(path, diff)
+        const loadingDiffs = new Set(prevState.loadingDiffs)
+        loadingDiffs.delete(path)
+        return { fileDiffs, loadingDiffs }
       })
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e)
       this.setState(prevState => {
-        const loadErrors = new Map(prevState.loadErrors)
-        loadErrors.set(path, `Could not load file: ${message}`)
-        const loadingOriginal = new Set(prevState.loadingOriginal)
-        loadingOriginal.delete(path)
-        return { loadErrors, loadingOriginal }
+        const diffErrors = new Map(prevState.diffErrors)
+        diffErrors.set(path, message)
+        const loadingDiffs = new Set(prevState.loadingDiffs)
+        loadingDiffs.delete(path)
+        return { diffErrors, loadingDiffs }
       })
     }
   }
