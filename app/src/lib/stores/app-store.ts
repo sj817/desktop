@@ -61,6 +61,7 @@ import {
   WorkingDirectoryFileChange,
   WorkingDirectoryStatus,
   AppFileStatusKind,
+  isConflictWithMarkers,
 } from '../../models/status'
 import { TipState, tipEquals, IValidBranch } from '../../models/tip'
 import {
@@ -286,7 +287,11 @@ import {
   isValidTutorialStep,
 } from '../../models/tutorial-step'
 import { OnboardingTutorialAssessor } from './helpers/tutorial-assessor'
-import { getUntrackedFiles } from '../status'
+import {
+  getUntrackedFiles,
+  getUnmergedFiles,
+  isConflictedFile,
+} from '../status'
 import { isBranchPushable } from '../helpers/push-control'
 import {
   findAssociatedPullRequest,
@@ -5718,29 +5723,69 @@ export class AppStore extends TypedBaseStore<IAppState> {
       error: null,
     })
 
-    // TODO: Once PR #21921 (CopilotStore.resolveConflicts / AppStore
-    // ._resolveConflictsWithCopilot) merges, call the backend here:
-    //
-    //   try {
-    //     const response = await this._resolveConflictsWithCopilot(repository)
-    //     this.popupManager.updatePopup({
-    //       type: PopupType.CopilotConflictResolution,
-    //       repository,
-    //       loading: false,
-    //       response,
-    //       error: null,
-    //     })
-    //   } catch (e) {
-    //     const message = e instanceof Error ? e.message : String(e)
-    //     this.popupManager.updatePopup({
-    //       type: PopupType.CopilotConflictResolution,
-    //       repository,
-    //       loading: false,
-    //       response: null,
-    //       error: message,
-    //     })
-    //   }
-    //   this.emitUpdate()
+    // Gather the conflicted file paths that have text conflict markers
+    const state = this.repositoryStateCache.get(repository)
+    const workingDirectory = state.changesState.workingDirectory
+    const unmerged = getUnmergedFiles(workingDirectory)
+    const textConflictPaths = unmerged
+      .filter(
+        f => isConflictedFile(f.status) && isConflictWithMarkers(f.status)
+      )
+      .map(f => f.path)
+
+    if (textConflictPaths.length === 0) {
+      this.popupManager.updatePopup({
+        type: PopupType.CopilotConflictResolution,
+        repository,
+        loading: false,
+        response: null,
+        error: 'No text-based conflict markers found in conflicted files.',
+      })
+      this.emitUpdate()
+      return
+    }
+
+    try {
+      const response = await this.copilotStore.resolveConflicts(
+        textConflictPaths,
+        repository.path
+      )
+
+      // Verify the popup is still showing (user may have cancelled)
+      if (
+        this.popupManager.currentPopup?.type !==
+        PopupType.CopilotConflictResolution
+      ) {
+        return
+      }
+
+      this.popupManager.updatePopup({
+        type: PopupType.CopilotConflictResolution,
+        repository,
+        loading: false,
+        response,
+        error: null,
+      })
+    } catch (e) {
+      // Only update if the popup is still showing
+      if (
+        this.popupManager.currentPopup?.type !==
+        PopupType.CopilotConflictResolution
+      ) {
+        return
+      }
+
+      const message = e instanceof Error ? e.message : String(e)
+      this.popupManager.updatePopup({
+        type: PopupType.CopilotConflictResolution,
+        repository,
+        loading: false,
+        response: null,
+        error: message,
+      })
+    }
+
+    this.emitUpdate()
   }
 
   /**

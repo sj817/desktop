@@ -243,7 +243,9 @@ export class ConflictsDialog extends React.Component<
    * - The feature flag is enabled
    * - There are still conflicted files to resolve
    */
-  private renderCopilotButton(conflictedFilesCount: number): JSX.Element | null {
+  private renderCopilotButton(
+    conflictedFilesCount: number
+  ): JSX.Element | null {
     const { onResolveWithCopilot, isCopilotResolutionInProgress } = this.props
 
     if (

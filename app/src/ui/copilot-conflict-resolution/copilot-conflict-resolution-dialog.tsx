@@ -94,19 +94,13 @@ export class CopilotConflictResolutionDialog extends React.Component<
               resolved
             </span>
             {acceptedCount > 0 && (
-              <span className="status-accepted">
-                {acceptedCount} accepted
-              </span>
+              <span className="status-accepted">{acceptedCount} accepted</span>
             )}
             {rejectedCount > 0 && (
-              <span className="status-rejected">
-                {rejectedCount} rejected
-              </span>
+              <span className="status-rejected">{rejectedCount} rejected</span>
             )}
             {pendingCount > 0 && (
-              <span className="status-pending">
-                {pendingCount} pending
-              </span>
+              <span className="status-pending">{pendingCount} pending</span>
             )}
           </div>
 

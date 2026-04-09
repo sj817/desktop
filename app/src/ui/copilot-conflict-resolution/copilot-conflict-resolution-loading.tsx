@@ -71,7 +71,10 @@ export class CopilotConflictResolutionLoading extends React.Component<ICopilotCo
   private renderError(error: string): JSX.Element {
     return (
       <div className="copilot-conflict-loading-content">
-        <Octicon symbol={octicons.copilotError} className="copilot-error-icon" />
+        <Octicon
+          symbol={octicons.copilotError}
+          className="copilot-error-icon"
+        />
         <p>Copilot was unable to resolve the conflicts.</p>
         <p className="copilot-conflict-loading-description">{error}</p>
       </div>

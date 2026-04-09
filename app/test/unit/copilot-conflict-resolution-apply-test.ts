@@ -93,8 +93,7 @@ describe('applyCopilotResolutionsToWorkingDirectory', () => {
     ]
 
     await assert.rejects(
-      () =>
-        applyCopilotResolutionsToWorkingDirectory(repoPath, resolutions),
+      () => applyCopilotResolutionsToWorkingDirectory(repoPath, resolutions),
       /absolute file path/i
     )
   })
@@ -112,8 +111,7 @@ describe('applyCopilotResolutionsToWorkingDirectory', () => {
     ]
 
     await assert.rejects(
-      () =>
-        applyCopilotResolutionsToWorkingDirectory(repoPath, resolutions),
+      () => applyCopilotResolutionsToWorkingDirectory(repoPath, resolutions),
       /escapes repository root/i
     )
   })
@@ -131,8 +129,7 @@ describe('applyCopilotResolutionsToWorkingDirectory', () => {
     ]
 
     await assert.rejects(
-      () =>
-        applyCopilotResolutionsToWorkingDirectory(repoPath, resolutions),
+      () => applyCopilotResolutionsToWorkingDirectory(repoPath, resolutions),
       /escapes repository root/i
     )
   })

@@ -5,6 +5,10 @@ import {
   ICopilotCommitMessage,
   parseCopilotCommitMessage,
 } from '../copilot-commit-message'
+import {
+  ICopilotConflictResolutionResponse,
+  parseCopilotConflictResolution,
+} from '../copilot-conflict-resolution'
 import { Emitter, Disposable } from 'event-kit'
 import * as ipcRenderer from '../ipc-renderer'
 import { join } from 'path'
@@ -54,6 +58,24 @@ the JSON object, just return it as plain text. For example:
   "title": "Fix issue with login form",
   "description": "The login form was not submitting correctly. This commit fixes that issue by adding a missing \`name\` attribute to the submit button."
 }
+`
+
+const ConflictResolutionSystemPrompt = `
+You are an AI assistant that resolves Git merge conflicts.
+
+You will be given one or more files that contain standard Git conflict markers.
+For each file, produce a resolved version that:
+1. Preserves the intent of both sides of the conflict.
+2. Produces syntactically valid code (or text).
+3. Does NOT contain any conflict markers.
+
+Your response must be a JSON object with a "resolutions" array. Each element has:
+- "path": the file path (exactly as given)
+- "resolvedContent": the full resolved file content (not a diff — the entire file)
+- "reasoning": a single sentence explaining how you resolved the conflict
+- "confidence": "high", "medium", or "low" based on how confident you are
+
+Do not use markdown fences. Return only the raw JSON object.
 `
 
 /**
@@ -186,6 +208,71 @@ export class CopilotStore {
       await session?.destroy().catch(() => {})
 
       // Stop the client after use
+      await this.stopClient(client)
+    }
+  }
+
+  /**
+   * Resolve merge conflicts for the given files using Copilot.
+   *
+   * Reads the raw content of each conflicted file (which contains Git conflict
+   * markers), sends them to Copilot for resolution, and parses the structured
+   * response.
+   *
+   * @param conflictedFilePaths Repo-relative paths of files with conflict markers
+   * @param repositoryPath Absolute path to the repository root
+   * @returns Parsed resolution response with per-file suggestions
+   * @throws Error if no GitHub.com account is available or resolution fails
+   */
+  public async resolveConflicts(
+    conflictedFilePaths: ReadonlyArray<string>,
+    repositoryPath: string
+  ): Promise<ICopilotConflictResolutionResponse> {
+    const fs = await import('fs')
+
+    // Read the conflicted file contents
+    const fileContents: Array<{ path: string; content: string }> = []
+    for (const filePath of conflictedFilePaths) {
+      const absPath = join(repositoryPath, filePath)
+      const content = await fs.promises.readFile(absPath, 'utf8')
+      fileContents.push({ path: filePath, content })
+    }
+
+    // Build the prompt with all conflicted files
+    const prompt = fileContents
+      .map(f => `--- File: ${f.path} ---\n${f.content}`)
+      .join('\n\n')
+
+    const client = await this.createClient(repositoryPath)
+    let session: Awaited<ReturnType<CopilotClient['createSession']>> | null =
+      null
+
+    try {
+      session = await client.createSession({
+        model: 'gpt-5-mini',
+        reasoningEffort: 'medium',
+        systemMessage: {
+          mode: 'append',
+          content: ConflictResolutionSystemPrompt,
+        },
+        onPermissionRequest: async () => ({
+          kind: 'denied-interactively-by-user',
+        }),
+      })
+
+      // Use a longer timeout since conflict resolution may be more complex
+      const response = await session.sendAndWait({ prompt }, 60000)
+
+      if (!response || !response.data.content) {
+        throw new Error('No response from Copilot')
+      }
+
+      return parseCopilotConflictResolution(response.data.content)
+    } catch (e) {
+      log.warn('CopilotStore: Failed to resolve conflicts', e)
+      throw e
+    } finally {
+      await session?.destroy().catch(() => {})
       await this.stopClient(client)
     }
   }

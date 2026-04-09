@@ -52,9 +52,7 @@ export async function applyCopilotResolutionsToWorkingDirectory(
   // Pre-validate all paths before writing anything
   const resolvedPaths: string[] = []
   for (const resolution of resolutions) {
-    resolvedPaths.push(
-      resolveAndValidatePath(repositoryPath, resolution.path)
-    )
+    resolvedPaths.push(resolveAndValidatePath(repositoryPath, resolution.path))
   }
 
   // Write files sequentially
