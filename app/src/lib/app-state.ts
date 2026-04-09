@@ -1008,6 +1008,11 @@ export type ICopilotConflictResolutionState =
   | {
       readonly kind: 'ready'
       readonly response: ICopilotConflictResolutionResponse
+      /**
+       * Files the user has accepted Copilot's suggestion for. The resolved
+       * content is written to disk only when the user clicks "Continue Merge".
+       */
+      readonly acceptedFiles: ReadonlySet<string>
     }
   | { readonly kind: 'error'; readonly error: string }
 

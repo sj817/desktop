@@ -1,6 +1,7 @@
 @import '../../mixins';
 
-dialog#conflicts-dialog {
+dialog#conflicts-dialog,
+dialog#copilot-conflicts-dialog {
   width: 500px;
 
   .summary {

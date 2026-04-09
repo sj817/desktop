@@ -49,6 +49,7 @@ import { DialogPreferredFocusClassName } from '../dialog'
 import { SideBySideDiff } from '../diff/side-by-side-diff'
 import { DiffOptions } from '../diff/diff-options'
 import { Resizable } from '../resizable'
+import { TabBar } from '../tab-bar'
 import { generateDiffFromStrings } from '../../lib/diff-from-strings'
 import { getBlobContents } from '../../lib/git/show'
 
@@ -90,6 +91,9 @@ interface ICopilotConflictResolutionDialogProps {
 
   /** Copilot's resolved suggestions for conflicted files. */
   readonly copilotResponse: ICopilotConflictResolutionResponse
+
+  /** Files the user has accepted Copilot's suggestion for (undoable). */
+  readonly acceptedCopilotResolutions: ReadonlySet<string>
 
   /** Current value of the "always resolve with Copilot" preference. */
   readonly alwaysResolveCopilotConflicts: boolean
@@ -201,6 +205,18 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
   private onSubmit = async () => {
     this.setState({ isCommitting: true })
+
+    // Write accepted Copilot resolutions to disk before continuing the merge
+    const acceptedResolutions = this.props.copilotResponse.resolutions.filter(
+      r => this.props.acceptedCopilotResolutions.has(r.path)
+    )
+    if (acceptedResolutions.length > 0) {
+      await this.props.dispatcher.applyCopilotConflictResolutions(
+        this.props.repository,
+        acceptedResolutions
+      )
+    }
+
     await this.props.onSubmit()
   }
 
@@ -228,19 +244,18 @@ export class CopilotConflictResolutionDialog extends React.Component<
     )
   }
 
-  private onSwitchTab =
-    (tab: DialogTab) => (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault()
-      this.setState({ activeTab: tab })
+  private onTabClicked = (index: number) => {
+    const tab: DialogTab = index === 0 ? 'summary' : 'changes'
+    this.setState({ activeTab: tab })
 
-      // Auto-load diff when switching to Changes tab
-      if (tab === 'changes' && this.state.selectedFilePath !== null) {
-        this.loadDiffForFile(
-          this.state.selectedFilePath,
-          this.state.selectedVariant
-        )
-      }
+    // Auto-load diff when switching to Changes tab
+    if (tab === 'changes' && this.state.selectedFilePath !== null) {
+      this.loadDiffForFile(
+        this.state.selectedFilePath,
+        this.state.selectedVariant
+      )
     }
+  }
 
   private onSelectChangesFile =
     (path: string) => (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -280,15 +295,19 @@ export class CopilotConflictResolutionDialog extends React.Component<
     return this.props.copilotResponse.resolutions.find(r => r.path === filePath)
   }
 
-  private onUseCopilotSuggestion = async (filePath: string) => {
-    const resolution = this.getCopilotResolution(filePath)
-    if (resolution === undefined) {
-      return
-    }
-
-    await this.props.dispatcher.applyCopilotConflictResolutions(
+  private onUseCopilotSuggestion = (filePath: string) => {
+    this.props.dispatcher.updateAcceptedCopilotResolution(
       this.props.repository,
-      [resolution]
+      filePath,
+      true
+    )
+  }
+
+  private onUndoCopilotSuggestion = (filePath: string) => {
+    this.props.dispatcher.updateAcceptedCopilotResolution(
+      this.props.repository,
+      filePath,
+      false
     )
   }
 
@@ -392,28 +411,13 @@ export class CopilotConflictResolutionDialog extends React.Component<
     return (
       <div className="copilot-summary-tab">
         {renderUnmergedFilesSummary(conflictedFilesCount)}
-        {this.renderCopilotBanner()}
         {this.renderUnmergedFiles(unmergedFiles)}
         {renderShellLink(this.openThisRepositoryInShell)}
       </div>
     )
   }
 
-  private renderCopilotBanner(): JSX.Element {
-    const { copilotResponse } = this.props
-    const count = copilotResponse.resolutions.length
-    const fileWord = count === 1 ? 'file' : 'files'
-    return (
-      <div className="copilot-suggestion-banner">
-        <Octicon symbol={octicons.copilot} />
-        <span>
-          Copilot has suggestions for {count} {fileWord}. Use the{' '}
-          <strong>Apply</strong> button or dropdown menu to accept them, or
-          switch to the <strong>Changes</strong> tab to preview diffs.
-        </span>
-      </div>
-    )
-  }
+  // -- File list --------------------------------------------------------
 
   private renderUnmergedFiles(
     files: ReadonlyArray<WorkingDirectoryFileChange>
@@ -428,7 +432,8 @@ export class CopilotConflictResolutionDialog extends React.Component<
               hasUnresolvedConflicts(
                 f.status,
                 this.props.manualResolutions.get(f.path)
-              )
+              ) &&
+              !this.props.acceptedCopilotResolutions.has(f.path)
             ) {
               isFirstConflictedFile = false
             }
@@ -462,6 +467,11 @@ export class CopilotConflictResolutionDialog extends React.Component<
       return this.renderResolvedFile(file, manualResolution)
     }
 
+    // File accepted by Copilot (not yet written to disk) — show as resolved
+    if (this.props.acceptedCopilotResolutions.has(file.path)) {
+      return this.renderCopilotAcceptedFile(file)
+    }
+
     const isTextConflict = isConflictWithMarkers(file.status)
     const disabled = resolvedExternalEditor === null
 
@@ -493,24 +503,28 @@ export class CopilotConflictResolutionDialog extends React.Component<
             file.status.entry.us,
             ourBranch
           ),
-          action: () =>
+          action: () => {
+            this.onUndoCopilotSuggestion(file.path)
             this.props.dispatcher.updateManualConflictResolution(
               this.props.repository,
               file.path,
               ManualConflictResolution.ours
-            ),
+            )
+          },
         })
         items.push({
           label: getLabelForManualResolutionOption(
             file.status.entry.them,
             theirBranch
           ),
-          action: () =>
+          action: () => {
+            this.onUndoCopilotSuggestion(file.path)
             this.props.dispatcher.updateManualConflictResolution(
               this.props.repository,
               file.path,
               ManualConflictResolution.theirs
-            ),
+            )
+          },
         })
       }
 
@@ -521,8 +535,10 @@ export class CopilotConflictResolutionDialog extends React.Component<
     }
 
     let subtitle = 'Manual conflict'
+    let subtitleClassName = 'file-conflicts-status'
     if (copilotResolution !== undefined) {
       subtitle = copilotResolution.reasoning
+      subtitleClassName = 'file-conflicts-status copilot-reasoning'
     } else if (isTextConflict && isConflictWithMarkers(file.status)) {
       const markerCount = file.status.conflictMarkerCount
       const conflicts = Math.ceil(markerCount / 3)
@@ -544,7 +560,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
         <Octicon symbol={octicons.fileCode} className="file-octicon" />
         <div className="column-left">
           <PathText path={file.path} />
-          <div className="file-conflicts-status">{subtitle}</div>
+          <div className={subtitleClassName}>{subtitle}</div>
         </div>
         <div className="action-buttons">
           {copilotResolution !== undefined && isTextConflict && (
@@ -631,6 +647,38 @@ export class CopilotConflictResolutionDialog extends React.Component<
             Undo
           </Button>
         )}
+        <div className="green-circle">
+          <Octicon symbol={octicons.check} />
+        </div>
+      </li>
+    )
+  }
+
+  private renderCopilotAcceptedFile(
+    file: WorkingDirectoryFileChange
+  ): JSX.Element {
+    const copilotResolution = this.getCopilotResolution(file.path)
+    const reasoning = copilotResolution?.reasoning ?? 'Copilot suggestion'
+
+    const onUndo = () => this.onUndoCopilotSuggestion(file.path)
+
+    return (
+      <li key={file.path} className="unmerged-file-status-resolved">
+        <Octicon symbol={octicons.fileCode} className="file-octicon" />
+        <div className="column-left" id={file.path}>
+          <PathText path={file.path} />
+          <div className="file-conflicts-status copilot-reasoning">
+            {reasoning}
+          </div>
+        </div>
+        <Button
+          className="undo-button"
+          // eslint-disable-next-line react/jsx-no-bind
+          onClick={onUndo}
+          ariaDescribedBy={file.path}
+        >
+          Undo
+        </Button>
         <div className="green-circle">
           <Octicon symbol={octicons.check} />
         </div>
@@ -919,33 +967,18 @@ export class CopilotConflictResolutionDialog extends React.Component<
   ): JSX.Element {
     const { activeTab } = this.state
     const resolvedCount = totalFilesCount - conflictedFilesCount
+    const selectedIndex = activeTab === 'summary' ? 0 : 1
 
     return (
-      <div className="copilot-dialog-tabs">
-        <button
-          className={
-            'copilot-dialog-tab' + (activeTab === 'summary' ? ' active' : '')
-          }
-          onClick={this.onSwitchTab('summary')}
-          type="button"
-        >
-          <Octicon symbol={octicons.listUnordered} />
-          {' Summary'}
-          <span className="tab-badge">
+      <TabBar selectedIndex={selectedIndex} onTabClicked={this.onTabClicked}>
+        <span>
+          Summary
+          <span className="counter">
             {resolvedCount}/{totalFilesCount}
           </span>
-        </button>
-        <button
-          className={
-            'copilot-dialog-tab' + (activeTab === 'changes' ? ' active' : '')
-          }
-          onClick={this.onSwitchTab('changes')}
-          type="button"
-        >
-          <Octicon symbol={octicons.diff} />
-          {' Changes'}
-        </button>
-      </div>
+        </span>
+        <span>Changes</span>
+      </TabBar>
     )
   }
 
@@ -961,9 +994,14 @@ export class CopilotConflictResolutionDialog extends React.Component<
     } = this.props
 
     const unmergedFiles = getUnmergedFiles(workingDirectory)
-    const conflictedFiles = getConflictedFiles(
+    const gitConflictedFiles = getConflictedFiles(
       workingDirectory,
       manualResolutions
+    )
+    // Files accepted via Copilot are not yet written to disk so git still
+    // reports them as conflicted. Exclude them so the Continue button enables.
+    const conflictedFiles = gitConflictedFiles.filter(
+      f => !this.props.acceptedCopilotResolutions.has(f.path)
     )
 
     const tooltipString =
@@ -977,12 +1015,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
         dismissDisabled={this.state.isCommitting}
         onDismissed={this.props.onDismissed}
         onSubmit={this.onSubmit}
-        title={
-          <>
-            <Octicon symbol={octicons.copilot} className="copilot-icon" />{' '}
-            {headerTitle}
-          </>
-        }
+        title={headerTitle}
         loading={this.state.isCommitting}
         disabled={this.state.isCommitting}
         className="copilot-conflict-resolution"

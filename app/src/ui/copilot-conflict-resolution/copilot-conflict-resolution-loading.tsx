@@ -3,10 +3,10 @@ import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import { Loading } from '../lib/loading'
+import { Button } from '../lib/button'
 
 interface ICopilotConflictResolutionLoadingProps {
-  /** Called when the user clicks Cancel to go back to the standard dialog. */
+  /** Called when the user clicks Back to return to the standard dialog. */
   readonly onCancel: () => void
   /** Called when the user clicks Retry after an error. */
   readonly onRetry: () => void
@@ -25,11 +25,11 @@ interface ICopilotConflictResolutionLoadingState {
 }
 
 /**
- * Loading/error dialog shown while Copilot is analyzing merge conflicts.
+ * Loading/error state shown while Copilot is analyzing merge conflicts.
  *
  * Renders in the same dialog slot as the conflicts dialog, replacing it
- * while Copilot is working. Shows a spinner with descriptive text and
- * Cancel/Abort buttons, or an error message with Retry if resolution failed.
+ * while Copilot is working. Shows a centered Copilot icon with "Thinking..."
+ * text and Back/Abort buttons, or an error message with Retry.
  */
 export class CopilotConflictResolutionLoading extends React.Component<
   ICopilotConflictResolutionLoadingProps,
@@ -53,28 +53,30 @@ export class CopilotConflictResolutionLoading extends React.Component<
     return (
       <Dialog
         id="copilot-conflict-resolution-loading"
-        title={
-          <>
-            <Octicon symbol={octicons.copilot} className="copilot-icon" />{' '}
-            {headerTitle}
-          </>
-        }
+        title={headerTitle}
         onDismissed={this.props.onCancel}
-        loading={error === null}
         disabled={false}
       >
         <DialogContent>
           {error !== null ? this.renderError(error) : this.renderLoading()}
         </DialogContent>
         <DialogFooter>
-          <OkCancelButtonGroup
-            okButtonText={error !== null ? 'Retry' : 'Analyzing\u2026'}
-            okButtonDisabled={error === null}
-            onOkButtonClick={error !== null ? this.props.onRetry : undefined}
-            cancelButtonText={abortButton}
-            onCancelButtonClick={this.onAbort}
-            cancelButtonDisabled={this.state.isAborting}
-          />
+          <div className="copilot-loading-footer">
+            <Button onClick={this.props.onCancel}>Back</Button>
+            {error !== null ? (
+              <OkCancelButtonGroup
+                okButtonText="Retry"
+                onOkButtonClick={this.props.onRetry}
+                cancelButtonText={abortButton}
+                onCancelButtonClick={this.onAbort}
+                cancelButtonDisabled={this.state.isAborting}
+              />
+            ) : (
+              <Button onClick={this.onAbort} disabled={this.state.isAborting}>
+                {abortButton}
+              </Button>
+            )}
+          </div>
         </DialogFooter>
       </Dialog>
     )
@@ -83,8 +85,10 @@ export class CopilotConflictResolutionLoading extends React.Component<
   private renderLoading(): JSX.Element {
     return (
       <div className="copilot-conflict-loading-content">
-        <Loading />
-        <p>Copilot is analyzing your conflicts&hellip;</p>
+        <div className="copilot-thinking">
+          <Octicon symbol={octicons.copilot} />
+          <span>Thinking&hellip;</span>
+        </div>
         <p className="copilot-conflict-loading-description">
           This may take a moment depending on the number and complexity of
           conflicts.

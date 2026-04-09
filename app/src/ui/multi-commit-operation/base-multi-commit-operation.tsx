@@ -275,6 +275,7 @@ export abstract class BaseMultiCommitOperation extends React.Component<IMultiCom
               openRepositoryInShell={openRepositoryInShell}
               someConflictsHaveBeenResolved={this.setConflictsHaveBeenResolved}
               copilotResponse={copilotState.response}
+              acceptedCopilotResolutions={copilotState.acceptedFiles}
               alwaysResolveCopilotConflicts={alwaysResolveCopilotConflicts}
               onExitCopilotMode={this.onCancelCopilotMode}
             />

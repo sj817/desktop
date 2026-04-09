@@ -5769,6 +5769,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       this._setCopilotConflictResolutionState(repository, {
         kind: 'ready',
         response,
+        acceptedFiles: new Set<string>(),
       })
     } catch (e) {
       // Guard against stale completions
@@ -5850,6 +5851,57 @@ export class AppStore extends TypedBaseStore<IAppState> {
       })
     )
 
+    this.emitUpdate()
+  }
+
+  /**
+   * Mark a file as accepted or unaccepted in the Copilot conflict resolution
+   * state. When `accepted` is true the file path is added to the accepted set;
+   * when false it is removed (undo). The resolved content is not written to
+   * disk until the user clicks "Continue Merge".
+   *
+   * This shouldn't be called directly. See `Dispatcher`.
+   */
+  public _updateAcceptedCopilotResolution(
+    repository: Repository,
+    filePath: string,
+    accepted: boolean
+  ): void {
+    const state = this.repositoryStateCache.get(repository)
+    const mcoState = state.multiCommitOperationState
+    if (mcoState === null) {
+      return
+    }
+    const { step } = mcoState
+    if (step.kind !== MultiCommitOperationStepKind.ShowConflicts) {
+      return
+    }
+    const copilotState = step.copilotConflictResolutionState
+    if (copilotState === undefined || copilotState.kind !== 'ready') {
+      return
+    }
+
+    const updatedAccepted = new Set(copilotState.acceptedFiles)
+    if (accepted) {
+      updatedAccepted.add(filePath)
+    } else {
+      updatedAccepted.delete(filePath)
+    }
+
+    this.repositoryStateCache.updateMultiCommitOperationState(
+      repository,
+      () => ({
+        step: {
+          ...step,
+          copilotConflictResolutionState: {
+            ...copilotState,
+            acceptedFiles: updatedAccepted,
+          },
+        },
+      })
+    )
+
+    this.updateMultiCommitOperationStateAfterManualResolution(repository)
     this.emitUpdate()
   }
 

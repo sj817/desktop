@@ -2,11 +2,24 @@
 
 // Loading dialog
 .copilot-conflict-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: var(--spacing-double) 0;
+  min-height: 200px;
 
   p {
     margin: var(--spacing) 0;
+  }
+
+  .copilot-thinking {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-half);
+    font-size: var(--font-size);
+    color: var(--text-secondary-color);
   }
 
   .copilot-conflict-loading-description {
@@ -17,6 +30,16 @@
 
 .copilot-error-icon {
   color: var(--error-color);
+}
+
+// Loading dialog footer with cancel button
+#copilot-conflict-resolution-loading {
+  .copilot-loading-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
 }
 
 // Copilot conflict resolution dialog — mirrors the standard conflicts dialog
@@ -35,12 +58,24 @@
       flex-direction: column;
       min-height: 0;
       padding: 0;
+      overflow-x: hidden;
     }
   }
 
-  .copilot-icon {
-    vertical-align: middle;
-    margin-right: var(--spacing-half);
+  // Give the tab bar more breathing room to match the Settings dialog feel
+  .tab-bar {
+    height: 40px;
+  }
+
+  // Override the shared max-height from _conflicts.scss since this dialog
+  // is much larger and the file list should fill available space
+  ul.unmerged-file-statuses {
+    max-height: none;
+  }
+
+  // Copilot reasoning text should be secondary color, not the orange conflict color
+  .copilot-reasoning {
+    color: var(--text-secondary-color) !important;
   }
 
   // Main content area (replaces DialogContent for flex height chain)
@@ -52,67 +87,15 @@
     overflow: hidden;
   }
 
-  // -- Tab bar --------------------------------------------------------
-
-  .copilot-dialog-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--box-border-color);
-    padding: 0 var(--spacing);
-    flex-shrink: 0;
-  }
-
-  .copilot-dialog-tab {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-third);
-    padding: var(--spacing-half) var(--spacing);
-    border: none;
-    border-bottom: 2px solid transparent;
-    background: none;
-    color: var(--text-secondary-color);
-    cursor: pointer;
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
-
-    &:hover {
-      color: var(--text-color);
-    }
-
-    &.active {
-      color: var(--text-color);
-      border-bottom-color: var(--link-button-color);
-    }
-
-    .tab-badge {
-      font-size: var(--font-size-xs);
-      padding: 1px 6px;
-      border-radius: 10px;
-      background-color: var(--box-border-color);
-    }
-  }
-
   // -- Summary tab ----------------------------------------------------
 
   .copilot-summary-tab {
     flex: 1;
     overflow-y: auto;
-    padding: var(--spacing);
-  }
-
-  .copilot-suggestion-banner {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-half);
-    padding: var(--spacing-half) var(--spacing);
-    margin-bottom: var(--spacing);
-    border-radius: var(--border-radius);
-    background-color: var(--box-selected-active-background-color);
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary-color);
-
-    .octicon {
-      flex-shrink: 0;
-    }
+    overflow-x: hidden;
+    // Match the default dialog-content padding so the shared ul negative
+    // margins from _conflicts.scss work correctly (no horizontal scrollbar)
+    padding: var(--spacing-double);
   }
 
   .copilot-apply-button {

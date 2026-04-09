@@ -1141,6 +1141,22 @@ export class Dispatcher {
   }
 
   /**
+   * Mark a file as accepted or unaccepted for Copilot conflict resolution.
+   * The resolved content is not written to disk until "Continue Merge".
+   */
+  public updateAcceptedCopilotResolution(
+    repository: Repository,
+    filePath: string,
+    accepted: boolean
+  ): void {
+    this.appStore._updateAcceptedCopilotResolution(
+      repository,
+      filePath,
+      accepted
+    )
+  }
+
+  /**
    * Set whether to always resolve conflicts with Copilot automatically.
    */
   public setAlwaysResolveCopilotConflicts(value: boolean): Promise<void> {
