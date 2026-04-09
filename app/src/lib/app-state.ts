@@ -34,6 +34,7 @@ import { Shell } from './shells'
 import { ApplicableTheme, ApplicationTheme } from '../ui/lib/application-theme'
 import { IAccountRepositories } from './stores/api-repositories-store'
 import { ManualConflictResolution } from '../models/manual-conflict-resolution'
+import { ICopilotConflictResolutionResponse } from './copilot-conflict-resolution'
 import { Banner } from '../models/banner'
 import { IStashEntry } from '../models/stash-entry'
 import { TutorialStep } from '../models/tutorial-step'
@@ -242,6 +243,9 @@ export interface IAppState {
 
   /** Should the app prompt the user to confirm commit message override? */
   readonly askForConfirmationOnCommitMessageOverride: boolean
+
+  /** Whether to always use Copilot to resolve merge conflicts automatically */
+  readonly alwaysResolveCopilotConflicts: boolean
 
   /** How the app should handle uncommitted changes when switching branches */
   readonly uncommittedChangesStrategy: UncommittedChangesStrategy
@@ -991,6 +995,21 @@ export function isCherryPickConflictState(
 ): conflictStatus is CherryPickConflictState {
   return conflictStatus.kind === 'cherryPick'
 }
+
+/**
+ * Tracks the state of Copilot conflict resolution within a ShowConflicts step.
+ *
+ * - `loading`: Copilot is analyzing conflicts
+ * - `ready`: Copilot has returned suggestions
+ * - `error`: Copilot failed to analyze conflicts
+ */
+export type ICopilotConflictResolutionState =
+  | { readonly kind: 'loading'; readonly requestId: number }
+  | {
+      readonly kind: 'ready'
+      readonly response: ICopilotConflictResolutionResponse
+    }
+  | { readonly kind: 'error'; readonly error: string }
 
 /**
  * Tracks the state of the app during a multi commit operation such as rebase,

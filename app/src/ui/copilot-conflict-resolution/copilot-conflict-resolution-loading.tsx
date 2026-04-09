@@ -6,28 +6,60 @@ import * as octicons from '../octicons/octicons.generated'
 import { Loading } from '../lib/loading'
 
 interface ICopilotConflictResolutionLoadingProps {
-  /** Called when the user clicks Cancel to abort the resolution request. */
-  readonly onDismissed: () => void
-
+  /** Called when the user clicks Cancel to go back to the standard dialog. */
+  readonly onCancel: () => void
+  /** Called when the user clicks Retry after an error. */
+  readonly onRetry: () => void
   /** Optional error message to display instead of the loading state. */
   readonly error: string | null
+  /** Title for the dialog header. */
+  readonly headerTitle: string | JSX.Element
+  /** Label for the abort button. */
+  readonly abortButton: string
+  /** Called when user clicks abort. */
+  readonly onAbort: () => Promise<void>
+}
+
+interface ICopilotConflictResolutionLoadingState {
+  readonly isAborting: boolean
 }
 
 /**
- * A simple loading dialog shown while Copilot is analyzing merge conflicts.
+ * Loading/error dialog shown while Copilot is analyzing merge conflicts.
  *
- * Displays a spinner with descriptive text and a Cancel button, or an error
- * message if the resolution request failed.
+ * Renders in the same dialog slot as the conflicts dialog, replacing it
+ * while Copilot is working. Shows a spinner with descriptive text and
+ * Cancel/Abort buttons, or an error message with Retry if resolution failed.
  */
-export class CopilotConflictResolutionLoading extends React.Component<ICopilotConflictResolutionLoadingProps> {
+export class CopilotConflictResolutionLoading extends React.Component<
+  ICopilotConflictResolutionLoadingProps,
+  ICopilotConflictResolutionLoadingState
+> {
+  public constructor(props: ICopilotConflictResolutionLoadingProps) {
+    super(props)
+    this.state = { isAborting: false }
+  }
+
+  private onAbort = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    this.setState({ isAborting: true })
+    await this.props.onAbort()
+    this.setState({ isAborting: false })
+  }
+
   public render() {
-    const { error } = this.props
+    const { error, headerTitle, abortButton } = this.props
 
     return (
       <Dialog
         id="copilot-conflict-resolution-loading"
-        title={this.renderTitle()}
-        onDismissed={this.props.onDismissed}
+        title={
+          <>
+            <Octicon symbol={octicons.copilot} className="copilot-icon" />{' '}
+            {headerTitle}
+          </>
+        }
+        onDismissed={this.props.onCancel}
         loading={error === null}
         disabled={false}
       >
@@ -36,22 +68,15 @@ export class CopilotConflictResolutionLoading extends React.Component<ICopilotCo
         </DialogContent>
         <DialogFooter>
           <OkCancelButtonGroup
-            okButtonText={error !== null ? 'Retry' : undefined}
+            okButtonText={error !== null ? 'Retry' : 'Analyzing\u2026'}
             okButtonDisabled={error === null}
-            cancelButtonText="Cancel"
-            onCancelButtonClick={this.props.onDismissed}
+            onOkButtonClick={error !== null ? this.props.onRetry : undefined}
+            cancelButtonText={abortButton}
+            onCancelButtonClick={this.onAbort}
+            cancelButtonDisabled={this.state.isAborting}
           />
         </DialogFooter>
       </Dialog>
-    )
-  }
-
-  private renderTitle() {
-    return (
-      <>
-        <Octicon symbol={octicons.copilot} className="copilot-icon" />
-        {' Copilot Conflict Resolution'}
-      </>
     )
   }
 
@@ -59,7 +84,7 @@ export class CopilotConflictResolutionLoading extends React.Component<ICopilotCo
     return (
       <div className="copilot-conflict-loading-content">
         <Loading />
-        <p>Copilot is analyzing your conflicts…</p>
+        <p>Copilot is analyzing your conflicts&hellip;</p>
         <p className="copilot-conflict-loading-description">
           This may take a moment depending on the number and complexity of
           conflicts.

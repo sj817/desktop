@@ -26,7 +26,6 @@ import { IAPIComment } from '../lib/api'
 import { ISecretScanResult } from '../ui/secret-scanning/push-protection-error-dialog'
 import { BypassReasonType } from '../ui/secret-scanning/bypass-push-protection-dialog'
 import { TerminalOutput, TerminalOutputListener } from '../lib/git'
-import { ICopilotConflictResolutionResponse } from '../lib/copilot-conflict-resolution'
 
 export enum PopupType {
   RenameBranch = 'RenameBranch',
@@ -108,7 +107,6 @@ export enum PopupType {
   GenerateCommitMessageDisclaimer = 'GenerateCommitMessageDisclaimer',
   HookFailed = 'HookFailed',
   CommitProgress = 'CommitProgress',
-  CopilotConflictResolution = 'CopilotConflictResolution',
 }
 
 interface IBasePopup {
@@ -480,15 +478,5 @@ export type PopupDetail =
   | {
       type: PopupType.CommitProgress
       subscribeToCommitOutput: TerminalOutputListener
-    }
-  | {
-      type: PopupType.CopilotConflictResolution
-      repository: Repository
-      /** Loading phase: Copilot is analyzing conflicts. */
-      loading: boolean
-      /** Set once Copilot returns resolutions. */
-      response: ICopilotConflictResolutionResponse | null
-      /** Set if the resolution request failed. */
-      error: string | null
     }
 export type Popup = IBasePopup & PopupDetail

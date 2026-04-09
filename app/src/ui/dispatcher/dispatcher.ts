@@ -22,6 +22,7 @@ import {
   CherryPickConflictState,
   MultiCommitOperationConflictState,
   IMultiCommitOperationState,
+  ICopilotConflictResolutionState,
   CommitOptions,
 } from '../../lib/app-state'
 import { assertNever, fatalError } from '../../lib/fatal-error'
@@ -1106,10 +1107,8 @@ export class Dispatcher {
   }
 
   /**
-   * Initiate Copilot-powered conflict resolution. Shows the loading popup
-   * and invokes the backend resolution engine.
-   *
-   * This shouldn't be called directly. See `Dispatcher`.
+   * Initiate Copilot-powered conflict resolution. Sets loading state on the
+   * current ShowConflicts step and invokes the backend resolution engine.
    */
   public startCopilotConflictResolution(repository: Repository): Promise<void> {
     return this.appStore._startCopilotConflictResolution(repository)
@@ -1118,8 +1117,6 @@ export class Dispatcher {
   /**
    * Apply the accepted Copilot conflict resolutions by writing the resolved
    * content to disk and refreshing repository status.
-   *
-   * This shouldn't be called directly. See `Dispatcher`.
    */
   public async applyCopilotConflictResolutions(
     repository: Repository,
@@ -1132,12 +1129,22 @@ export class Dispatcher {
   }
 
   /**
-   * Dismiss the Copilot conflict resolution popup.
-   *
-   * This shouldn't be called directly. See `Dispatcher`.
+   * Set the Copilot conflict resolution state on the current ShowConflicts
+   * step. Pass `undefined` to clear Copilot mode and return to the standard
+   * conflicts dialog.
    */
-  public dismissCopilotConflictResolution(): void {
-    this.appStore._closePopup(PopupType.CopilotConflictResolution)
+  public setCopilotConflictResolutionState(
+    repository: Repository,
+    state: ICopilotConflictResolutionState | undefined
+  ): void {
+    this.appStore._setCopilotConflictResolutionState(repository, state)
+  }
+
+  /**
+   * Set whether to always resolve conflicts with Copilot automatically.
+   */
+  public setAlwaysResolveCopilotConflicts(value: boolean): Promise<void> {
+    return this.appStore._setAlwaysResolveCopilotConflicts(value)
   }
 
   /** Remove the given account from the app. */

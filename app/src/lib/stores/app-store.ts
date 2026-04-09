@@ -130,6 +130,7 @@ import {
   IFileListFilterState,
   isMergeConflictState,
   IMultiCommitOperationState,
+  ICopilotConflictResolutionState,
   IConstrainedValue,
   ICompareState,
   CommitOptions,
@@ -420,6 +421,8 @@ const confirmUndoCommitKey: string = 'confirmUndoCommit'
 const confirmCommitFilteredChangesKey: string =
   'confirmCommitFilteredChangesKey'
 const confirmCommitMessageOverrideKey: string = 'confirmCommitMessageOverride'
+const alwaysResolveCopilotConflictsDefault: boolean = false
+const alwaysResolveCopilotConflictsKey: string = 'alwaysResolveCopilotConflicts'
 
 const uncommittedChangesStrategyKey = 'uncommittedChangesStrategyKind'
 
@@ -562,6 +565,10 @@ export class AppStore extends TypedBaseStore<IAppState> {
     confirmCommitFilteredChangesDefault
   private confirmCommitMessageOverride: boolean =
     confirmCommitMessageOverrideDefault
+  private alwaysResolveCopilotConflicts: boolean =
+    alwaysResolveCopilotConflictsDefault
+  /** Auto-incrementing ID for tracking Copilot conflict resolution requests */
+  private copilotConflictRequestIdCounter = 0
   private imageDiffType: ImageDiffType = imageDiffTypeDefault
   private hideWhitespaceInChangesDiff: boolean =
     hideWhitespaceInChangesDiffDefault
@@ -1101,6 +1108,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
         this.confirmCommitFilteredChanges,
       askForConfirmationOnCommitMessageOverride:
         this.confirmCommitMessageOverride,
+      alwaysResolveCopilotConflicts: this.alwaysResolveCopilotConflicts,
       uncommittedChangesStrategy: this.uncommittedChangesStrategy,
       selectedExternalEditor: this.selectedExternalEditor,
       imageDiffType: this.imageDiffType,
@@ -2301,6 +2309,11 @@ export class AppStore extends TypedBaseStore<IAppState> {
     this.confirmCommitMessageOverride = getBoolean(
       confirmCommitMessageOverrideKey,
       confirmCommitMessageOverrideDefault
+    )
+
+    this.alwaysResolveCopilotConflicts = getBoolean(
+      alwaysResolveCopilotConflictsKey,
+      alwaysResolveCopilotConflictsDefault
     )
 
     this.uncommittedChangesStrategy =
@@ -5700,10 +5713,12 @@ export class AppStore extends TypedBaseStore<IAppState> {
   /**
    * Start Copilot-powered conflict resolution for the given repository.
    *
-   * Shows the loading popup, then (when the backend resolution engine from
-   * PR #21921 is available) calls the resolution API. For now, this creates
-   * the popup infrastructure so the UI can be tested end-to-end once the
-   * backend lands.
+   * Sets the Copilot conflict resolution state on the current ShowConflicts
+   * step to loading, then calls the backend resolution engine. When results
+   * arrive, updates the step state to ready (or error).
+   *
+   * Uses a request ID to guard against stale completions if the user
+   * cancels or navigates away before the request finishes.
    *
    * This shouldn't be called directly. See `Dispatcher`.
    */
@@ -5714,13 +5729,12 @@ export class AppStore extends TypedBaseStore<IAppState> {
       return
     }
 
-    // Show loading popup
-    await this._showPopup({
-      type: PopupType.CopilotConflictResolution,
-      repository,
-      loading: true,
-      response: null,
-      error: null,
+    const requestId = ++this.copilotConflictRequestIdCounter
+
+    // Set loading state on the current ShowConflicts step
+    this._setCopilotConflictResolutionState(repository, {
+      kind: 'loading',
+      requestId,
     })
 
     // Gather the conflicted file paths that have text conflict markers
@@ -5734,15 +5748,10 @@ export class AppStore extends TypedBaseStore<IAppState> {
       .map(f => f.path)
 
     if (textConflictPaths.length === 0) {
-      this.popupManager.updatePopup({
-        ...this.popupManager.currentPopup,
-        type: PopupType.CopilotConflictResolution,
-        repository,
-        loading: false,
-        response: null,
+      this._setCopilotConflictResolutionState(repository, {
+        kind: 'error',
         error: 'No text-based conflict markers found in conflicted files.',
       })
-      this.emitUpdate()
       return
     }
 
@@ -5752,28 +5761,18 @@ export class AppStore extends TypedBaseStore<IAppState> {
         repository.path
       )
 
-      // Verify the popup is still showing (user may have cancelled)
-      if (
-        this.popupManager.currentPopup?.type !==
-        PopupType.CopilotConflictResolution
-      ) {
+      // Guard against stale completions
+      if (!this.isCopilotConflictRequestCurrent(repository, requestId)) {
         return
       }
 
-      this.popupManager.updatePopup({
-        ...this.popupManager.currentPopup,
-        type: PopupType.CopilotConflictResolution,
-        repository,
-        loading: false,
+      this._setCopilotConflictResolutionState(repository, {
+        kind: 'ready',
         response,
-        error: null,
       })
     } catch (e) {
-      // Only update if the popup is still showing
-      if (
-        this.popupManager.currentPopup?.type !==
-        PopupType.CopilotConflictResolution
-      ) {
+      // Guard against stale completions
+      if (!this.isCopilotConflictRequestCurrent(repository, requestId)) {
         return
       }
 
@@ -5788,15 +5787,68 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
       log.warn(`[AppStore] Copilot conflict resolution failed: ${rawMessage}`)
 
-      this.popupManager.updatePopup({
-        ...this.popupManager.currentPopup,
-        type: PopupType.CopilotConflictResolution,
-        repository,
-        loading: false,
-        response: null,
+      this._setCopilotConflictResolutionState(repository, {
+        kind: 'error',
         error: message,
       })
     }
+  }
+
+  /**
+   * Check whether the given request ID matches the current Copilot conflict
+   * resolution state's request ID. Returns false if the user has navigated
+   * away from the ShowConflicts step or a new request has superseded this one.
+   */
+  private isCopilotConflictRequestCurrent(
+    repository: Repository,
+    requestId: number
+  ): boolean {
+    const state = this.repositoryStateCache.get(repository)
+    const mcoState = state.multiCommitOperationState
+    if (mcoState === null) {
+      return false
+    }
+    const { step } = mcoState
+    if (step.kind !== MultiCommitOperationStepKind.ShowConflicts) {
+      return false
+    }
+    const copilotState = step.copilotConflictResolutionState
+    return (
+      copilotState !== undefined &&
+      copilotState.kind === 'loading' &&
+      copilotState.requestId === requestId
+    )
+  }
+
+  /**
+   * Set the Copilot conflict resolution state on the current ShowConflicts
+   * step. If the current step is not ShowConflicts, this is a no-op.
+   *
+   * This shouldn't be called directly. See `Dispatcher`.
+   */
+  public _setCopilotConflictResolutionState(
+    repository: Repository,
+    copilotConflictResolutionState: ICopilotConflictResolutionState | undefined
+  ): void {
+    const state = this.repositoryStateCache.get(repository)
+    const mcoState = state.multiCommitOperationState
+    if (mcoState === null) {
+      return
+    }
+    const { step } = mcoState
+    if (step.kind !== MultiCommitOperationStepKind.ShowConflicts) {
+      return
+    }
+
+    this.repositoryStateCache.updateMultiCommitOperationState(
+      repository,
+      () => ({
+        step: {
+          ...step,
+          copilotConflictResolutionState,
+        },
+      })
+    )
 
     this.emitUpdate()
   }
@@ -5823,12 +5875,6 @@ export class AppStore extends TypedBaseStore<IAppState> {
     log.info(
       `[AppStore] Applied ${written} Copilot conflict resolution(s) to ${repository.name}`
     )
-
-    // TODO: Once PR #21919 (telemetry) merges, record metrics:
-    //   this.statsStore.increment('copilotConflictResolutionAcceptedCount')
-
-    // Close the resolution popup
-    this._closePopup(PopupType.CopilotConflictResolution)
 
     // Refresh repo so the conflicts dialog picks up resolved files
     await this._refreshRepository(repository)
@@ -6320,6 +6366,16 @@ export class AppStore extends TypedBaseStore<IAppState> {
     setBoolean(confirmForcePushKey, value)
 
     this.updateMenuLabelsForSelectedRepository()
+
+    this.emitUpdate()
+
+    return Promise.resolve()
+  }
+
+  /** This shouldn't be called directly. See `Dispatcher`. */
+  public _setAlwaysResolveCopilotConflicts(value: boolean): Promise<void> {
+    this.alwaysResolveCopilotConflicts = value
+    setBoolean(alwaysResolveCopilotConflictsKey, value)
 
     this.emitUpdate()
 

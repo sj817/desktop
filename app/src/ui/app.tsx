@@ -202,10 +202,6 @@ import {
 } from './secret-scanning/bypass-push-protection-dialog'
 import { HookFailed } from './hook-failed/hook-failed'
 import { CommitProgress } from './commit-progress/commit-progress'
-import {
-  CopilotConflictResolutionDialog,
-  CopilotConflictResolutionLoading,
-} from './copilot-conflict-resolution'
 
 const MinuteInMilliseconds = 1000 * 60
 const HourInMilliseconds = MinuteInMilliseconds * 60
@@ -2227,6 +2223,9 @@ export class App extends React.Component<IAppProps, IAppState> {
             openFileInExternalEditor={this.openFileInExternalEditor}
             resolvedExternalEditor={this.state.resolvedExternalEditor}
             openRepositoryInShell={this.openCurrentRepositoryInShell}
+            alwaysResolveCopilotConflicts={
+              this.state.alwaysResolveCopilotConflicts
+            }
           />
         )
       }
@@ -2613,27 +2612,6 @@ export class App extends React.Component<IAppProps, IAppState> {
           <CommitProgress
             key="commit-progress-dialog"
             subscribeToCommitOutput={popup.subscribeToCommitOutput}
-            onDismissed={onPopupDismissedFn}
-          />
-        )
-      }
-      case PopupType.CopilotConflictResolution: {
-        if (popup.loading || popup.response === null) {
-          return (
-            <CopilotConflictResolutionLoading
-              key="copilot-conflict-resolution-loading"
-              onDismissed={onPopupDismissedFn}
-              error={popup.error}
-            />
-          )
-        }
-
-        return (
-          <CopilotConflictResolutionDialog
-            key="copilot-conflict-resolution-dialog"
-            dispatcher={this.props.dispatcher}
-            repository={popup.repository}
-            resolutions={popup.response}
             onDismissed={onPopupDismissedFn}
           />
         )
