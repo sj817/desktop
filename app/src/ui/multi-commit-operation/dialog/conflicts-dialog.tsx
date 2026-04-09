@@ -306,15 +306,17 @@ export class ConflictsDialog extends React.Component<
           {this.renderContent(unmergedFiles, conflictedFiles.length)}
         </DialogContent>
         <DialogFooter>
-          {this.renderCopilotButton(conflictedFiles.length)}
-          <OkCancelButtonGroup
-            okButtonText={submitButton}
-            okButtonDisabled={conflictedFiles.length > 0}
-            okButtonTitle={tooltipString}
-            cancelButtonText={abortButton}
-            onCancelButtonClick={this.onAbort}
-            cancelButtonDisabled={this.state.isAborting}
-          />
+          <div className="conflicts-footer-with-copilot">
+            {this.renderCopilotButton(conflictedFiles.length)}
+            <OkCancelButtonGroup
+              okButtonText={submitButton}
+              okButtonDisabled={conflictedFiles.length > 0}
+              okButtonTitle={tooltipString}
+              cancelButtonText={abortButton}
+              onCancelButtonClick={this.onAbort}
+              cancelButtonDisabled={this.state.isAborting}
+            />
+          </div>
         </DialogFooter>
       </Dialog>
     )

@@ -125,4 +125,17 @@ dialog#conflicts-dialog {
       pointer-events: none;
     }
   }
+
+  .conflicts-footer-with-copilot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    .copilot-resolve-button {
+      .octicon {
+        margin-right: 2px;
+      }
+    }
+  }
 }
