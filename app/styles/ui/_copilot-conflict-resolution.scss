@@ -218,21 +218,13 @@
     border-bottom: var(--base-border);
     flex-shrink: 0;
 
-    .file-octicon {
-      flex-shrink: 0;
-      color: var(--text-secondary-color);
-    }
-
     .column-left {
       flex: 1;
       min-width: 0;
 
       .file-conflicts-status {
-        font-size: var(--font-size-xs);
+        font-size: var(--font-size-sm);
         color: var(--text-secondary-color);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
       }
     }
 

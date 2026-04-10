@@ -940,7 +940,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
     return (
       <div className="copilot-changes-viewer">
         <div className="copilot-changes-viewer-header">
-          <Octicon symbol={octicons.fileCode} className="file-octicon" />
           <div className="column-left">
             <PathText path={filePath} />
             <div className={subtitleClassName}>{subtitle}</div>
