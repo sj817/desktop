@@ -5755,10 +5755,24 @@ export class AppStore extends TypedBaseStore<IAppState> {
       return
     }
 
+    // Extract branch names from the MCO conflict state for Copilot context
+    const mcoState = state.multiCommitOperationState
+    let ourBranch: string | undefined
+    let theirBranch: string | undefined
+    if (
+      mcoState !== null &&
+      mcoState.step.kind === MultiCommitOperationStepKind.ShowConflicts
+    ) {
+      ourBranch = mcoState.step.conflictState.ourBranch
+      theirBranch = mcoState.step.conflictState.theirBranch
+    }
+
     try {
       const response = await this.copilotStore.resolveConflicts(
         textConflictPaths,
-        repository.path
+        repository.path,
+        ourBranch,
+        theirBranch
       )
 
       // Guard against stale completions

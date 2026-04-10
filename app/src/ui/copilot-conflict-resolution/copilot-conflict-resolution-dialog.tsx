@@ -420,42 +420,41 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
   private renderSummaryTab(
     unmergedFiles: ReadonlyArray<WorkingDirectoryFileChange>,
-    conflictedFilesCount: number
+    _conflictedFilesCount: number
   ): JSX.Element {
     if (unmergedFiles.length === 0) {
       return renderAllResolved()
     }
 
     const { ourBranch, theirBranch, copilotResponse } = this.props
-    const fileCount = conflictedFilesCount
-    const fileWord = fileCount === 1 ? 'file' : 'files'
 
     return (
       <div className="copilot-summary-tab">
         <div className="copilot-summary-overview">
-          <Octicon symbol={octicons.copilot} />
-          <div className="copilot-summary-overview-text">
-            {copilotResponse.summary !== undefined && (
-              <p className="copilot-summary-explanation">
+          <div className="copilot-summary-header">
+            <Octicon symbol={octicons.gitMerge} />
+            {'Merging '}
+            {theirBranch !== undefined ? (
+              <strong>{theirBranch}</strong>
+            ) : (
+              'their branch'
+            )}
+            {' into '}
+            {ourBranch !== undefined ? (
+              <strong>{ourBranch}</strong>
+            ) : (
+              'your branch'
+            )}
+          </div>
+          {copilotResponse.summary !== undefined && (
+            <div className="copilot-summary-recommendation">
+              <Octicon symbol={octicons.copilot} />
+              <p>
+                <strong>{'Recommendation: '}</strong>
                 {copilotResponse.summary}
               </p>
-            )}
-            <p className="copilot-summary-meta">
-              {'Merging '}
-              {theirBranch !== undefined ? (
-                <strong>{theirBranch}</strong>
-              ) : (
-                'their branch'
-              )}
-              {' into '}
-              {ourBranch !== undefined ? (
-                <strong>{ourBranch}</strong>
-              ) : (
-                'your branch'
-              )}
-              {` — ${fileCount} conflicted ${fileWord}.`}
-            </p>
-          </div>
+            </div>
+          )}
         </div>
         {this.renderUnmergedFiles(unmergedFiles)}
       </div>

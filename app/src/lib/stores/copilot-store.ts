@@ -64,13 +64,16 @@ const ConflictResolutionSystemPrompt = `
 You are an AI assistant that resolves Git merge conflicts.
 
 You will be given one or more files that contain standard Git conflict markers.
+The user message may include branch names (e.g. "Merging feature-A into main").
+Use those branch names in your summary instead of "HEAD" or "ours/theirs".
+
 For each file, produce a resolved version that:
 1. Preserves the intent of both sides of the conflict.
 2. Produces syntactically valid code (or text).
 3. Does NOT contain any conflict markers.
 
 Your response must be a JSON object with:
-- "summary": a brief 1-2 sentence overview of the conflicting changes from both branches and your overall resolution approach
+- "summary": a brief 1-2 sentence overview of the conflicting changes from both branches and your overall resolution approach. Reference the actual branch names.
 - "resolutions": an array where each element has:
   - "path": the file path (exactly as given)
   - "resolvedContent": the full resolved file content (not a diff — the entire file)
@@ -227,7 +230,9 @@ export class CopilotStore {
    */
   public async resolveConflicts(
     conflictedFilePaths: ReadonlyArray<string>,
-    repositoryPath: string
+    repositoryPath: string,
+    ourBranch?: string,
+    theirBranch?: string
   ): Promise<ICopilotConflictResolutionResponse> {
     const fs = await import('fs')
 
@@ -239,10 +244,18 @@ export class CopilotStore {
       fileContents.push({ path: filePath, content })
     }
 
-    // Build the prompt with all conflicted files
-    const prompt = fileContents
-      .map(f => `--- File: ${f.path} ---\n${f.content}`)
-      .join('\n\n')
+    // Build the prompt with branch context and all conflicted files
+    const branchContext =
+      ourBranch || theirBranch
+        ? `Merging ${theirBranch ?? 'their branch'} into ${
+            ourBranch ?? 'our branch'
+          }.\n\n`
+        : ''
+    const prompt =
+      branchContext +
+      fileContents
+        .map(f => `--- File: ${f.path} ---\n${f.content}`)
+        .join('\n\n')
 
     const client = await this.createClient(repositoryPath)
     let session: Awaited<ReturnType<CopilotClient['createSession']>> | null =

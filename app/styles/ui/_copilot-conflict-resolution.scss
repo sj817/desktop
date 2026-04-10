@@ -103,37 +103,42 @@
   }
 
   .copilot-summary-overview {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--spacing);
-    padding: var(--spacing);
     margin-bottom: var(--spacing);
     background: var(--box-alt-background-color);
     border: var(--base-border);
     border-radius: var(--border-radius);
+    overflow: hidden;
 
-    > .octicon {
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .copilot-summary-overview-text {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .copilot-summary-explanation {
-      margin: 0 0 var(--spacing-half) 0;
+    .copilot-summary-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-half);
+      padding: var(--spacing);
       font-size: var(--font-size);
-      color: var(--text-color);
-      line-height: 1.4;
+      font-weight: var(--font-weight-semibold);
+
+      .octicon {
+        flex-shrink: 0;
+      }
     }
 
-    .copilot-summary-meta {
-      margin: 0;
-      font-size: var(--font-size-sm);
-      color: var(--text-secondary-color);
-      line-height: 1.4;
+    .copilot-summary-recommendation {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing);
+      padding: var(--spacing-half) var(--spacing) var(--spacing);
+
+      > .octicon {
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      p {
+        margin: 0;
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary-color);
+        line-height: 1.4;
+      }
     }
   }
 
