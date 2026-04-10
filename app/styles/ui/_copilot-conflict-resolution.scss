@@ -102,6 +102,29 @@
     padding: var(--spacing-double);
   }
 
+  .copilot-summary-overview {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing);
+    padding: var(--spacing);
+    margin-bottom: var(--spacing);
+    background: var(--box-alt-background-color);
+    border: var(--base-border);
+    border-radius: var(--border-radius);
+
+    .octicon {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    p {
+      margin: 0;
+      font-size: var(--font-size);
+      color: var(--text-color);
+      line-height: 1.4;
+    }
+  }
+
   // Resolution pill (clickable badge showing active resolution strategy)
   .resolution-pill {
     display: inline-flex;

@@ -426,8 +426,30 @@ export class CopilotConflictResolutionDialog extends React.Component<
       return renderAllResolved()
     }
 
+    const { ourBranch, theirBranch } = this.props
+    const fileCount = conflictedFilesCount
+    const fileWord = fileCount === 1 ? 'file' : 'files'
+
     return (
       <div className="copilot-summary-tab">
+        <div className="copilot-summary-overview">
+          <Octicon symbol={octicons.copilot} />
+          <p>
+            {'Merging '}
+            {theirBranch !== undefined ? (
+              <strong>{theirBranch}</strong>
+            ) : (
+              'their branch'
+            )}
+            {' into '}
+            {ourBranch !== undefined ? (
+              <strong>{ourBranch}</strong>
+            ) : (
+              'your branch'
+            )}
+            {` — Copilot resolved ${fileCount} conflicted ${fileWord}.`}
+          </p>
+        </div>
         {this.renderUnmergedFiles(unmergedFiles)}
       </div>
     )
