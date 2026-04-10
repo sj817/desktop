@@ -47,9 +47,12 @@ dialog#copilot-conflicts-dialog {
     li.unmerged-file-status-conflicts {
       display: flex;
       flex-flow: row nowrap;
+      align-items: flex-start;
 
       .file-octicon {
         margin-right: var(--spacing);
+        // Nudge down to align with the first line of text
+        margin-top: 2px;
       }
 
       .column-left {
@@ -71,7 +74,7 @@ dialog#copilot-conflicts-dialog {
         flex-shrink: 0;
         flex: 0 0 auto;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
 
         .resolve-arrow-menu {
