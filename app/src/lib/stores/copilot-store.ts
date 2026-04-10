@@ -69,10 +69,12 @@ For each file, produce a resolved version that:
 2. Produces syntactically valid code (or text).
 3. Does NOT contain any conflict markers.
 
-Your response must be a JSON object with a "resolutions" array. Each element has:
-- "path": the file path (exactly as given)
-- "resolvedContent": the full resolved file content (not a diff — the entire file)
-- "reasoning": a single sentence explaining how you resolved the conflict
+Your response must be a JSON object with:
+- "summary": a brief 1-2 sentence overview of the conflicting changes from both branches and your overall resolution approach
+- "resolutions": an array where each element has:
+  - "path": the file path (exactly as given)
+  - "resolvedContent": the full resolved file content (not a diff — the entire file)
+  - "reasoning": a single sentence explaining how you resolved the conflict
 
 Do not use markdown fences. Return only the raw JSON object.
 `
