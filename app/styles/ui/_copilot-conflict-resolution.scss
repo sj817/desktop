@@ -112,15 +112,27 @@
     border: var(--base-border);
     border-radius: var(--border-radius);
 
-    .octicon {
+    > .octicon {
       flex-shrink: 0;
       margin-top: 2px;
     }
 
-    p {
-      margin: 0;
+    .copilot-summary-overview-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .copilot-summary-explanation {
+      margin: 0 0 var(--spacing-half) 0;
       font-size: var(--font-size);
       color: var(--text-color);
+      line-height: 1.4;
+    }
+
+    .copilot-summary-meta {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary-color);
       line-height: 1.4;
     }
   }

@@ -20,6 +20,13 @@ export interface IFileResolution {
 
 /** The complete response from Copilot conflict resolution. */
 export interface ICopilotConflictResolutionResponse {
+  /**
+   * An overall summary from Copilot explaining the nature of the conflicts
+   * and the recommended resolution approach. Optional — older response
+   * formats may not include it.
+   */
+  readonly summary?: string
+
   readonly resolutions: ReadonlyArray<IFileResolution>
 }
 
@@ -96,5 +103,8 @@ export function parseCopilotConflictResolution(
     throw new Error('Copilot returned an empty resolutions array')
   }
 
-  return { resolutions }
+  const p = parsed as Record<string, unknown>
+  const summary = typeof p.summary === 'string' ? p.summary : undefined
+
+  return { summary, resolutions }
 }
