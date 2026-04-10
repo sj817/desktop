@@ -116,6 +116,9 @@
     color: var(--text-color);
     white-space: nowrap;
     height: 24px;
+    // Fixed width so the pill doesn't jump between Copilot/Current/Incoming
+    width: 110px;
+    justify-content: center;
 
     .resolution-pill-label {
       margin: 0 2px;
@@ -125,29 +128,8 @@
       margin: 0 -3px;
     }
 
-    &.copilot {
-      color: var(--link-button-color);
-      border-color: var(--link-button-color);
-    }
-
-    &.current {
-      color: var(--color-new);
-      border-color: var(--color-new);
-    }
-
-    &.incoming {
-      color: var(--link-button-color);
-      border-color: var(--link-button-color);
-    }
-
-    &.unresolved {
-      color: var(--text-secondary-color);
-    }
-
     &.resolved-externally {
       cursor: default;
-      color: var(--color-new);
-      border-color: var(--color-new);
     }
   }
 
@@ -156,11 +138,13 @@
     align-items: center;
     justify-content: center;
     padding: 2px 4px;
-    border: none;
-    background: none;
+    margin-left: var(--spacing-half);
+    border: 1px solid var(--box-border-color);
+    background: var(--box-background-color);
     color: var(--text-secondary-color);
     cursor: pointer;
     border-radius: var(--border-radius);
+    height: 24px;
 
     &:hover {
       color: var(--text-color);

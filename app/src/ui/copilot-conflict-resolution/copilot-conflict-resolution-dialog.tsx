@@ -89,7 +89,6 @@ interface ICopilotConflictResolutionDialogProps {
   readonly onAbort: () => Promise<void>
   readonly onDismissed: () => void
   readonly openFileInExternalEditor: (path: string) => void
-  readonly openRepositoryInShell: (repository: Repository) => void
   readonly someConflictsHaveBeenResolved?: () => void
 
   /** Copilot's resolved suggestions for conflicted files. */
@@ -241,9 +240,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
     await this.props.onAbort()
     this.setState({ isAborting: false })
   }
-
-  private openThisRepositoryInShell = () =>
-    this.props.openRepositoryInShell(this.props.repository)
 
   private onAlwaysResolveCopilotConflictsChanged = (
     event: React.FormEvent<HTMLInputElement>
@@ -588,13 +584,15 @@ export class CopilotConflictResolutionDialog extends React.Component<
     file: WorkingDirectoryFileChange
   ): JSX.Element {
     const onClick = () => this.showFileActionsMenu(file)
+    const fileName = Path.basename(file.path)
 
     return (
       <Button
         // eslint-disable-next-line react/jsx-no-bind
         onClick={onClick}
         className="file-actions-kebab"
-        ariaLabel="More file actions"
+        ariaLabel={`Open ${fileName} externally`}
+        tooltip={`Open ${fileName} externally`}
         ariaHaspopup="menu"
       >
         <Octicon symbol={octicons.kebabHorizontal} />
@@ -691,11 +689,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
       {
         label: RevealInFileManagerLabel,
         action: () => revealInFileManager(this.props.repository, file.path),
-      },
-      { type: 'separator' },
-      {
-        label: __DARWIN__ ? 'Open in Terminal' : 'Open in command line',
-        action: () => this.openThisRepositoryInShell(),
       },
     ]
 
