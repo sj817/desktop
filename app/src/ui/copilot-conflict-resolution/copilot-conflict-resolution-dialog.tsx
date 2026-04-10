@@ -550,22 +550,22 @@ export class CopilotConflictResolutionDialog extends React.Component<
     const isCopilotReasoning = className.includes('copilot-reasoning')
     const isExpanded = this.state.expandedReasoningFiles.has(filePath)
 
-    if (!isCopilotReasoning || isExpanded) {
+    if (!isCopilotReasoning) {
+      return <div className={className}>{text}</div>
+    }
+
+    if (isExpanded) {
       return (
         <div className={className}>
           {text}
-          {isCopilotReasoning && (
-            <>
-              {' '}
-              <button
-                className="show-more-toggle"
-                // eslint-disable-next-line react/jsx-no-bind
-                onClick={() => this.toggleReasoningExpanded(filePath)}
-              >
-                show less
-              </button>
-            </>
-          )}
+          <button
+            className="expand-reasoning-toggle"
+            aria-label="Show less"
+            // eslint-disable-next-line react/jsx-no-bind
+            onClick={() => this.toggleReasoningExpanded(filePath)}
+          >
+            {'[…]'}
+          </button>
         </div>
       )
     }
@@ -574,11 +574,12 @@ export class CopilotConflictResolutionDialog extends React.Component<
       <div className={`${className} truncated`}>
         <span className="reasoning-text">{text}</span>
         <button
-          className="show-more-toggle"
+          className="expand-reasoning-toggle"
+          aria-label="Show more"
           // eslint-disable-next-line react/jsx-no-bind
           onClick={() => this.toggleReasoningExpanded(filePath)}
         >
-          show more
+          {'[…]'}
         </button>
       </div>
     )
@@ -1114,21 +1115,15 @@ export class CopilotConflictResolutionDialog extends React.Component<
   // -- Top-level tabs -------------------------------------------------
 
   private renderDialogTabs(
-    conflictedFilesCount: number,
-    totalFilesCount: number
+    _conflictedFilesCount: number,
+    _totalFilesCount: number
   ): JSX.Element {
     const { activeTab } = this.state
-    const resolvedCount = totalFilesCount - conflictedFilesCount
     const selectedIndex = activeTab === 'summary' ? 0 : 1
 
     return (
       <TabBar selectedIndex={selectedIndex} onTabClicked={this.onTabClicked}>
-        <span>
-          Summary
-          <span className="counter">
-            {resolvedCount}/{totalFilesCount}
-          </span>
-        </span>
+        <span>Summary</span>
         <span>Changes</span>
       </TabBar>
     )
