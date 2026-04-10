@@ -103,42 +103,50 @@
   }
 
   .copilot-summary-overview {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing);
     margin-bottom: var(--spacing);
+    padding: var(--spacing);
     background: var(--box-alt-background-color);
     border: var(--base-border);
     border-radius: var(--border-radius);
-    overflow: hidden;
 
-    .copilot-summary-header {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-half);
-      padding: var(--spacing);
-      font-size: var(--font-size);
-      font-weight: var(--font-weight-semibold);
-
-      .octicon {
-        flex-shrink: 0;
-      }
+    > .octicon {
+      flex-shrink: 0;
+      margin-top: 2px;
     }
 
-    .copilot-summary-recommendation {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--spacing);
-      padding: var(--spacing-half) var(--spacing) var(--spacing);
+    p {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary-color);
+      line-height: 1.4;
+    }
+  }
 
-      > .octicon {
-        flex-shrink: 0;
-        margin-top: 2px;
-      }
+  // Per-file reasoning truncation
+  .file-conflicts-status.copilot-reasoning.truncated {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 
-      p {
-        margin: 0;
-        font-size: var(--font-size-sm);
-        color: var(--text-secondary-color);
-        line-height: 1.4;
-      }
+    .reasoning-text {
+      display: inline;
+    }
+  }
+
+  .show-more-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: var(--font-size-sm);
+    color: var(--link-button-color);
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 

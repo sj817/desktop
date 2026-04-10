@@ -129,6 +129,9 @@ interface ICopilotConflictResolutionDialogState {
   readonly showSideBySideDiff: boolean
   /** Width of the file sidebar in the Changes tab. */
   readonly sidebarWidth: number
+
+  /** Files whose per-file reasoning text is expanded (not truncated). */
+  readonly expandedReasoningFiles: ReadonlySet<string>
 }
 
 /**
@@ -170,6 +173,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
       originalContents: new Map(),
       showSideBySideDiff: true,
       sidebarWidth: DefaultSidebarWidth,
+      expandedReasoningFiles: new Set(),
     }
   }
 
@@ -426,36 +430,16 @@ export class CopilotConflictResolutionDialog extends React.Component<
       return renderAllResolved()
     }
 
-    const { ourBranch, theirBranch, copilotResponse } = this.props
+    const { copilotResponse } = this.props
 
     return (
       <div className="copilot-summary-tab">
-        <div className="copilot-summary-overview">
-          <div className="copilot-summary-header">
-            <Octicon symbol={octicons.gitMerge} />
-            {'Merging '}
-            {theirBranch !== undefined ? (
-              <strong>{theirBranch}</strong>
-            ) : (
-              'their branch'
-            )}
-            {' into '}
-            {ourBranch !== undefined ? (
-              <strong>{ourBranch}</strong>
-            ) : (
-              'your branch'
-            )}
+        {copilotResponse.summary !== undefined && (
+          <div className="copilot-summary-overview">
+            <Octicon symbol={octicons.copilot} />
+            <p>{copilotResponse.summary}</p>
           </div>
-          {copilotResponse.summary !== undefined && (
-            <div className="copilot-summary-recommendation">
-              <Octicon symbol={octicons.copilot} />
-              <p>
-                <strong>{'Recommendation: '}</strong>
-                {copilotResponse.summary}
-              </p>
-            </div>
-          )}
-        </div>
+        )}
         {this.renderUnmergedFiles(unmergedFiles)}
       </div>
     )
@@ -542,7 +526,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
         <Octicon symbol={octicons.fileCode} className="file-octicon" />
         <div className="column-left" id={file.path}>
           <PathText path={file.path} />
-          <div className={subtitleClassName}>{subtitle}</div>
+          {this.renderSubtitle(file.path, subtitle, subtitleClassName)}
         </div>
         <div className="action-buttons">
           {!resolvedExternally
@@ -558,6 +542,60 @@ export class CopilotConflictResolutionDialog extends React.Component<
     )
   }
 
+  private renderSubtitle(
+    filePath: string,
+    text: string,
+    className: string
+  ): JSX.Element {
+    const isCopilotReasoning = className.includes('copilot-reasoning')
+    const isExpanded = this.state.expandedReasoningFiles.has(filePath)
+
+    if (!isCopilotReasoning || isExpanded) {
+      return (
+        <div className={className}>
+          {text}
+          {isCopilotReasoning && (
+            <>
+              {' '}
+              <button
+                className="show-more-toggle"
+                // eslint-disable-next-line react/jsx-no-bind
+                onClick={() => this.toggleReasoningExpanded(filePath)}
+              >
+                show less
+              </button>
+            </>
+          )}
+        </div>
+      )
+    }
+
+    return (
+      <div className={`${className} truncated`}>
+        <span className="reasoning-text">{text}</span>
+        <button
+          className="show-more-toggle"
+          // eslint-disable-next-line react/jsx-no-bind
+          onClick={() => this.toggleReasoningExpanded(filePath)}
+        >
+          show more
+        </button>
+      </div>
+    )
+  }
+
+  private toggleReasoningExpanded(filePath: string) {
+    this.setState(prevState => {
+      const expanded = new Set(prevState.expandedReasoningFiles)
+      if (expanded.has(filePath)) {
+        expanded.delete(filePath)
+      } else {
+        expanded.add(filePath)
+      }
+      return { expandedReasoningFiles: expanded }
+    })
+  }
+
   /** Clickable pill showing the active resolution strategy. */
   private renderResolutionPill(
     file: WorkingDirectoryFileChange,
@@ -570,7 +608,7 @@ export class CopilotConflictResolutionDialog extends React.Component<
 
     if (isCopilotAccepted) {
       icon = <Octicon symbol={octicons.copilot} />
-      label = 'Copilot'
+      label = 'Suggestion'
       pillClass = 'resolution-pill copilot'
     } else if (manualResolution === ManualConflictResolution.ours) {
       icon = (
@@ -1123,13 +1161,27 @@ export class CopilotConflictResolutionDialog extends React.Component<
         ? 'Resolve all changes before continuing'
         : undefined
 
+    // Build the dialog title with conflict count, e.g.
+    // "Resolve 3 conflicted files before Merge"
+    const conflictedFileCount = unmergedFiles.filter(f =>
+      isConflictedFile(f.status)
+    ).length
+    const fileCountLabel =
+      conflictedFileCount === 1
+        ? `${conflictedFileCount} conflicted file`
+        : `${conflictedFileCount} conflicted files`
+    const dialogTitle =
+      typeof headerTitle === 'string'
+        ? headerTitle.replace('conflicts', fileCountLabel)
+        : headerTitle
+
     return (
       <Dialog
         id="copilot-conflicts-dialog"
         dismissDisabled={this.state.isCommitting}
         onDismissed={this.props.onDismissed}
         onSubmit={this.onSubmit}
-        title={headerTitle}
+        title={dialogTitle}
         loading={this.state.isCommitting}
         disabled={this.state.isCommitting}
         className="copilot-conflict-resolution"
