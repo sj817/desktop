@@ -190,6 +190,35 @@ export class CopilotConflictResolutionDialog extends React.Component<
     }
   }
 
+  public componentDidUpdate(prevProps: ICopilotConflictResolutionDialogProps) {
+    // When the resolution for the selected file changes, load the matching
+    // diff variant so the Changes tab stays in sync with the Summary tab.
+    const filePath = this.state.selectedFilePath
+    if (filePath === null || this.state.activeTab !== 'changes') {
+      return
+    }
+
+    const wasCopilotAccepted =
+      prevProps.acceptedCopilotResolutions.has(filePath)
+    const isCopilotAccepted =
+      this.props.acceptedCopilotResolutions.has(filePath)
+    const prevManual = prevProps.manualResolutions.get(filePath)
+    const curManual = this.props.manualResolutions.get(filePath)
+
+    if (wasCopilotAccepted !== isCopilotAccepted || prevManual !== curManual) {
+      let variant: DiffVariant = 'copilot'
+      if (isCopilotAccepted) {
+        variant = 'copilot'
+      } else if (curManual === ManualConflictResolution.ours) {
+        variant = 'ours'
+      } else if (curManual === ManualConflictResolution.theirs) {
+        variant = 'theirs'
+      }
+      this.setState({ selectedVariant: variant })
+      this.loadDiffForFile(filePath, variant)
+    }
+  }
+
   public componentWillUnmount() {
     const {
       workingDirectory,
@@ -261,15 +290,6 @@ export class CopilotConflictResolutionDialog extends React.Component<
       )
     }
   }
-
-  private onSelectVariant =
-    (variant: DiffVariant) => (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault()
-      this.setState({ selectedVariant: variant })
-      if (this.state.selectedFilePath !== null) {
-        this.loadDiffForFile(this.state.selectedFilePath, variant)
-      }
-    }
 
   private onShowSideBySideDiffChanged = (showSideBySideDiff: boolean) => {
     this.setState({ showSideBySideDiff })
@@ -706,7 +726,18 @@ export class CopilotConflictResolutionDialog extends React.Component<
   ): ReadonlyArray<CommittedFileChange> {
     return unmergedFiles
       .filter(f => isConflictedFile(f.status))
-      .map(f => new CommittedFileChange(f.path, f.status, 'HEAD', 'HEAD~1'))
+      .map(
+        f =>
+          new CommittedFileChange(
+            f.path,
+            // Use Modified status so the FileList doesn't show conflict
+            // warning icons — every file in this list is conflicted by
+            // definition, so the icon adds no information.
+            { kind: AppFileStatusKind.Modified },
+            'HEAD',
+            'HEAD~1'
+          )
+      )
   }
 
   private getSelectedCommittedFile(
@@ -799,81 +830,132 @@ export class CopilotConflictResolutionDialog extends React.Component<
   ): JSX.Element {
     const files = this.getConflictedCommittedFiles(unmergedFiles)
     const selectedFile = this.getSelectedCommittedFile(files)
-    const selectedResolution = this.state.selectedFilePath
-      ? this.getCopilotResolution(this.state.selectedFilePath)
-      : undefined
     const conflictCount = files.length
 
     return (
       <div className="copilot-changes-tab">
-        <div className="files-changed-header">
-          <div className="commits-displayed">
-            {conflictCount === 1
-              ? '1 conflicted file'
-              : `${conflictCount} conflicted files`}
-          </div>
-          <DiffOptions
-            isInteractiveDiff={false}
-            hideWhitespaceChanges={false}
-            onHideWhitespaceChangesChanged={this.onNoOp}
-            showSideBySideDiff={this.state.showSideBySideDiff}
-            onShowSideBySideDiffChanged={this.onShowSideBySideDiffChanged}
-            onDiffOptionsOpened={this.onNoOp}
-          />
-        </div>
-        <div className="files-diff-viewer">
-          <Resizable
-            width={this.state.sidebarWidth}
-            minimumWidth={MinSidebarWidth}
-            maximumWidth={MaxSidebarWidth}
-            onResize={this.onSidebarResize}
-            onReset={this.onSidebarReset}
-            description="Conflict file list"
-          >
-            <FileList
-              files={files}
-              onSelectedFileChanged={this.onChangesFileSelected}
-              selectedFile={selectedFile}
-              availableWidth={clamp({
-                value: this.state.sidebarWidth,
-                min: MinSidebarWidth,
-                max: MaxSidebarWidth,
-              })}
-              onContextMenu={this.onChangesFileContextMenu}
-              onRowDoubleClick={this.onChangesFileDoubleClick}
+        <div className="copilot-changes-border-box">
+          <div className="files-changed-header">
+            <div className="commits-displayed">
+              {conflictCount === 1
+                ? '1 conflicted file'
+                : `${conflictCount} conflicted files`}
+            </div>
+            <DiffOptions
+              isInteractiveDiff={false}
+              hideWhitespaceChanges={false}
+              onHideWhitespaceChangesChanged={this.onNoOp}
+              showSideBySideDiff={this.state.showSideBySideDiff}
+              onShowSideBySideDiffChanged={this.onShowSideBySideDiffChanged}
+              onDiffOptionsOpened={this.onNoOp}
             />
-          </Resizable>
-          <div className="copilot-changes-content">
-            {selectedResolution !== undefined
-              ? this.renderChangesViewer(selectedResolution)
-              : this.renderNoFileSelected()}
+          </div>
+          <div className="files-diff-viewer">
+            <Resizable
+              width={this.state.sidebarWidth}
+              minimumWidth={MinSidebarWidth}
+              maximumWidth={MaxSidebarWidth}
+              onResize={this.onSidebarResize}
+              onReset={this.onSidebarReset}
+              description="Conflict file list"
+            >
+              <FileList
+                files={files}
+                onSelectedFileChanged={this.onChangesFileSelected}
+                selectedFile={selectedFile}
+                availableWidth={clamp({
+                  value: this.state.sidebarWidth,
+                  min: MinSidebarWidth,
+                  max: MaxSidebarWidth,
+                })}
+                onContextMenu={this.onChangesFileContextMenu}
+                onRowDoubleClick={this.onChangesFileDoubleClick}
+              />
+            </Resizable>
+            <div className="copilot-changes-content">
+              {this.state.selectedFilePath !== null
+                ? this.renderChangesViewer()
+                : this.renderNoFileSelected()}
+            </div>
           </div>
         </div>
       </div>
     )
   }
 
-  private renderChangesViewer(resolution: IFileResolution): JSX.Element {
-    const { path } = resolution
-    const variant = this.state.selectedVariant
-    const cacheKey = diffCacheKey(path, variant)
+  private renderChangesViewer(): JSX.Element | null {
+    const filePath = this.state.selectedFilePath
+    if (filePath === null) {
+      return this.renderNoFileSelected()
+    }
+
+    const resolution = this.getCopilotResolution(filePath)
+    const unmergedFiles = getUnmergedFiles(this.props.workingDirectory)
+    const file = unmergedFiles.find(f => f.path === filePath)
+
+    // Determine which variant to show based on the actual resolution state
+    const isCopilotAccepted =
+      this.props.acceptedCopilotResolutions.has(filePath)
+    const manualResolution = this.props.manualResolutions.get(filePath)
+    let variant: DiffVariant = this.state.selectedVariant
+    if (isCopilotAccepted) {
+      variant = 'copilot'
+    } else if (manualResolution === ManualConflictResolution.ours) {
+      variant = 'ours'
+    } else if (manualResolution === ManualConflictResolution.theirs) {
+      variant = 'theirs'
+    }
+
+    const cacheKey = diffCacheKey(filePath, variant)
     const diff = this.state.fileDiffs.get(cacheKey)
     const isLoading = this.state.loadingDiffs.has(cacheKey)
     const diffError = this.state.diffErrors.get(cacheKey)
 
+    // Determine subtitle
+    let subtitle: string
+    let subtitleClassName = 'file-conflicts-status'
+    if (isCopilotAccepted && resolution !== undefined) {
+      subtitle = resolution.reasoning
+      subtitleClassName = 'file-conflicts-status copilot-reasoning'
+    } else if (resolution !== undefined && !manualResolution) {
+      subtitle = resolution.reasoning
+      subtitleClassName = 'file-conflicts-status copilot-reasoning'
+    } else if (manualResolution === ManualConflictResolution.ours) {
+      subtitle = `Using changes from ${this.props.ourBranch || 'our branch'}`
+    } else if (manualResolution === ManualConflictResolution.theirs) {
+      subtitle = `Using changes from ${
+        this.props.theirBranch || 'their branch'
+      }`
+    } else {
+      subtitle = 'Unresolved'
+    }
+
+    const isManuallyResolved =
+      file !== undefined &&
+      isConflictedFile(file.status) &&
+      !hasUnresolvedConflicts(file.status, manualResolution)
+    const resolvedExternally =
+      isManuallyResolved && manualResolution === undefined && !isCopilotAccepted
+
     return (
       <div className="copilot-changes-viewer">
         <div className="copilot-changes-viewer-header">
-          <div className="copilot-changes-viewer-info">
-            <div className="copilot-changes-viewer-title-row">
-              <span className="copilot-changes-viewer-path">{path}</span>
-            </div>
-            <div className="copilot-changes-viewer-reasoning">
-              <Octicon symbol={octicons.copilot} />
-              <span>{resolution.reasoning}</span>
-            </div>
+          <Octicon symbol={octicons.fileCode} className="file-octicon" />
+          <div className="column-left">
+            <PathText path={filePath} />
+            <div className={subtitleClassName}>{subtitle}</div>
           </div>
-          {this.renderVariantPicker(variant)}
+          <div className="action-buttons">
+            {file !== undefined &&
+            isConflictedFile(file.status) &&
+            !resolvedExternally
+              ? this.renderResolutionPill(
+                  file,
+                  isCopilotAccepted,
+                  manualResolution
+                )
+              : null}
+          </div>
         </div>
 
         <div className="copilot-changes-diff-container">
@@ -884,49 +966,12 @@ export class CopilotConflictResolutionDialog extends React.Component<
             </div>
           )}
           {diffError !== undefined &&
+            resolution !== undefined &&
             this.renderDiffFallback(resolution, diffError)}
           {diff !== undefined &&
             !isLoading &&
-            this.renderDiffContent(path, diff)}
+            this.renderDiffContent(filePath, diff)}
         </div>
-      </div>
-    )
-  }
-
-  private renderVariantPicker(selectedVariant: DiffVariant): JSX.Element {
-    return (
-      <div className="copilot-variant-picker" role="radiogroup">
-        <Button
-          className={
-            'picker-option' + (selectedVariant === 'copilot' ? ' selected' : '')
-          }
-          onClick={this.onSelectVariant('copilot')}
-          ariaPressed={selectedVariant === 'copilot'}
-          size="small"
-        >
-          <Octicon symbol={octicons.copilot} />
-          {' Copilot'}
-        </Button>
-        <Button
-          className={
-            'picker-option' + (selectedVariant === 'ours' ? ' selected' : '')
-          }
-          onClick={this.onSelectVariant('ours')}
-          ariaPressed={selectedVariant === 'ours'}
-          size="small"
-        >
-          {' Ours'}
-        </Button>
-        <Button
-          className={
-            'picker-option' + (selectedVariant === 'theirs' ? ' selected' : '')
-          }
-          onClick={this.onSelectVariant('theirs')}
-          ariaPressed={selectedVariant === 'theirs'}
-          size="small"
-        >
-          {' Theirs'}
-        </Button>
       </div>
     )
   }
