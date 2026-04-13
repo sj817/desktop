@@ -194,26 +194,26 @@ export async function resolveAgentMode(
   try {
     const taskPrompt = buildAgentTaskPrompt(scenario)
 
-    const session = await client.createSession({
+    const sessionConfig: Record<string, unknown> = {
       model,
-      reasoningEffort: 'medium',
       systemMessage: {
         mode: 'append',
         content: AgentSystemPrompt,
       },
       workingDirectory: scenario.repoPath,
-      // Enable all tools — the agent can use bash, grep, file editor, etc.
       onPermissionRequest: async () => ({
         kind: 'approved' as const,
       }),
-    })
+    }
+
+    const session = await client.createSession(sessionConfig)
 
     try {
       // Subscribe to usage events
       session.on('assistant.usage', tokenTracker.handleUsageEvent)
 
       // Track tool calls
-      session.on('tool.call', () => {
+      session.on('tool.execution_start', () => {
         toolCallCount++
       })
 
@@ -222,7 +222,7 @@ export async function resolveAgentMode(
         300_000 // 5 minute timeout for agent mode
       )
 
-      if (!result || !result.data.content) {
+      if (!result?.data?.content) {
         throw new Error('No response from Copilot agent')
       }
 

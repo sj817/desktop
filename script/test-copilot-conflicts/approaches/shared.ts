@@ -1,31 +1,28 @@
 /**
  * Shared Copilot SDK client setup for benchmark approaches.
  *
- * Replicates the CopilotClient construction pattern from
- * app/src/lib/stores/copilot-store.ts, adapted for standalone script usage.
+ * Uses the SDK's built-in CLI spawning (no Electron-specific CLI path).
  */
 
 import { join } from 'path'
-import { pathToFileURL } from 'url'
+import { execSync } from 'child_process'
 
 type CopilotClientConstructor = new (opts: Record<string, unknown>) => ICopilotClientInstance
 interface ICopilotSession {
-  on(event: string, handler: (...args: unknown[]) => void): void
-  sendAndWait(msg: { prompt: string }, timeout: number): Promise<{ data: { content: string } } | null>
+  on(event: string, handler: (...args: unknown[]) => void): () => void
+  sendAndWait(msg: { prompt: string }, timeout: number): Promise<{ type: string; data: { content: string } } | undefined>
   destroy(): Promise<void>
+  disconnect(): Promise<void>
 }
 export interface ICopilotClientInstance {
   createSession(config: Record<string, unknown>): Promise<ICopilotSession>
-  stop(): Promise<void>
+  stop(): Promise<unknown>
   listModels?(): Promise<Array<{ id: string; name?: string }>>
 }
 
 /**
  * Lazily load the CopilotClient constructor.
- * This avoids failing at import time when the SDK isn't installed
- * (e.g. when running --list or --help).
- *
- * We resolve the SDK from app/node_modules since the dependency is
+ * Resolves the SDK from app/node_modules since the dependency is
  * declared in app/package.json, not the root package.json.
  */
 function getCopilotClientConstructor(): CopilotClientConstructor {
@@ -49,73 +46,50 @@ export interface IModelInfo {
 }
 
 /**
- * Resolve the path to the Copilot CLI entry point bundled with Desktop.
- *
- * The CLI is installed as a dependency in app/node_modules/@github/copilot-sdk
- * and includes a CLI directory with an index.js entry point.
- */
-function getCopilotCLIDir(): string {
-  // __dirname is script/test-copilot-conflicts/approaches/
-  // We need to go up 3 levels to reach the repo root, then into app/node_modules
-  return join(__dirname, '..', '..', '..', 'app', 'node_modules', '@github', 'copilot-sdk', 'cli')
-}
-
-/**
- * Get the path to the Node/Electron executable.
- *
- * In script context we use the current Node.js process executable directly,
- * since we're not running inside Electron.
- */
-function getCopilotCLIPath(): string {
-  return process.execPath
-}
-
-/**
  * Get a GitHub token for Copilot API access.
  *
- * Checks GITHUB_TOKEN environment variable. The token must have Copilot
- * access (typically a user token from a GitHub.com account with Copilot).
+ * Checks GITHUB_TOKEN env var first, then falls back to `gh auth token`.
  */
 export function getGitHubToken(): string {
-  const token = process.env.GITHUB_TOKEN
-  if (!token) {
-    throw new Error(
-      'GITHUB_TOKEN environment variable is required.\n' +
-      'Set it to a GitHub.com personal access token with Copilot access.\n' +
-      'Example: export GITHUB_TOKEN=ghp_...'
-    )
+  const envToken = process.env.GITHUB_TOKEN
+  if (envToken) {
+    return envToken
   }
-  return token
+
+  try {
+    const ghToken = execSync('gh auth token', {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim()
+    if (ghToken) {
+      return ghToken
+    }
+  } catch {
+    // gh CLI not available or not authenticated
+  }
+
+  throw new Error(
+    'No GitHub token found.\n' +
+    'Set GITHUB_TOKEN env var or authenticate via `gh auth login`.\n' +
+    'The token needs Copilot access.'
+  )
 }
 
 /**
  * Create a CopilotClient instance for the given repository path.
  *
- * This mirrors the pattern from copilot-store.ts but adapted for
- * standalone script usage (no Electron, no ipcRenderer).
+ * Uses the SDK's built-in CLI spawning — no Electron-specific path needed.
  */
 export async function createCopilotClient(
   repositoryPath: string,
   token: string
 ): Promise<ICopilotClientInstance> {
-  const cliDir = getCopilotCLIDir()
-  let importPath = join(cliDir, 'index.js')
-
-  if (process.platform === 'win32') {
-    importPath = pathToFileURL(importPath).href
-  }
-
   const ClientCtor = getCopilotClientConstructor()
   return new ClientCtor({
-    cliPath: getCopilotCLIPath(),
-    cliArgs: ['--eval', `import '${importPath}'`, '--'],
-    env: {
-      ELECTRON_RUN_AS_NODE: '1',
-      COPILOT_RUN_APP: '1',
-    },
     cwd: repositoryPath,
     autoStart: true,
     githubToken: token,
+    logLevel: 'warning',
   })
 }
 

@@ -376,9 +376,8 @@ export async function resolveSinglePrompt(
     const basePrompt = formatConflictContextForPrompt(context)
     const fullPrompt = addCommitContext(scenario, basePrompt)
 
-    const session = await client.createSession({
+    const sessionConfig: Record<string, unknown> = {
       model,
-      reasoningEffort: 'medium',
       systemMessage: {
         mode: 'append',
         content: ConflictResolutionSystemPrompt,
@@ -386,7 +385,9 @@ export async function resolveSinglePrompt(
       onPermissionRequest: async () => ({
         kind: 'denied-interactively-by-user' as const,
       }),
-    })
+    }
+
+    const session = await client.createSession(sessionConfig)
 
     try {
       // Subscribe to usage events
@@ -397,7 +398,7 @@ export async function resolveSinglePrompt(
         120_000 // 2 minute timeout for benchmark
       )
 
-      if (!result || !result.data.content) {
+      if (!result?.data?.content) {
         throw new Error('No response from Copilot')
       }
 
