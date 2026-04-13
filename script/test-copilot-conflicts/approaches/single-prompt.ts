@@ -28,6 +28,8 @@ import { LatencyTracker } from '../metrics/latency-tracker'
 const ConflictResolutionSystemPrompt = `
 You are an expert merge conflict resolver for a Git repository. Your task is to analyze merge conflicts and produce correct, clean resolutions.
 
+IMPORTANT: You have all the context you need in the user message below. Do NOT attempt to use any tools. Do NOT try to read files, run commands, or call any functions. Respond ONLY with the JSON format specified at the end of these instructions.
+
 You will receive:
 - Branch names for both sides of the merge
 - The conflict markers from each conflicted file (ours, theirs, and optionally base content)
@@ -378,6 +380,7 @@ export async function resolveSinglePrompt(
 
     const sessionConfig: Record<string, unknown> = {
       model,
+      availableTools: [],
       systemMessage: {
         mode: 'append',
         content: ConflictResolutionSystemPrompt,
@@ -398,11 +401,28 @@ export async function resolveSinglePrompt(
         120_000 // 2 minute timeout for benchmark
       )
 
-      if (!result?.data?.content) {
-        throw new Error('No response from Copilot')
+      if (!result) {
+        throw new Error('No response from Copilot (sendAndWait returned undefined)')
       }
 
-      response = parseResolutionResponse(result.data.content)
+      const content = result.data?.content ?? ''
+      if (!content) {
+        throw new Error(
+          `Empty response content from Copilot. Event type: ${result.type}, ` +
+          `data keys: ${Object.keys(result.data || {}).join(',')}, ` +
+          `raw: ${JSON.stringify(result).slice(0, 300)}`
+        )
+      }
+
+      try {
+        response = parseResolutionResponse(content)
+      } catch (parseErr) {
+        const preview = content.length > 500 ? content.slice(0, 500) + '...' : content
+        throw new Error(
+          `${parseErr instanceof Error ? parseErr.message : String(parseErr)}\n` +
+          `--- Raw response (${content.length} chars) ---\n${preview}`
+        )
+      }
     } finally {
       await session.destroy().catch(() => {})
     }
