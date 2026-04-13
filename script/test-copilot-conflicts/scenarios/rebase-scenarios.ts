@@ -6,14 +6,14 @@
  * benchmark can feed to Copilot for resolution.
  */
 
-import { execSync } from 'child_process'
+import { execFileSync } from 'child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 
 import {
-  ConflictedFile,
-  GeneratedScenario,
-  ScenarioFactory,
+  IConflictedFile,
+  IGeneratedScenario,
+  IScenarioFactory,
 } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -21,7 +21,7 @@ import {
 // ---------------------------------------------------------------------------
 
 function git(cwd: string, ...args: ReadonlyArray<string>): string {
-  return execSync(`git ${args.join(' ')}`, {
+  return execFileSync('git', [...args], {
     cwd,
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
@@ -33,8 +33,8 @@ function initRepo(dir: string): void {
     mkdirSync(dir, { recursive: true })
   }
   git(dir, 'init')
-  git(dir, 'config', 'user.email', '"bench@test.com"')
-  git(dir, 'config', 'user.name', '"Benchmark"')
+  git(dir, 'config', 'user.email', 'bench@test.com')
+  git(dir, 'config', 'user.name', 'Benchmark')
 }
 
 // ---------------------------------------------------------------------------
@@ -127,13 +127,13 @@ function makeMultiRoundFileContent(): string {
 // Scenarios
 // ---------------------------------------------------------------------------
 
-const rebaseBasic: ScenarioFactory = {
+const rebaseBasic: IScenarioFactory = {
   id: 'rebase-basic',
   description:
     'Rebase with one conflicting commit in a three-commit feature branch',
   tags: ['basic'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     const dir = join(tmpDir, 'rebase-basic')
     initRepo(dir)
 
@@ -141,7 +141,7 @@ const rebaseBasic: ScenarioFactory = {
     const filePath = join(dir, 'file.ts')
     writeFileSync(filePath, makeBasicFileContent())
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"initial: add parseCsv utility"')
+    git(dir, 'commit', '-m', 'initial: add parseCsv utility')
 
     // Create feature branch with 3 commits
     git(dir, 'checkout', '-b', 'feature')
@@ -153,7 +153,7 @@ const rebaseBasic: ScenarioFactory = {
     )
     writeFileSync(filePath, c1)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"feat: import existsSync"')
+    git(dir, 'commit', '-m', 'feat: import existsSync')
 
     // Commit 2: modify the parsing loop (middle — this will conflict)
     const c2 = c1.replace(
@@ -162,7 +162,7 @@ const rebaseBasic: ScenarioFactory = {
     )
     writeFileSync(filePath, c2)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"feat: trim cell whitespace"')
+    git(dir, 'commit', '-m', 'feat: trim cell whitespace')
 
     // Commit 3: modify the return statement (bottom — no overlap)
     const c3 = c2.replace(
@@ -171,7 +171,7 @@ const rebaseBasic: ScenarioFactory = {
     )
     writeFileSync(filePath, c3)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"feat: trim header whitespace"')
+    git(dir, 'commit', '-m', 'feat: trim header whitespace')
 
     // Switch to main and make a conflicting change in the same loop region
     git(dir, 'checkout', 'main')
@@ -181,7 +181,7 @@ const rebaseBasic: ScenarioFactory = {
     )
     writeFileSync(filePath, mainContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"refactor: normalize cell values to lowercase"')
+    git(dir, 'commit', '-m', 'refactor: normalize cell values to lowercase')
 
     // Attempt rebase — will stop at commit 2
     git(dir, 'checkout', 'feature')
@@ -192,7 +192,7 @@ const rebaseBasic: ScenarioFactory = {
     }
 
     const conflictContent = readFileSync(filePath, 'utf8')
-    const conflictedFiles: ReadonlyArray<ConflictedFile> = [
+    const conflictedFiles: ReadonlyArray<IConflictedFile> = [
       { path: 'file.ts', content: conflictContent },
     ]
 
@@ -213,13 +213,13 @@ const rebaseBasic: ScenarioFactory = {
   },
 }
 
-const rebaseMultiRound: ScenarioFactory = {
+const rebaseMultiRound: IScenarioFactory = {
   id: 'rebase-multi-round',
   description:
     'Rebase with multiple conflicting commits across a five-commit feature branch',
   tags: ['basic'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     const dir = join(tmpDir, 'rebase-multi-round')
     initRepo(dir)
 
@@ -227,7 +227,7 @@ const rebaseMultiRound: ScenarioFactory = {
     const filePath = join(dir, 'file.ts')
     writeFileSync(filePath, makeMultiRoundFileContent())
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"initial: add config module"')
+    git(dir, 'commit', '-m', 'initial: add config module')
 
     // Create feature branch with 5 commits
     git(dir, 'checkout', '-b', 'feature')
@@ -238,7 +238,7 @@ const rebaseMultiRound: ScenarioFactory = {
       '\n\nexport function validatePort(port: number): boolean {\n  return port > 0 && port < 65536\n}\n'
     writeFileSync(filePath, content)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"feat: add validatePort helper"')
+    git(dir, 'commit', '-m', 'feat: add validatePort helper')
 
     // Commit 2: change DEFAULT_CONFIG values (will conflict)
     content = readFileSync(filePath, 'utf8')
@@ -247,7 +247,7 @@ const rebaseMultiRound: ScenarioFactory = {
       .replace('  debug: false,', '  debug: true,')
     writeFileSync(filePath, content)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"feat: update default port and enable debug"')
+    git(dir, 'commit', '-m', 'feat: update default port and enable debug')
 
     // Commit 3: change loadConfig parsing logic (will conflict)
     content = readFileSync(filePath, 'utf8')
@@ -257,7 +257,7 @@ const rebaseMultiRound: ScenarioFactory = {
     )
     writeFileSync(filePath, content)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"feat: gracefully handle malformed config"')
+    git(dir, 'commit', '-m', 'feat: gracefully handle malformed config')
 
     // Commit 4: update saveConfig formatting (no overlap)
     content = readFileSync(filePath, 'utf8')
@@ -267,7 +267,7 @@ const rebaseMultiRound: ScenarioFactory = {
     )
     writeFileSync(filePath, content)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"style: add trailing newline to saved config"')
+    git(dir, 'commit', '-m', 'style: add trailing newline to saved config')
 
     // Commit 5: change mergeConfigs to use spread (will conflict)
     content = readFileSync(filePath, 'utf8')
@@ -285,7 +285,7 @@ const rebaseMultiRound: ScenarioFactory = {
     )
     writeFileSync(filePath, content)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"refactor: simplify mergeConfigs with spread"')
+    git(dir, 'commit', '-m', 'refactor: simplify mergeConfigs with spread')
 
     // Switch to main and make conflicting changes in regions 2, 3, and 5
     git(dir, 'checkout', 'main')
@@ -330,7 +330,7 @@ const rebaseMultiRound: ScenarioFactory = {
       dir,
       'commit',
       '-m',
-      '"refactor: adjust defaults, trim raw config, explicit undefined checks"'
+      'refactor: adjust defaults, trim raw config, explicit undefined checks'
     )
 
     // Attempt rebase — will stop at commit 2 (the first conflict)
@@ -342,7 +342,7 @@ const rebaseMultiRound: ScenarioFactory = {
     }
 
     const conflictContent = readFileSync(filePath, 'utf8')
-    const conflictedFiles: ReadonlyArray<ConflictedFile> = [
+    const conflictedFiles: ReadonlyArray<IConflictedFile> = [
       { path: 'file.ts', content: conflictContent },
     ]
 
@@ -367,7 +367,7 @@ const rebaseMultiRound: ScenarioFactory = {
 // Exported factory list
 // ---------------------------------------------------------------------------
 
-export const rebaseScenarios: ReadonlyArray<ScenarioFactory> = [
+export const rebaseScenarios: ReadonlyArray<IScenarioFactory> = [
   rebaseBasic,
   rebaseMultiRound,
 ]

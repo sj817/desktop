@@ -6,14 +6,14 @@
  * resolution.
  */
 
-import { execSync } from 'child_process'
+import { execFileSync } from 'child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 
 import {
-  ConflictedFile,
-  GeneratedScenario,
-  ScenarioFactory,
+  IConflictedFile,
+  IGeneratedScenario,
+  IScenarioFactory,
 } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -21,7 +21,7 @@ import {
 // ---------------------------------------------------------------------------
 
 function git(cwd: string, ...args: ReadonlyArray<string>): string {
-  return execSync(`git ${args.join(' ')}`, {
+  return execFileSync('git', [...args], {
     cwd,
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
@@ -33,8 +33,8 @@ function initRepo(dir: string): void {
     mkdirSync(dir, { recursive: true })
   }
   git(dir, 'init')
-  git(dir, 'config', 'user.email', '"bench@test.com"')
-  git(dir, 'config', 'user.name', '"Benchmark"')
+  git(dir, 'config', 'user.email', 'bench@test.com')
+  git(dir, 'config', 'user.name', 'Benchmark')
 }
 
 // ---------------------------------------------------------------------------
@@ -128,13 +128,13 @@ function makeHelpersContent(): string {
 // Scenarios
 // ---------------------------------------------------------------------------
 
-const cherrypickBasic: ScenarioFactory = {
+const cherrypickBasic: IScenarioFactory = {
   id: 'cherrypick-basic',
   description:
     'Cherry-pick a single commit that conflicts with a diverged main branch',
   tags: ['basic'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     const dir = join(tmpDir, 'cherrypick-basic')
     initRepo(dir)
 
@@ -142,7 +142,7 @@ const cherrypickBasic: ScenarioFactory = {
     const filePath = join(dir, 'file.ts')
     writeFileSync(filePath, makeBasicUtilContent())
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"initial: add currency formatting utilities"')
+    git(dir, 'commit', '-m', 'initial: add currency formatting utilities')
 
     // Create feature branch and modify the formatCurrency function
     git(dir, 'checkout', '-b', 'feature')
@@ -157,7 +157,7 @@ const cherrypickBasic: ScenarioFactory = {
       )
     writeFileSync(filePath, featureContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"feat: support negative currency values"')
+    git(dir, 'commit', '-m', 'feat: support negative currency values')
 
     // Switch to main and make a different modification to the same region
     git(dir, 'checkout', 'main')
@@ -172,7 +172,7 @@ const cherrypickBasic: ScenarioFactory = {
       )
     writeFileSync(filePath, mainContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"refactor: use Intl.NumberFormat for locale-aware formatting"')
+    git(dir, 'commit', '-m', 'refactor: use Intl.NumberFormat for locale-aware formatting')
 
     // Cherry-pick the feature commit onto main
     try {
@@ -182,7 +182,7 @@ const cherrypickBasic: ScenarioFactory = {
     }
 
     const conflictContent = readFileSync(filePath, 'utf8')
-    const conflictedFiles: ReadonlyArray<ConflictedFile> = [
+    const conflictedFiles: ReadonlyArray<IConflictedFile> = [
       { path: 'file.ts', content: conflictContent },
     ]
 
@@ -203,13 +203,13 @@ const cherrypickBasic: ScenarioFactory = {
   },
 }
 
-const cherrypickMulti: ScenarioFactory = {
+const cherrypickMulti: IScenarioFactory = {
   id: 'cherrypick-multi',
   description:
     'Cherry-pick a commit that causes conflicts in multiple files',
   tags: ['basic'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     const dir = join(tmpDir, 'cherrypick-multi')
     initRepo(dir)
 
@@ -219,7 +219,7 @@ const cherrypickMulti: ScenarioFactory = {
     writeFileSync(mainFilePath, makeMultiFileContent())
     writeFileSync(helpersPath, makeHelpersContent())
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"initial: add logger module with helpers"')
+    git(dir, 'commit', '-m', 'initial: add logger module with helpers')
 
     // Create feature branch with 3 commits touching both files
     git(dir, 'checkout', '-b', 'feature')
@@ -243,7 +243,7 @@ const cherrypickMulti: ScenarioFactory = {
     writeFileSync(mainFilePath, fileContent)
     writeFileSync(helpersPath, helpersContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"feat: add trace log level"')
+    git(dir, 'commit', '-m', 'feat: add trace log level')
 
     // Feature commit 2: modify formatMessage
     fileContent = readFileSync(mainFilePath, 'utf8')
@@ -253,7 +253,7 @@ const cherrypickMulti: ScenarioFactory = {
     )
     writeFileSync(mainFilePath, fileContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"feat: uppercase log level in output"')
+    git(dir, 'commit', '-m', 'feat: uppercase log level in output')
 
     // Feature commit 3: modify shouldLog and logError
     fileContent = readFileSync(mainFilePath, 'utf8')
@@ -269,7 +269,7 @@ const cherrypickMulti: ScenarioFactory = {
     )
     writeFileSync(helpersPath, helpersContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"feat: update level ordering and return from logError"')
+    git(dir, 'commit', '-m', 'feat: update level ordering and return from logError')
 
     // Switch to main and make conflicting changes in overlapping regions
     git(dir, 'checkout', 'main')
@@ -296,7 +296,7 @@ const cherrypickMulti: ScenarioFactory = {
     writeFileSync(mainFilePath, mainFileContent)
     writeFileSync(helpersPath, mainHelpersContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"refactor: adjust default level, reformat log output"')
+    git(dir, 'commit', '-m', 'refactor: adjust default level, reformat log output')
 
     // Cherry-pick the first feature commit (the one that touches both files)
     const hash = git(dir, 'rev-parse', 'feature~2').trim()
@@ -306,7 +306,7 @@ const cherrypickMulti: ScenarioFactory = {
       // Expected: cherry-pick fails due to conflicts
     }
 
-    const conflictedFiles: Array<ConflictedFile> = []
+    const conflictedFiles: Array<IConflictedFile> = []
 
     const fileConflict = readFileSync(mainFilePath, 'utf8')
     if (fileConflict.includes('<<<<<<<')) {
@@ -339,7 +339,7 @@ const cherrypickMulti: ScenarioFactory = {
 // Exported factory list
 // ---------------------------------------------------------------------------
 
-export const cherrypickScenarios: ReadonlyArray<ScenarioFactory> = [
+export const cherrypickScenarios: ReadonlyArray<IScenarioFactory> = [
   cherrypickBasic,
   cherrypickMulti,
 ]

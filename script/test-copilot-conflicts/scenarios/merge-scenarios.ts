@@ -5,15 +5,15 @@
  * so the benchmark harness can evaluate Copilot's resolution quality.
  */
 
-import { execSync } from 'child_process'
+import { execFileSync } from 'child_process'
 import { writeFileSync, readFileSync, mkdirSync } from 'fs'
 import { join } from 'path'
 
 import {
-  GeneratedScenario,
-  ScenarioFactory,
-  ConflictedFile,
-  PRMetadata,
+  IGeneratedScenario,
+  IScenarioFactory,
+  IConflictedFile,
+  IPRMetadata,
 } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -21,7 +21,7 @@ import {
 // ---------------------------------------------------------------------------
 
 function git(cwd: string, ...args: ReadonlyArray<string>): string {
-  return execSync(`git ${args.join(' ')}`, {
+  return execFileSync('git', [...args], {
     cwd,
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
@@ -30,8 +30,8 @@ function git(cwd: string, ...args: ReadonlyArray<string>): string {
 
 function initRepo(dir: string): void {
   git(dir, 'init')
-  git(dir, 'config', 'user.email', '"bench@test.com"')
-  git(dir, 'config', 'user.name', '"Benchmark"')
+  git(dir, 'config', 'user.email', 'bench@test.com')
+  git(dir, 'config', 'user.name', 'Benchmark')
 }
 
 /** Read a file relative to a repo directory. */
@@ -47,9 +47,9 @@ function writeFile(dir: string, filePath: string, content: string): void {
 }
 
 /** Collect all conflicted files by checking git status for unmerged paths. */
-function collectConflictedFiles(dir: string): ReadonlyArray<ConflictedFile> {
+function collectConflictedFiles(dir: string): ReadonlyArray<IConflictedFile> {
   const status = git(dir, 'status', '--porcelain')
-  const files: Array<ConflictedFile> = []
+  const files: Array<IConflictedFile> = []
 
   for (const line of status.split('\n')) {
     // Unmerged paths show as UU, AA, DD, AU, UA, DU, UD
@@ -68,13 +68,13 @@ function collectConflictedFiles(dir: string): ReadonlyArray<ConflictedFile> {
 // Scenario: merge-basic
 // ---------------------------------------------------------------------------
 
-const mergeBasic: ScenarioFactory = {
+const mergeBasic: IScenarioFactory = {
   id: 'merge-basic',
   description:
     'Simple single-file merge conflict in overlapping function bodies',
   tags: ['basic', 'scalable'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     const dir = join(tmpDir, 'repo')
     mkdirSync(dir, { recursive: true })
     initRepo(dir)
@@ -112,7 +112,7 @@ const mergeBasic: ScenarioFactory = {
 
     writeFile(dir, 'file.ts', originalContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Initial auth module"')
+    git(dir, 'commit', '-m', 'Initial auth module')
 
     // Feature branch: refactor token handling to use HMAC
     git(dir, 'checkout', '-b', 'feature')
@@ -150,7 +150,7 @@ const mergeBasic: ScenarioFactory = {
 
     writeFile(dir, 'file.ts', featureContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Refactor auth token handling"')
+    git(dir, 'commit', '-m', 'Refactor auth token handling')
 
     // Main branch: optimize validation with caching
     git(dir, 'checkout', 'main')
@@ -196,7 +196,7 @@ const mergeBasic: ScenarioFactory = {
 
     writeFile(dir, 'file.ts', mainContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Optimize token validation"')
+    git(dir, 'commit', '-m', 'Optimize token validation')
 
     try {
       git(dir, 'merge', 'feature')
@@ -227,12 +227,12 @@ const mergeBasic: ScenarioFactory = {
 // Scenario: merge-multifile
 // ---------------------------------------------------------------------------
 
-const mergeMultifile: ScenarioFactory = {
+const mergeMultifile: IScenarioFactory = {
   id: 'merge-multifile',
   description: 'Multi-file merge conflict across three independent modules',
   tags: ['basic', 'scalable'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     const dir = join(tmpDir, 'repo')
     mkdirSync(dir, { recursive: true })
     initRepo(dir)
@@ -312,7 +312,7 @@ const mergeMultifile: ScenarioFactory = {
     writeFile(dir, 'module-b.ts', moduleB)
     writeFile(dir, 'module-c.ts', moduleC)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Add core modules"')
+    git(dir, 'commit', '-m', 'Add core modules')
 
     // Feature branch: refactor all modules
     git(dir, 'checkout', '-b', 'feature')
@@ -412,7 +412,7 @@ const mergeMultifile: ScenarioFactory = {
     writeFile(dir, 'module-b.ts', featureModuleB)
     writeFile(dir, 'module-c.ts', featureModuleC)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Refactor modules with extended APIs"')
+    git(dir, 'commit', '-m', 'Refactor modules with extended APIs')
 
     // Main branch: different changes to same regions
     git(dir, 'checkout', 'main')
@@ -516,7 +516,7 @@ const mergeMultifile: ScenarioFactory = {
     writeFile(dir, 'module-b.ts', mainModuleB)
     writeFile(dir, 'module-c.ts', mainModuleC)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Enhance modules with additional features"')
+    git(dir, 'commit', '-m', 'Enhance modules with additional features')
 
     try {
       git(dir, 'merge', 'feature')
@@ -547,13 +547,13 @@ const mergeMultifile: ScenarioFactory = {
 // Scenario: merge-crossfile
 // ---------------------------------------------------------------------------
 
-const mergeCrossfile: ScenarioFactory = {
+const mergeCrossfile: IScenarioFactory = {
   id: 'merge-crossfile',
   description:
     'Cross-file rename conflict requiring coherent resolution across types and consumer',
   tags: ['adversarial'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     const dir = join(tmpDir, 'repo')
     mkdirSync(dir, { recursive: true })
     initRepo(dir)
@@ -593,7 +593,7 @@ const mergeCrossfile: ScenarioFactory = {
     writeFile(dir, 'types.ts', typesContent)
     writeFile(dir, 'consumer.ts', consumerContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Add user types and consumer"')
+    git(dir, 'commit', '-m', 'Add user types and consumer')
 
     // Feature branch: rename userId → id
     git(dir, 'checkout', '-b', 'feature')
@@ -633,16 +633,16 @@ const mergeCrossfile: ScenarioFactory = {
     writeFile(dir, 'types.ts', featureTypes)
     writeFile(dir, 'consumer.ts', featureConsumer)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Rename userId to id for consistency"')
+    git(dir, 'commit', '-m', 'Rename userId to id for consistency')
 
-    // Main branch: add new function that uses userId
+    // Main branch: modify the same functions to use userId differently
     git(dir, 'checkout', 'main')
 
     const mainConsumer = [
       'import { User, Session } from "./types"',
       '',
       'export function formatUserDisplay(user: User): string {',
-      '  return `${user.name} (${user.userId})`',
+      '  return `User: ${user.userId} - ${user.name}`',
       '}',
       '',
       'export function isSessionValid(session: Session): boolean {',
@@ -650,24 +650,18 @@ const mergeCrossfile: ScenarioFactory = {
       '}',
       '',
       'export function getUserId(user: User): string {',
-      '  return user.userId',
-      '}',
-      '',
-      'export function getUser(session: Session): {',
-      '  id: string',
-      '  displayName: string',
-      '} {',
-      '  return {',
-      '    id: session.user.userId,',
-      '    displayName: `${session.user.name} <${session.user.email}>`,',
+      '  // Validate userId before returning',
+      '  if (!user.userId || user.userId.length === 0) {',
+      '    throw new Error("Invalid userId")',
       '  }',
+      '  return user.userId',
       '}',
       '',
     ].join('\n')
 
     writeFile(dir, 'consumer.ts', mainConsumer)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Add getUser helper to consumer"')
+    git(dir, 'commit', '-m', 'Add getUser helper to consumer')
 
     try {
       git(dir, 'merge', 'feature')
@@ -716,12 +710,12 @@ const mergeCrossfile: ScenarioFactory = {
 // Scenario: merge-adddelete
 // ---------------------------------------------------------------------------
 
-const mergeAddDelete: ScenarioFactory = {
+const mergeAddDelete: IScenarioFactory = {
   id: 'merge-adddelete',
   description: 'Add/delete conflict where one branch modifies a deleted file',
   tags: ['basic'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     const dir = join(tmpDir, 'repo')
     mkdirSync(dir, { recursive: true })
     initRepo(dir)
@@ -746,12 +740,12 @@ const mergeAddDelete: ScenarioFactory = {
 
     writeFile(dir, 'old-module.ts', moduleContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Add legacy config module"')
+    git(dir, 'commit', '-m', 'Add legacy config module')
 
     // Feature branch: delete the deprecated module
     git(dir, 'checkout', '-b', 'feature')
     git(dir, 'rm', 'old-module.ts')
-    git(dir, 'commit', '-m', '"Remove deprecated legacy config module"')
+    git(dir, 'commit', '-m', 'Remove deprecated legacy config module')
 
     // Main branch: improve the module
     git(dir, 'checkout', 'main')
@@ -785,7 +779,7 @@ const mergeAddDelete: ScenarioFactory = {
 
     writeFile(dir, 'old-module.ts', improvedContent)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Improve legacy config parser robustness"')
+    git(dir, 'commit', '-m', 'Improve legacy config parser robustness')
 
     try {
       git(dir, 'merge', 'feature')
@@ -816,13 +810,13 @@ const mergeAddDelete: ScenarioFactory = {
 // Scenario: merge-with-pr
 // ---------------------------------------------------------------------------
 
-const mergeWithPR: ScenarioFactory = {
+const mergeWithPR: IScenarioFactory = {
   id: 'merge-with-pr',
   description:
     'Merge conflict with PR metadata guiding OAuth2 migration intent',
   tags: ['basic', 'intent'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     const dir = join(tmpDir, 'repo')
     mkdirSync(dir, { recursive: true })
     initRepo(dir)
@@ -854,7 +848,7 @@ const mergeWithPR: ScenarioFactory = {
 
     writeFile(dir, 'auth.ts', originalAuth)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Add legacy token auth module"')
+    git(dir, 'commit', '-m', 'Add legacy token auth module')
 
     // Feature branch: migrate to OAuth2
     git(dir, 'checkout', '-b', 'feature')
@@ -905,7 +899,7 @@ const mergeWithPR: ScenarioFactory = {
 
     writeFile(dir, 'auth.ts', oauth2Auth)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Replace legacy auth with OAuth2"')
+    git(dir, 'commit', '-m', 'Replace legacy auth with OAuth2')
 
     // Main branch: add validation to legacy auth
     git(dir, 'checkout', 'main')
@@ -944,10 +938,10 @@ const mergeWithPR: ScenarioFactory = {
 
     writeFile(dir, 'auth.ts', enhancedLegacyAuth)
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Add API token validation"')
+    git(dir, 'commit', '-m', 'Add API token validation')
 
     // Write PR metadata
-    const prMetadata: PRMetadata = {
+    const prMetadata: IPRMetadata = {
       title: 'Replace legacy auth with OAuth2',
       body:
         'This PR replaces legacy token authentication with OAuth2. ' +
@@ -956,7 +950,7 @@ const mergeWithPR: ScenarioFactory = {
     }
     writeFile(dir, '.pr-metadata.json', JSON.stringify(prMetadata, null, 2))
     git(dir, 'add', '.')
-    git(dir, 'commit', '-m', '"Add PR metadata"')
+    git(dir, 'commit', '-m', 'Add PR metadata')
 
     try {
       git(dir, 'merge', 'feature')
@@ -999,7 +993,7 @@ const mergeWithPR: ScenarioFactory = {
 // Exported factory list
 // ---------------------------------------------------------------------------
 
-export const mergeScenarios: ReadonlyArray<ScenarioFactory> = [
+export const mergeScenarios: ReadonlyArray<IScenarioFactory> = [
   mergeBasic,
   mergeMultifile,
   mergeCrossfile,

@@ -10,7 +10,7 @@ import { execFileSync } from 'child_process'
 import { writeFileSync, readFileSync, mkdirSync } from 'fs'
 import { join } from 'path'
 
-import { GeneratedScenario, ScenarioFactory, ConflictedFile } from '../types'
+import { IGeneratedScenario, IScenarioFactory, IConflictedFile } from '../types'
 
 function git(cwd: string, ...args: string[]): string {
   return execFileSync('git', args, {
@@ -30,13 +30,13 @@ function initRepo(dir: string): void {
 // adversarial-rename
 // ---------------------------------------------------------------------------
 
-const adversarialRename: ScenarioFactory = {
+const adversarialRename: IScenarioFactory = {
   id: 'adversarial-rename',
   description:
     'Rename userId→id in types.ts; consumer files must be consistent',
   tags: ['adversarial'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     initRepo(tmpDir)
 
     // Base files
@@ -253,7 +253,7 @@ export function handleListUsers(): User[] {
       // Expected conflict
     }
 
-    const conflictedFiles: Array<ConflictedFile> = []
+    const conflictedFiles: Array<IConflictedFile> = []
     for (const path of [
       'types.ts',
       'service.ts',
@@ -311,13 +311,13 @@ export function handleListUsers(): User[] {
 // adversarial-interface
 // ---------------------------------------------------------------------------
 
-const adversarialInterface: ScenarioFactory = {
+const adversarialInterface: IScenarioFactory = {
   id: 'adversarial-interface',
   description:
     'Both branches add different fields to interface; resolution must include both',
   tags: ['adversarial'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     initRepo(tmpDir)
 
     writeFileSync(
@@ -483,7 +483,7 @@ export class AuthService {
       // Expected
     }
 
-    const conflictedFiles: Array<ConflictedFile> = []
+    const conflictedFiles: Array<IConflictedFile> = []
     for (const path of ['interface.ts', 'implementation.ts']) {
       const content = readFileSync(join(tmpDir, path), 'utf8')
       if (content.includes('<<<<<<<')) {
@@ -524,12 +524,12 @@ export class AuthService {
 // adversarial-import
 // ---------------------------------------------------------------------------
 
-const adversarialImport: ScenarioFactory = {
+const adversarialImport: IScenarioFactory = {
   id: 'adversarial-import',
   description: 'Both branches add same import; resolution must deduplicate',
   tags: ['adversarial'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     initRepo(tmpDir)
 
     writeFileSync(
@@ -627,7 +627,7 @@ export function renderCreatedDate(date: Date): string {
       // Expected
     }
 
-    const conflictedFiles: Array<ConflictedFile> = []
+    const conflictedFiles: Array<IConflictedFile> = []
     const content = readFileSync(join(tmpDir, 'consumer.ts'), 'utf8')
     if (content.includes('<<<<<<<')) {
       conflictedFiles.push({ path: 'consumer.ts', content })
@@ -664,13 +664,13 @@ export function renderCreatedDate(date: Date): string {
 // adversarial-pr-intent
 // ---------------------------------------------------------------------------
 
-const adversarialPrIntent: ScenarioFactory = {
+const adversarialPrIntent: IScenarioFactory = {
   id: 'adversarial-pr-intent',
   description:
     'PR says replace legacy auth with OAuth2; resolution must prefer OAuth2',
   tags: ['adversarial', 'intent'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     initRepo(tmpDir)
 
     writeFileSync(
@@ -863,7 +863,7 @@ export function createConfig(token: string, expiry: number): AppConfig {
       // Expected
     }
 
-    const conflictedFiles: Array<ConflictedFile> = []
+    const conflictedFiles: Array<IConflictedFile> = []
     for (const path of ['auth.ts', 'config.ts']) {
       const content = readFileSync(join(tmpDir, path), 'utf8')
       if (content.includes('<<<<<<<')) {
@@ -910,13 +910,13 @@ export function createConfig(token: string, expiry: number): AppConfig {
 // adversarial-delete-modify
 // ---------------------------------------------------------------------------
 
-const adversarialDeleteModify: ScenarioFactory = {
+const adversarialDeleteModify: IScenarioFactory = {
   id: 'adversarial-delete-modify',
   description:
     'Branch A deletes deprecated function, Branch B modifies it; deletion should win',
   tags: ['adversarial'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     initRepo(tmpDir)
 
     writeFileSync(
@@ -1007,7 +1007,7 @@ export function anotherHelper(n: number): number {
     }
 
     const content = readFileSync(join(tmpDir, 'helpers.ts'), 'utf8')
-    const conflictedFiles: Array<ConflictedFile> = content.includes('<<<<<<<')
+    const conflictedFiles: Array<IConflictedFile> = content.includes('<<<<<<<')
       ? [{ path: 'helpers.ts', content }]
       : []
 
@@ -1040,13 +1040,13 @@ export function anotherHelper(n: number): number {
 // adversarial-config
 // ---------------------------------------------------------------------------
 
-const adversarialConfig: ScenarioFactory = {
+const adversarialConfig: IScenarioFactory = {
   id: 'adversarial-config',
   description:
     'Both branches change DB host in two config files; must be consistent',
   tags: ['adversarial'],
 
-  async generate(tmpDir: string): Promise<GeneratedScenario> {
+  async generate(tmpDir: string): Promise<IGeneratedScenario> {
     initRepo(tmpDir)
     mkdirSync(join(tmpDir, 'config'), { recursive: true })
 
@@ -1152,7 +1152,7 @@ const adversarialConfig: ScenarioFactory = {
       // Expected
     }
 
-    const conflictedFiles: Array<ConflictedFile> = []
+    const conflictedFiles: Array<IConflictedFile> = []
     for (const path of ['config/database.json', 'config/api.json']) {
       const content = readFileSync(join(tmpDir, path), 'utf8')
       if (content.includes('<<<<<<<')) {
@@ -1208,7 +1208,7 @@ const adversarialConfig: ScenarioFactory = {
 // Export
 // ---------------------------------------------------------------------------
 
-export const adversarialScenarios: ReadonlyArray<ScenarioFactory> = [
+export const adversarialScenarios: ReadonlyArray<IScenarioFactory> = [
   adversarialRename,
   adversarialInterface,
   adversarialImport,
