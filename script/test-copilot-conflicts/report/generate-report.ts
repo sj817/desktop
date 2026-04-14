@@ -321,11 +321,42 @@ function generateScaleCeiling(
   lines.push('## Scale Ceiling')
   lines.push('')
   lines.push(
-    'At what file count does each approach start failing or degrading?'
+    'How does accuracy change as file count increases? Only scalable scenarios ' +
+    '(same conflict pattern at different file counts) are compared here.'
   )
   lines.push('')
 
-  const scaleTiers = [...new Set(results.map(r => r.fileCount))].sort(
+  // Identify base scenario names that have scaled variants (e.g. merge-basic, merge-basic-x5)
+  const baseScenarioPattern = /^(.+?)-x\d+$/
+  const scaledIds = new Set<string>()
+  const baseNames = new Set<string>()
+
+  for (const r of results) {
+    const match = r.scenarioId.match(baseScenarioPattern)
+    if (match) {
+      baseNames.add(match[1])
+      scaledIds.add(r.scenarioId)
+    }
+  }
+
+  // Also include the base scenarios themselves if they have scaled variants
+  for (const r of results) {
+    if (baseNames.has(r.scenarioId)) {
+      scaledIds.add(r.scenarioId)
+    }
+  }
+
+  const scalableResults = results.filter(
+    r => scaledIds.has(r.scenarioId) || baseNames.has(r.scenarioId)
+  )
+
+  if (scalableResults.length === 0) {
+    lines.push('_No scaled scenarios in this run — cannot determine ceiling._')
+    lines.push('')
+    return lines.join('\n')
+  }
+
+  const scaleTiers = [...new Set(scalableResults.map(r => r.fileCount))].sort(
     (a, b) => a - b
   )
 
@@ -335,42 +366,71 @@ function generateScaleCeiling(
     return lines.join('\n')
   }
 
-  const approaches = getUniqueApproaches(results)
+  const approaches = getUniqueApproaches(scalableResults)
 
-  lines.push('| Scale (files) | ' + approaches.map(formatApproach).join(' | ') + ' |')
-  lines.push('| --- | ' + approaches.map(() => '---').join(' | ') + ' |')
+  // Build header: Scale | Approach1 Score | Approach1 Tokens | Approach1 Latency | ...
+  const headerCells = ['Scale (files)']
+  for (const approach of approaches) {
+    headerCells.push(`${formatApproach(approach)} Score`)
+    headerCells.push(`${formatApproach(approach)} Tokens`)
+    headerCells.push(`${formatApproach(approach)} Latency`)
+  }
+  lines.push(`| ${headerCells.join(' | ')} |`)
+  lines.push(`| ${headerCells.map(() => '---').join(' | ')} |`)
 
   for (const scale of scaleTiers) {
     const cells = [String(scale)]
     for (const approach of approaches) {
-      const subset = results.filter(
+      const subset = scalableResults.filter(
         r => r.fileCount === scale && r.approach === approach
       )
       if (subset.length === 0) {
-        cells.push('—')
+        cells.push('—', '—', '—')
         continue
       }
 
       const avgScore = average(subset.map(r => r.accuracy.score))
-      const errorRate =
-        (subset.filter(r => r.resolution.error !== null).length /
-          subset.length) *
-        100
+      const errorCount = subset.filter(r => r.resolution.error !== null).length
+      const avgTokens = average(
+        subset.map(
+          r =>
+            r.resolution.tokenUsage.totalInputTokens +
+            r.resolution.tokenUsage.totalOutputTokens
+        )
+      )
+      const avgLatency = average(subset.map(r => r.resolution.latencyMs))
 
-      let status: string
-      if (errorRate > 50) {
-        status = `❌ ${avgScore.toFixed(0)} (${errorRate.toFixed(0)}% errors)`
+      let scoreCell: string
+      if (errorCount === subset.length) {
+        // All failed
+        const errSample = subset[0].resolution.error ?? ''
+        if (errSample.includes('exceeds the limit')) {
+          scoreCell = `❌ token limit`
+        } else if (errSample.includes('imeout')) {
+          scoreCell = `❌ timeout`
+        } else {
+          scoreCell = `❌ ${avgScore.toFixed(0)}`
+        }
       } else if (avgScore < 50) {
-        status = `⚠️ ${avgScore.toFixed(0)}`
+        scoreCell = `⚠️ ${avgScore.toFixed(0)}`
       } else {
-        status = `✅ ${avgScore.toFixed(0)}`
+        scoreCell = `✅ ${avgScore.toFixed(0)}`
       }
-      cells.push(status)
+
+      cells.push(scoreCell, formatNumber(avgTokens), formatMs(avgLatency))
     }
     lines.push(`| ${cells.join(' | ')} |`)
   }
 
   lines.push('')
+
+  // Footnote with scenario list
+  const sortedBaseNames = [...baseNames].sort()
+  lines.push(
+    `_Scenarios compared: ${sortedBaseNames.join(', ')}_`
+  )
+  lines.push('')
+
   return lines.join('\n')
 }
 

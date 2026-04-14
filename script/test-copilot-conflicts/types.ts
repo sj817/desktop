@@ -201,7 +201,7 @@ export interface IBenchmarkConfig {
 export const DEFAULT_CONFIG: IBenchmarkConfig = {
   scenarios: 'all',
   approaches: 'all',
-  scales: [5, 15, 30],
+  scales: [1, 5, 10, 30, 50, 75, 100, 150, 200, 300, 500, 1000],
   models: ['gpt-5-mini'],
   reportOnly: false,
   resultsDir: 'script/test-copilot-conflicts/results',
