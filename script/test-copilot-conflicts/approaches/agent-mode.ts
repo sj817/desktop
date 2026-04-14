@@ -219,7 +219,7 @@ export async function resolveAgentMode(
 
       const result = await session.sendAndWait(
         { prompt: taskPrompt },
-        300_000 // 5 minute timeout for agent mode
+        600_000 // 10 minute timeout (same budget as single-prompt)
       )
 
       if (!result?.data?.content) {

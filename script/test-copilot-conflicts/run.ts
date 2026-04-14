@@ -49,6 +49,7 @@ interface IParsedArgs {
   approach: ReadonlyArray<ApproachId> | 'all'
   scale: ReadonlyArray<number>
   model: ReadonlyArray<string>
+  runs: number
   reportOnly: boolean
   list: boolean
   help: boolean
@@ -60,6 +61,7 @@ function parseArgs(argv: ReadonlyArray<string>): IParsedArgs {
     approach: 'all',
     scale: DEFAULT_CONFIG.scales as number[],
     model: DEFAULT_CONFIG.models as string[],
+    runs: 1,
     reportOnly: false,
     list: false,
     help: false,
@@ -102,6 +104,15 @@ function parseArgs(argv: ReadonlyArray<string>): IParsedArgs {
           i++
         }
         break
+      case '--runs':
+        if (next) {
+          args.runs = parseInt(next.trim(), 10)
+          if (isNaN(args.runs) || args.runs < 1) {
+            args.runs = 1
+          }
+          i++
+        }
+        break
       case '--report-only':
         args.reportOnly = true
         break
@@ -129,8 +140,9 @@ Usage:
 Options:
   --scenario <ids>     Comma-separated scenario IDs (default: all)
   --approach <ids>     Comma-separated approaches: single-prompt,agent-mode (default: all)
-  --scale <counts>     Comma-separated file counts for scaling (default: 5,15,30)
+  --scale <counts>     Comma-separated file counts for scaling (default: 1,5,10,30,50,75,100,...)
   --model <models>     Comma-separated model IDs (default: gpt-5-mini)
+  --runs <N>           Number of runs per cell for statistical confidence (default: 1)
   --report-only        Generate report from cached results only
   --list               List available scenario IDs
   --help, -h           Show this help
@@ -194,7 +206,7 @@ function loadCachedRuns(dir: string): ReadonlyArray<IBenchmarkRun> {
 // Benchmark orchestration
 // ---------------------------------------------------------------------------
 
-async function runBenchmark(config: IBenchmarkConfig): Promise<IBenchmarkRun> {
+async function runBenchmark(config: IBenchmarkConfig, numRuns: number): Promise<IBenchmarkRun> {
   const runId = `${new Date().toISOString().replace(/[:.]/g, '-')}`
   const startTime = new Date().toISOString()
 
@@ -203,6 +215,7 @@ async function runBenchmark(config: IBenchmarkConfig): Promise<IBenchmarkRun> {
   console.log('   Approaches:', config.approaches === 'all' ? 'all' : config.approaches)
   console.log('   Scales:', config.scales)
   console.log('   Models:', config.models)
+  console.log('   Runs per cell:', numRuns)
   console.log('')
 
   // Step 1: Generate scenarios
@@ -221,74 +234,96 @@ async function runBenchmark(config: IBenchmarkConfig): Promise<IBenchmarkRun> {
     // Step 3: Get GitHub token and create client
     const token = getGitHubToken()
 
-    // Step 4: Run each combination
+    // Step 4: Run each combination (repeated numRuns times)
     const results: Array<IBenchmarkResult> = []
 
-    for (const scenario of scenarios) {
-      for (const approach of approaches) {
-        for (const model of config.models) {
-          console.log(
-            `🔬 Running: ${scenario.id} × ${approach} × ${model} (${scenario.fileCount} files)...`
-          )
+    for (let run = 1; run <= numRuns; run++) {
+      if (numRuns > 1) {
+        console.log(`\n━━━ Run ${run}/${numRuns} ━━━\n`)
+      }
 
-          const tokenTracker = new TokenTracker()
-          const latencyTracker = new LatencyTracker()
+      for (const scenario of scenarios) {
+        for (const approach of approaches) {
+          for (const model of config.models) {
+            const runLabel = numRuns > 1 ? ` [run ${run}/${numRuns}]` : ''
+            console.log(
+              `🔬 Running: ${scenario.id} × ${approach} × ${model} (${scenario.fileCount} files)${runLabel}...`
+            )
 
-          let resolution
-          try {
-            const client = await createCopilotClient(scenario.repoPath, token)
+            const tokenTracker = new TokenTracker()
+            const latencyTracker = new LatencyTracker()
+
+            let resolution
             try {
-              resolution = await runApproach(
+              const client = await createCopilotClient(scenario.repoPath, token)
+              try {
+                resolution = await runApproach(
+                  approach,
+                  client,
+                  model,
+                  scenario,
+                  tokenTracker,
+                  latencyTracker
+                )
+              } finally {
+                await stopClient(client)
+              }
+            } catch (e) {
+              const errorMsg = e instanceof Error ? e.message : String(e)
+
+              // Detect infra/auth failures vs real benchmark failures
+              if (isInfraFailure(errorMsg)) {
+                console.log(`   ⚠️  Infra failure (excluded from results): ${errorMsg}`)
+                console.log('')
+                continue
+              }
+
+              resolution = {
                 approach,
-                client,
+                scenarioId: scenario.id,
                 model,
-                scenario,
-                tokenTracker,
-                latencyTracker
-              )
-            } finally {
-              await stopClient(client)
+                response: null,
+                error: errorMsg,
+                tokenUsage: tokenTracker.getUsage(),
+                latencyMs: latencyTracker.getElapsedMs(),
+                toolCallCount: 0,
+              }
             }
-          } catch (e) {
-            // Client creation failed
-            resolution = {
-              approach,
+
+            // Also filter infra failures that happen inside the approach
+            if (resolution.error && isInfraFailure(resolution.error)) {
+              console.log(`   ⚠️  Infra failure (excluded from results): ${resolution.error}`)
+              console.log('')
+              continue
+            }
+
+            const accuracy = checkAccuracy(scenario, resolution.response)
+
+            const result: IBenchmarkResult = {
               scenarioId: scenario.id,
+              scenarioDescription: scenario.description,
+              approach,
               model,
-              response: null,
-              error: e instanceof Error ? e.message : String(e),
-              tokenUsage: tokenTracker.getUsage(),
-              latencyMs: latencyTracker.getElapsedMs(),
-              toolCallCount: 0,
+              fileCount: scenario.fileCount,
+              tags: [...scenario.tags],
+              resolution,
+              accuracy,
+              timestamp: new Date().toISOString(),
             }
+
+            results.push(result)
+
+            // Print inline result
+            const emoji = accuracy.score >= 80 ? '✅' : accuracy.score >= 50 ? '⚠️' : '❌'
+            console.log(
+              `   ${emoji} Score: ${accuracy.score}/100 | Latency: ${formatMs(resolution.latencyMs)} | ` +
+                `Tokens: ${resolution.tokenUsage.totalInputTokens + resolution.tokenUsage.totalOutputTokens}`
+            )
+            if (resolution.error) {
+              console.log(`   ⚡ Error: ${resolution.error}`)
+            }
+            console.log('')
           }
-
-          const accuracy = checkAccuracy(scenario, resolution.response)
-
-          const result: IBenchmarkResult = {
-            scenarioId: scenario.id,
-            scenarioDescription: scenario.description,
-            approach,
-            model,
-            fileCount: scenario.fileCount,
-            tags: [...scenario.tags],
-            resolution,
-            accuracy,
-            timestamp: new Date().toISOString(),
-          }
-
-          results.push(result)
-
-          // Print inline result
-          const emoji = accuracy.score >= 80 ? '✅' : accuracy.score >= 50 ? '⚠️' : '❌'
-          console.log(
-            `   ${emoji} Score: ${accuracy.score}/100 | Latency: ${formatMs(resolution.latencyMs)} | ` +
-              `Tokens: ${resolution.tokenUsage.totalInputTokens + resolution.tokenUsage.totalOutputTokens}`
-          )
-          if (resolution.error) {
-            console.log(`   ⚡ Error: ${resolution.error}`)
-          }
-          console.log('')
         }
       }
     }
@@ -330,6 +365,27 @@ function formatMs(ms: number): string {
     return `${Math.round(ms)}ms`
   }
   return `${(ms / 1000).toFixed(1)}s`
+}
+
+/**
+ * Detect infra/auth failures that should be excluded from benchmark results.
+ * These are not model failures — they indicate token expiration, rate limits,
+ * or environment issues that would pollute the data.
+ */
+function isInfraFailure(error: string): boolean {
+  const infraPatterns = [
+    'Session was not created with authentication',
+    'authentication info or custom provider',
+    'ECONNREFUSED',
+    'ENOTFOUND',
+    'ETIMEDOUT',
+    'rate limit',
+    'Rate limit',
+    '401',
+    '403',
+    'token expired',
+  ]
+  return infraPatterns.some(pattern => error.includes(pattern))
 }
 
 // ---------------------------------------------------------------------------
@@ -387,7 +443,7 @@ async function main(): Promise<void> {
   }
 
   try {
-    const run = await runBenchmark(config)
+    const run = await runBenchmark(config, args.runs)
 
     // Save results
     const resultPath = saveRunResults(run, resultsDir)

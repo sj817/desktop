@@ -235,8 +235,9 @@ export function checkAccuracy(
       notes.push('Cross-file coherence check failed')
     }
   } else {
-    // Non-adversarial scenarios get full marks for coherence
-    score += 15
+    // Non-adversarial scenarios: no coherence verifier available.
+    // Score is out of 70 (not 100), normalized below.
+    crossFileCoherent = null
   }
 
   // Check 5: Intent respected (15 points, intent scenarios only)
@@ -249,9 +250,24 @@ export function checkAccuracy(
       notes.push('Intent verification check failed')
     }
   } else {
-    // Non-intent scenarios get full marks for intent
-    score += 15
+    // Non-intent scenarios: no intent verifier available.
+    // Score is out of available points, normalized below.
+    intentRespected = null
   }
+
+  // Normalize score to 0-100 based on applicable checks only.
+  // Markers=30, Files=20, Syntax=20 are always applicable.
+  // Coherence=15, Intent=15 are only applicable when verifiers exist.
+  let maxPossible = 70 // markers + files + syntax
+  if (scenario.verifyCoherence !== null) {
+    maxPossible += 15
+  }
+  if (scenario.verifyIntent !== null) {
+    maxPossible += 15
+  }
+  const normalizedScore = maxPossible > 0
+    ? Math.round((score / maxPossible) * 100)
+    : 0
 
   return {
     markersRemoved,
@@ -259,7 +275,7 @@ export function checkAccuracy(
     syntaxValid,
     crossFileCoherent,
     intentRespected,
-    score: Math.min(100, score),
+    score: Math.min(100, normalizedScore),
     notes,
   }
 }

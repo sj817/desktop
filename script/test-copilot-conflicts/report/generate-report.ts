@@ -65,7 +65,9 @@ function generateExecutiveSummary(
 
   for (const approach of approaches) {
     const approachResults = results.filter(r => r.approach === approach)
-    const avgScore = average(approachResults.map(r => r.accuracy.score))
+    const scores = approachResults.map(r => r.accuracy.score)
+    const avgScore = average(scores)
+    const scoreStdDev = stddev(scores)
     const successRate =
       (approachResults.filter(r => r.resolution.error === null).length /
         approachResults.length) *
@@ -79,8 +81,19 @@ function generateExecutiveSummary(
       )
     )
 
+    // Detect if we have multi-run data (same scenario+approach appears more than once)
+    const scenarioCounts = new Map<string, number>()
+    for (const r of approachResults) {
+      scenarioCounts.set(r.scenarioId, (scenarioCounts.get(r.scenarioId) ?? 0) + 1)
+    }
+    const maxRunsPerCell = Math.max(...scenarioCounts.values())
+
     lines.push(`### ${formatApproach(approach)}`)
-    lines.push(`- **Average accuracy score:** ${avgScore.toFixed(1)}/100`)
+    if (maxRunsPerCell > 1) {
+      lines.push(`- **Average accuracy score:** ${avgScore.toFixed(1)} ± ${scoreStdDev.toFixed(1)}/100 (${maxRunsPerCell} runs/cell)`)
+    } else {
+      lines.push(`- **Average accuracy score:** ${avgScore.toFixed(1)}/100`)
+    }
     lines.push(`- **Success rate:** ${successRate.toFixed(1)}%`)
     lines.push(`- **Average latency:** ${formatMs(avgLatency)}`)
     lines.push(`- **Average tokens:** ${formatNumber(avgTokens)}`)
@@ -129,15 +142,21 @@ function generateAccuracyMatrix(
     const cells = [scenarioId]
     for (const approach of approaches) {
       for (const model of models) {
-        const r = results.find(
+        const matching = results.filter(
           x =>
             x.scenarioId === scenarioId &&
             x.approach === approach &&
             x.model === model
         )
-        if (r) {
-          const emoji = r.accuracy.score >= 80 ? '✅' : r.accuracy.score >= 50 ? '⚠️' : '❌'
-          cells.push(`${emoji} ${r.accuracy.score}`)
+        if (matching.length > 0) {
+          const avgScore = average(matching.map(m => m.accuracy.score))
+          const emoji = avgScore >= 100 ? '✅' : avgScore >= 80 ? '⚠️' : '❌'
+          if (matching.length > 1) {
+            const sd = stddev(matching.map(m => m.accuracy.score))
+            cells.push(`${emoji} ${avgScore.toFixed(0)}±${sd.toFixed(0)}`)
+          } else {
+            cells.push(`${emoji} ${matching[0].accuracy.score}`)
+          }
         } else {
           cells.push('—')
         }
@@ -525,6 +544,16 @@ function average(values: ReadonlyArray<number>): number {
     return 0
   }
   return values.reduce((sum, v) => sum + v, 0) / values.length
+}
+
+function stddev(values: ReadonlyArray<number>): number {
+  if (values.length < 2) {
+    return 0
+  }
+  const avg = average(values)
+  const variance =
+    values.reduce((sum, v) => sum + (v - avg) ** 2, 0) / (values.length - 1)
+  return Math.sqrt(variance)
 }
 
 function formatMs(ms: number): string {
