@@ -398,7 +398,7 @@ export async function resolveSinglePrompt(
 
       const result = await session.sendAndWait(
         { prompt: fullPrompt },
-        120_000 // 2 minute timeout for benchmark
+        600_000 // 10 minute timeout for benchmark (large scale needs time)
       )
 
       if (!result) {
