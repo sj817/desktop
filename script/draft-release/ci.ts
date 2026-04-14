@@ -69,41 +69,41 @@ async function commandVersion(channel: Channel): Promise<void> {
 
   const next = getNextVersionNumber(previous, channel)
 
-  const outputs: Record<string, string> = { previous, next }
+  const outputs: Record<string, string> = {
+    previous,
+    next,
+    'compare-base': previous,
+  }
 
-  // For production releases, also discover the latest beta tag so the
-  // workflow can branch from it (avoids shipping untested code).
   if (channel === 'production') {
-    // getLatestRelease can filter OUT betas but not filter TO only betas,
-    // so we call it with betas included and check if the result is a beta.
-    // If the latest overall tag is a production tag (e.g., 3.5.7 > 3.5.7-beta3),
-    // we need to look through all tags manually to find the latest beta.
-    const { sort: semverSort } = await import('semver')
-    const { sh } = await import('../sh')
-    const allTags = (await sh('git', 'tag'))
-      .split('\n')
-      .filter(
-        tag =>
-          tag.startsWith('release-') &&
-          !tag.includes('-linux') &&
-          !tag.includes('-test') &&
-          tag.includes('-beta')
-      )
-      .map(tag => tag.substring(8))
+    // For production releases, discover the latest beta tag so the
+    // workflow can branch from it (avoids shipping untested code).
+    const latestBeta = await getLatestRelease({
+      excludeBetaReleases: false,
+      excludeTestReleases: true,
+      onlyBetaReleases: true,
+    })
 
-    const sortedBetas = semverSort(allTags.filter(Boolean))
-    const latestBeta = sortedBetas.at(-1)
-
-    if (!latestBeta) {
-      throw new Error(
-        'Unable to determine the latest beta release tag for a production release.'
-      )
+    outputs['latest-beta'] = latestBeta
+  } else if (channel === 'beta') {
+    // For beta releases, use the latest beta tag as the comparison base
+    // for release notes generation. This ensures notes reflect changes
+    // since the last beta, not the last production release.
+    try {
+      const latestBeta = await getLatestRelease({
+        excludeBetaReleases: false,
+        excludeTestReleases: true,
+        onlyBetaReleases: true,
+      })
+      outputs['compare-base'] = latestBeta
+    } catch {
+      // No beta tags exist yet — fall back to previous (production tag)
+      console.log('ℹ️ No beta tags found, using previous release as compare base')
     }
-
-    outputs['latest-beta'] = String(latestBeta)
   }
 
   console.log(`📦 Previous: ${previous} → Next: ${next}`)
+  console.log(`📊 Compare base: ${outputs['compare-base']}`)
   if (outputs['latest-beta']) {
     console.log(`📌 Latest beta: ${outputs['latest-beta']} (branch base)`)
   }

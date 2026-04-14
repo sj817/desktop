@@ -12,17 +12,27 @@ import { sh } from '../sh'
  *
  * @param options.excludeBetaReleases - when true, filters out beta release tags
  * @param options.excludeTestReleases - when true, filters out test release tags
+ * @param options.onlyBetaReleases - when true, returns only beta release tags
  */
 export async function getLatestRelease(options: {
   excludeBetaReleases: boolean
   excludeTestReleases: boolean
+  onlyBetaReleases?: boolean
 }): Promise<string> {
+  if (options.excludeBetaReleases && options.onlyBetaReleases) {
+    throw new Error(
+      'Cannot set both excludeBetaReleases and onlyBetaReleases'
+    )
+  }
+
   let releaseTags = (await sh('git', 'tag'))
     .split('\n')
     .filter(tag => tag.startsWith('release-'))
     .filter(tag => !tag.includes('-linux'))
 
-  if (options.excludeBetaReleases) {
+  if (options.onlyBetaReleases) {
+    releaseTags = releaseTags.filter(tag => tag.includes('-beta'))
+  } else if (options.excludeBetaReleases) {
     releaseTags = releaseTags.filter(tag => !tag.includes('-beta'))
   }
 
