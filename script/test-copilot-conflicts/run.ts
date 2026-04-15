@@ -38,6 +38,7 @@ import { resolveAgentMode } from './approaches/agent-mode'
 import { resolveSinglePromptChunked } from './approaches/single-prompt-chunked'
 import { resolveAgentModePreseeded } from './approaches/agent-mode-preseeded'
 import { resolveChunkedPreseededAgent } from './approaches/chunked-preseeded-agent'
+import { resolveUnifiedParallel } from './approaches/unified-parallel'
 import { checkAccuracy } from './metrics/accuracy-checker'
 import { TokenTracker } from './metrics/token-tracker'
 import { LatencyTracker } from './metrics/latency-tracker'
@@ -83,12 +84,12 @@ function parseArgs(argv: ReadonlyArray<string>): IParsedArgs {
         break
       case '--approach':
         if (next) {
-          const validApproaches = new Set<string>(['single-prompt', 'agent-mode', 'single-prompt-chunked', 'agent-mode-preseeded', 'chunked-preseeded-agent'])
+          const validApproaches = new Set<string>(['single-prompt', 'agent-mode', 'single-prompt-chunked', 'agent-mode-preseeded', 'chunked-preseeded-agent', 'unified-parallel'])
           const parsed = next.split(',').map(s => s.trim())
           const invalid = parsed.filter(a => !validApproaches.has(a))
           if (invalid.length > 0) {
             console.error(`Invalid approach(es): ${invalid.join(', ')}`)
-            console.error('Valid approaches: single-prompt, agent-mode, single-prompt-chunked, agent-mode-preseeded, chunked-preseeded-agent')
+            console.error('Valid approaches: single-prompt, agent-mode, single-prompt-chunked, agent-mode-preseeded, chunked-preseeded-agent, unified-parallel')
             process.exit(1)
           }
           args.approach = parsed as ApproachId[]
@@ -231,7 +232,7 @@ async function runBenchmark(config: IBenchmarkConfig, numRuns: number): Promise<
     // Step 2: Determine which approaches to run
     const approaches: ReadonlyArray<ApproachId> =
       config.approaches === 'all'
-        ? ['single-prompt', 'agent-mode', 'single-prompt-chunked', 'agent-mode-preseeded', 'chunked-preseeded-agent']
+        ? ['single-prompt', 'agent-mode', 'single-prompt-chunked', 'agent-mode-preseeded', 'chunked-preseeded-agent', 'unified-parallel']
         : config.approaches
 
     // Step 3: Get GitHub token and create client
@@ -366,6 +367,8 @@ async function runApproach(
       return resolveAgentModePreseeded(client, model, scenario, tokenTracker, latencyTracker)
     case 'chunked-preseeded-agent':
       return resolveChunkedPreseededAgent(client, model, scenario, tokenTracker, latencyTracker)
+    case 'unified-parallel':
+      return resolveUnifiedParallel(client, model, scenario, tokenTracker, latencyTracker)
   }
 }
 

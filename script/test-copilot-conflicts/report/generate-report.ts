@@ -579,5 +579,7 @@ function formatApproach(approach: ApproachId): string {
       return 'Agent Mode (Pre-seeded)'
     case 'chunked-preseeded-agent':
       return 'Chunked Pre-seeded Agent'
+    case 'unified-parallel':
+      return 'Unified Parallel'
   }
 }
