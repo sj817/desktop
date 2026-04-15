@@ -37,6 +37,7 @@ import { resolveSinglePrompt } from './approaches/single-prompt'
 import { resolveAgentMode } from './approaches/agent-mode'
 import { resolveSinglePromptChunked } from './approaches/single-prompt-chunked'
 import { resolveAgentModePreseeded } from './approaches/agent-mode-preseeded'
+import { resolveChunkedPreseededAgent } from './approaches/chunked-preseeded-agent'
 import { checkAccuracy } from './metrics/accuracy-checker'
 import { TokenTracker } from './metrics/token-tracker'
 import { LatencyTracker } from './metrics/latency-tracker'
@@ -82,12 +83,12 @@ function parseArgs(argv: ReadonlyArray<string>): IParsedArgs {
         break
       case '--approach':
         if (next) {
-          const validApproaches = new Set<string>(['single-prompt', 'agent-mode', 'single-prompt-chunked', 'agent-mode-preseeded'])
+          const validApproaches = new Set<string>(['single-prompt', 'agent-mode', 'single-prompt-chunked', 'agent-mode-preseeded', 'chunked-preseeded-agent'])
           const parsed = next.split(',').map(s => s.trim())
           const invalid = parsed.filter(a => !validApproaches.has(a))
           if (invalid.length > 0) {
             console.error(`Invalid approach(es): ${invalid.join(', ')}`)
-            console.error('Valid approaches: single-prompt, agent-mode, single-prompt-chunked, agent-mode-preseeded')
+            console.error('Valid approaches: single-prompt, agent-mode, single-prompt-chunked, agent-mode-preseeded, chunked-preseeded-agent')
             process.exit(1)
           }
           args.approach = parsed as ApproachId[]
@@ -141,7 +142,7 @@ Usage:
 
 Options:
   --scenario <ids>     Comma-separated scenario IDs (default: all)
-  --approach <ids>     Comma-separated approaches: single-prompt,agent-mode,single-prompt-chunked,agent-mode-preseeded (default: all)
+  --approach <ids>     Comma-separated approaches: single-prompt,agent-mode,single-prompt-chunked,agent-mode-preseeded,chunked-preseeded-agent (default: all)
   --scale <counts>     Comma-separated file counts for scaling (default: 1,5,10,30,50,75,100,...)
   --model <models>     Comma-separated model IDs (default: gpt-5-mini)
   --runs <N>           Number of runs per cell for statistical confidence (default: 1)
@@ -230,7 +231,7 @@ async function runBenchmark(config: IBenchmarkConfig, numRuns: number): Promise<
     // Step 2: Determine which approaches to run
     const approaches: ReadonlyArray<ApproachId> =
       config.approaches === 'all'
-        ? ['single-prompt', 'agent-mode', 'single-prompt-chunked', 'agent-mode-preseeded']
+        ? ['single-prompt', 'agent-mode', 'single-prompt-chunked', 'agent-mode-preseeded', 'chunked-preseeded-agent']
         : config.approaches
 
     // Step 3: Get GitHub token and create client
@@ -363,6 +364,8 @@ async function runApproach(
       return resolveSinglePromptChunked(client, model, scenario, tokenTracker, latencyTracker)
     case 'agent-mode-preseeded':
       return resolveAgentModePreseeded(client, model, scenario, tokenTracker, latencyTracker)
+    case 'chunked-preseeded-agent':
+      return resolveChunkedPreseededAgent(client, model, scenario, tokenTracker, latencyTracker)
   }
 }
 

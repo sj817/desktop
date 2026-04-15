@@ -577,5 +577,7 @@ function formatApproach(approach: ApproachId): string {
       return 'Single Prompt (Chunked)'
     case 'agent-mode-preseeded':
       return 'Agent Mode (Pre-seeded)'
+    case 'chunked-preseeded-agent':
+      return 'Chunked Pre-seeded Agent'
   }
 }
