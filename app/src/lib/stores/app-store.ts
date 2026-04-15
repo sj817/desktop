@@ -8602,8 +8602,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
     const current = this.selectedCopilotModels[feature] ?? null
     if (model !== current) {
       if (model === null) {
-        const { [feature]: _, ...rest } = this.selectedCopilotModels
-        this.selectedCopilotModels = rest
+        const updated = { ...this.selectedCopilotModels }
+        delete updated[feature]
+        this.selectedCopilotModels = updated
       } else {
         this.selectedCopilotModels = {
           ...this.selectedCopilotModels,
