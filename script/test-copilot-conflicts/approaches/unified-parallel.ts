@@ -540,7 +540,7 @@ async function resolveChunkSinglePrompt(
   client: ICopilotClientInstance,
   model: string,
   prompt: string,
-  tokenTracker: TokenTracker
+  chunkTracker: TokenTracker
 ): Promise<IResolutionResponse> {
   const sessionConfig: Record<string, unknown> = {
     model,
@@ -557,7 +557,7 @@ async function resolveChunkSinglePrompt(
   const session = await client.createSession(sessionConfig)
 
   try {
-    session.on('assistant.usage', tokenTracker.handleUsageEvent)
+    session.on('assistant.usage', chunkTracker.handleUsageEvent)
 
     const result = await session.sendAndWait(
       { prompt },
@@ -583,7 +583,7 @@ async function resolveChunkAgentFallback(
   model: string,
   prompt: string,
   repoPath: string,
-  tokenTracker: TokenTracker
+  chunkTracker: TokenTracker
 ): Promise<IResolutionResponse> {
   const sessionConfig: Record<string, unknown> = {
     model,
@@ -600,7 +600,7 @@ async function resolveChunkAgentFallback(
   const session = await client.createSession(sessionConfig)
 
   try {
-    session.on('assistant.usage', tokenTracker.handleUsageEvent)
+    session.on('assistant.usage', chunkTracker.handleUsageEvent)
 
     const result = await session.sendAndWait(
       { prompt },
@@ -663,49 +663,52 @@ export async function resolveUnifiedParallel(
       prompt: buildChunkPrompt(scenario, files, commitLog),
     }))
 
-    // 4. Run all chunks in parallel
+    // 4. Run all chunks in parallel — each gets its own TokenTracker
     const chunkResults = await Promise.all(
       tasks.map(async (task): Promise<{
         readonly task: IChunkTask
         resolutions: ReadonlyArray<IFileResolution> | null
         error: string | null
+        chunkTracker: TokenTracker
       }> => {
+        const chunkTracker = new TokenTracker()
         try {
           const result = await resolveChunkSinglePrompt(
-            client, model, task.prompt, tokenTracker
+            client, model, task.prompt, chunkTracker
           )
 
           // 5. Validate result
           if (validateChunkResult(result, task.files)) {
-            return { task, resolutions: result.resolutions, error: null }
+            return { task, resolutions: result.resolutions, error: null, chunkTracker }
           }
 
           // Validation failed — retry once with single prompt
           const retryResult = await resolveChunkSinglePrompt(
-            client, model, task.prompt, tokenTracker
+            client, model, task.prompt, chunkTracker
           )
 
           if (validateChunkResult(retryResult, task.files)) {
-            return { task, resolutions: retryResult.resolutions, error: null }
+            return { task, resolutions: retryResult.resolutions, error: null, chunkTracker }
           }
 
           // 6. Fall back to agent mode for this chunk
           toolCallCount++
           const agentResult = await resolveChunkAgentFallback(
-            client, model, task.prompt, scenario.repoPath, tokenTracker
+            client, model, task.prompt, scenario.repoPath, chunkTracker
           )
-          return { task, resolutions: agentResult.resolutions, error: null }
+          return { task, resolutions: agentResult.resolutions, error: null, chunkTracker }
         } catch (e) {
           return {
             task,
             resolutions: null,
             error: e instanceof Error ? e.message : String(e),
+            chunkTracker,
           }
         }
       })
     )
 
-    // 7. Merge all resolutions
+    // 7. Merge all resolutions and token usage
     const allResolutions: Array<IFileResolution> = []
     const errors: Array<string> = []
 
@@ -714,6 +717,11 @@ export async function resolveUnifiedParallel(
         allResolutions.push(...cr.resolutions)
       } else if (cr.error) {
         errors.push(`Chunk ${cr.task.index}: ${cr.error}`)
+      }
+      // Merge chunk token usage into the main tracker
+      const chunkUsage = cr.chunkTracker.getUsage()
+      for (const interaction of chunkUsage.interactions) {
+        tokenTracker.recordUsage(interaction)
       }
     }
 
