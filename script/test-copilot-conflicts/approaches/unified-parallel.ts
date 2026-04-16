@@ -13,7 +13,7 @@
  */
 
 import { extname } from 'path'
-import { ICopilotClientInstance } from './shared'
+import { ICopilotClientInstance, createCopilotClient, stopClient } from './shared'
 import {
   IGeneratedScenario,
   IResolutionResult,
@@ -633,7 +633,8 @@ export async function resolveUnifiedParallel(
   model: string,
   scenario: IGeneratedScenario,
   tokenTracker: TokenTracker,
-  latencyTracker: LatencyTracker
+  latencyTracker: LatencyTracker,
+  githubToken?: string
 ): Promise<IResolutionResult> {
   latencyTracker.start()
 
@@ -672,11 +673,11 @@ export async function resolveUnifiedParallel(
       chunkTracker: TokenTracker
     }
 
-    async function processChunk(task: IChunkTask): Promise<ChunkResult> {
+    async function processChunk(task: IChunkTask, chunkClient: ICopilotClientInstance): Promise<ChunkResult> {
       const chunkTracker = new TokenTracker()
       try {
         const result = await resolveChunkSinglePrompt(
-          client, model, task.prompt, chunkTracker
+          chunkClient, model, task.prompt, chunkTracker
         )
 
         // 5. Validate result
@@ -686,7 +687,7 @@ export async function resolveUnifiedParallel(
 
         // Validation failed — retry once with single prompt
         const retryResult = await resolveChunkSinglePrompt(
-          client, model, task.prompt, chunkTracker
+          chunkClient, model, task.prompt, chunkTracker
         )
 
         if (validateChunkResult(retryResult, task.files)) {
@@ -696,7 +697,7 @@ export async function resolveUnifiedParallel(
         // 6. Fall back to agent mode for this chunk
         toolCallCount++
         const agentResult = await resolveChunkAgentFallback(
-          client, model, task.prompt, scenario.repoPath, chunkTracker
+          chunkClient, model, task.prompt, scenario.repoPath, chunkTracker
         )
         return { task, resolutions: agentResult.resolutions, error: null, chunkTracker }
       } catch (e) {
@@ -709,12 +710,32 @@ export async function resolveUnifiedParallel(
       }
     }
 
-    // Process in waves of MAX_CONCURRENCY
+    // Process in waves of MAX_CONCURRENCY — each wave gets a fresh SDK client
+    // to prevent zombie subprocess accumulation
     const chunkResults: Array<ChunkResult> = []
     for (let i = 0; i < tasks.length; i += MAX_CONCURRENCY) {
       const wave = tasks.slice(i, i + MAX_CONCURRENCY)
-      const waveResults = await Promise.all(wave.map(processChunk))
-      chunkResults.push(...waveResults)
+
+      // Create a fresh client for this wave (or reuse the passed-in client for small runs)
+      const usePerWaveClient = tasks.length > MAX_CONCURRENCY && githubToken
+      let waveClient: ICopilotClientInstance
+      if (usePerWaveClient) {
+        waveClient = await createCopilotClient(scenario.repoPath, githubToken)
+      } else {
+        waveClient = client
+      }
+
+      try {
+        const waveResults = await Promise.all(
+          wave.map(task => processChunk(task, waveClient))
+        )
+        chunkResults.push(...waveResults)
+      } finally {
+        // Stop the per-wave client to kill its SDK subprocesses
+        if (usePerWaveClient) {
+          await stopClient(waveClient)
+        }
+      }
     }
 
     // 7. Merge all resolutions and token usage

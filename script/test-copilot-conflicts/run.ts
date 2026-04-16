@@ -267,7 +267,8 @@ async function runBenchmark(config: IBenchmarkConfig, numRuns: number): Promise<
                   model,
                   scenario,
                   tokenTracker,
-                  latencyTracker
+                  latencyTracker,
+                  token
                 )
               } finally {
                 await stopClient(client)
@@ -354,7 +355,8 @@ async function runApproach(
   model: string,
   scenario: IGeneratedScenario,
   tokenTracker: TokenTracker,
-  latencyTracker: LatencyTracker
+  latencyTracker: LatencyTracker,
+  githubToken?: string
 ) {
   switch (approach) {
     case 'single-prompt':
@@ -368,7 +370,7 @@ async function runApproach(
     case 'chunked-preseeded-agent':
       return resolveChunkedPreseededAgent(client, model, scenario, tokenTracker, latencyTracker)
     case 'unified-parallel':
-      return resolveUnifiedParallel(client, model, scenario, tokenTracker, latencyTracker)
+      return resolveUnifiedParallel(client, model, scenario, tokenTracker, latencyTracker, githubToken)
   }
 }
 
