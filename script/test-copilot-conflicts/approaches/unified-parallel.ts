@@ -26,6 +26,7 @@ import { TokenTracker } from '../metrics/token-tracker'
 import { LatencyTracker } from '../metrics/latency-tracker'
 
 const TARGET_CHUNK_SIZE = 5
+const MAX_CONCURRENCY = 5 // Max parallel SDK sessions to avoid memory exhaustion
 
 // ---------------------------------------------------------------------------
 // System prompt — identical to single-prompt but chunk-aware
@@ -663,50 +664,58 @@ export async function resolveUnifiedParallel(
       prompt: buildChunkPrompt(scenario, files, commitLog),
     }))
 
-    // 4. Run all chunks in parallel — each gets its own TokenTracker
-    const chunkResults = await Promise.all(
-      tasks.map(async (task): Promise<{
-        readonly task: IChunkTask
-        resolutions: ReadonlyArray<IFileResolution> | null
-        error: string | null
-        chunkTracker: TokenTracker
-      }> => {
-        const chunkTracker = new TokenTracker()
-        try {
-          const result = await resolveChunkSinglePrompt(
-            client, model, task.prompt, chunkTracker
-          )
+    // 4. Run chunks with bounded concurrency — each gets its own TokenTracker
+    type ChunkResult = {
+      readonly task: IChunkTask
+      resolutions: ReadonlyArray<IFileResolution> | null
+      error: string | null
+      chunkTracker: TokenTracker
+    }
 
-          // 5. Validate result
-          if (validateChunkResult(result, task.files)) {
-            return { task, resolutions: result.resolutions, error: null, chunkTracker }
-          }
+    async function processChunk(task: IChunkTask): Promise<ChunkResult> {
+      const chunkTracker = new TokenTracker()
+      try {
+        const result = await resolveChunkSinglePrompt(
+          client, model, task.prompt, chunkTracker
+        )
 
-          // Validation failed — retry once with single prompt
-          const retryResult = await resolveChunkSinglePrompt(
-            client, model, task.prompt, chunkTracker
-          )
-
-          if (validateChunkResult(retryResult, task.files)) {
-            return { task, resolutions: retryResult.resolutions, error: null, chunkTracker }
-          }
-
-          // 6. Fall back to agent mode for this chunk
-          toolCallCount++
-          const agentResult = await resolveChunkAgentFallback(
-            client, model, task.prompt, scenario.repoPath, chunkTracker
-          )
-          return { task, resolutions: agentResult.resolutions, error: null, chunkTracker }
-        } catch (e) {
-          return {
-            task,
-            resolutions: null,
-            error: e instanceof Error ? e.message : String(e),
-            chunkTracker,
-          }
+        // 5. Validate result
+        if (validateChunkResult(result, task.files)) {
+          return { task, resolutions: result.resolutions, error: null, chunkTracker }
         }
-      })
-    )
+
+        // Validation failed — retry once with single prompt
+        const retryResult = await resolveChunkSinglePrompt(
+          client, model, task.prompt, chunkTracker
+        )
+
+        if (validateChunkResult(retryResult, task.files)) {
+          return { task, resolutions: retryResult.resolutions, error: null, chunkTracker }
+        }
+
+        // 6. Fall back to agent mode for this chunk
+        toolCallCount++
+        const agentResult = await resolveChunkAgentFallback(
+          client, model, task.prompt, scenario.repoPath, chunkTracker
+        )
+        return { task, resolutions: agentResult.resolutions, error: null, chunkTracker }
+      } catch (e) {
+        return {
+          task,
+          resolutions: null,
+          error: e instanceof Error ? e.message : String(e),
+          chunkTracker,
+        }
+      }
+    }
+
+    // Process in waves of MAX_CONCURRENCY
+    const chunkResults: Array<ChunkResult> = []
+    for (let i = 0; i < tasks.length; i += MAX_CONCURRENCY) {
+      const wave = tasks.slice(i, i + MAX_CONCURRENCY)
+      const waveResults = await Promise.all(wave.map(processChunk))
+      chunkResults.push(...waveResults)
+    }
 
     // 7. Merge all resolutions and token usage
     const allResolutions: Array<IFileResolution> = []
