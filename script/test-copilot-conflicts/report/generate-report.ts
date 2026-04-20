@@ -573,13 +573,9 @@ function formatApproach(approach: ApproachId): string {
       return 'Single Prompt'
     case 'agent-mode':
       return 'Agent Mode'
-    case 'single-prompt-chunked':
-      return 'Single Prompt (Chunked)'
     case 'agent-mode-preseeded':
       return 'Agent Mode (Pre-seeded)'
-    case 'chunked-preseeded-agent':
-      return 'Chunked Pre-seeded Agent'
     case 'unified-parallel':
-      return 'Unified Parallel'
+      return 'Batched Single Prompt'
   }
 }

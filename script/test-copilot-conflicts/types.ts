@@ -106,7 +106,7 @@ export interface IResolutionResponse {
 // ---------------------------------------------------------------------------
 
 /** Identifier for a resolution approach. */
-export type ApproachId = 'single-prompt' | 'agent-mode' | 'single-prompt-chunked' | 'agent-mode-preseeded' | 'chunked-preseeded-agent' | 'unified-parallel'
+export type ApproachId = 'single-prompt' | 'agent-mode' | 'agent-mode-preseeded' | 'unified-parallel'
 
 /** Token usage data from a single SDK interaction. */
 export interface ITokenUsage {

@@ -35,9 +35,7 @@ import {
 import { createCopilotClient, getGitHubToken, stopClient, ICopilotClientInstance } from './approaches/shared'
 import { resolveSinglePrompt } from './approaches/single-prompt'
 import { resolveAgentMode } from './approaches/agent-mode'
-import { resolveSinglePromptChunked } from './approaches/single-prompt-chunked'
 import { resolveAgentModePreseeded } from './approaches/agent-mode-preseeded'
-import { resolveChunkedPreseededAgent } from './approaches/chunked-preseeded-agent'
 import { resolveUnifiedParallel } from './approaches/unified-parallel'
 import { checkAccuracy } from './metrics/accuracy-checker'
 import { TokenTracker } from './metrics/token-tracker'
@@ -84,12 +82,12 @@ function parseArgs(argv: ReadonlyArray<string>): IParsedArgs {
         break
       case '--approach':
         if (next) {
-          const validApproaches = new Set<string>(['single-prompt', 'agent-mode', 'single-prompt-chunked', 'agent-mode-preseeded', 'chunked-preseeded-agent', 'unified-parallel'])
+          const validApproaches = new Set<string>(['single-prompt', 'agent-mode', 'agent-mode-preseeded', 'unified-parallel'])
           const parsed = next.split(',').map(s => s.trim())
           const invalid = parsed.filter(a => !validApproaches.has(a))
           if (invalid.length > 0) {
             console.error(`Invalid approach(es): ${invalid.join(', ')}`)
-            console.error('Valid approaches: single-prompt, agent-mode, single-prompt-chunked, agent-mode-preseeded, chunked-preseeded-agent, unified-parallel')
+            console.error('Valid approaches: single-prompt, agent-mode, agent-mode-preseeded, unified-parallel')
             process.exit(1)
           }
           args.approach = parsed as ApproachId[]
@@ -143,7 +141,7 @@ Usage:
 
 Options:
   --scenario <ids>     Comma-separated scenario IDs (default: all)
-  --approach <ids>     Comma-separated approaches: single-prompt,agent-mode,single-prompt-chunked,agent-mode-preseeded,chunked-preseeded-agent (default: all)
+  --approach <ids>     Comma-separated approaches: single-prompt,agent-mode,agent-mode-preseeded,unified-parallel (default: all)
   --scale <counts>     Comma-separated file counts for scaling (default: 1,5,10,30,50,75,100,...)
   --model <models>     Comma-separated model IDs (default: gpt-5-mini)
   --runs <N>           Number of runs per cell for statistical confidence (default: 1)
@@ -232,7 +230,7 @@ async function runBenchmark(config: IBenchmarkConfig, numRuns: number): Promise<
     // Step 2: Determine which approaches to run
     const approaches: ReadonlyArray<ApproachId> =
       config.approaches === 'all'
-        ? ['single-prompt', 'agent-mode', 'single-prompt-chunked', 'agent-mode-preseeded', 'chunked-preseeded-agent', 'unified-parallel']
+        ? ['single-prompt', 'agent-mode', 'agent-mode-preseeded', 'unified-parallel']
         : config.approaches
 
     // Step 3: Get GitHub token and create client
@@ -258,10 +256,11 @@ async function runBenchmark(config: IBenchmarkConfig, numRuns: number): Promise<
             const latencyTracker = new LatencyTracker()
 
             let resolution
+            const TIMEOUT_MS = 5 * 60 * 1000 // 5 minute cap per approach
             try {
               const client = await createCopilotClient(scenario.repoPath, token)
               try {
-                resolution = await runApproach(
+                const approachPromise = runApproach(
                   approach,
                   client,
                   model,
@@ -269,6 +268,10 @@ async function runBenchmark(config: IBenchmarkConfig, numRuns: number): Promise<
                   tokenTracker,
                   latencyTracker
                 )
+                const timeoutPromise = new Promise<never>((_, reject) =>
+                  setTimeout(() => reject(new Error('TIMEOUT: exceeded 5 minute cap')), TIMEOUT_MS)
+                )
+                resolution = await Promise.race([approachPromise, timeoutPromise])
               } finally {
                 await stopClient(client)
               }
@@ -361,12 +364,8 @@ async function runApproach(
       return resolveSinglePrompt(client, model, scenario, tokenTracker, latencyTracker)
     case 'agent-mode':
       return resolveAgentMode(client, model, scenario, tokenTracker, latencyTracker)
-    case 'single-prompt-chunked':
-      return resolveSinglePromptChunked(client, model, scenario, tokenTracker, latencyTracker)
     case 'agent-mode-preseeded':
       return resolveAgentModePreseeded(client, model, scenario, tokenTracker, latencyTracker)
-    case 'chunked-preseeded-agent':
-      return resolveChunkedPreseededAgent(client, model, scenario, tokenTracker, latencyTracker)
     case 'unified-parallel':
       return resolveUnifiedParallel(client, model, scenario, tokenTracker, latencyTracker)
   }
