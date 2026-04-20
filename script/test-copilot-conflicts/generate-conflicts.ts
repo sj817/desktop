@@ -14,6 +14,7 @@ import { mergeScenarios } from './scenarios/merge-scenarios'
 import { rebaseScenarios } from './scenarios/rebase-scenarios'
 import { cherrypickScenarios } from './scenarios/cherrypick-scenarios'
 import { adversarialScenarios } from './scenarios/adversarial-scenarios'
+import { complexScenarios } from './scenarios/complex-scenarios'
 import { inflateScenario } from './scenarios/scale-inflator'
 
 /** All registered scenario factories. */
@@ -22,6 +23,7 @@ const allFactories: ReadonlyArray<IScenarioFactory> = [
   ...rebaseScenarios,
   ...cherrypickScenarios,
   ...adversarialScenarios,
+  ...complexScenarios,
 ]
 
 /**
