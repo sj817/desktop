@@ -13,7 +13,7 @@
  */
 
 import { extname } from 'path'
-import { ICopilotClientInstance, createCopilotClient, stopClient } from './shared'
+import { ICopilotClientInstance } from './shared'
 import {
   IGeneratedScenario,
   IResolutionResult,
@@ -25,8 +25,20 @@ import {
 import { TokenTracker } from '../metrics/token-tracker'
 import { LatencyTracker } from '../metrics/latency-tracker'
 
-const TARGET_CHUNK_SIZE = 5
 const MAX_CONCURRENCY = 5 // Max parallel SDK sessions to avoid memory exhaustion
+const MEMORY_LIMIT_MB = 4096 // Abort if child process RSS exceeds this
+
+/**
+ * Compute the target chunk size based on total file count.
+ * - ≤20 files: no chunking (single prompt handles this well)
+ * - 21–100 files: chunks of ~20
+ * - 100+ files: chunks of ~15 (smaller to protect output quality)
+ */
+function getTargetChunkSize(totalFiles: number): number {
+  if (totalFiles <= 20) return totalFiles // no chunking
+  if (totalFiles <= 100) return 20
+  return 15
+}
 
 // ---------------------------------------------------------------------------
 // System prompt — identical to single-prompt but chunk-aware
@@ -242,7 +254,9 @@ function extractSymbols(content: string): {
 function groupByDependency(
   files: ReadonlyArray<IConflictedFile>
 ): ReadonlyArray<ReadonlyArray<IConflictedFile>> {
-  if (files.length <= TARGET_CHUNK_SIZE) {
+  const targetSize = getTargetChunkSize(files.length)
+
+  if (files.length <= targetSize) {
     return [files]
   }
 
@@ -326,14 +340,14 @@ function groupByDependency(
     groups.get(root)!.push(files[i])
   }
 
-  // Split oversized groups into sub-chunks of TARGET_CHUNK_SIZE
+  // Split oversized groups into sub-chunks of targetSize
   const result: Array<ReadonlyArray<IConflictedFile>> = []
   for (const group of groups.values()) {
-    if (group.length <= TARGET_CHUNK_SIZE) {
+    if (group.length <= targetSize) {
       result.push(group)
     } else {
-      for (let i = 0; i < group.length; i += TARGET_CHUNK_SIZE) {
-        result.push(group.slice(i, i + TARGET_CHUNK_SIZE))
+      for (let i = 0; i < group.length; i += targetSize) {
+        result.push(group.slice(i, i + targetSize))
       }
     }
   }
@@ -633,8 +647,7 @@ export async function resolveUnifiedParallel(
   model: string,
   scenario: IGeneratedScenario,
   tokenTracker: TokenTracker,
-  latencyTracker: LatencyTracker,
-  githubToken?: string
+  latencyTracker: LatencyTracker
 ): Promise<IResolutionResult> {
   latencyTracker.start()
 
@@ -710,32 +723,25 @@ export async function resolveUnifiedParallel(
       }
     }
 
-    // Process in waves of MAX_CONCURRENCY — each wave gets a fresh SDK client
-    // to prevent zombie subprocess accumulation
+    // Process in waves of MAX_CONCURRENCY using the passed-in client.
+    // Monitor memory between waves as a safety valve.
     const chunkResults: Array<ChunkResult> = []
     for (let i = 0; i < tasks.length; i += MAX_CONCURRENCY) {
-      const wave = tasks.slice(i, i + MAX_CONCURRENCY)
-
-      // Create a fresh client for this wave (or reuse the passed-in client for small runs)
-      const usePerWaveClient = tasks.length > MAX_CONCURRENCY && githubToken
-      let waveClient: ICopilotClientInstance
-      if (usePerWaveClient) {
-        waveClient = await createCopilotClient(scenario.repoPath, githubToken)
-      } else {
-        waveClient = client
-      }
-
-      try {
-        const waveResults = await Promise.all(
-          wave.map(task => processChunk(task, waveClient))
-        )
-        chunkResults.push(...waveResults)
-      } finally {
-        // Stop the per-wave client to kill its SDK subprocesses
-        if (usePerWaveClient) {
-          await stopClient(waveClient)
+      // Memory safety check between waves
+      if (i > 0) {
+        const memMB = Math.round(process.memoryUsage().rss / 1024 / 1024)
+        if (memMB > MEMORY_LIMIT_MB) {
+          throw new Error(
+            `Memory limit exceeded: ${memMB}MB > ${MEMORY_LIMIT_MB}MB after wave ${Math.floor(i / MAX_CONCURRENCY)}`
+          )
         }
       }
+
+      const wave = tasks.slice(i, i + MAX_CONCURRENCY)
+      const waveResults = await Promise.all(
+        wave.map(task => processChunk(task, client))
+      )
+      chunkResults.push(...waveResults)
     }
 
     // 7. Merge all resolutions and token usage
