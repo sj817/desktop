@@ -72,7 +72,7 @@ class ModelRow extends React.Component<IModelRowProps> {
         : 'Untitled model'
     const reasoningLabel =
       model.reasoningEffort !== undefined
-        ? `Thinking: ${formatReasoningEffort(model.reasoningEffort)}`
+        ? `Reasoning: ${formatReasoningEffort(model.reasoningEffort)}`
         : null
     return (
       <li className="copilot-byok-provider">

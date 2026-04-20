@@ -98,12 +98,12 @@ export class EditCopilotBYOKModelDialog extends React.Component<
           </Row>
           <Row className="copilot-byok-field">
             <Select
-              label={__DARWIN__ ? 'Thinking Effort' : 'Thinking effort'}
+              label={__DARWIN__ ? 'Reasoning Effort' : 'Reasoning effort'}
               value={this.state.reasoningEffort}
               onChange={this.onReasoningEffortChanged}
             >
               <option value={NoReasoningEffort}>
-                Off — non-reasoning model
+                Default (provider's choice)
               </option>
               {ReasoningEffortOrder.map(effort => (
                 <option key={effort} value={effort}>
@@ -114,7 +114,8 @@ export class EditCopilotBYOKModelDialog extends React.Component<
             <p className="copilot-byok-field-hint">
               Reasoning models (o1, o3, GPT-5 reasoning variants, etc.) think
               before responding. Higher levels are slower but produce better
-              answers on complex tasks.
+              answers on complex tasks. Leave on <em>Default</em> for
+              non-reasoning models or to let the provider pick.
             </p>
           </Row>
         </DialogContent>
