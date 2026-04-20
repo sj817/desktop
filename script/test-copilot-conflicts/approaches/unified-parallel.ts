@@ -340,16 +340,38 @@ function groupByDependency(
     groups.get(root)!.push(files[i])
   }
 
-  // Split oversized groups into sub-chunks of targetSize
-  const result: Array<ReadonlyArray<IConflictedFile>> = []
+  // Split oversized groups and consolidate undersized groups into chunks of targetSize
+  const result: Array<Array<IConflictedFile>> = []
+  let currentBin: Array<IConflictedFile> = []
+
   for (const group of groups.values()) {
-    if (group.length <= targetSize) {
-      result.push(group)
-    } else {
+    if (group.length >= targetSize) {
+      // Large dependency group — split into sub-chunks, keeping it separate
+      // First, flush the current bin if it has anything
+      if (currentBin.length > 0) {
+        result.push(currentBin)
+        currentBin = []
+      }
       for (let i = 0; i < group.length; i += targetSize) {
         result.push(group.slice(i, i + targetSize))
       }
+    } else {
+      // Small group — pack into the current bin up to targetSize
+      if (currentBin.length + group.length > targetSize) {
+        // Bin would overflow — finalize it and start a new one
+        if (currentBin.length > 0) {
+          result.push(currentBin)
+        }
+        currentBin = [...group]
+      } else {
+        currentBin.push(...group)
+      }
     }
+  }
+
+  // Don't forget the last bin
+  if (currentBin.length > 0) {
+    result.push(currentBin)
   }
 
   return result
@@ -572,12 +594,21 @@ async function resolveChunkSinglePrompt(
   const session = await client.createSession(sessionConfig)
 
   try {
-    session.on('assistant.usage', chunkTracker.handleUsageEvent)
+    // Use a single-shot tracker to avoid SDK cross-contamination bug
+    // where parallel sessions broadcast usage events to all handlers
+    const shotTracker = new TokenTracker(1)
+    session.on('assistant.usage', shotTracker.handleUsageEvent)
 
     const result = await session.sendAndWait(
       { prompt },
       600_000
     )
+
+    // Merge the single valid interaction into the chunk tracker
+    const usage = shotTracker.getUsage()
+    for (const interaction of usage.interactions) {
+      chunkTracker.recordUsage(interaction)
+    }
 
     if (!result?.data?.content) {
       throw new Error('No response from Copilot')
@@ -615,6 +646,9 @@ async function resolveChunkAgentFallback(
   const session = await client.createSession(sessionConfig)
 
   try {
+    // Agent mode may have multiple interactions (tool calls), so we allow
+    // more events. Cross-contamination is less likely here since agent
+    // fallback typically runs after parallel chunks complete.
     session.on('assistant.usage', chunkTracker.handleUsageEvent)
 
     const result = await session.sendAndWait(
@@ -670,6 +704,7 @@ export async function resolveUnifiedParallel(
 
     // 2. Group files by dependency
     const chunks = groupByDependency(scenario.conflictedFiles)
+    console.log(`   [unified-parallel] ${scenario.conflictedFiles.length} files → ${chunks.length} chunks (sizes: ${chunks.map(c => c.length).join(', ')})`)
 
     // 3. Build prompts for each chunk
     const tasks: Array<IChunkTask> = chunks.map((files, index) => ({
@@ -695,23 +730,31 @@ export async function resolveUnifiedParallel(
 
         // 5. Validate result
         if (validateChunkResult(result, task.files)) {
+          const u = chunkTracker.getUsage()
+          console.log(`      [chunk ${task.index}] ✓ first attempt | interactions=${u.interactions.length} tokens=${u.totalInputTokens + u.totalOutputTokens}`)
           return { task, resolutions: result.resolutions, error: null, chunkTracker }
         }
 
+        console.log(`      [chunk ${task.index}] validation failed, retrying...`)
         // Validation failed — retry once with single prompt
         const retryResult = await resolveChunkSinglePrompt(
           chunkClient, model, task.prompt, chunkTracker
         )
 
         if (validateChunkResult(retryResult, task.files)) {
+          const u = chunkTracker.getUsage()
+          console.log(`      [chunk ${task.index}] ✓ retry | interactions=${u.interactions.length} tokens=${u.totalInputTokens + u.totalOutputTokens}`)
           return { task, resolutions: retryResult.resolutions, error: null, chunkTracker }
         }
 
+        console.log(`      [chunk ${task.index}] retry failed, falling back to agent...`)
         // 6. Fall back to agent mode for this chunk
         toolCallCount++
         const agentResult = await resolveChunkAgentFallback(
           chunkClient, model, task.prompt, scenario.repoPath, chunkTracker
         )
+        const u = chunkTracker.getUsage()
+        console.log(`      [chunk ${task.index}] ✓ agent fallback | interactions=${u.interactions.length} tokens=${u.totalInputTokens + u.totalOutputTokens}`)
         return { task, resolutions: agentResult.resolutions, error: null, chunkTracker }
       } catch (e) {
         return {
@@ -747,6 +790,7 @@ export async function resolveUnifiedParallel(
     // 7. Merge all resolutions and token usage
     const allResolutions: Array<IFileResolution> = []
     const errors: Array<string> = []
+    let totalMergedTokens = 0
 
     for (const cr of chunkResults) {
       if (cr.resolutions) {
@@ -756,10 +800,13 @@ export async function resolveUnifiedParallel(
       }
       // Merge chunk token usage into the main tracker
       const chunkUsage = cr.chunkTracker.getUsage()
+      const chunkTotal = chunkUsage.totalInputTokens + chunkUsage.totalOutputTokens
+      totalMergedTokens += chunkTotal
       for (const interaction of chunkUsage.interactions) {
         tokenTracker.recordUsage(interaction)
       }
     }
+    console.log(`   [unified-parallel] merged ${chunkResults.length} chunks → ${totalMergedTokens} total tokens, ${tokenTracker.getUsage().interactions.length} interactions`)
 
     if (allResolutions.length > 0) {
       response = { resolutions: allResolutions }

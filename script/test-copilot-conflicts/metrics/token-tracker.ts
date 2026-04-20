@@ -20,12 +20,20 @@ import { IAggregateTokenUsage, ITokenUsage } from '../types'
  */
 export class TokenTracker {
   private readonly interactions: Array<ITokenUsage> = []
+  private readonly maxInteractions: number
+
+  constructor(maxInteractions: number = Infinity) {
+    this.maxInteractions = maxInteractions
+  }
 
   /**
    * Event handler for SDK `assistant.usage` events.
    * Bind this to the session event emitter.
    */
   public readonly handleUsageEvent = (...args: unknown[]): void => {
+    if (this.interactions.length >= this.maxInteractions) {
+      return // Ignore duplicate events from SDK cross-contamination
+    }
     const event = args[0] as {
       data: {
         inputTokens?: number
