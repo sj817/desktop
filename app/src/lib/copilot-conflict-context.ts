@@ -56,7 +56,7 @@ const baseMarker = /^\|{7}(?:\s|$)/
 const separatorMarker = /^={7}$/
 const theirsMarker = /^>{7}(?:\s|$)/
 
-/** Maximum file size (in characters) to include in conflict context */
+/** Maximum file size (in bytes) to include in conflict context */
 const MAX_CONFLICT_FILE_SIZE = 1_048_576
 
 function isConflictMarker(line: string): boolean {
