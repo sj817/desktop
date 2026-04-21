@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises'
-import { join, extname } from 'path'
+import { extname, resolve } from 'path'
 
 import { Repository } from '../models/repository'
 import { PullRequest } from '../models/pull-request'
@@ -62,6 +62,18 @@ const baseMarker = /^\|{7}\s?/
 const separatorMarker = /^={7}$/
 const theirsMarker = /^>{7}\s?/
 
+/** Maximum file size (in characters) to include in conflict context */
+const MAX_CONFLICT_FILE_SIZE = 1_048_576
+
+function isConflictMarker(line: string): boolean {
+  return (
+    oursMarker.test(line) ||
+    baseMarker.test(line) ||
+    separatorMarker.test(line) ||
+    theirsMarker.test(line)
+  )
+}
+
 /**
  * Parse a file's text content and extract all conflict hunks.
  *
@@ -78,7 +90,7 @@ export function extractConflictHunks(
   fileContent: string,
   contextLines: number = 3
 ): ReadonlyArray<IConflictHunk> {
-  const lines = fileContent.split('\n')
+  const lines = fileContent.split(/\r?\n/)
   const hunks: Array<IConflictHunk> = []
 
   let i = 0
@@ -144,8 +156,25 @@ export function extractConflictHunks(
     const contextStart = Math.max(0, markerStart - contextLines)
     const contextEnd = Math.min(lines.length - 1, hunkEnd + contextLines)
 
-    const contextBefore = lines.slice(contextStart, markerStart).join('\n')
-    const contextAfter = lines.slice(hunkEnd + 1, contextEnd + 1).join('\n')
+    // Clamp context to not include conflict markers from adjacent hunks
+    const contextBeforeLines: Array<string> = []
+    for (let j = markerStart - 1; j >= contextStart; j--) {
+      if (isConflictMarker(lines[j])) {
+        break
+      }
+      contextBeforeLines.unshift(lines[j])
+    }
+
+    const contextAfterLines: Array<string> = []
+    for (let j = hunkEnd + 1; j <= contextEnd; j++) {
+      if (isConflictMarker(lines[j])) {
+        break
+      }
+      contextAfterLines.push(lines[j])
+    }
+
+    const contextBefore = contextBeforeLines.join('\n')
+    const contextAfter = contextAfterLines.join('\n')
 
     hunks.push({
       oursContent: oursLines.join('\n'),
@@ -225,15 +254,27 @@ export async function buildConflictContext(
   files: ReadonlyArray<{ readonly path: string }>
 ): Promise<ICopilotConflictContext> {
   const fileContexts: Array<IFileConflictContext> = []
+  const resolvedDir = resolve(workingDirectory)
 
   for (const file of files) {
-    const absolutePath = join(workingDirectory, file.path)
+    const absolutePath = resolve(resolvedDir, file.path)
+
+    // Guard against path traversal — resolved path must stay inside the repo
+    if (!absolutePath.startsWith(resolvedDir + '/')) {
+      continue
+    }
+
     let content: string
 
     try {
       content = await readFile(absolutePath, 'utf8')
     } catch {
       // Skip files that can't be read as UTF-8 (e.g. binary files)
+      continue
+    }
+
+    // Skip very large files to avoid exceeding LLM token limits
+    if (content.length > MAX_CONFLICT_FILE_SIZE) {
       continue
     }
 
@@ -285,12 +326,16 @@ export function formatConflictContextForPrompt(
     parts.push('')
     if (pullRequest.body) {
       parts.push('Description:')
-      parts.push(pullRequest.body)
+      parts.push(makeFencedBlock(pullRequest.body))
       parts.push('')
     }
   }
 
-  if (commitContext) {
+  if (
+    commitContext &&
+    (commitContext.ourCommits.length > 0 ||
+      commitContext.theirCommits.length > 0)
+  ) {
     parts.push('## Recent Commits')
     parts.push('')
 
@@ -323,37 +368,27 @@ export function formatConflictContextForPrompt(
 
       if (hunk.contextBefore) {
         parts.push('Context before:')
-        parts.push(`\`\`\`${lang}`)
-        parts.push(hunk.contextBefore)
-        parts.push('```')
+        parts.push(makeFencedBlock(hunk.contextBefore, lang))
         parts.push('')
       }
 
       parts.push('Ours (current branch):')
-      parts.push(`\`\`\`${lang}`)
-      parts.push(hunk.oursContent)
-      parts.push('```')
+      parts.push(makeFencedBlock(hunk.oursContent, lang))
       parts.push('')
 
       if (hunk.baseContent !== null) {
         parts.push('Base (common ancestor):')
-        parts.push(`\`\`\`${lang}`)
-        parts.push(hunk.baseContent)
-        parts.push('```')
+        parts.push(makeFencedBlock(hunk.baseContent, lang))
         parts.push('')
       }
 
       parts.push('Theirs (incoming branch):')
-      parts.push(`\`\`\`${lang}`)
-      parts.push(hunk.theirsContent)
-      parts.push('```')
+      parts.push(makeFencedBlock(hunk.theirsContent, lang))
       parts.push('')
 
       if (hunk.contextAfter) {
         parts.push('Context after:')
-        parts.push(`\`\`\`${lang}`)
-        parts.push(hunk.contextAfter)
-        parts.push('```')
+        parts.push(makeFencedBlock(hunk.contextAfter, lang))
         parts.push('')
       }
     }
@@ -366,4 +401,22 @@ export function formatConflictContextForPrompt(
 function getLangFromPath(filePath: string): string {
   const ext = extname(filePath)
   return ext.startsWith('.') ? ext.slice(1) : ''
+}
+
+/**
+ * Wrap content in a fenced code block using a delimiter long enough
+ * to avoid breaking if the content itself contains backticks.
+ */
+function makeFencedBlock(content: string, lang: string = ''): string {
+  let maxRun = 2
+  const runs = content.match(/`+/g)
+  if (runs) {
+    for (const run of runs) {
+      if (run.length > maxRun) {
+        maxRun = run.length
+      }
+    }
+  }
+  const fence = '`'.repeat(Math.max(3, maxRun + 1))
+  return `${fence}${lang}\n${content}\n${fence}`
 }

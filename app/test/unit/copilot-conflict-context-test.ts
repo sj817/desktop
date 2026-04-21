@@ -12,6 +12,53 @@ import { gitHubRepoFixture } from '../helpers/github-repo-builder'
 
 describe('copilot-conflict-context', () => {
   describe('extractConflictHunks', () => {
+    it('handles CRLF line endings (Windows)', () => {
+      const content = [
+        'line before',
+        '<<<<<<< HEAD',
+        'our change',
+        '=======',
+        'their change',
+        '>>>>>>> feature',
+        'line after',
+      ].join('\r\n')
+
+      const hunks = extractConflictHunks(content)
+
+      assert.equal(hunks.length, 1)
+      assert.equal(hunks[0].oursContent, 'our change')
+      assert.equal(hunks[0].theirsContent, 'their change')
+      assert.equal(hunks[0].baseContent, null)
+    })
+
+    it('does not bleed conflict markers into context lines', () => {
+      const content = [
+        'start',
+        '<<<<<<< HEAD',
+        'ours-1',
+        '=======',
+        'theirs-1',
+        '>>>>>>> feature',
+        'middle',
+        '<<<<<<< HEAD',
+        'ours-2',
+        '=======',
+        'theirs-2',
+        '>>>>>>> feature',
+        'end',
+      ].join('\n')
+
+      const hunks = extractConflictHunks(content, 5)
+
+      assert.equal(hunks.length, 2)
+      // First hunk contextAfter should stop before the next <<<<<<< marker
+      assert.equal(hunks[0].contextAfter, 'middle')
+      assert.ok(!hunks[0].contextAfter.includes('<<<<<<<'))
+      // Second hunk contextBefore should stop after the previous >>>>>>> marker
+      assert.equal(hunks[1].contextBefore, 'middle')
+      assert.ok(!hunks[1].contextBefore.includes('>>>>>>>'))
+    })
+
     it('extracts a standard two-way conflict hunk', () => {
       const content = [
         'line before',
@@ -648,9 +695,48 @@ describe('copilot-conflict-context', () => {
         null
       )
 
-      assert.ok(result.includes('## Recent Commits'))
+      assert.ok(!result.includes('## Recent Commits'))
       assert.ok(!result.includes('### Ours'))
       assert.ok(!result.includes('### Theirs'))
+    })
+    it('uses safe fences when content contains backticks', () => {
+      const context: ICopilotConflictContext = {
+        ourLabel: 'main',
+        theirLabel: 'feature',
+        files: [
+          {
+            path: 'README.md',
+            hunks: [
+              {
+                oursContent: 'Use ```ts\nconst x = 1\n``` for examples',
+                theirsContent: 'Use ```js\nconst x = 2\n``` for examples',
+                baseContent: null,
+                contextBefore: '',
+                contextAfter: '',
+              },
+            ],
+          },
+        ],
+      }
+
+      const result = formatConflictContextForPrompt(context)
+
+      // The fence delimiter should be longer than the 3-backtick runs in content
+      assert.ok(result.includes('````'))
+    })
+
+    it('wraps PR body in a fenced block', () => {
+      const pr = makePullRequest(
+        42,
+        'Docs update',
+        '## Changes\n- Updated ```code``` examples'
+      )
+
+      const result = formatConflictContextForPrompt(baseContext, null, pr)
+
+      assert.ok(result.includes('Description:'))
+      // PR body should be inside a fence, not raw markdown
+      assert.ok(result.includes('````'))
     })
   })
 })
