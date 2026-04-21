@@ -18,6 +18,39 @@ export interface ICopilotErrorDisplayInfo {
   readonly actionURL?: string
 }
 
+/** An error which contains additional metadata. */
+export class CopilotError extends Error {
+  /** The error's metadata. */
+  private readonly statusCode: number
+  private readonly paymentRequiredErrorCode?: CopilotPaymentRequiredErrorCode
+  private readonly retryAfterValue?: string
+
+  public constructor(
+    message: string,
+    statusCode: number,
+    options: ICopilotErrorOptions = {}
+  ) {
+    super(message)
+
+    this.name = 'CopilotError'
+    this.statusCode = statusCode
+    this.paymentRequiredErrorCode = options.paymentRequiredErrorCode
+    this.retryAfterValue = options.retryAfter
+  }
+
+  public get isPaymentRequiredError(): boolean {
+    return this.statusCode === HttpStatusCode.PaymentRequired
+  }
+
+  public get code(): CopilotPaymentRequiredErrorCode | undefined {
+    return this.paymentRequiredErrorCode
+  }
+
+  public get retryAfter(): string | undefined {
+    return this.retryAfterValue
+  }
+}
+
 const knownPaymentRequiredErrorCodes: ReadonlyArray<CopilotPaymentRequiredErrorCode> =
   ['quota_exceeded', 'session_quota_exceeded', 'billing_not_configured']
 
@@ -161,42 +194,5 @@ export function getCopilotErrorDisplayInfo(
         title: 'Copilot billing issue',
         message: error.message,
       }
-  }
-}
-
-/** An error which contains additional metadata. */
-export class CopilotError extends Error {
-  /** The error's metadata. */
-  private readonly statusCode: number
-  private readonly paymentRequiredErrorCode?: CopilotPaymentRequiredErrorCode
-  private readonly retryAfterValue?: string
-
-  public constructor(
-    message: string,
-    statusCode: number,
-    options: ICopilotErrorOptions = {}
-  ) {
-    super(message)
-
-    this.name = 'CopilotError'
-    this.statusCode = statusCode
-    this.paymentRequiredErrorCode = options.paymentRequiredErrorCode
-    this.retryAfterValue = options.retryAfter
-  }
-
-  public get isQuotaExceededError(): boolean {
-    return this.statusCode === HttpStatusCode.PaymentRequired
-  }
-
-  public get isPaymentRequiredError(): boolean {
-    return this.statusCode === HttpStatusCode.PaymentRequired
-  }
-
-  public get code(): CopilotPaymentRequiredErrorCode | undefined {
-    return this.paymentRequiredErrorCode
-  }
-
-  public get retryAfter(): string | undefined {
-    return this.retryAfterValue
   }
 }
