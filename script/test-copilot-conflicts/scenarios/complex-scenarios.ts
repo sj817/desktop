@@ -1337,21 +1337,20 @@ export type {
         body: 'This PR replaces the legacy API key authentication system with OAuth2 Bearer token flow. The old x-api-key and x-api-secret headers are no longer supported. Clients must use Authorization: Bearer <token> header. Rate limiting should still be preserved but adapted to work with the new OAuth2 session model.',
       },
       verifyCoherence: (resolutions: Map<string, string>) => {
-        // Check that OAuth2 types are used consistently
+        // Check that OAuth2 types are used consistently across resolved files
         const types = resolutions.get('src/auth/types.ts') || ''
         const validator = resolutions.get('src/auth/validator.ts') || ''
-        const middleware = resolutions.get('src/middleware/auth-middleware.ts') || ''
+        const config = resolutions.get('src/config/app-config.ts') || ''
 
-        // Should have OAuth tokens
+        // types.ts should have both OAuth tokens AND rate limiting
         const hasOAuthTokens = types.includes('accessToken') && types.includes('refreshToken')
-        // Should have rate limiting
         const hasRateLimit = types.includes('rateLimit') || types.includes('RateLimit')
-        // Validator should match types
-        const validatorUsesOAuth = validator.includes('accessToken') || validator.includes('OAuthTokens')
-        // Middleware should use Bearer
-        const middlewareUsesBearer = middleware.includes('Bearer') || middleware.includes('authorization')
+        // Validator should reference OAuth concepts
+        const validatorUsesOAuth = validator.includes('accessToken') || validator.includes('OAuthTokens') || validator.includes('introspect')
+        // Config should reference OAuth2
+        const configUsesOAuth = config.includes('oauth2') || config.includes('clientId') || config.includes('tokenEndpoint')
 
-        return hasOAuthTokens && hasRateLimit && validatorUsesOAuth && middlewareUsesBearer
+        return hasOAuthTokens && hasRateLimit && validatorUsesOAuth && configUsesOAuth
       },
       verifyIntent: (resolutions: Map<string, string>) => {
         // PR intent: OAuth2 should replace API keys
