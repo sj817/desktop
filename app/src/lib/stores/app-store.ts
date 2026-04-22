@@ -134,6 +134,7 @@ import {
   IFileListFilterState,
   isMergeConflictState,
   IMultiCommitOperationState,
+  ConflictState,
   IConstrainedValue,
   ICompareState,
   CommitOptions,
@@ -5728,6 +5729,63 @@ export class AppStore extends TypedBaseStore<IAppState> {
     })
   }
 
+  /**
+   * Extract display labels and git refs for both sides of a conflict.
+   * Returns null for unrecognized conflict types.
+   */
+  private async getConflictLabelsAndRefs(
+    repository: Repository,
+    conflictState: ConflictState,
+    multiCommitOperationState: IMultiCommitOperationState | null
+  ): Promise<{
+    readonly ourLabel: string
+    readonly theirLabel: string
+    readonly ourRef: string | undefined
+    readonly theirRef: string | undefined
+  } | null> {
+    if (isMergeConflictState(conflictState)) {
+      const theirBranch = await this.getMergeConflictsTheirBranch(
+        repository,
+        false,
+        multiCommitOperationState
+      )
+      return {
+        ourLabel: conflictState.currentBranch,
+        ourRef: conflictState.currentBranch,
+        theirLabel: theirBranch ?? 'incoming branch',
+        theirRef: theirBranch,
+      }
+    }
+
+    if (isRebaseConflictState(conflictState)) {
+      return {
+        ourLabel: conflictState.baseBranch ?? 'current branch',
+        ourRef: conflictState.baseBranch,
+        theirLabel: conflictState.targetBranch,
+        theirRef: conflictState.targetBranch,
+      }
+    }
+
+    if (isCherryPickConflictState(conflictState)) {
+      const sourceBranch =
+        multiCommitOperationState !== null &&
+        multiCommitOperationState.operationDetail.kind ===
+          MultiCommitOperationKind.CherryPick &&
+        multiCommitOperationState.operationDetail.sourceBranch !== null
+          ? multiCommitOperationState.operationDetail.sourceBranch.name
+          : undefined
+
+      return {
+        ourLabel: conflictState.targetBranchName,
+        ourRef: conflictState.targetBranchName,
+        theirLabel: sourceBranch ?? 'cherry-picked commit',
+        theirRef: sourceBranch,
+      }
+    }
+
+    return null
+  }
+
   /** This shouldn't be called directly. See 'Dispatcher'. */
   public async _resolveConflictsWithCopilot(
     repository: Repository,
@@ -5745,48 +5803,13 @@ export class AppStore extends TypedBaseStore<IAppState> {
         return null
       }
 
-      // Extract labels and refs for all conflict types
-      let ourLabel: string
-      let theirLabel: string
-      let ourRef: string | undefined
-      let theirRef: string | undefined
+      const labels = await this.getConflictLabelsAndRefs(
+        repository,
+        conflictState,
+        state.multiCommitOperationState
+      )
 
-      if (isMergeConflictState(conflictState)) {
-        ourLabel = conflictState.currentBranch
-        ourRef = conflictState.currentBranch
-
-        // Determine their branch from multiCommitOperationState or MERGE_HEAD
-        const { multiCommitOperationState } = state
-        const theirBranch = await this.getMergeConflictsTheirBranch(
-          repository,
-          false,
-          multiCommitOperationState
-        )
-        theirLabel = theirBranch ?? 'incoming branch'
-        theirRef = theirBranch
-      } else if (isRebaseConflictState(conflictState)) {
-        ourLabel = conflictState.baseBranch ?? 'current branch'
-        ourRef = conflictState.baseBranch
-        theirLabel = conflictState.targetBranch
-        theirRef = conflictState.targetBranch
-      } else if (isCherryPickConflictState(conflictState)) {
-        ourLabel = conflictState.targetBranchName
-        ourRef = conflictState.targetBranchName
-
-        const { multiCommitOperationState } = state
-        if (
-          multiCommitOperationState !== null &&
-          multiCommitOperationState.operationDetail.kind ===
-            MultiCommitOperationKind.CherryPick &&
-          multiCommitOperationState.operationDetail.sourceBranch !== null
-        ) {
-          theirLabel =
-            multiCommitOperationState.operationDetail.sourceBranch.name
-          theirRef = theirLabel
-        } else {
-          theirLabel = 'cherry-picked commit'
-        }
-      } else {
+      if (labels === null) {
         return null
       }
 
@@ -5800,18 +5823,20 @@ export class AppStore extends TypedBaseStore<IAppState> {
       }
 
       const context = await buildConflictContext(
-        ourLabel,
-        theirLabel,
+        labels.ourLabel,
+        labels.theirLabel,
         repository.path,
         conflictedFiles
       )
 
       // Best-effort enrichment — never block resolution on these
       const commitContext =
-        ourRef && theirRef
-          ? await gatherCommitContext(repository, ourRef, theirRef).catch(
-              () => null
-            )
+        labels.ourRef && labels.theirRef
+          ? await gatherCommitContext(
+              repository,
+              labels.ourRef,
+              labels.theirRef
+            ).catch(() => null)
           : null
 
       const currentPullRequest = state.branchesState.currentPullRequest ?? null
