@@ -1,3 +1,9 @@
+/**
+ * Prefix for errors that are safe to retry (parse/validation failures).
+ * Visible in logs so it's clear a retry was attempted.
+ */
+export const RetryableErrorPrefix = 'Retry: '
+
 /** Resolution suggestion for a single conflicted file. */
 export interface IFileResolution {
   /** Repository-relative file path that was resolved. */
@@ -57,7 +63,7 @@ export function parseCopilotConflictResolution(
       break
     } catch {
       parseError = new Error(
-        'Copilot returned invalid JSON for conflict resolution generation'
+        `${RetryableErrorPrefix}Copilot returned invalid JSON for conflict resolution generation`
       )
     }
   }
@@ -67,7 +73,7 @@ export function parseCopilotConflictResolution(
 
   if (!isRecord(parsed)) {
     throw new Error(
-      'Copilot returned an invalid conflict resolution payload: expected an object'
+      `${RetryableErrorPrefix}Copilot returned an invalid conflict resolution payload: expected an object`
     )
   }
 
@@ -75,13 +81,13 @@ export function parseCopilotConflictResolution(
 
   if (!Array.isArray(resolutions)) {
     throw new Error(
-      'Copilot returned an invalid conflict resolution payload: "resolutions" must be an array'
+      `${RetryableErrorPrefix}Copilot returned an invalid conflict resolution payload: "resolutions" must be an array`
     )
   }
 
   if (resolutions.length === 0) {
     throw new Error(
-      'Copilot returned an invalid conflict resolution payload: "resolutions" must not be empty'
+      `${RetryableErrorPrefix}Copilot returned an invalid conflict resolution payload: "resolutions" must not be empty`
     )
   }
 
@@ -92,7 +98,7 @@ export function parseCopilotConflictResolution(
 
     if (!isRecord(entry)) {
       throw new Error(
-        `Copilot returned an invalid conflict resolution payload: resolution at index ${i} must be an object`
+        `${RetryableErrorPrefix}Copilot returned an invalid conflict resolution payload: resolution at index ${i} must be an object`
       )
     }
 
@@ -100,25 +106,25 @@ export function parseCopilotConflictResolution(
 
     if (typeof path !== 'string' || path.trim().length === 0) {
       throw new Error(
-        `Copilot returned an invalid conflict resolution payload: "path" at index ${i} must be a non-empty string`
+        `${RetryableErrorPrefix}Copilot returned an invalid conflict resolution payload: "path" at index ${i} must be a non-empty string`
       )
     }
 
     if (typeof resolvedContent !== 'string') {
       throw new Error(
-        `Copilot returned an invalid conflict resolution payload: "resolvedContent" at index ${i} must be a string`
+        `${RetryableErrorPrefix}Copilot returned an invalid conflict resolution payload: "resolvedContent" at index ${i} must be a string`
       )
     }
 
     if (/^<{7}\s/m.test(resolvedContent) && /^={7}$/m.test(resolvedContent)) {
       throw new Error(
-        `Copilot returned an invalid conflict resolution payload: "resolvedContent" at index ${i} still contains conflict markers`
+        `${RetryableErrorPrefix}Copilot returned an invalid conflict resolution payload: "resolvedContent" at index ${i} still contains conflict markers`
       )
     }
 
     if (typeof reasoning !== 'string' || reasoning.trim().length === 0) {
       throw new Error(
-        `Copilot returned an invalid conflict resolution payload: "reasoning" at index ${i} must be a non-empty string`
+        `${RetryableErrorPrefix}Copilot returned an invalid conflict resolution payload: "reasoning" at index ${i} must be a non-empty string`
       )
     }
 

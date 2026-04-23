@@ -9,6 +9,7 @@ import {
 import {
   ICopilotConflictResolutionResponse,
   IFileResolution,
+  RetryableErrorPrefix,
   parseCopilotConflictResolution,
 } from '../copilot-conflict-resolution'
 import {
@@ -527,7 +528,7 @@ export class CopilotStore extends BaseStore {
         for (const path of returnedPaths) {
           if (!expectedPaths.has(path)) {
             throw new Error(
-              `Copilot returned resolution for unexpected file: ${path}`
+              `${RetryableErrorPrefix}Copilot returned resolution for unexpected file: ${path}`
             )
           }
         }
@@ -535,7 +536,7 @@ export class CopilotStore extends BaseStore {
         // Check for duplicate paths
         if (returnedPaths.size !== parsed.resolutions.length) {
           throw new Error(
-            'Copilot returned duplicate file paths in resolutions'
+            `${RetryableErrorPrefix}Copilot returned duplicate file paths in resolutions`
           )
         }
 
@@ -548,7 +549,9 @@ export class CopilotStore extends BaseStore {
         }
         if (missingPaths.length > 0) {
           throw new Error(
-            `Copilot did not return resolutions for: ${missingPaths.join(', ')}`
+            `${RetryableErrorPrefix}Copilot did not return resolutions for: ${missingPaths.join(
+              ', '
+            )}`
           )
         }
 
@@ -557,13 +560,8 @@ export class CopilotStore extends BaseStore {
         lastError = e instanceof Error ? e : new Error(String(e))
 
         // Only retry on parse/validation failures — fail fast on
-        // transport errors (timeouts, auth, session creation). All
-        // parse/validation errors use messages starting with "Copilot
-        // returned" or "Copilot did not return".
-        const msg = lastError.message
-        const isRetryable =
-          msg.startsWith('Copilot returned') ||
-          msg.startsWith('Copilot did not return')
+        // transport errors (timeouts, auth, session creation).
+        const isRetryable = lastError.message.startsWith(RetryableErrorPrefix)
 
         if (!isRetryable || attempt > 0) {
           break
