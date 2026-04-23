@@ -14,6 +14,7 @@ import {
 import {
   IBYOKProvider,
   encodeModelKey,
+  isLocalBaseUrl,
   parseModelKey,
 } from '../../lib/copilot/byok'
 
@@ -258,14 +259,5 @@ export class CopilotPreferences extends React.Component<
       case 'anthropic':
         return 'Anthropic'
     }
-  }
-}
-
-function isLocalBaseUrl(baseUrl: string): boolean {
-  try {
-    const { hostname } = new URL(baseUrl)
-    return hostname === 'localhost' || hostname === '127.0.0.1'
-  } catch {
-    return false
   }
 }

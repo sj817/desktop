@@ -192,6 +192,36 @@ export function parseModelKey(value: string): CopilotModelKey {
 }
 
 /**
+ * Returns true if the given base URL points at the local machine. Used to
+ * surface a "Local" badge in the provider list. Recognises both IPv4 (127/8
+ * and 0.0.0.0) and IPv6 loopback in bracketed and bare forms.
+ */
+export function isLocalBaseUrl(baseUrl: string): boolean {
+  let hostname: string
+  try {
+    hostname = new URL(baseUrl).hostname
+  } catch {
+    return false
+  }
+
+  if (hostname === 'localhost' || hostname === '0.0.0.0') {
+    return true
+  }
+
+  // URL parses [::1] back to '[::1]' on some platforms, '::1' on others.
+  if (hostname === '::1' || hostname === '[::1]') {
+    return true
+  }
+
+  // Any 127.0.0.0/8 address is loopback (RFC 1122 §3.2.1.3).
+  if (/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname)) {
+    return true
+  }
+
+  return false
+}
+
+/**
  * Returns true if the given string parses as an absolute http:// or https://
  * URL. Used as the single source of truth for `baseUrl` validation in both
  * the dialog and the localStorage loader.
