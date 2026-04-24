@@ -8837,11 +8837,16 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
   /**
    * Drops any per-feature model selection that points at a BYOK
-   * provider/model that no longer exists.
+   * provider/model that no longer exists, or at a Copilot model that is
+   * no longer offered by the loaded model list. Copilot selections are
+   * only scrubbed once we have a definitive model list (i.e. the list has
+   * been fetched at least once); while still loading we leave them alone
+   * so a transient empty list doesn't downgrade valid selections.
    */
   private scrubMissingCopilotModelSelections(): void {
     const updated: CopilotModelSelections = {}
     let changed = false
+    const copilotModels = this.copilotModels
     for (const [feature, raw] of Object.entries(this.selectedCopilotModels)) {
       if (raw === undefined) {
         continue
@@ -8856,6 +8861,14 @@ export class AppStore extends TypedBaseStore<IAppState> {
           changed = true
           continue
         }
+      } else if (
+        key.kind === 'copilot' &&
+        key.modelId !== '' &&
+        copilotModels !== null &&
+        !copilotModels.some(m => m.id === key.modelId)
+      ) {
+        changed = true
+        continue
       }
       updated[feature as CopilotFeature] = raw
     }
@@ -8870,6 +8883,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
   public async _fetchCopilotModels(): Promise<void> {
     const models = await this.copilotStore.listModels()
     this.copilotModels = [...models]
+    this.scrubMissingCopilotModelSelections()
     this.emitUpdate()
   }
 
