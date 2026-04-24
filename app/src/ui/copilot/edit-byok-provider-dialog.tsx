@@ -399,13 +399,15 @@ export class EditCopilotBYOKProviderDialog extends React.Component<
 
     const existing = this.props.provider
     const id = existing?.id ?? crypto.randomUUID()
-    const trimmedModels = this.state.models.map(m => ({
-      id: m.id.trim(),
-      name: m.name.trim() === '' ? m.id.trim() : m.name.trim(),
-      ...(m.reasoningEffort !== undefined
-        ? { reasoningEffort: m.reasoningEffort }
-        : {}),
-    }))
+    const trimmedModels = this.state.models
+      .filter(m => m.id.trim() !== '')
+      .map(m => ({
+        id: m.id.trim(),
+        name: m.name.trim() === '' ? m.id.trim() : m.name.trim(),
+        ...(m.reasoningEffort !== undefined
+          ? { reasoningEffort: m.reasoningEffort }
+          : {}),
+      }))
 
     const provider: IBYOKProvider = {
       id,
