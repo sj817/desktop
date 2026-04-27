@@ -60,7 +60,9 @@ export interface IBYOKProvider {
 }
 
 const ProvidersStorageKey = 'copilot-byok-providers'
-const TokenStoreKey = 'copilot-byok'
+const TokenStoreKey = `${
+  __DEV__ ? 'GitHub Desktop Dev' : 'GitHub Desktop'
+} - Copilot BYOK provider`
 
 /**
  * Loads the list of BYOK providers from local storage. Returns an empty list
