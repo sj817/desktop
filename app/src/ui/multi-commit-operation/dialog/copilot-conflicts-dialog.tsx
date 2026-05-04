@@ -8,8 +8,7 @@ import {
   WorkingDirectoryStatus,
   WorkingDirectoryFileChange,
 } from '../../../models/status'
-import { getUnmergedFiles } from '../../../lib/status'
-import { isConflictedFile } from '../../../lib/status'
+import { getUnmergedFiles, isConflictedFile } from '../../../lib/status'
 import { OkCancelButtonGroup } from '../../dialog/ok-cancel-button-group'
 import { Button } from '../../lib/button'
 import { Octicon } from '../../octicons'
