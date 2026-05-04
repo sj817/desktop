@@ -281,7 +281,7 @@ export abstract class BaseMultiCommitOperation extends React.Component<IMultiCom
             workingDirectory={this.props.workingDirectory}
             operationKind={this.props.state.operationDetail.kind}
             onContinueAfterConflicts={this.onContinueAfterConflicts}
-            onAbort={this.onAbort}
+            onAbort={this.onConfirmingAbort}
           />
         )
       default:
