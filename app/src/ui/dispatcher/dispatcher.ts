@@ -3799,6 +3799,11 @@ export class Dispatcher {
     this.appStore._endMultiCommitOperation(repository)
   }
 
+  /** Initiate Copilot conflict resolution for the given repository. */
+  public startCopilotConflictResolution(repository: Repository) {
+    this.appStore._startCopilotConflictResolution(repository)
+  }
+
   /** Opens conflicts found banner for part of multi commit operation */
   public onConflictsFoundBanner = (
     repository: Repository,

@@ -8255,6 +8255,13 @@ export class AppStore extends TypedBaseStore<IAppState> {
   }
 
   /** This shouldn't be called directly. See `Dispatcher`. */
+  public _startCopilotConflictResolution(repository: Repository): void {
+    log.info(
+      `[AppStore] Starting Copilot conflict resolution for ${repository.name}`
+    )
+  }
+
+  /** This shouldn't be called directly. See `Dispatcher`. */
   public _initializeMultiCommitOperation(
     repository: Repository,
     operationDetail: MultiCommitOperationDetail,
