@@ -5978,12 +5978,22 @@ export class AppStore extends TypedBaseStore<IAppState> {
       return
     }
 
-    const { copilotResolutions } = multiCommitOperationState
+    const { copilotResolutions, step } = multiCommitOperationState
     if (copilotResolutions === null || copilotResolutions.length === 0) {
       return
     }
 
+    // Respect any manual overrides the user chose in the result dialog
+    const manualResolutions =
+      step.kind === MultiCommitOperationStepKind.ShowCopilotConflicts
+        ? step.conflictState.manualResolutions
+        : new Map<string, ManualConflictResolution>()
+
     for (const resolution of copilotResolutions) {
+      if (manualResolutions.has(resolution.path)) {
+        continue
+      }
+
       const absolutePath = await resolveWithin(repository.path, resolution.path)
       if (absolutePath === null) {
         log.warn(
