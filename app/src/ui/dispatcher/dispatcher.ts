@@ -3794,6 +3794,22 @@ export class Dispatcher {
     return this.appStore._setMultiCommitOperationStep(repository, step)
   }
 
+  /**
+   * Atomically transition the multi commit operation step and set the
+   * useCopilotConflictResolution flag in a single store update.
+   */
+  public setMultiCommitOperationStepWithCopilotResolution(
+    repository: Repository,
+    step: MultiCommitOperationStep,
+    useCopilotConflictResolution: boolean
+  ): void {
+    this.appStore._setMultiCommitOperationStepWithCopilotResolution(
+      repository,
+      step,
+      useCopilotConflictResolution
+    )
+  }
+
   /** Method to clear multi commit operation state. */
   public endMultiCommitOperation(repository: Repository) {
     this.appStore._endMultiCommitOperation(repository)
