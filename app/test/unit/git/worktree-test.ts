@@ -5,7 +5,7 @@ import { setupEmptyRepository } from '../../helpers/repositories'
 import { makeCommit } from '../../helpers/repository-scaffolding'
 import {
   parseWorktreePorcelainOutput,
-  getWorktreeCheckedOutBranches,
+  listWorktrees,
 } from '../../../src/lib/git'
 
 describe('git/worktree', () => {
@@ -200,14 +200,23 @@ describe('git/worktree', () => {
     })
   })
 
-  describe('getWorktreeCheckedOutBranches', () => {
+  describe('listWorktrees', () => {
+    /** Helper to extract checked-out branch refs from worktree entries */
+    function checkedOutBranches(
+      worktrees: ReadonlyArray<{ readonly branch: string | null }>
+    ): ReadonlySet<string> {
+      return new Set(
+        worktrees.map(wt => wt.branch).filter(b => b !== null)
+      )
+    }
+
     it('returns only main worktree branch when there are no linked worktrees', async t => {
       const repo = await setupEmptyRepository(t, 'main')
       await makeCommit(repo, {
         entries: [{ path: 'README', contents: 'hello' }],
       })
 
-      const branches = await getWorktreeCheckedOutBranches(repo)
+      const branches = checkedOutBranches(await listWorktrees(repo))
       assert.strictEqual(branches.size, 1)
       assert(branches.has('refs/heads/main'))
     })
@@ -223,7 +232,7 @@ describe('git/worktree', () => {
         repo.path
       )
 
-      const branches = await getWorktreeCheckedOutBranches(repo)
+      const branches = checkedOutBranches(await listWorktrees(repo))
       assert(branches.has('refs/heads/feature-a'))
       assert(branches.has('refs/heads/main'))
       assert.strictEqual(branches.size, 2)
@@ -245,7 +254,7 @@ describe('git/worktree', () => {
         repo.path
       )
 
-      const branches = await getWorktreeCheckedOutBranches(repo)
+      const branches = checkedOutBranches(await listWorktrees(repo))
       assert(branches.has('refs/heads/feature-a'))
       assert(branches.has('refs/heads/feature-b'))
       assert(branches.has('refs/heads/main'))
@@ -265,9 +274,7 @@ describe('git/worktree', () => {
         repo.path
       )
 
-      const branches = await getWorktreeCheckedOutBranches(repo)
-      // Detached worktrees have no branch line in porcelain output
-      // but the main worktree branch is still included
+      const branches = checkedOutBranches(await listWorktrees(repo))
       assert.strictEqual(branches.size, 1)
       assert(branches.has('refs/heads/main'))
     })

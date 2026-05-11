@@ -65,25 +65,6 @@ export async function listWorktrees(
   return parseWorktreePorcelainOutput(result.stdout)
 }
 
-/**
- * Get the set of canonical branch refs (e.g. `refs/heads/feature`)
- * checked out in any worktree (main or linked).
- */
-export async function getWorktreeCheckedOutBranches(
-  repository: Repository
-): Promise<ReadonlySet<string>> {
-  const worktrees = await listWorktrees(repository)
-  const branches = new Set<string>()
-
-  for (const wt of worktrees) {
-    if (wt.branch !== null) {
-      branches.add(wt.branch)
-    }
-  }
-
-  return branches
-}
-
 export async function addWorktree(
   repository: Repository,
   path: string,
