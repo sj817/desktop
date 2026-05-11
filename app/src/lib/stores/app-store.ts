@@ -5644,8 +5644,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
    */
   public async _switchWorktree(
     repository: Repository,
-    worktreePath: string,
-    mainWorktreePath: string
+    worktreePath: string
   ): Promise<void> {
     const { kind } = await getRepositoryType(worktreePath).catch(e => {
       log.error('Could not determine repository type', e)
@@ -5653,12 +5652,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
     })
 
     if (kind !== 'regular' && kind !== 'unsafe') {
-      this.emitError(
-        new Error(
-          `The worktree path '${worktreePath}' does not appear to be a valid Git repository.`
-        )
+      throw new Error(
+        `The worktree path '${worktreePath}' does not appear to be a valid Git repository.`
       )
-      return
     }
 
     // If the repository path isn't trusted we'll mark the repository as
@@ -5669,7 +5665,6 @@ export class AppStore extends TypedBaseStore<IAppState> {
     const result = await this.repositoriesStore.switchWorktree(
       repository,
       worktreePath,
-      mainWorktreePath,
       missing
     )
 
@@ -5688,11 +5683,10 @@ export class AppStore extends TypedBaseStore<IAppState> {
       const mainPath = worktrees.find(wt => wt.type === 'main')?.path
 
       if (mainPath === undefined) {
-        this.emitError(new Error('Could not find main worktree'))
-        return
+        throw new Error('Could not find main worktree')
       }
 
-      await this._switchWorktree(repository, mainPath, mainPath)
+      await this._switchWorktree(repository, mainPath)
       await removeWorktree(mainPath, worktreePath)
     } else {
       await removeWorktree(repository.path, worktreePath)

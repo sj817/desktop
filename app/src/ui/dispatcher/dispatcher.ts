@@ -1017,10 +1017,11 @@ export class Dispatcher {
    */
   public switchWorktree(
     repository: Repository,
-    worktreePath: string,
-    mainWorktreePath: string
+    worktreePath: string
   ): Promise<void> {
-    return this.appStore._switchWorktree(repository, worktreePath, mainWorktreePath)
+    return this.appStore
+      ._switchWorktree(repository, worktreePath)
+      .catch(e => this.postError(e))
   }
 
   /**
@@ -1031,7 +1032,9 @@ export class Dispatcher {
     repository: Repository,
     worktreePath: string
   ): Promise<void> {
-    return this.appStore._deleteWorktree(repository, worktreePath)
+    return this.appStore
+      ._deleteWorktree(repository, worktreePath)
+      .catch(e => this.postError(e))
   }
 
   /**

@@ -8,7 +8,6 @@ import { FoldoutType, IConstrainedValue } from '../../lib/app-state'
 import { WorktreeEntry } from '../../models/worktree'
 import { WorktreeList } from '../worktrees/worktree-list'
 import { listWorktrees } from '../../lib/git/worktree'
-import { CloningRepository } from '../../models/cloning-repository'
 import { showContextualMenu } from '../../lib/menu-item'
 import { generateWorktreeContextMenuItems } from '../worktrees/worktree-list-item-context-menu'
 import { PopupType } from '../../models/popup'
@@ -21,7 +20,6 @@ interface IWorktreeDropdownProps {
   readonly isOpen: boolean
   readonly onDropDownStateChanged: (state: DropdownState) => void
   readonly enableFocusTrap: boolean
-  readonly repositories: ReadonlyArray<Repository | CloningRepository>
   readonly worktreeDropdownWidth: IConstrainedValue
 }
 
@@ -64,25 +62,8 @@ export class WorktreeDropdown extends React.Component<
     const { dispatcher, repository } = this.props
 
     dispatcher.closeFoldout(FoldoutType.Worktree)
-
-    const mainWorktree = this.state.worktrees.find(wt => wt.type === 'main')
-    if (mainWorktree === undefined) {
-      return
-    }
-
-    const mainWorktreePath = mainWorktree.path
-    const worktreePath = worktree.path
-
-    // Already on this worktree, nothing to do
-    if (worktreePath === repository.path) {
-      return
-    }
-
-    await dispatcher.switchWorktree(repository, worktreePath, mainWorktreePath)
+    await dispatcher.switchWorktree(repository, worktree.path)
   }
-
-  // Intentional no-op: navigation happens on click, not selection change
-
 
   private onWorktreeContextMenu = (
     worktree: WorktreeEntry,
@@ -150,10 +131,7 @@ export class WorktreeDropdown extends React.Component<
 
   private getCurrentWorktree(): WorktreeEntry | null {
     const repoPath = this.props.repository.path
-    return (
-      this.state.worktrees.find(wt => wt.path === repoPath) ??
-      null
-    )
+    return this.state.worktrees.find(wt => wt.path === repoPath) ?? null
   }
 
   private onResize = (width: number) => {
