@@ -2535,13 +2535,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
     const worktreeDropdownMax =
       available - clamp(this.branchDropdownWidth) - defaultPushPullButtonWidth
-    const minimumWorktreeDropdownWidth =
-      defaultWorktreeDropdownWidth > available / 3
-        ? available / 3 - 10
-        : defaultWorktreeDropdownWidth
     this.worktreeDropdownWidth = constrain(
       this.worktreeDropdownWidth,
-      minimumWorktreeDropdownWidth,
+      Math.min(available / 3 - 10, 170),
       worktreeDropdownMax
     )
 
