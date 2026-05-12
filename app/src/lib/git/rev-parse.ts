@@ -29,15 +29,24 @@ export async function getRepositoryType(path: string): Promise<RepositoryType> {
     )
 
     if (result.exitCode === 0) {
-      const [isBare, cdup, gitDir] = result.stdout.split('\n', 3)
+      // --is-bare-repository and --show-cdup each produce a single line but
+      // --git-dir could theoretically contain newlines so we parse the known
+      // fields first and treat the remainder as the git dir. We use [\s\S]*
+      // instead of .* for the git dir capture group because .* doesn't match
+      // newlines whereas [\s\S]* matches any character including newlines.
+      const match = result.stdout.match(/^(true|false)\n(.*)\n([\s\S]*)\n$/)
 
-      return isBare === 'true'
-        ? { kind: 'bare' }
-        : {
-            kind: 'regular',
-            topLevelWorkingDirectory: resolve(path, cdup),
-            gitDir: resolve(path, gitDir),
-          }
+      if (match) {
+        const [, isBare, cdup, gitDir] = match
+
+        return isBare === 'true'
+          ? { kind: 'bare' }
+          : {
+              kind: 'regular',
+              topLevelWorkingDirectory: resolve(path, cdup),
+              gitDir: resolve(path, gitDir),
+            }
+      }
     }
 
     const unsafeMatch =
