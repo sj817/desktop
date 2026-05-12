@@ -7,7 +7,7 @@ import { ToolbarDropdown, DropdownState } from './dropdown'
 import { FoldoutType, IConstrainedValue } from '../../lib/app-state'
 import { WorktreeEntry } from '../../models/worktree'
 import { WorktreeList } from '../worktrees/worktree-list'
-import { showContextualMenu } from '../../lib/menu-item'
+import { showContextualMenu, IMenuItem } from '../../lib/menu-item'
 import { generateWorktreeContextMenuItems } from '../worktrees/worktree-list-item-context-menu'
 import { PopupType } from '../../models/popup'
 import { Resizable } from '../resizable'
@@ -88,6 +88,31 @@ export class WorktreeDropdown extends React.Component<
     })
   }
 
+  private onContextMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+
+    const currentWorktree = this.getCurrentWorktree()
+    if (currentWorktree === null) {
+      return
+    }
+
+    const isMain = currentWorktree.type === 'main'
+
+    const items = generateWorktreeContextMenuItems({
+      path: currentWorktree.path,
+      isMainWorktree: isMain,
+      isLocked: currentWorktree.isLocked,
+      onRemoveWorktree: isMain ? undefined : this.onRemoveWorktree,
+    })
+
+    const newWorktreeItem: IMenuItem = {
+      label: __DARWIN__ ? 'New Worktree…' : 'New worktree…',
+      action: this.onCreateNewWorktree,
+    }
+
+    showContextualMenu([newWorktreeItem, { type: 'separator' }, ...items])
+  }
+
   private onFilterTextChanged = (text: string) => {
     this.setState({ filterText: text })
   }
@@ -139,6 +164,7 @@ export class WorktreeDropdown extends React.Component<
         description={description}
         tooltip={isOpen ? undefined : `Current worktree is ${title}`}
         onDropdownStateChanged={this.props.onDropDownStateChanged}
+        onContextMenu={this.onContextMenu}
         dropdownContentRenderer={this.renderWorktreeFoldout}
         dropdownState={currentState}
         showDisclosureArrow={true}
