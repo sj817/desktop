@@ -241,7 +241,7 @@ export async function getCherryPickSnapshot(
   try {
     abortSafetySha = (
       await readFile(
-        Path.join(repository.path, '.git', 'sequencer', 'abort-safety'),
+        Path.join(repository.resolvedGitDir, 'sequencer', 'abort-safety'),
         'utf8'
       )
     ).trim()
@@ -254,7 +254,7 @@ export async function getCherryPickSnapshot(
 
     headSha = (
       await readFile(
-        Path.join(repository.path, '.git', 'sequencer', 'head'),
+        Path.join(repository.resolvedGitDir, 'sequencer', 'head'),
         'utf8'
       )
     ).trim()
@@ -267,7 +267,7 @@ export async function getCherryPickSnapshot(
 
     const remainingPicks = (
       await readFile(
-        Path.join(repository.path, '.git', 'sequencer', 'todo'),
+        Path.join(repository.resolvedGitDir, 'sequencer', 'todo'),
         'utf8'
       )
     ).trim()
@@ -308,7 +308,7 @@ export async function getCherryPickSnapshot(
     // thus sequencer files were not used.
     const cherryPickHeadSha = (
       await readFile(
-        Path.join(repository.path, '.git', 'CHERRY_PICK_HEAD'),
+        Path.join(repository.resolvedGitDir, 'CHERRY_PICK_HEAD'),
         'utf8'
       )
     ).trim()

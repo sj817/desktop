@@ -84,6 +84,16 @@ export class Repository {
   public get path(): string {
     return this.mainWorkTree.path
   }
+
+  /**
+   * The resolved path to the .git directory for this repository.
+   *
+   * Uses the stored gitDir if available, otherwise falls back to
+   * joining the repository path with '.git'.
+   */
+  public get resolvedGitDir(): string {
+    return this.gitDir ?? Path.join(this.path, '.git')
+  }
 }
 
 /** A worktree linked to a main working tree (aka `Repository`) */
