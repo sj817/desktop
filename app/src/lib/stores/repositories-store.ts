@@ -31,7 +31,6 @@ import { shallowEquals } from '../equality'
 
 type AddRepositoryOptions = {
   missing?: boolean
-  gitDir?: string
 }
 
 /** The store for local repositories. */
@@ -236,6 +235,7 @@ export class RepositoriesStore extends TypedBaseStore<
    */
   public async addRepository(
     path: string,
+    gitDir: string,
     opts?: AddRepositoryOptions
   ): Promise<Repository> {
     const repository = await this.db.transaction(
@@ -256,7 +256,7 @@ export class RepositoriesStore extends TypedBaseStore<
           missing: opts?.missing ?? false,
           lastStashCheckDate: null,
           alias: null,
-          gitDir: opts?.gitDir,
+          gitDir,
         }
         const id = await this.db.repositories.add(dbRepo)
         return this.toRepository({ id, ...dbRepo })

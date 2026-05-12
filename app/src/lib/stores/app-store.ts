@@ -6887,9 +6887,11 @@ export class AppStore extends TypedBaseStore<IAppState> {
       })
 
       if (repositoryType.kind === 'unsafe') {
-        const repository = await this.repositoriesStore.addRepository(path, {
-          missing: true,
-        })
+        const repository = await this.repositoriesStore.addRepository(
+          path,
+          Path.join(path, '.git'),
+          { missing: true }
+        )
 
         addedRepositories.push(repository)
         continue
@@ -6911,7 +6913,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
         const addedRepo = await this.repositoriesStore.addRepository(
           validatedPath,
-          { gitDir: repositoryType.gitDir }
+          repositoryType.gitDir
         )
 
         // initialize the remotes for this new repository to ensure it can fetch
