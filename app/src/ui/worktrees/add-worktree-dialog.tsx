@@ -165,6 +165,7 @@ export class AddWorktreeDialog extends React.Component<
       >
         <DialogContent>
           <RepositoryPath
+            initialName={this.props.initialBranchName}
             onFullPathChanged={this.onFullPathChanged}
             onNameChanged={this.onWorktreeNameChanged}
             nameLabel={__DARWIN__ ? 'Worktree Name' : 'Worktree name'}
