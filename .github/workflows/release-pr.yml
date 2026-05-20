@@ -37,13 +37,14 @@ jobs:
           private_key: ${{ secrets.DESKTOP_RELEASES_APP_PRIVATE_KEY }}
 
       - name: Create Release Pull Request
-        uses: peter-evans/create-pull-request@v6.0.5
         if: |
           startsWith(github.ref, 'refs/heads/releases/') && !contains(github.ref, 'test')
-        with:
-          token: ${{ steps.generate-token.outputs.token }}
-          title: ${{ env.PR_TITLE }}
-          body: ${{ env.PR_BODY }}
-          branch: ${{ github.ref }}
-          base: development
-          draft: true
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          gh pr create \
+            --head "${{ github.ref_name }}" \
+            --base development \
+            --title "$PR_TITLE" \
+            --body "$PR_BODY" \
+            --draft
