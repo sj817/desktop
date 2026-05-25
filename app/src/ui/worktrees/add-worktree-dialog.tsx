@@ -176,7 +176,10 @@ export class AddWorktreeDialog extends React.Component<
   }
 
   public render() {
-    const disabled = this.state.fullPath === null || this.state.creating
+    const disabled =
+      this.state.fullPath === null ||
+      this.state.creating ||
+      this.getEffectiveBranchName().length === 0
     const branchPlaceholder = sanitizedRefName(this.state.worktreeName)
 
     return (
