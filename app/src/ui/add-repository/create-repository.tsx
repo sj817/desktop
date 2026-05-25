@@ -196,7 +196,7 @@ export class CreateRepository extends React.Component<
       // If the path is considered unsafe by Git we won't be able to
       // verify that it's a repository (or worktree). So we'll fall back to this
       // naive approximation.
-      isRepository = await directoryExists(join(Path.dirname(fullPath), '.git'))
+      isRepository = await directoryExists(join(fullPath, '.git'))
     }
 
     if (type.kind === 'regular') {
