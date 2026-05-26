@@ -38,6 +38,7 @@ export class CommitProgress extends React.Component<ICommitProgressProps> {
       <Dialog
         id="commit-progress-dialog"
         title={`Committing changes`}
+        fallbackFocusSelector="#repository-sidebar button.commit-button"
         onDismissed={this.onDismissed}
         onSubmit={this.onDismissed}
       >

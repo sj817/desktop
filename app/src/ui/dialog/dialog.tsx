@@ -58,6 +58,18 @@ const titleBarHeight = getTitleBarHeight()
 
 interface IDialogProps {
   /**
+   * An optional CSS selector for an element that should receive focus when
+   * the dialog is dismissed and the element that was focused before the dialog
+   * opened is no longer in the DOM.
+   *
+   * If not provided and the previously focused element is gone, focus will
+   * follow the browser's default behavior (typically the body).
+   *
+   * https://github.com/github/accessibility-audits/issues/15830
+   */
+  readonly fallbackFocusSelector?: string
+
+  /**
    * An optional dialog title. Most, if not all dialogs should have
    * this. When present the Dialog renders a DialogHeader element
    * containing an icon (if the type prop warrants it), the title itself
@@ -263,6 +275,7 @@ export class Dialog extends React.Component<DialogProps, IDialogState> {
   )
 
   private dialogElement: HTMLDialogElement | null = null
+  private previouslyFocusedElement: HTMLElement | null = null
   private dismissGraceTimeoutId?: number
 
   private disableClickDismissalTimeoutId: number | null = null
@@ -390,6 +403,11 @@ export class Dialog extends React.Component<DialogProps, IDialogState> {
     if (this.dialogElement == null) {
       return
     }
+
+    this.previouslyFocusedElement =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null
 
     if (!this.dialogElement.open) {
       this.dialogElement.showModal()
@@ -624,6 +642,20 @@ export class Dialog extends React.Component<DialogProps, IDialogState> {
     }
 
     this.checkIsTopMostDialog(false)
+    this.restoreFocusOnClose()
+  }
+
+  private restoreFocusOnClose() {
+    if (
+      this.previouslyFocusedElement &&
+      !document.contains(this.previouslyFocusedElement) &&
+      this.props.fallbackFocusSelector
+    ) {
+      const fallback = document.querySelector<HTMLElement>(
+        this.props.fallbackFocusSelector
+      )
+      fallback?.focus()
+    }
   }
 
   public componentDidUpdate(prevProps: DialogProps) {
