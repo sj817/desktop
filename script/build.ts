@@ -433,6 +433,28 @@ function copyDependencies() {
         }
       }
     }
+
+    // Verify no foreign-platform native binaries remain in the copilot
+    // directory. This catches cases where a new dependency introduces
+    // prebuilds in an unexpected location that we haven't added to
+    // prebuildsDirs above.
+    const foreignBinaries = findForeignNativeBinaries(
+      copilotDestination,
+      currentPlatform,
+      currentArch
+    )
+    if (foreignBinaries.length > 0) {
+      console.error(
+        'Found native binaries for non-current platforms in copilot output:'
+      )
+      for (const binary of foreignBinaries) {
+        console.error(`  ${binary}`)
+      }
+      throw new Error(
+        `${foreignBinaries.length} foreign-platform native binary(ies) found in copilot directory. ` +
+          `Add the parent prebuild directory to prebuildsDirs in script/build.ts.`
+      )
+    }
   }
 
   // Dev builds for macOS require a SSH wrapper to use SSH_ASKPASS
@@ -580,4 +602,75 @@ function getNotarizationOptions(): OsxNotarizeOptions | undefined {
   return appleId && appleIdPassword && teamId
     ? { tool: 'notarytool', appleId, appleIdPassword, teamId }
     : undefined
+}
+
+/**
+ * Recursively finds native binary files (.node, .dll, .exe, .dylib, .so)
+ * under the given root whose path contains a foreign platform identifier,
+ * indicating they weren't pruned and shouldn't be shipped.
+ */
+function findForeignNativeBinaries(
+  root: string,
+  currentPlatform: string,
+  currentArch: string
+): ReadonlyArray<string> {
+  const nativeExtensions = ['.node', '.dll', '.exe', '.dylib', '.so']
+  const allPlatforms = [
+    'darwin',
+    'linux',
+    'win32',
+    'freebsd',
+    'openbsd',
+    'musl',
+  ]
+  const allArchitectures = [
+    'x64',
+    'arm64',
+    'ia32',
+    'armhf',
+    'riscv64',
+    'loong64',
+  ]
+
+  const foreignPlatforms = allPlatforms.filter(p => p !== currentPlatform)
+  const foreignArchitectures = allArchitectures.filter(
+    a => a !== currentArch
+  )
+
+  const results: Array<string> = []
+
+  const walk = (dir: string) => {
+    let entries
+    try {
+      entries = readdirSync(dir, { withFileTypes: true })
+    } catch {
+      return
+    }
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name)
+
+      if (entry.isDirectory()) {
+        walk(fullPath)
+      } else if (nativeExtensions.some(ext => entry.name.endsWith(ext))) {
+        const relativePath = path.relative(root, fullPath)
+        const isForeign =
+          foreignPlatforms.some(p => relativePath.includes(p)) ||
+          foreignArchitectures.some(a =>
+            relativePath.includes(`${path.sep}${a}${path.sep}`) ||
+            relativePath.includes(`_${a}${path.sep}`) ||
+            relativePath.includes(`-${a}${path.sep}`) ||
+            relativePath.includes(`-${a}/`) ||
+            relativePath.includes(`_${a}/`)
+          )
+
+        if (isForeign) {
+          results.push(relativePath)
+        }
+      }
+    }
+  }
+
+  walk(root)
+  return results
 }
