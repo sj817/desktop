@@ -12,6 +12,7 @@ export const defaultTerminalOptions: Readonly<ITerminalOptions> = {
   fontFamily: getMonospaceFontFamily(),
   fontSize: 12,
   screenReaderMode: true,
+  disableStdin: true,
 }
 
 export type TerminalProps = ITerminalOptions &
@@ -111,11 +112,12 @@ export class Terminal extends React.Component<TerminalProps, ITerminalState> {
   public render() {
     return (
       <>
-        {this.props.renderContentsForScreenReader && (
-          <pre className="sr-only" aria-live="polite" aria-atomic={true}>
-            {this.state.screenReaderContent}
-          </pre>
-        )}
+        {this.props.renderContentsForScreenReader &&
+          this.state.screenReaderContent && (
+            <pre className="sr-only" aria-live="polite" aria-atomic={true}>
+              {this.state.screenReaderContent}
+            </pre>
+          )}
         <div
           aria-hidden={this.props.renderContentsForScreenReader}
           ref={this.terminalRef}
