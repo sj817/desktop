@@ -82,6 +82,9 @@ export class Terminal extends React.Component<TerminalProps, ITerminalState> {
     this.terminal = new XTermTerminal({
       ...defaultTerminalOptions,
       ...initOpts,
+      screenReaderMode: this.props.renderContentsForScreenReader
+        ? false
+        : initOpts.screenReaderMode ?? defaultTerminalOptions.screenReaderMode,
 
       rows: this.props.rows ?? 20,
       cols: this.props.cols ?? 80,
