@@ -18,11 +18,27 @@ export type TerminalProps = ITerminalOptions &
   ITerminalInitOnlyOptions & {
     readonly terminalOutput?: TerminalOutput
     readonly hideCursor?: boolean
+    /**
+     * Whether or not to render the terminal contents in plain
+     * text for screen readers.
+     *
+     * Note that this will also hide the terminal from screen readers
+     */
+    readonly renderContentsForScreenReader?: boolean
   }
 
-export class Terminal extends React.Component<TerminalProps> {
+interface ITerminalState {
+  readonly screenReaderContent: string
+}
+
+export class Terminal extends React.Component<TerminalProps, ITerminalState> {
   private terminalRef = React.createRef<HTMLDivElement>()
   private terminal: XTermTerminal | null = null
+
+  public constructor(props: TerminalProps) {
+    super(props)
+    this.state = { screenReaderContent: '' }
+  }
 
   public get Terminal() {
     return this.terminal
@@ -30,10 +46,30 @@ export class Terminal extends React.Component<TerminalProps> {
 
   public write(data: TerminalOutput) {
     if (Array.isArray(data)) {
-      data.forEach(chunk => this.terminal?.write(chunk))
+      data.forEach(chunk =>
+        this.terminal?.write(chunk, this.onTerminalWriteComplete)
+      )
     } else {
-      this.terminal?.write(data)
+      this.terminal?.write(data, this.onTerminalWriteComplete)
     }
+  }
+
+  private onTerminalWriteComplete = () => {
+    if (!this.props.renderContentsForScreenReader || !this.terminal) {
+      return
+    }
+
+    const buffer = this.terminal.buffer.active
+    const lines: Array<string> = []
+
+    for (let i = 0; i < buffer.length; i++) {
+      const line = buffer.getLine(i)
+      if (line) {
+        lines.push(line.translateToString(true))
+      }
+    }
+
+    this.setState({ screenReaderContent: lines.join('\n') })
   }
 
   public componentWillUnmount(): void {
@@ -73,6 +109,18 @@ export class Terminal extends React.Component<TerminalProps> {
   }
 
   public render() {
-    return <div ref={this.terminalRef}></div>
+    return (
+      <>
+        {this.props.renderContentsForScreenReader && (
+          <pre className="sr-only" aria-live="polite" aria-atomic={true}>
+            {this.state.screenReaderContent}
+          </pre>
+        )}
+        <div
+          aria-hidden={this.props.renderContentsForScreenReader}
+          ref={this.terminalRef}
+        ></div>
+      </>
+    )
   }
 }

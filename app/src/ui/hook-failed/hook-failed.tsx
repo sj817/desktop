@@ -44,6 +44,7 @@ export class HookFailed extends React.Component<IHookFailedProps> {
             The {this.props.hookName} hook failed. What would you like to do?
           </p>
           <Terminal
+            renderContentsForScreenReader={true}
             terminalOutput={this.props.terminalOutput}
             rows={15}
             cols={80}
