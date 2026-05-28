@@ -108,3 +108,4 @@ folder: [logos](app/static/logos).
 GitHub® and its stylized versions and the Invertocat mark are GitHub's
 Trademarks or registered Trademarks. When using GitHub's logos, be sure to
 follow the GitHub [logo guidelines](https://github.com/logos).
+foo
