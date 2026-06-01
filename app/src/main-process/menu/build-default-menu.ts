@@ -9,21 +9,7 @@ import * as ipcWebContents from '../ipc-webcontents'
 import { mkdir } from 'fs/promises'
 import { buildTestMenu } from './build-test-menu'
 
-const createPullRequestLabel = __DARWIN__
-  ? 'Create Pull Request'
-  : 'Create &pull request'
-const showPullRequestLabel = __DARWIN__
-  ? 'View Pull Request on GitHub'
-  : 'View &pull request on GitHub'
 const defaultBranchNameValue = __DARWIN__ ? 'Default Branch' : 'default branch'
-const confirmRepositoryRemovalLabel = __DARWIN__ ? 'Remove…' : '&Remove…'
-const repositoryRemovalLabel = __DARWIN__ ? 'Remove' : '&Remove'
-const confirmStashAllChangesLabel = __DARWIN__
-  ? 'Stash All Changes…'
-  : '&Stash all changes…'
-const stashAllChangesLabel = __DARWIN__
-  ? 'Stash All Changes'
-  : '&Stash all changes'
 
 enum ZoomDirection {
   Reset,
@@ -51,14 +37,6 @@ export function buildDefaultMenu({
     contributionTargetDefaultBranch,
     25
   )
-
-  const removeRepoLabel = askForConfirmationOnRepositoryRemoval
-    ? confirmRepositoryRemovalLabel
-    : repositoryRemovalLabel
-
-  const pullRequestLabel = hasCurrentPullRequest
-    ? showPullRequestLabel
-    : createPullRequestLabel
 
   const template = new Array<Electron.MenuItemConstructorOptions>()
 
@@ -199,7 +177,7 @@ export function buildDefaultMenu({
         click: emit('show-branches'),
       },
       {
-        label: __DARWIN__ ? 'Show Worktrees List' : '&Worktrees list',
+        label: __DARWIN__ ? 'Show Worktrees List' : 'Wor&ktrees list',
         id: 'show-worktrees-list',
         accelerator: 'CmdOrCtrl+Alt+W',
         click: emit('show-worktrees'),
@@ -212,7 +190,13 @@ export function buildDefaultMenu({
         click: emit('go-to-commit-message'),
       },
       {
-        label: getStashedChangesLabel(isStashedChangesVisible),
+        label: isStashedChangesVisible
+          ? __DARWIN__
+            ? 'Hide Stashed Changes'
+            : 'H&ide stashed changes'
+          : __DARWIN__
+          ? 'Show Stashed Changes'
+          : 'Sho&w stashed changes',
         id: 'toggle-stashed-changes',
         accelerator: 'Ctrl+H',
         click: isStashedChangesVisible
@@ -298,11 +282,6 @@ export function buildDefaultMenu({
     ],
   })
 
-  const pushLabel = getPushLabel(
-    isForcePushForCurrentRepository,
-    askForConfirmationOnForcePush
-  )
-
   const pushEventType = isForcePushForCurrentRepository ? 'force-push' : 'push'
 
   template.push({
@@ -311,7 +290,9 @@ export function buildDefaultMenu({
     submenu: [
       {
         id: 'push',
-        label: pushLabel,
+        label: `${isForcePushForCurrentRepository ? 'Force ' : ''} ${
+          __DARWIN__ ? 'Push' : 'p&ush'
+        }${askForConfirmationOnForcePush ? '…' : ''}`,
         accelerator: 'CmdOrCtrl+P',
         click: emit(pushEventType),
       },
@@ -328,7 +309,9 @@ export function buildDefaultMenu({
         click: emit('fetch'),
       },
       {
-        label: removeRepoLabel,
+        label: `${__DARWIN__ ? 'Remove' : '&Remove'}${
+          askForConfirmationOnRepositoryRemoval ? '…' : ''
+        }`,
         id: 'remove-repository',
         accelerator: 'CmdOrCtrl+Backspace',
         click: emit('remove-repository'),
@@ -424,9 +407,9 @@ export function buildDefaultMenu({
       click: emit('discard-all-changes'),
     },
     {
-      label: askForConfirmationWhenStashingAllChanges
-        ? confirmStashAllChangesLabel
-        : stashAllChangesLabel,
+      label: `${__DARWIN__ ? 'Stash All Changes' : '&Stash all changes'}${
+        askForConfirmationWhenStashingAllChanges ? '…' : ''
+      }`,
       id: 'stash-all-changes',
       accelerator: 'CmdOrCtrl+Shift+S',
       click: emit('stash-all-changes'),
@@ -484,14 +467,20 @@ export function buildDefaultMenu({
   ]
 
   branchSubmenu.push({
-    label: __DARWIN__ ? 'Preview Pull Request' : 'Preview pull request',
+    label: __DARWIN__ ? 'Preview Pull Request' : 'Preview pull request &Branch',
     id: 'preview-pull-request',
     accelerator: 'CmdOrCtrl+Alt+P',
     click: emit('preview-pull-request'),
   })
 
   branchSubmenu.push({
-    label: pullRequestLabel,
+    label: hasCurrentPullRequest
+      ? __DARWIN__
+        ? 'View Pull Request on GitHub'
+        : 'View &pull request on GitHub'
+      : __DARWIN__
+      ? 'Create Pull Request'
+      : 'Create &pull request',
     id: 'create-pull-request',
     accelerator: 'CmdOrCtrl+R',
     click: emit('open-pull-request'),
@@ -556,14 +545,12 @@ export function buildDefaultMenu({
     },
   }
 
-  const showLogsLabel = __DARWIN__
-    ? 'Show Logs in Finder'
-    : __WIN32__
-    ? 'S&how logs in Explorer'
-    : 'S&how logs in your File Manager'
-
   const showLogsItem: Electron.MenuItemConstructorOptions = {
-    label: showLogsLabel,
+    label: __DARWIN__
+      ? 'Show Logs in Finder'
+      : __WIN32__
+      ? 'S&how logs in Explorer'
+      : 'S&how logs in your File Manager',
     click() {
       const logPath = getLogDirectoryPath()
       mkdir(logPath, { recursive: true })
@@ -605,29 +592,6 @@ export function buildDefaultMenu({
   ensureItemIds(template)
 
   return Menu.buildFromTemplate(template)
-}
-
-function getPushLabel(
-  isForcePushForCurrentRepository: boolean,
-  askForConfirmationOnForcePush: boolean
-): string {
-  if (!isForcePushForCurrentRepository) {
-    return __DARWIN__ ? 'Push' : 'P&ush'
-  }
-
-  if (askForConfirmationOnForcePush) {
-    return __DARWIN__ ? 'Force Push…' : 'Force P&ush…'
-  }
-
-  return __DARWIN__ ? 'Force Push' : 'Force P&ush'
-}
-
-function getStashedChangesLabel(isStashedChangesVisible: boolean): string {
-  if (isStashedChangesVisible) {
-    return __DARWIN__ ? 'Hide Stashed Changes' : 'H&ide stashed changes'
-  }
-
-  return __DARWIN__ ? 'Show Stashed Changes' : 'Sho&w stashed changes'
 }
 
 type ClickHandler = (
