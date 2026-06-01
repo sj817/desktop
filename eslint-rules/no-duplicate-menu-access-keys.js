@@ -7,6 +7,7 @@
 /**
  * Extract the access key character from a Windows menu label string.
  * The access key is the character immediately following a single '&'.
+ *
  * @param {string} label
  * @returns {string | null}
  */
@@ -106,6 +107,7 @@ module.exports = {
  * Extract string literal values from a label property value.
  * Handles: string literals, ternary expressions (picks the Windows label),
  * and template literals.
+ *
  * @param {import('estree').Expression | import('estree').SpreadElement | import('estree').Pattern} node
  * @returns {string[]}
  */
