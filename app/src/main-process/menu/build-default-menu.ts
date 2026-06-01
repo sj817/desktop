@@ -212,7 +212,13 @@ export function buildDefaultMenu({
         click: emit('go-to-commit-message'),
       },
       {
-        label: getStashedChangesLabel(isStashedChangesVisible),
+        label: isStashedChangesVisible
+          ? __DARWIN__
+            ? 'Hide Stashed Changes'
+            : 'H&ide stashed changes'
+          : __DARWIN__
+            ? 'Show Stashed Changes'
+            : 'Sho&w stashed changes',
         id: 'toggle-stashed-changes',
         accelerator: 'Ctrl+H',
         click: isStashedChangesVisible
@@ -620,14 +626,6 @@ function getPushLabel(
   }
 
   return __DARWIN__ ? 'Force Push' : 'Force P&ush'
-}
-
-function getStashedChangesLabel(isStashedChangesVisible: boolean): string {
-  if (isStashedChangesVisible) {
-    return __DARWIN__ ? 'Hide Stashed Changes' : 'H&ide stashed changes'
-  }
-
-  return __DARWIN__ ? 'Show Stashed Changes' : 'Sho&w stashed changes'
 }
 
 type ClickHandler = (
