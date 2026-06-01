@@ -31,6 +31,21 @@ describe('no-duplicate-menu-access-keys', () => {
           { label: d ? 'Mac' : '&File', id: 'a' },
           { label: d ? 'Mac' : '&Edit', id: 'b' },
         ]`,
+        // Same access key in mutually exclusive branches of same item (allowed)
+        `const items = [
+          { label: d ? 'P&ush' : 'Force P&ush', id: 'a' },
+          { label: '&Edit', id: 'b' },
+        ]`,
+        // Template literal with access key in static part and inline ternary expression
+        {
+          code: 'const items = [{ label: `O&pen in ${d ? "Terminal" : "shell"}`, id: "a" }, { label: `&File`, id: "b" }]',
+          parserOptions: { ecmaVersion: 2015, sourceType: 'module' },
+        },
+        // Template literal with ternary expressions inside (compact pattern)
+        {
+          code: 'const items = [{ label: `${d ? "Remove" : "&Remove"}${ask ? "…" : ""}`, id: "a" }, { label: "&Edit", id: "b" }]',
+          parserOptions: { ecmaVersion: 2015, sourceType: 'module' },
+        },
       ],
       invalid: [
         {
@@ -42,11 +57,39 @@ describe('no-duplicate-menu-access-keys', () => {
           errors: [{ messageId: 'duplicateAccessKey' }],
         },
         {
-          // Ternary duplicates
+          // Ternary duplicates across different items
           code: `const items = [
             { label: d ? 'Mac' : '&Worktrees', id: 'a' },
             { label: d ? 'Mac' : 'Sho&w stash', id: 'b' },
           ]`,
+          errors: [{ messageId: 'duplicateAccessKey' }],
+        },
+        {
+          // Variable reference not allowed
+          code: `const items = [
+            { label: myVar, id: 'a' },
+            { label: '&Edit', id: 'b' },
+          ]`,
+          errors: [{ messageId: 'labelMustBeInline' }],
+        },
+        {
+          // Function call not allowed
+          code: `const items = [
+            { label: getLabel(), id: 'a' },
+            { label: '&Edit', id: 'b' },
+          ]`,
+          errors: [{ messageId: 'labelMustBeInline' }],
+        },
+        {
+          // Template literal with variable expression not allowed
+          code: 'const items = [{ label: `${myLabel}`, id: "a" }, { label: "&Edit", id: "b" }]',
+          parserOptions: { ecmaVersion: 2015, sourceType: 'module' },
+          errors: [{ messageId: 'labelMustBeInline' }],
+        },
+        {
+          // Template with ternary that conflicts with sibling
+          code: 'const items = [{ label: `${d ? "Remove" : "&Remove"}${ask ? "…" : ""}`, id: "a" }, { label: "&Rename", id: "b" }]',
+          parserOptions: { ecmaVersion: 2015, sourceType: 'module' },
           errors: [{ messageId: 'duplicateAccessKey' }],
         },
       ],

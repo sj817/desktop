@@ -22,7 +22,7 @@ rules:
   # CUSTOM #
   ##########
   insecure-random: error
-  no-duplicate-menu-access-keys: error
+  no-duplicate-menu-access-keys: off
   react-no-unbound-dispatcher-props: error
   react-readonly-props-and-state: error
   react-proper-lifecycle-methods: error
@@ -221,6 +221,9 @@ overrides:
   - files: 'app/src/ui/octicons/octicons.generated.ts'
     rules:
       '@typescript-eslint/naming-convention': off
+  - files: 'app/src/main-process/menu/build-default-menu.ts'
+    rules:
+      no-duplicate-menu-access-keys: error
 
 parserOptions:
   sourceType: module
