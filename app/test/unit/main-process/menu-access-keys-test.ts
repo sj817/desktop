@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert'
-import * as fs from 'node:fs'
+import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 
 /**
@@ -144,12 +144,12 @@ function extractWindowsLabels(source: string): Map<string, string[]> {
 }
 
 describe('menu access keys', () => {
-  it('has no duplicate access keys within any submenu on Windows', () => {
+  it('has no duplicate access keys within any submenu on Windows', async () => {
     const menuSourcePath = path.resolve(
       __dirname,
       '../../../src/main-process/menu/build-default-menu.ts'
     )
-    const source = fs.readFileSync(menuSourcePath, 'utf-8')
+    const source = await fs.readFile(menuSourcePath, 'utf-8')
     const menus = extractWindowsLabels(source)
 
     // Ensure we actually parsed something
