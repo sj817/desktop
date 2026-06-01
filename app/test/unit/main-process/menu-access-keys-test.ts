@@ -176,16 +176,14 @@ describe('menu access keys', () => {
           // (e.g. Push/Force Push which never appear simultaneously)
           const isMutuallyExclusive =
             items.every(i => i.includes('ush')) ||
-            items.every(
-              i => i.includes('Show') || i.includes('Hide')
-            ) ||
-            items.every(
-              i => i.includes('Remove') || i.includes('Stash')
-            )
+            items.every(i => i.includes('Show') || i.includes('Hide')) ||
+            items.every(i => i.includes('Remove') || i.includes('Stash'))
 
           if (!isMutuallyExclusive) {
             duplicates.push(
-              `Menu "${menuName}" has duplicate access key '&${key}': ${items.map(i => `"${i}"`).join(', ')}`
+              `Menu "${menuName}" has duplicate access key '&${key}': ${items
+                .map(i => `"${i}"`)
+                .join(', ')}`
             )
           }
         }

@@ -30,7 +30,7 @@ module.exports = {
     },
     messages: {
       duplicateAccessKey:
-        "Duplicate access key '&{{key}}' in menu. Already used by \"{{existingLabel}}\". Choose a different access key for \"{{currentLabel}}\".",
+        'Duplicate access key \'&{{key}}\' in menu. Already used by "{{existingLabel}}". Choose a different access key for "{{currentLabel}}".',
       labelMustBeInline:
         'Menu item labels must be inline string literals or ternary expressions so access key conflicts can be statically detected.',
     },
@@ -239,8 +239,10 @@ function isInlineLabel(node) {
   if (node.type === 'ConditionalExpression') {
     // Only require inlining for branches that could contain access keys.
     // A branch without any & character doesn't need validation.
-    const consInline = !couldContainAccessKey(node.consequent) || isInlineLabel(node.consequent)
-    const altInline = !couldContainAccessKey(node.alternate) || isInlineLabel(node.alternate)
+    const consInline =
+      !couldContainAccessKey(node.consequent) || isInlineLabel(node.consequent)
+    const altInline =
+      !couldContainAccessKey(node.alternate) || isInlineLabel(node.alternate)
     return consInline && altInline
   }
 
@@ -273,7 +275,10 @@ function couldContainAccessKey(node) {
   }
 
   if (node.type === 'ConditionalExpression') {
-    return couldContainAccessKey(node.consequent) || couldContainAccessKey(node.alternate)
+    return (
+      couldContainAccessKey(node.consequent) ||
+      couldContainAccessKey(node.alternate)
+    )
   }
 
   // For variables, function calls, etc. — we can't tell, assume yes
