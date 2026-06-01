@@ -36,6 +36,16 @@ describe('no-duplicate-menu-access-keys', () => {
           { label: d ? 'P&ush' : 'Force P&ush', id: 'a' },
           { label: '&Edit', id: 'b' },
         ]`,
+        // Escaped ampersands (&&) should not be treated as access keys
+        `const items = [
+          { label: 'Save && &Close', id: 'a' },
+          { label: '&Edit', id: 'b' },
+        ]`,
+        // Double ampersand without real access key shouldn't conflict
+        `const items = [
+          { label: 'Fish && Chips', id: 'a' },
+          { label: '&Edit', id: 'b' },
+        ]`,
         // Template literal with access key in static part and inline ternary expression
         {
           code: 'const items = [{ label: `O&pen in ${d ? "Terminal" : "shell"}`, id: "a" }, { label: `&File`, id: "b" }]',

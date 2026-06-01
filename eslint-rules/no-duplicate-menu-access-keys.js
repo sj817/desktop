@@ -7,12 +7,15 @@
 /**
  * Extract the access key character from a Windows menu label string.
  * The access key is the character immediately following a single '&'.
+ * Double ampersands (&&) are literal ampersand escapes and are ignored.
  *
  * @param {string} label
  * @returns {string | null}
  */
 function getAccessKey(label) {
-  const match = label.match(/&([^&])/)
+  // Strip escaped ampersands (&&) before searching for the access key
+  const stripped = label.replace(/&&/g, '')
+  const match = stripped.match(/&(.)/)
   return match ? match[1].toLowerCase() : null
 }
 
@@ -223,7 +226,9 @@ function isInlineLabel(node) {
   if (node.type === 'TemplateLiteral') {
     // If the access key (&X) is in the static parts of the template,
     // we can always extract it regardless of what expressions evaluate to
-    const hasKeyInStatic = node.quasis.some(q => /&[^&]/.test(q.value.raw))
+    const hasKeyInStatic = node.quasis.some(q =>
+      /&./.test(q.value.raw.replace(/&&/g, ''))
+    )
     if (hasKeyInStatic) {
       return true
     }
@@ -251,11 +256,20 @@ function isInlineLabel(node) {
  */
 function couldContainAccessKey(node) {
   if (node.type === 'Literal' && typeof node.value === 'string') {
-    return /&[^&]/.test(node.value)
+    return /&./.test(node.value.replace(/&&/g, ''))
   }
 
   if (node.type === 'TemplateLiteral') {
-    return node.quasis.some(q => /&[^&]/.test(q.value.raw))
+    // Check static parts
+    if (node.quasis.some(q => /&./.test(q.value.raw.replace(/&&/g, '')))) {
+      return true
+    }
+    // Recurse into expressions only if they are analyzable (literals/ternaries)
+    // For opaque expressions (variables, logical expressions), we don't assume
+    // they contain access keys — this avoids false positives on macOS labels
+    return node.expressions.some(
+      expr => isInlineLabel(expr) && couldContainAccessKey(expr)
+    )
   }
 
   if (node.type === 'ConditionalExpression') {
