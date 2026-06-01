@@ -199,7 +199,7 @@ export function buildDefaultMenu({
         click: emit('show-branches'),
       },
       {
-        label: __DARWIN__ ? 'Show Worktrees List' : '&Worktrees list',
+        label: __DARWIN__ ? 'Show Worktrees List' : 'Wor&ktrees list',
         id: 'show-worktrees-list',
         accelerator: 'CmdOrCtrl+Alt+W',
         click: emit('show-worktrees'),
