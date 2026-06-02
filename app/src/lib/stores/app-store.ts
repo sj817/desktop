@@ -6102,11 +6102,15 @@ export class AppStore extends TypedBaseStore<IAppState> {
         'copilotStore.resolveConflicts',
         repository
       )
+      const modelRequest = await this.resolveCopilotModelRequest(
+        this.selectedCopilotModels['conflict-resolution'] ?? null
+      )
       const result = await this.copilotStore.resolveConflicts(
         context,
         commitContext,
         currentPullRequest,
         repository.path,
+        modelRequest,
         onProgress
       )
       resolveTimer.done()

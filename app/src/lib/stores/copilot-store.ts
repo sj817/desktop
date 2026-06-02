@@ -46,6 +46,14 @@ export const DefaultCopilotModel = 'gpt-5-mini'
 const DefaultReasoningEffort: ReasoningEffort = 'low'
 
 /**
+ * The reasoning effort used for Copilot conflict resolution when the selected
+ * model doesn't otherwise specify one. Conflict resolution benefits from a
+ * higher effort than the commit-message default, so this is intentionally
+ * `'medium'`.
+ */
+const DefaultConflictResolutionReasoningEffort: ReasoningEffort = 'medium'
+
+/**
  * Default per-request timeout (in milliseconds) for Copilot SDK calls such
  * as commit message generation. Custom BYOK providers may override this
  * via {@link CopilotModelRequest.timeoutMs}.
@@ -86,7 +94,7 @@ export type CopilotModelRequest =
     }
 
 /** Copilot features that support per-model selection. */
-export type CopilotFeature = 'commit-message-generation'
+export type CopilotFeature = 'commit-message-generation' | 'conflict-resolution'
 
 /**
  * Per-feature model selections. An absent key means the default model
@@ -623,6 +631,45 @@ export class CopilotStore extends BaseStore {
   }
 
   /**
+   * Resolves a {@link CopilotModelRequest} into the concrete session model
+   * configuration (model id, reasoning effort and optional BYOK provider)
+   * forwarded to the Copilot SDK's `createSession`.
+   *
+   * When no model is requested (or the requested built-in model can't be
+   * found) it falls back to {@link DefaultCopilotModel} and the supplied
+   * `defaultReasoningEffort`.
+   */
+  private async resolveSessionModelConfig(
+    request: CopilotModelRequest | null | undefined,
+    defaultReasoningEffort: ReasoningEffort
+  ): Promise<{
+    modelId: string
+    reasoningEffort: ReasoningEffort | undefined
+    provider: CopilotProviderConfig | undefined
+  }> {
+    if (request && request.kind === 'byok') {
+      return {
+        modelId: request.modelId,
+        reasoningEffort: request.reasoningEffort ?? defaultReasoningEffort,
+        provider: request.provider,
+      }
+    }
+
+    const requestedModelId =
+      request?.kind === 'copilot' ? request.modelId : null
+    const cachedModels = await this.getCachedModels()
+    const resolvedModel = requestedModelId
+      ? cachedModels.find(m => m.id === requestedModelId) ?? null
+      : getPreferredDefaultModel(cachedModels)
+
+    return {
+      modelId: resolvedModel?.id ?? requestedModelId ?? DefaultCopilotModel,
+      reasoningEffort: defaultReasoningEffort,
+      provider: undefined,
+    }
+  }
+
+  /**
    * Use the Copilot SDK to analyze conflicts and suggest resolutions.
    *
    * For small conflict sets (≤20 files) a single prompt is sent. Larger sets
@@ -633,6 +680,8 @@ export class CopilotStore extends BaseStore {
    * @param commitContext - Optional commit history from both sides
    * @param pullRequest - Optional pull request for enrichment
    * @param repositoryPath - Path to the repository working directory
+   * @param request - Optional model selection (built-in or BYOK). When omitted
+   *   the default conflict-resolution model is used.
    * @param onProgress - Optional callback for streaming progress to the UI
    * @returns The parsed conflict resolution response
    * @throws Error if no GitHub.com account is available or if resolution fails
@@ -642,6 +691,7 @@ export class CopilotStore extends BaseStore {
     commitContext: IConflictCommitContext | null,
     pullRequest: PullRequest | null,
     repositoryPath: string,
+    request?: CopilotModelRequest | null,
     onProgress?: (progress: IConflictResolutionProgress) => void
   ): Promise<ICopilotConflictResolutionResponse> {
     const resolvableFiles = context.files.filter(f => !f.skippedReason)
@@ -652,6 +702,11 @@ export class CopilotStore extends BaseStore {
     }
 
     onProgress?.({ filesResolved: 0, filesTotal })
+
+    const modelConfig = await this.resolveSessionModelConfig(
+      request,
+      DefaultConflictResolutionReasoningEffort
+    )
 
     const clientTimer = startTimer('createClient')
     const client = await this.createClient(repositoryPath)
@@ -673,6 +728,7 @@ export class CopilotStore extends BaseStore {
           client,
           prompt,
           resolvableFiles,
+          modelConfig,
           reasoningSnippet => {
             onProgress?.({
               filesResolved: 0,
@@ -711,6 +767,7 @@ export class CopilotStore extends BaseStore {
               client,
               prompt,
               chunkFiles,
+              modelConfig,
               reasoningSnippet => {
                 onProgress?.({
                   filesResolved,
@@ -763,6 +820,11 @@ export class CopilotStore extends BaseStore {
     client: CopilotClient,
     prompt: string,
     expectedFiles: ReadonlyArray<IFileConflictContext>,
+    modelConfig: {
+      modelId: string
+      reasoningEffort: ReasoningEffort | undefined
+      provider: CopilotProviderConfig | undefined
+    },
     onReasoningSnippet?: (snippet: string) => void
   ): Promise<ReadonlyArray<IFileResolution>> {
     const expectedPaths = new Set(expectedFiles.map(f => f.path))
@@ -777,8 +839,9 @@ export class CopilotStore extends BaseStore {
           `createSession (attempt ${attempt + 1})`
         )
         session = await client.createSession({
-          model: 'gpt-5-mini',
-          reasoningEffort: 'medium',
+          model: modelConfig.modelId,
+          reasoningEffort: modelConfig.reasoningEffort,
+          provider: modelConfig.provider,
           streaming: true,
           availableTools: [],
           systemMessage: {
