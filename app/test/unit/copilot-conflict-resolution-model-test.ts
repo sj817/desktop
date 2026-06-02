@@ -120,6 +120,24 @@ describe('getConflictResolutionModelDisplay', () => {
     })
   })
 
+  it('strips the reasoning marker but keeps other markers, with the effort', () => {
+    const reasoningVariant = makeModel({
+      id: 'opus-high',
+      name: 'Claude Opus 4.7 (High reasoning)(Internal only)',
+      supportedReasoningEfforts: ['high'],
+    })
+    const selection = encodeModelKey({ kind: 'copilot', modelId: 'opus-high' })
+    const result = getConflictResolutionModelDisplay(
+      selection,
+      [reasoningVariant],
+      []
+    )
+    assert.deepStrictEqual(result, {
+      modelName: 'Claude Opus 4.7 (Internal only)',
+      reasoningEffort: 'high',
+    })
+  })
+
   it('returns the BYOK model name and its configured effort', () => {
     const selection = encodeModelKey({
       kind: 'byok',

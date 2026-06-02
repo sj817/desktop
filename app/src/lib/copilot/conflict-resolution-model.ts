@@ -45,7 +45,7 @@ export function getConflictResolutionModelDisplay(
     const provider = byokProviders.find(p => p.id === key.providerId)
     const model = provider?.models.find(m => m.id === key.modelId)
     if (model !== undefined) {
-      return { modelName: model.name, reasoningEffort: model.reasoningEffort }
+      return buildDisplay(model.name, model.reasoningEffort)
     }
     // Selection points at a deleted provider/model; fall back to the default
     // built-in model below, matching the engine's resolution behaviour.
@@ -60,21 +60,48 @@ export function getConflictResolutionModelDisplay(
     : getPreferredDefaultModel(models)
 
   if (resolvedModel !== null) {
-    return {
-      modelName: resolvedModel.name,
-      reasoningEffort: getSupportedReasoningEffort(
+    return buildDisplay(
+      resolvedModel.name,
+      getSupportedReasoningEffort(
         resolvedModel,
         DefaultConflictResolutionReasoningEffort
-      ),
-    }
+      )
+    )
   }
 
   // No model metadata is available (the list hasn't loaded, or the selection
   // points at a model that's no longer offered). Mirror the engine's fallback:
   // use the explicitly requested model id when there is one, otherwise the
   // default model name, paired with the default reasoning effort.
-  return {
-    modelName: requestedModelId ?? DefaultCopilotModelName,
-    reasoningEffort: DefaultConflictResolutionReasoningEffort,
-  }
+  return buildDisplay(
+    requestedModelId ?? DefaultCopilotModelName,
+    DefaultConflictResolutionReasoningEffort
+  )
+}
+
+/**
+ * Builds the display info, normalizing the model name so every model renders
+ * consistently as "Name · Effort". Some Copilot models embed the reasoning
+ * level in their name, e.g. "Claude Opus 4.7 (High reasoning)(Internal only)" —
+ * the reasoning parenthetical is stripped so the effort isn't duplicated, while
+ * other markers like "(Internal only)" are preserved.
+ */
+function buildDisplay(
+  modelName: string,
+  reasoningEffort: ReasoningEffort | undefined
+): IConflictResolutionModelDisplay {
+  return { modelName: cleanModelName(modelName), reasoningEffort }
+}
+
+/**
+ * Removes the redundant parenthetical "(... reasoning ...)" marker from a model
+ * name (its reasoning level is shown separately) and collapses the resulting
+ * whitespace. Other parentheticals (e.g. "(Internal only)" or version tags)
+ * are left untouched.
+ */
+function cleanModelName(name: string): string {
+  return name
+    .replace(/\s*\([^)]*reasoning[^)]*\)/gi, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
 }
