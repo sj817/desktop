@@ -283,8 +283,6 @@ export class CopilotConflictsDialog extends React.Component<
     const choiceLabel = this.getResolutionLabel(choice)
     const reasoning = resolution?.reasoning
 
-    const iconSymbol =
-      choice === 'copilot' ? octicons.copilot : octicons.fileCode
     const reasoningText =
       choice === 'copilot' && reasoning
         ? reasoning
@@ -303,7 +301,6 @@ export class CopilotConflictsDialog extends React.Component<
 
     return (
       <li key={file.path} className="copilot-conflicts-file-item">
-        <Octicon className="copilot-file-icon" symbol={iconSymbol} />
         <div className="copilot-file-details">
           <PathText path={file.path} />
           {reasoningText !== undefined && (
