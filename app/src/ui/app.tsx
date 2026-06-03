@@ -214,6 +214,7 @@ import { AddWorktreeDialog } from './worktrees/add-worktree-dialog'
 import { RenameWorktreeDialog } from './worktrees/rename-worktree-dialog'
 import { DeleteWorktreeDialog } from './worktrees/delete-worktree-dialog'
 import { DeleteWorktreeFailedDialog } from './worktrees/delete-worktree-failed-dialog'
+import { WorktreeEntry } from '../models/worktree'
 
 const MinuteInMilliseconds = 1000 * 60
 const HourInMilliseconds = MinuteInMilliseconds * 60
@@ -2816,9 +2817,9 @@ export class App extends React.Component<IAppProps, IAppState> {
             repository={popup.repository}
             worktreePath={popup.worktreePath}
             error={popup.error}
-            originalWorktreePath={popup.originalWorktreePath}
+            originalWorktree={popup.originalWorktree}
             onDeleteWorktree={this.onDeleteWorkTree}
-            onSwitchToWorktree={this.onSwitchToWorktreeByPath}
+            onSwitchToWorktree={this.onSwitchToWorktree}
             onDismissed={onPopupDismissedFn}
           />
         )
@@ -2828,30 +2829,19 @@ export class App extends React.Component<IAppProps, IAppState> {
     }
   }
 
+  private onSwitchToWorktree = (
+    repository: Repository,
+    worktree: WorktreeEntry
+  ) => {
+    return this.props.dispatcher.switchWorktree(repository, worktree)
+  }
+
   private onDeleteWorkTree = (
     repository: Repository,
     worktreePath: string,
     force?: boolean
   ) => {
     return this.props.dispatcher.deleteWorktree(repository, worktreePath, force)
-  }
-
-  private onSwitchToWorktreeByPath = async (
-    repository: Repository,
-    worktreePath: string
-  ) => {
-    const selection = this.state.selectedState
-    if (selection == null || selection.type !== SelectionType.Repository) {
-      return
-    }
-
-    const worktree = selection.state.worktrees.find(
-      wt => wt.path === worktreePath
-    )
-
-    if (worktree !== undefined) {
-      await this.props.dispatcher.switchWorktree(repository, worktree)
-    }
   }
 
   private onConfirmWorktreeRemovalChanged = (value: boolean) => {

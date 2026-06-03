@@ -5762,11 +5762,13 @@ export class AppStore extends TypedBaseStore<IAppState> {
   ): Promise<void> {
     const isDeletingCurrentWorktree = repository.path === worktreePath
     let path = repository.path
-    const originalWorktreePath = isDeletingCurrentWorktree ? worktreePath : null
+    let originalWorktree: WorktreeEntry | null = null
 
     if (isDeletingCurrentWorktree) {
       const worktrees = await listWorktrees(repository)
       const main = worktrees.find(wt => wt.type === 'main')
+      originalWorktree =
+        worktrees.find(wt => wt.path === repository.path) ?? null
 
       if (main === undefined) {
         throw new Error('Could not find main worktree')
@@ -5788,7 +5790,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
         repository,
         worktreePath,
         error: e,
-        originalWorktreePath,
+        originalWorktree,
       })
     }
 
