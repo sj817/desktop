@@ -5750,7 +5750,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
         worktreePath,
       })
     } else {
-      this._deleteWorktree(repository, worktreePath)
+      this._deleteWorktree(repository, worktreePath).catch(e =>
+        this.emitError(e)
+      )
     }
   }
 
