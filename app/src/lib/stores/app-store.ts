@@ -389,8 +389,12 @@ import { updateStore } from '../../ui/lib/update-store'
 import { startTimer } from '../../ui/lib/timing'
 import { BypassReasonType } from '../../ui/secret-scanning/bypass-push-protection-dialog'
 import {
+  selectReferencedContext,
+  fallbackReferencedContext,
+  collectSourceLinks,
   IConflictResolutionProgress,
-  ICopilotConflictResolutionResponse,
+  ICopilotResolutionSummary,
+  IFileResolution,
 } from '../copilot-conflict-resolution'
 import {
   buildConflictContext,
@@ -6054,7 +6058,10 @@ export class AppStore extends TypedBaseStore<IAppState> {
     repository: Repository,
     onProgress?: (progress: IConflictResolutionProgress) => void,
     signal?: AbortSignal
-  ): Promise<ICopilotConflictResolutionResponse | null> {
+  ): Promise<{
+    readonly resolutions: ReadonlyArray<IFileResolution>
+    readonly summary: ICopilotResolutionSummary
+  } | null> {
     if (!enableCopilotConflictResolution()) {
       return null
     }
@@ -6119,7 +6126,25 @@ export class AppStore extends TypedBaseStore<IAppState> {
           signal
         )
 
-        return result
+        // The model can only cite data we placed in the prompt, so resolving
+        // its references is a simple lookup against the gathered context —
+        // no re-fetching or re-hydration required. When the model cites
+        // nothing, fall back to the most informative item we gathered so the
+        // "Context" list always traces the conflict to at least one source.
+        const cited = selectReferencedContext(result.references, context)
+        const references =
+          cited.length > 0 ? cited : fallbackReferencedContext(context)
+
+        return {
+          resolutions: result.resolutions,
+          summary: {
+            markdown: result.summary,
+            ourLabel: labels.ourLabel,
+            theirLabel: labels.theirLabel,
+            references,
+            sourceLinks: collectSourceLinks(context),
+          },
+        }
       } finally {
         resolveTimer.done()
       }
@@ -6555,6 +6580,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
                 MultiCommitOperationStepKind.ShowCopilotConflicts,
             },
             copilotResolutions: result.resolutions,
+            copilotResolutionSummary: result.summary,
             copilotResolutionProgress: null,
             copilotResolutionAbortController: null,
           })
@@ -6575,6 +6601,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
             conflictState,
           },
           copilotResolutions: result.resolutions,
+          copilotResolutionSummary: result.summary,
           copilotResolutionProgress: null,
           copilotResolutionAbortController: null,
         })
@@ -6604,6 +6631,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
           },
           useCopilotConflictResolution: false,
           copilotResolutions: null,
+          copilotResolutionSummary: null,
           copilotResolutionProgress: null,
           copilotResolutionAbortController: null,
         })
@@ -9126,6 +9154,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       userHasResolvedConflicts: false,
       useCopilotConflictResolution: false,
       copilotResolutions: null,
+      copilotResolutionSummary: null,
       copilotResolutionProgress: null,
       copilotResolutionAbortController: null,
       originalBranchTip,
