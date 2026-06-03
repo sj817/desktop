@@ -46,6 +46,15 @@ export const DefaultCopilotModel = 'gpt-5-mini'
 const DefaultReasoningEffort: ReasoningEffort = 'low'
 
 /**
+ * The reasoning effort used for Copilot conflict resolution when the selected
+ * model doesn't otherwise specify one. Conflict resolution benefits from a
+ * higher effort than the commit-message default, so this is intentionally
+ * `'medium'`.
+ */
+export const DefaultConflictResolutionReasoningEffort: ReasoningEffort =
+  'medium'
+
+/**
  * Default per-request timeout (in milliseconds) for Copilot SDK calls such
  * as commit message generation. Custom BYOK providers may override this
  * via {@link CopilotModelRequest.timeoutMs}.
@@ -86,7 +95,15 @@ export type CopilotModelRequest =
     }
 
 /** Copilot features that support per-model selection. */
-export type CopilotFeature = 'commit-message-generation'
+export type CopilotFeature = 'commit-message-generation' | 'conflict-resolution'
+
+/** Concrete session config produced by resolving a {@link CopilotModelRequest}. */
+interface IResolvedConflictModelConfig {
+  readonly modelId: string
+  readonly reasoningEffort: ReasoningEffort | undefined
+  readonly provider: CopilotProviderConfig | undefined
+  readonly timeoutMs: number | undefined
+}
 
 /**
  * Per-feature model selections. An absent key means the default model
@@ -306,6 +323,13 @@ export const ReasoningEffortOrder = ['low', 'medium', 'high', 'xhigh'] as const
 
 export type ReasoningEffort = typeof ReasoningEffortOrder[number]
 
+/** Formats a reasoning effort for display, e.g. 'xhigh' → 'Extra high'. */
+export function formatReasoningEffort(effort: ReasoningEffort): string {
+  return effort === 'xhigh'
+    ? 'Extra high'
+    : effort.charAt(0).toUpperCase() + effort.slice(1)
+}
+
 /**
  * Returns the lowest reasoning effort supported by the given model, or
  * undefined if the model does not support reasoning effort configuration.
@@ -313,13 +337,26 @@ export type ReasoningEffort = typeof ReasoningEffortOrder[number]
 export function getLowestReasoningEffort(
   model: ModelInfo
 ): ReasoningEffort | undefined {
-  const supported = model.supportedReasoningEfforts as
-    | ReadonlyArray<ReasoningEffort>
-    | undefined
+  const supported = model.supportedReasoningEfforts
   if (!supported || supported.length === 0) {
     return undefined
   }
   return ReasoningEffortOrder.find(e => supported.includes(e))
+}
+
+/**
+ * Resolves the reasoning effort to send for a given model, preferring
+ * `preferred` when the model supports it. Falls back to the model's lowest
+ * supported effort, or `undefined` when the model doesn't support reasoning
+ * effort at all (so we don't forward an unsupported value to the SDK).
+ */
+export function getSupportedReasoningEffort(
+  model: ModelInfo,
+  preferred: ReasoningEffort
+): ReasoningEffort | undefined {
+  return model.supportedReasoningEfforts?.includes(preferred)
+    ? preferred
+    : getLowestReasoningEffort(model)
 }
 
 /**
@@ -817,6 +854,54 @@ export class CopilotStore extends BaseStore {
   }
 
   /**
+   * Resolves a {@link CopilotModelRequest} into the concrete session config
+   * (model id, reasoning effort, optional BYOK provider and timeout) used to
+   * resolve conflicts. Built-in models fall back to the preferred default and
+   * have their effort clamped to a supported value; BYOK requests pass through
+   * unchanged.
+   */
+  private resolveConflictModelConfig(
+    request: CopilotModelRequest | null | undefined
+  ): IResolvedConflictModelConfig {
+    if (request && request.kind === 'byok') {
+      return {
+        modelId: request.modelId,
+        reasoningEffort: request.reasoningEffort,
+        provider: request.provider,
+        timeoutMs: request.timeoutMs,
+      }
+    }
+
+    const requestedModelId =
+      request?.kind === 'copilot' ? request.modelId : null
+    // Use whatever model metadata we already have rather than forcing a
+    // refresh: resolveConflicts is about to create its own client, so a cold
+    // fetch here would double the startup latency. It also keeps us in sync
+    // with the loading dialog, which reads the same cached list. A missing
+    // cache is treated as "metadata unavailable" (raw id, no effort).
+    const cachedModels = this.cachedModels ?? []
+    const resolvedModel = requestedModelId
+      ? cachedModels.find(m => m.id === requestedModelId) ?? null
+      : getPreferredDefaultModel(cachedModels)
+
+    return {
+      modelId: resolvedModel?.id ?? requestedModelId ?? DefaultCopilotModel,
+      // When the model isn't in the list we have no capability metadata, so we
+      // can't confirm it supports reasoning effort. Omit it rather than send an
+      // unsupported value — the SDK only accepts reasoningEffort for models
+      // where it's supported.
+      reasoningEffort: resolvedModel
+        ? getSupportedReasoningEffort(
+            resolvedModel,
+            DefaultConflictResolutionReasoningEffort
+          )
+        : undefined,
+      provider: undefined,
+      timeoutMs: undefined,
+    }
+  }
+
+  /**
    * Use the Copilot SDK to analyze conflicts and suggest resolutions.
    *
    * For small conflict sets (≤20 files) a single prompt is sent. Larger sets
@@ -827,6 +912,8 @@ export class CopilotStore extends BaseStore {
    * @param commitContext - Optional commit history from both sides
    * @param pullRequest - Optional pull request for enrichment
    * @param repositoryPath - Path to the repository working directory
+   * @param request - Optional model selection (built-in or BYOK). When omitted
+   *   the default conflict-resolution model is used.
    * @param onProgress - Optional callback for streaming progress to the UI
    * @returns The parsed conflict resolution response
    * @throws Error if no GitHub.com account is available or if resolution fails
@@ -836,6 +923,7 @@ export class CopilotStore extends BaseStore {
     commitContext: IConflictCommitContext | null,
     pullRequest: PullRequest | null,
     repositoryPath: string,
+    request?: CopilotModelRequest | null,
     onProgress?: (progress: IConflictResolutionProgress) => void,
     signal?: AbortSignal
   ): Promise<ICopilotConflictResolutionResponse> {
@@ -847,6 +935,8 @@ export class CopilotStore extends BaseStore {
     }
 
     onProgress?.({ filesResolved: 0, filesTotal })
+
+    const modelConfig = this.resolveConflictModelConfig(request)
 
     const clientTimer = startTimer('createClient')
     const client = await this.createClient(repositoryPath)
@@ -868,6 +958,7 @@ export class CopilotStore extends BaseStore {
           client,
           prompt,
           resolvableFiles,
+          modelConfig,
           reasoningSnippet => {
             onProgress?.({
               filesResolved: 0,
@@ -913,6 +1004,7 @@ export class CopilotStore extends BaseStore {
               client,
               prompt,
               chunkFiles,
+              modelConfig,
               reasoningSnippet => {
                 onProgress?.({
                   filesResolved,
@@ -967,6 +1059,7 @@ export class CopilotStore extends BaseStore {
     client: CopilotClient,
     prompt: string,
     expectedFiles: ReadonlyArray<IFileConflictContext>,
+    modelConfig: IResolvedConflictModelConfig,
     onReasoningSnippet?: (snippet: string) => void,
     signal?: AbortSignal
   ): Promise<ReadonlyArray<IFileResolution>> {
@@ -981,8 +1074,9 @@ export class CopilotStore extends BaseStore {
 
       const sessionTimer = startTimer(`createSession (attempt ${attempt + 1})`)
       const session = await client.createSession({
-        model: 'gpt-5-mini',
-        reasoningEffort: 'medium',
+        model: modelConfig.modelId,
+        reasoningEffort: modelConfig.reasoningEffort,
+        provider: modelConfig.provider,
         streaming: true,
         availableTools: [],
         systemMessage: {
@@ -1013,7 +1107,7 @@ export class CopilotStore extends BaseStore {
           session,
           prompt,
           {
-            timeoutMs: 600_000,
+            timeoutMs: modelConfig.timeoutMs ?? 600_000,
             signal,
             onReasoningSnippet,
           }
