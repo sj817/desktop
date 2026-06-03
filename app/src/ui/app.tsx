@@ -192,7 +192,10 @@ import { webUtils } from 'electron'
 import { showTestUI } from './lib/test-ui-components/test-ui-components'
 import { ConfirmCommitFilteredChanges } from './changes/confirm-commit-filtered-changes-dialog'
 import { AboutTestDialog } from './about/about-test-dialog'
-import { enableCopilotSdkCommitMessageGeneration } from '../lib/feature-flag'
+import {
+  enableCopilotSdkCommitMessageGeneration,
+  enableWorktreeSupport,
+} from '../lib/feature-flag'
 import {
   ISecretScanResult,
   PushProtectionErrorDialog,
@@ -949,6 +952,10 @@ export class App extends React.Component<IAppProps, IAppState> {
   }
 
   private showWorktrees() {
+    if (!enableWorktreeSupport()) {
+      return
+    }
+
     const state = this.state.selectedState
     if (state == null || state.type !== SelectionType.Repository) {
       return
@@ -965,6 +972,10 @@ export class App extends React.Component<IAppProps, IAppState> {
   }
 
   private showCreateWorktree() {
+    if (!enableWorktreeSupport()) {
+      return
+    }
+
     const state = this.state.selectedState
     if (state == null || state.type !== SelectionType.Repository) {
       return
@@ -3350,8 +3361,8 @@ export class App extends React.Component<IAppProps, IAppState> {
       onChangeRepositoryAlias: onChangeRepositoryAlias,
       onRemoveRepositoryAlias: onRemoveRepositoryAlias,
       onViewOnGitHub: this.viewOnGitHub,
-      onCreateWorktree: onCreateWorktree,
-      onShowWorktrees: onShowWorktrees,
+      onCreateWorktree: enableWorktreeSupport() ? onCreateWorktree : undefined,
+      onShowWorktrees: enableWorktreeSupport() ? onShowWorktrees : undefined,
       repository: repository,
       shellLabel: this.state.useCustomShell
         ? undefined
@@ -3566,6 +3577,10 @@ export class App extends React.Component<IAppProps, IAppState> {
   }
 
   private renderWorktreeToolbarButton(): JSX.Element | null {
+    if (!enableWorktreeSupport()) {
+      return null
+    }
+
     const selection = this.state.selectedState
 
     if (selection == null || selection.type !== SelectionType.Repository) {
