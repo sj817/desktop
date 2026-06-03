@@ -1667,6 +1667,9 @@ export class App extends React.Component<IAppProps, IAppState> {
             confirmCommitMessageOverride={
               this.state.askForConfirmationOnCommitMessageOverride
             }
+            confirmWorktreeRemoval={
+              this.state.askForConfirmationOnWorktreeRemoval
+            }
             uncommittedChangesStrategy={this.state.uncommittedChangesStrategy}
             selectedExternalEditor={this.state.selectedExternalEditor}
             useWindowsOpenSSH={this.state.useWindowsOpenSSH}
@@ -2795,7 +2798,13 @@ export class App extends React.Component<IAppProps, IAppState> {
             key="delete-worktree"
             repository={popup.repository}
             worktreePath={popup.worktreePath}
+            askForConfirmationOnWorktreeRemoval={
+              this.state.askForConfirmationOnWorktreeRemoval
+            }
             onDeleteWorktree={this.onDeleteWorkTree}
+            onConfirmWorktreeRemovalChanged={
+              this.onConfirmWorktreeRemovalChanged
+            }
             onDismissed={onPopupDismissedFn}
           />
         )
@@ -2807,7 +2816,9 @@ export class App extends React.Component<IAppProps, IAppState> {
             repository={popup.repository}
             worktreePath={popup.worktreePath}
             error={popup.error}
+            originalWorktreePath={popup.originalWorktreePath}
             onDeleteWorktree={this.onDeleteWorkTree}
+            onSwitchToWorktree={this.onSwitchToWorktreeByPath}
             onDismissed={onPopupDismissedFn}
           />
         )
@@ -2823,6 +2834,28 @@ export class App extends React.Component<IAppProps, IAppState> {
     force?: boolean
   ) => {
     return this.props.dispatcher.deleteWorktree(repository, worktreePath, force)
+  }
+
+  private onSwitchToWorktreeByPath = async (
+    repository: Repository,
+    worktreePath: string
+  ) => {
+    const selection = this.state.selectedState
+    if (selection == null || selection.type !== SelectionType.Repository) {
+      return
+    }
+
+    const worktree = selection.state.worktrees.find(
+      wt => wt.path === worktreePath
+    )
+
+    if (worktree !== undefined) {
+      await this.props.dispatcher.switchWorktree(repository, worktree)
+    }
+  }
+
+  private onConfirmWorktreeRemovalChanged = (value: boolean) => {
+    this.props.dispatcher.setConfirmWorktreeRemovalSetting(value)
   }
 
   private onUpdateCommitOptions = (

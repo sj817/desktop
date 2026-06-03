@@ -439,6 +439,7 @@ const askForConfirmationOnForcePushDefault = true
 const confirmUndoCommitDefault: boolean = true
 const confirmCommitFilteredChangesDefault: boolean = true
 const confirmCommitMessageOverrideDefault: boolean = true
+const confirmWorktreeRemovalDefault: boolean = true
 const askToMoveToApplicationsFolderKey: string = 'askToMoveToApplicationsFolder'
 const confirmRepoRemovalKey: string = 'confirmRepoRemoval'
 const showCommitLengthWarningKey: string = 'showCommitLengthWarning'
@@ -452,6 +453,7 @@ const confirmUndoCommitKey: string = 'confirmUndoCommit'
 const confirmCommitFilteredChangesKey: string =
   'confirmCommitFilteredChangesKey'
 const confirmCommitMessageOverrideKey: string = 'confirmCommitMessageOverride'
+const confirmWorktreeRemovalKey: string = 'confirmWorktreeRemoval'
 
 const uncommittedChangesStrategyKey = 'uncommittedChangesStrategyKind'
 
@@ -603,6 +605,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
     confirmCommitFilteredChangesDefault
   private confirmCommitMessageOverride: boolean =
     confirmCommitMessageOverrideDefault
+  private confirmWorktreeRemoval: boolean = confirmWorktreeRemovalDefault
   private imageDiffType: ImageDiffType = imageDiffTypeDefault
   private hideWhitespaceInChangesDiff: boolean =
     hideWhitespaceInChangesDiffDefault
@@ -1159,6 +1162,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
         this.confirmCommitFilteredChanges,
       askForConfirmationOnCommitMessageOverride:
         this.confirmCommitMessageOverride,
+      askForConfirmationOnWorktreeRemoval: this.confirmWorktreeRemoval,
       uncommittedChangesStrategy: this.uncommittedChangesStrategy,
       selectedExternalEditor: this.selectedExternalEditor,
       imageDiffType: this.imageDiffType,
@@ -2371,6 +2375,11 @@ export class AppStore extends TypedBaseStore<IAppState> {
     this.confirmCommitMessageOverride = getBoolean(
       confirmCommitMessageOverrideKey,
       confirmCommitMessageOverrideDefault
+    )
+
+    this.confirmWorktreeRemoval = getBoolean(
+      confirmWorktreeRemovalKey,
+      confirmWorktreeRemovalDefault
     )
 
     this.uncommittedChangesStrategy =
@@ -5730,6 +5739,22 @@ export class AppStore extends TypedBaseStore<IAppState> {
   }
 
   /** This shouldn't be called directly. See 'Dispatcher'. */
+  public _requestDeleteWorktree(
+    repository: Repository,
+    worktreePath: string
+  ): void {
+    if (this.confirmWorktreeRemoval) {
+      this._showPopup({
+        type: PopupType.DeleteWorktree,
+        repository,
+        worktreePath,
+      })
+    } else {
+      this._deleteWorktree(repository, worktreePath)
+    }
+  }
+
+  /** This shouldn't be called directly. See 'Dispatcher'. */
   public async _deleteWorktree(
     repository: Repository,
     worktreePath: string,
@@ -5737,6 +5762,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
   ): Promise<void> {
     const isDeletingCurrentWorktree = repository.path === worktreePath
     let path = repository.path
+    const originalWorktreePath = isDeletingCurrentWorktree ? worktreePath : null
 
     if (isDeletingCurrentWorktree) {
       const worktrees = await listWorktrees(repository)
@@ -5762,6 +5788,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
         repository,
         worktreePath,
         error: e,
+        originalWorktreePath,
       })
     }
 
@@ -6906,6 +6933,15 @@ export class AppStore extends TypedBaseStore<IAppState> {
   ): Promise<void> {
     this.confirmCommitMessageOverride = value
     setBoolean(confirmCommitMessageOverrideKey, value)
+
+    this.emitUpdate()
+
+    return Promise.resolve()
+  }
+
+  public _setConfirmWorktreeRemovalSetting(value: boolean): Promise<void> {
+    this.confirmWorktreeRemoval = value
+    setBoolean(confirmWorktreeRemovalKey, value)
 
     this.emitUpdate()
 
