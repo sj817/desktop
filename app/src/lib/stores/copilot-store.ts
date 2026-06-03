@@ -15,6 +15,7 @@ import { getCopilotPaymentRequiredErrorFromSessionError } from '../copilot-error
 import {
   CopilotValidationError,
   ConflictResolutionSystemPrompt,
+  ICopilotConflictReference,
   ICopilotConflictResolutionResponse,
   IConflictResolutionProgress,
   IFileResolution,
@@ -25,12 +26,10 @@ import {
   createDependencyAwareChunks,
 } from '../copilot-conflict-resolution'
 import {
-  ICopilotConflictContext,
-  IConflictCommitContext,
+  IConflictResolutionContext,
   IFileConflictContext,
   formatConflictContextForPrompt,
 } from '../copilot-conflict-context'
-import { PullRequest } from '../../models/pull-request'
 import * as ipcRenderer from '../ipc-renderer'
 import { startTimer } from '../../ui/lib/timing'
 import { join } from 'path'
@@ -823,18 +822,15 @@ export class CopilotStore extends BaseStore {
    * are automatically batched into parallel chunks with up to 5 concurrent
    * requests. Each chunk is retried once on parse failure.
    *
-   * @param context - The structured conflict context (files with hunks)
-   * @param commitContext - Optional commit history from both sides
-   * @param pullRequest - Optional pull request for enrichment
+   * @param context - The unified conflict-resolution context (files,
+   *                  commits, and pull requests from both sides)
    * @param repositoryPath - Path to the repository working directory
    * @param onProgress - Optional callback for streaming progress to the UI
    * @returns The parsed conflict resolution response
    * @throws Error if no GitHub.com account is available or if resolution fails
    */
   public async resolveConflicts(
-    context: ICopilotConflictContext,
-    commitContext: IConflictCommitContext | null,
-    pullRequest: PullRequest | null,
+    context: IConflictResolutionContext,
     repositoryPath: string,
     onProgress?: (progress: IConflictResolutionProgress) => void,
     signal?: AbortSignal
@@ -854,17 +850,12 @@ export class CopilotStore extends BaseStore {
 
     try {
       if (filesTotal <= SinglePromptFileLimit) {
-        const filteredContext: ICopilotConflictContext = {
-          ourLabel: context.ourLabel,
-          theirLabel: context.theirLabel,
+        const filteredContext: IConflictResolutionContext = {
+          ...context,
           files: resolvableFiles,
         }
-        const prompt = formatConflictContextForPrompt(
-          filteredContext,
-          commitContext,
-          pullRequest
-        )
-        const resolutions = await this.resolveChunk(
+        const prompt = formatConflictContextForPrompt(filteredContext)
+        const chunkResult = await this.resolveChunk(
           client,
           prompt,
           resolvableFiles,
@@ -878,7 +869,11 @@ export class CopilotStore extends BaseStore {
           signal
         )
         onProgress?.({ filesResolved: filesTotal, filesTotal })
-        return { resolutions }
+        return {
+          resolutions: chunkResult.resolutions,
+          summary: chunkResult.summary,
+          references: chunkResult.references,
+        }
       }
 
       // Batch into chunks and resolve concurrently. Smaller chunks at high
@@ -886,6 +881,8 @@ export class CopilotStore extends BaseStore {
       const chunkSize = filesTotal > 100 ? 15 : 20
       const chunks = createDependencyAwareChunks(resolvableFiles, chunkSize)
       const allResolutions: Array<IFileResolution> = []
+      let firstSummary: string | null = null
+      let firstReferences: ReadonlyArray<ICopilotConflictReference> = []
       let filesResolved = 0
 
       // Process chunks with bounded concurrency
@@ -899,16 +896,11 @@ export class CopilotStore extends BaseStore {
         const batch = chunks.slice(i, i + MaxConcurrentChunks)
         const batchSettled = await Promise.allSettled(
           batch.map(chunkFiles => {
-            const chunkContext: ICopilotConflictContext = {
-              ourLabel: context.ourLabel,
-              theirLabel: context.theirLabel,
+            const chunkContext: IConflictResolutionContext = {
+              ...context,
               files: chunkFiles,
             }
-            const prompt = formatConflictContextForPrompt(
-              chunkContext,
-              commitContext,
-              pullRequest
-            )
+            const prompt = formatConflictContextForPrompt(chunkContext)
             return this.resolveChunk(
               client,
               prompt,
@@ -929,8 +921,17 @@ export class CopilotStore extends BaseStore {
         let firstError: Error | undefined
         for (const result of batchSettled) {
           if (result.status === 'fulfilled') {
-            allResolutions.push(...result.value)
-            filesResolved += result.value.length
+            allResolutions.push(...result.value.resolutions)
+            filesResolved += result.value.resolutions.length
+            if (firstSummary === null && result.value.summary !== null) {
+              firstSummary = result.value.summary
+            }
+            if (
+              firstReferences.length === 0 &&
+              result.value.references.length > 0
+            ) {
+              firstReferences = result.value.references
+            }
             onProgress?.({
               filesResolved,
               filesTotal,
@@ -949,7 +950,11 @@ export class CopilotStore extends BaseStore {
       }
 
       onProgress?.({ filesResolved: filesTotal, filesTotal })
-      return { resolutions: allResolutions }
+      return {
+        resolutions: allResolutions,
+        summary: firstSummary,
+        references: firstReferences,
+      }
     } finally {
       await this.stopClient(client)
     }
@@ -962,6 +967,10 @@ export class CopilotStore extends BaseStore {
    * Retries once on parse or validation failure. Transport errors (timeouts,
    * auth, session creation) fail fast, and user-initiated aborts are never
    * retried.
+   *
+   * Returns the validated per-file resolutions along with the optional
+   * markdown summary string (null if the model omitted it) and any
+   * structured references the model cited.
    */
   private async resolveChunk(
     client: CopilotClient,
@@ -969,7 +978,11 @@ export class CopilotStore extends BaseStore {
     expectedFiles: ReadonlyArray<IFileConflictContext>,
     onReasoningSnippet?: (snippet: string) => void,
     signal?: AbortSignal
-  ): Promise<ReadonlyArray<IFileResolution>> {
+  ): Promise<{
+    readonly resolutions: ReadonlyArray<IFileResolution>
+    readonly summary: string | null
+    readonly references: ReadonlyArray<ICopilotConflictReference>
+  }> {
     const expectedPaths = new Set(expectedFiles.map(f => f.path))
     let lastError: Error | undefined
 
@@ -1026,7 +1039,11 @@ export class CopilotStore extends BaseStore {
         validateResolutionPaths(parsed.resolutions, expectedPaths)
         parseTimer.done()
 
-        return parsed.resolutions
+        return {
+          resolutions: parsed.resolutions,
+          summary: parsed.summary,
+          references: parsed.references,
+        }
       } catch (e) {
         lastError = e instanceof Error ? e : new Error(String(e))
 
