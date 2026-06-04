@@ -157,8 +157,6 @@ export const MaxConcurrentChunks = 5
 export const ConflictResolutionSystemPrompt = `
 You have all the context you need below. Do NOT attempt to use tools. Respond ONLY with the JSON format specified.
 
-Custom instructions take priority. If this repository or the user has provided Copilot custom instructions (they appear in this session's context), you MUST follow them where they affect the wording, tone, or level of detail of your summary and per-file reasoning — even when they ask for more or less detail than the guidance below. The ONLY things custom instructions may never change are the structural requirements: always return exactly the JSON schema below, keep the summary to the two specified headings in order, attribute sides by "#1234"/short SHA, and never add URLs or extra sections.
-
 You are an expert Git conflict resolver. Your task is to analyze conflicts from merge, rebase, or cherry-pick operations and produce correct, clean resolutions.
 
 You will receive:
@@ -210,8 +208,6 @@ Summary rules (read carefully — the summary is a brief banner rendered as mark
 - Brevity is the priority: prefer the shortest wording that still lets a reader verify the decision. Do NOT enumerate every kept item, and do NOT describe which files merged mechanically — that granular, per-file detail belongs in each resolution's "reasoning", not here
 - "Conflicting changes": 1-2 sentences describing, in plain language, what each side was doing and where they collided. When many files conflicted, summarize them ("several menu components") rather than listing every filename. Attribute the incoming change to its "#1234" or short SHA, and the current side likewise
 - "Resolution": 1 short sentence on how and why you resolved it. If — and only if — a side's change was dropped or overridden, add one short clause naming that single most important trade-off and wrap it in **double asterisks** so it stands out
-- Use backticks SPARINGLY — only for the one or two code identifiers (a function, type, or constant) that are genuinely central to the conflict. Do NOT wrap filenames, lists of files, branch names, side labels, or ordinary words in backticks; write those as plain prose. Backticked identifiers are not links — only "#1234" and short SHAs become links
-- Refer to a side by its "#1234"/short SHA or as "the current branch" / "the incoming change" — never wrap a branch name or side label in backticks
 - Refer to pull requests by id only — write "#1234" (no link, no URL). Refer to commits by their short SHA — write "abc1234" (no link, no URL). The application turns these into links itself. Attribute each side to its source id at most once; the Context list already lists them, so do not repeat the same id in every sentence
 - Do NOT include a third section, a "References" / "Links" section, or any URLs — those are rendered separately by the application
 - Use plain language. Do not name the speaker or address the user as "you" — write "the current branch", not "your branch"
@@ -781,23 +777,9 @@ export function createDependencyAwareChunks(
         p => p.replace(/\.[^./]+$/, '').replace(/^.*\//, '') === a.baseName
       )
 
-      let sharedSymbols = false
-      if (!sharedSymbols) {
-        for (const exp of a.exports) {
-          if (b.references.has(exp)) {
-            sharedSymbols = true
-            break
-          }
-        }
-      }
-      if (!sharedSymbols) {
-        for (const exp of b.exports) {
-          if (a.references.has(exp)) {
-            sharedSymbols = true
-            break
-          }
-        }
-      }
+      const sharedSymbols =
+        [...a.exports].some(exp => b.references.has(exp)) ||
+        [...b.exports].some(exp => a.references.has(exp))
 
       if (aImportsB || bImportsA || sharedSymbols) {
         union(i, j)
