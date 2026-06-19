@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@locales/*": ["../../locales/*"],
+      "@official/*": ["./official/src/*"],
+      "@i18n": ["./src/i18n/official.ts"]
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["src"],
+  "exclude": ["src/official.tsx"]
+}

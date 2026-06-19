@@ -1,0 +1,83 @@
+# Continuous integration: type-check, Rust tests, and a full cross-platform
+# Tauri build on every push / PR. Release artifacts are handled separately by
+# release.yml (tag-driven).
+name: ci
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: macos-latest, name: macos-arm64, args: '--target aarch64-apple-darwin' }
+          - { platform: macos-latest, name: macos-x64, args: '--target x86_64-apple-darwin' }
+          - { platform: ubuntu-22.04, name: linux-x64, args: '' }
+          - { platform: windows-latest, name: windows-x64, args: '' }
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive # gemoji assets
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      # Version comes from the "packageManager" field in package.json
+      # (pnpm@9.x). Don't also set `version:` here — action-setup@v4 errors
+      # with "Multiple versions of pnpm specified" if both are present.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri -> target
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type-check + Vite build
+        run: pnpm build
+
+      # tauri's build.rs requires the externalBin sidecar to exist at compile
+      # time (tauri.conf.json -> bundle.externalBin). The Tauri build step below
+      # stages it via beforeBuildCommand, but `cargo test` compiles src-tauri
+      # too, so stage the host-triple sidecar first or the test build fails with
+      # "resource path binaries/git-credential-desktop-<triple> doesn't exist".
+      - name: Build credential-helper sidecar
+        run: node scripts/prebuild-helper.mjs
+
+      - name: Rust unit tests
+        working-directory: apps/desktop/src-tauri
+        run: cargo test --lib
+
+      - name: Build Tauri app
+        run: pnpm tauri build ${{ matrix.args }}
+
+      - name: Upload bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-desktop-next-${{ matrix.name }}
+          path: apps/desktop/src-tauri/target/**/release/bundle/**
+          if-no-files-found: warn

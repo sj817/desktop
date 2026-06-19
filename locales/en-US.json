@@ -1,0 +1,38 @@
+{
+  "app": {
+    "title": "GitHub Desktop Next",
+    "tagline": "A community fork migrating from Electron to Tauri"
+  },
+  "toolbar": {
+    "openRepository": "Open repository",
+    "refresh": "Refresh"
+  },
+  "repo": {
+    "empty": "Open a Git repository to get started.",
+    "notARepository": "That folder is not a Git repository.",
+    "path": "Path",
+    "reveal": "Show in file manager",
+    "branch": "Current branch",
+    "branches": "Branches",
+    "changes": "Changes ({{count}})",
+    "noChanges": "No uncommitted changes.",
+    "commits": "Recent commits",
+    "noCommits": "No commits yet.",
+    "loading": "Loading…"
+  },
+  "theme": {
+    "label": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "about": {
+    "language": "Language",
+    "appVersion": "App {{version}}",
+    "platform": "Platform: {{platform}}",
+    "architecture": "Arch: {{arch}}"
+  },
+  "errors": {
+    "generic": "Something went wrong: {{message}}"
+  }
+}

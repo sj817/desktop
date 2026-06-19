@@ -1,0 +1,38 @@
+{
+  "app": {
+    "title": "GitHub Desktop Next",
+    "tagline": "从 Electron 迁移到 Tauri 的社区版本"
+  },
+  "toolbar": {
+    "openRepository": "打开仓库",
+    "refresh": "刷新"
+  },
+  "repo": {
+    "empty": "打开一个 Git 仓库开始使用。",
+    "notARepository": "该文件夹不是 Git 仓库。",
+    "path": "路径",
+    "reveal": "在文件管理器中显示",
+    "branch": "当前分支",
+    "branches": "分支",
+    "changes": "更改（{{count}}）",
+    "noChanges": "没有未提交的更改。",
+    "commits": "最近提交",
+    "noCommits": "暂无提交。",
+    "loading": "加载中…"
+  },
+  "theme": {
+    "label": "主题",
+    "system": "跟随系统",
+    "light": "浅色",
+    "dark": "深色"
+  },
+  "about": {
+    "language": "语言",
+    "appVersion": "应用 {{version}}",
+    "platform": "平台：{{platform}}",
+    "architecture": "架构：{{arch}}"
+  },
+  "errors": {
+    "generic": "出现错误：{{message}}"
+  }
+}

@@ -1,0 +1,23 @@
+# Standalone credential-helper binary, kept in its own crate so building it does
+# NOT run the main app's tauri-build (which validates externalBin and would
+# otherwise deadlock: the helper must exist before the app build, but building it
+# via the app crate would require it to already exist). Staged into
+# src-tauri/binaries/ by scripts/prebuild-helper.mjs for Tauri's externalBin.
+[package]
+name = "git-credential-desktop"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.77.2"
+
+[[bin]]
+name = "git-credential-desktop"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = "1"
+
+[profile.release]
+opt-level = "z"
+strip = true
+codegen-units = 1
+panic = "abort"

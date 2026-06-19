@@ -1,0 +1,4 @@
+# pnpm workspace for GitHub Desktop Next (community Tauri fork).
+packages:
+  - apps/*
+  - packages/*

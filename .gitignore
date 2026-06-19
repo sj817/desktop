@@ -1,0 +1,20 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# Rust / Tauri build artifacts
+**/src-tauri/target/
+**/src-tauri/gen/schemas/
+
+# Local scratch
+app-icon.png
+scripts/*.png
+**/test-results/
+
+# Tauri dev server log
+.taurilog.txt
+
+# Local tooling / editor config
+.claude/
+.vscode/

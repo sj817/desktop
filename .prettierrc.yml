@@ -1,0 +1,9 @@
+# Mirrors the legacy GitHub Desktop style so migrated code keeps one convention:
+# no semicolons, single quotes, 2-space indent, trailing commas on multiline
+# objects/arrays (es5), avoid arrow parens.
+singleQuote: true
+trailingComma: es5
+semi: false
+arrowParens: avoid
+proseWrap: always
+endOfLine: auto

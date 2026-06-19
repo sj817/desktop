@@ -1,0 +1,210 @@
+import {
+  AppFileStatusKind,
+  AppFileStatus,
+  ConflictedFileStatus,
+  WorkingDirectoryStatus,
+  isConflictWithMarkers,
+  GitStatusEntry,
+  isConflictedFileStatus,
+  WorkingDirectoryFileChange,
+} from '../models/status'
+import { assertNever } from './fatal-error'
+import { t } from '@i18n'
+import { ManualConflictResolution } from '../models/manual-conflict-resolution'
+
+/**
+ * Convert a given `AppFileStatusKind` value to a human-readable string to be
+ * presented to users which describes the state of a file.
+ *
+ * Typically this will be the same value as that of the enum key.
+ *
+ * Used in file lists.
+ */
+export function mapStatus(status: AppFileStatus): string {
+  switch (status.kind) {
+    case AppFileStatusKind.New:
+    case AppFileStatusKind.Untracked:
+      return t('New')
+    case AppFileStatusKind.Modified:
+      return t('Modified')
+    case AppFileStatusKind.Deleted:
+      return t('Deleted')
+    case AppFileStatusKind.Renamed:
+      return t('Renamed')
+    case AppFileStatusKind.Conflicted:
+      if (isConflictWithMarkers(status)) {
+        const conflictsCount = status.conflictMarkerCount
+        return conflictsCount > 0 ? t('Conflicted') : t('Resolved')
+      }
+
+      return t('Conflicted')
+    case AppFileStatusKind.Copied:
+      return t('Copied')
+    default:
+      return assertNever(status, `Unknown file status ${status}`)
+  }
+}
+
+/**
+ * Return a CSS-safe class suffix for a file status (always English, never
+ * translated). Used for styling via `.status-new`, `.status-modified`, etc.
+ */
+export function mapStatusClass(status: AppFileStatus): string {
+  switch (status.kind) {
+    case AppFileStatusKind.New:
+    case AppFileStatusKind.Untracked:
+      return 'new'
+    case AppFileStatusKind.Modified:
+      return 'modified'
+    case AppFileStatusKind.Deleted:
+      return 'deleted'
+    case AppFileStatusKind.Renamed:
+      return 'renamed'
+    case AppFileStatusKind.Conflicted:
+      if (isConflictWithMarkers(status)) {
+        return status.conflictMarkerCount > 0 ? 'conflicted' : 'resolved'
+      }
+      return 'conflicted'
+    case AppFileStatusKind.Copied:
+      return 'copied'
+    default:
+      return assertNever(status, `Unknown file status ${status}`)
+  }
+}
+
+/** Typechecker helper to identify conflicted files */
+export function isConflictedFile(
+  file: AppFileStatus
+): file is ConflictedFileStatus {
+  return file.kind === AppFileStatusKind.Conflicted
+}
+
+/**
+ * Returns a value indicating whether any of the files in the
+ * working directory is in a conflicted state. See `isConflictedFile`
+ * for the definition of a conflicted file.
+ */
+export function hasConflictedFiles(
+  workingDirectoryStatus: WorkingDirectoryStatus
+): boolean {
+  return workingDirectoryStatus.files.some(f => isConflictedFile(f.status))
+}
+
+/**
+ * Determine if we have any conflict markers or if its been resolved manually
+ */
+export function hasUnresolvedConflicts(
+  status: ConflictedFileStatus,
+  manualResolution?: ManualConflictResolution
+) {
+  // if there's a manual resolution, the file does not have unresolved conflicts
+  if (manualResolution !== undefined) {
+    return false
+  }
+
+  if (isConflictWithMarkers(status)) {
+    // text file may have conflict markers present
+    return status.conflictMarkerCount > 0
+  }
+
+  // binary file doesn't contain markers
+  return true
+}
+
+/** the possible git status entries for a manually conflicted file status
+ * only intended for use in this file, but could evolve into an official type someday
+ */
+type UnmergedStatusEntry =
+  | GitStatusEntry.Added
+  | GitStatusEntry.UpdatedButUnmerged
+  | GitStatusEntry.Deleted
+
+/** Returns a human-readable description for a chosen version of a file
+ *  intended for use with manually resolved merge conflicts
+ */
+export function getUnmergedStatusEntryDescription(
+  entry: UnmergedStatusEntry,
+  branch?: string
+): string {
+  const suffix = branch ? ` from ${branch}` : ''
+
+  switch (entry) {
+    case GitStatusEntry.Added:
+      return branch
+        ? t('Using the added file from {{branch}}', { branch })
+        : t('Using the added file')
+    case GitStatusEntry.UpdatedButUnmerged:
+      return branch
+        ? t('Using the modified file from {{branch}}', { branch })
+        : t('Using the modified file')
+    case GitStatusEntry.Deleted:
+      return branch
+        ? t('Using the deleted file from {{branch}}', { branch })
+        : t('Using the deleted file')
+    default:
+      return assertNever(entry, `Unknown status entry to format${suffix}`)
+  }
+}
+
+/** Returns a human-readable description for an available manual resolution method
+ *  intended for use with manually resolved merge conflicts
+ */
+export function getLabelForManualResolutionOption(
+  entry: UnmergedStatusEntry,
+  branch?: string
+): string {
+  switch (entry) {
+    case GitStatusEntry.Added:
+      return branch
+        ? t('Use the added file from {{branch}}', { branch })
+        : t('Use the added file')
+    case GitStatusEntry.UpdatedButUnmerged:
+      return branch
+        ? t('Use the modified file from {{branch}}', { branch })
+        : t('Use the modified file')
+    case GitStatusEntry.Deleted:
+      return branch
+        ? t('Do not include this file on {{branch}}', { branch })
+        : t('Do not include this file')
+    default:
+      return assertNever(entry, 'Unknown status entry to format')
+  }
+}
+
+/** Filter working directory changes for conflicted or resolved files  */
+export function getUnmergedFiles(status: WorkingDirectoryStatus) {
+  return status.files.filter(f => isConflictedFile(f.status))
+}
+
+/** Filter working directory changes for untracked files  */
+export function getUntrackedFiles(
+  workingDirectoryStatus: WorkingDirectoryStatus
+): ReadonlyArray<WorkingDirectoryFileChange> {
+  return workingDirectoryStatus.files.filter(
+    file => file.status.kind === AppFileStatusKind.Untracked
+  )
+}
+
+/** Filter working directory changes for resolved files  */
+export function getResolvedFiles(
+  status: WorkingDirectoryStatus,
+  manualResolutions: Map<string, ManualConflictResolution>
+) {
+  return status.files.filter(
+    f =>
+      isConflictedFileStatus(f.status) &&
+      !hasUnresolvedConflicts(f.status, manualResolutions.get(f.path))
+  )
+}
+
+/** Filter working directory changes for conflicted files  */
+export function getConflictedFiles(
+  status: WorkingDirectoryStatus,
+  manualResolutions: Map<string, ManualConflictResolution>
+) {
+  return status.files.filter(
+    f =>
+      isConflictedFileStatus(f.status) &&
+      hasUnresolvedConflicts(f.status, manualResolutions.get(f.path))
+  )
+}

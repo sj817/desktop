@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "GitHub Desktop Next",
+  "version": "0.1.0",
+  "identifier": "com.sj817.github-desktop-next",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1440",
+    "beforeDevCommand": "node ../../scripts/prebuild-helper.mjs && pnpm dev",
+    "beforeBuildCommand": "pnpm build && node ../../scripts/prebuild-helper.mjs"
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["x-github-desktop-auth"]
+      }
+    }
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "GitHub Desktop Next",
+        "width": 960,
+        "height": 660,
+        "minWidth": 960,
+        "minHeight": 660,
+        "decorations": false,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "externalBin": ["binaries/git-credential-desktop"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

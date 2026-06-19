@@ -1,0 +1,425 @@
+#preferences {
+  .dialog-content.git-preferences {
+    padding: 0;
+
+    .git-preferences-content {
+      padding: var(--spacing-double);
+    }
+
+    .git-hook-shell-select {
+      margin-bottom: var(--spacing);
+    }
+
+    .hooks-warning {
+      margin-bottom: var(--spacing);
+    }
+  }
+
+  .preferences-container {
+    display: flex;
+    .tab-container {
+      border-left: var(--base-border);
+      flex: 1;
+      // Without this, a tab whose content has long unbroken text can
+      // grow past the dialog's max-width and break out the right edge.
+      min-width: 0;
+    }
+
+    fieldset {
+      border: none;
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .advanced-section {
+      &:not(:last-child) {
+        margin-bottom: var(--spacing);
+      }
+
+      .checkbox-component:not(:last-child) {
+        margin-bottom: var(--spacing-half);
+      }
+
+      .setting-hint-warning {
+        margin-top: var(--spacing);
+      }
+
+      .warning-icon {
+        color: var(--warning-badge-icon-color);
+      }
+    }
+  }
+
+  .tab-bar {
+    .icon {
+      width: 16px;
+    }
+  }
+
+  .formatting-section {
+    margin-top: var(--spacing);
+
+    .prefer-absolute-dates {
+      margin-top: var(--spacing);
+      margin-bottom: var(--spacing);
+    }
+  }
+
+  .accounts-tab {
+    .account-info {
+      .user-info-container {
+        display: flex;
+        flex-grow: 1;
+        gap: var(--spacing);
+      }
+
+      .avatar {
+        // 32px for the image + 2 on each side for the base border.
+        width: 34px;
+        height: 34px;
+
+        align-self: center;
+      }
+
+      .user-info {
+        flex-grow: 1;
+        align-self: flex-start;
+
+        .account-title,
+        .name {
+          font-weight: var(--font-weight-semibold);
+          // Tighten it up a little so that the real name and
+          // username lines up with the avatar.
+          margin-top: -2px;
+          margin-bottom: -2px;
+        }
+      }
+    }
+
+    @media (max-width: 600px) {
+      .account-info {
+        flex-direction: column;
+
+        .user-info-container {
+          margin-bottom: var(--spacing);
+        }
+
+        .button-component {
+          align-self: normal;
+        }
+      }
+    }
+
+    .call-to-action {
+      display: block;
+
+      .button-component {
+        margin-top: var(--spacing);
+        margin-left: 0;
+      }
+    }
+  }
+
+  .no-options-found {
+    label {
+      margin-bottom: 0;
+    }
+
+    span {
+      color: var(--text-secondary-color);
+    }
+  }
+
+  .default-branch-component {
+    .ref-name-text-box {
+      margin-top: var(--spacing);
+    }
+
+    #default-branch-description {
+      margin-top: var(--spacing);
+    }
+  }
+
+  .settings-description {
+    margin-top: var(--spacing);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary-color);
+  }
+
+  .example-link {
+    cursor: default !important;
+  }
+
+  .theme-selector {
+    display: flex;
+    margin: 0 calc(var(--spacing-half) * -1);
+
+    .radio-button-component {
+      display: block;
+      padding: var(--spacing-half);
+      position: relative;
+      margin: 0;
+
+      label {
+        input[type='radio'] {
+          position: absolute;
+          left: calc(var(--spacing) + var(--spacing-half));
+          margin-top: calc(50.5%);
+
+          &:checked + span {
+            border-color: var(--box-selected-active-background-color);
+          }
+        }
+
+        > span {
+          border-radius: var(--border-radius);
+          border: var(--base-border);
+          float: left;
+          overflow: hidden;
+          padding-bottom: var(--spacing-half);
+          width: 100%;
+          margin: 0;
+
+          .theme-value-label {
+            margin-left: calc(var(--spacing-triple));
+          }
+
+          img {
+            width: 100%;
+            border-bottom: var(--base-border);
+            margin-bottom: var(--spacing-half);
+            display: block;
+          }
+
+          .system-theme-swatch {
+            width: 100%;
+            position: relative;
+            display: block;
+
+            img {
+              position: absolute;
+              top: 0;
+
+              &:first-child {
+                position: inherit;
+              }
+
+              &:last-child {
+                clip-path: polygon(50% 0, 100% 0%, 100% 100%, 50% 100%);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+#external-editor-error {
+  width: 450px;
+
+  p {
+    word-wrap: break-word;
+  }
+}
+
+.extra-integration-slot {
+  margin-top: var(--spacing);
+
+  .row-component {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--spacing);
+
+    .select-component {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .button-component {
+      flex-shrink: 0;
+      margin-bottom: 2px;
+    }
+  }
+}
+
+.add-integration-row {
+  margin-top: var(--spacing);
+}
+
+.git-status-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-half);
+  margin-bottom: var(--spacing);
+
+  .git-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &.found {
+      background: #56d364;
+      animation: pulse-green 2s ease-in-out infinite;
+    }
+
+    &.missing {
+      background: #ff7b72;
+      animation: pulse-red 2s ease-in-out infinite;
+    }
+  }
+
+  @keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 5px 2px rgba(86, 211, 100, 0.5); }
+    50% { box-shadow: 0 0 14px 6px rgba(86, 211, 100, 0.9); }
+  }
+
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 5px 2px rgba(255, 123, 114, 0.5); }
+    50% { box-shadow: 0 0 14px 6px rgba(255, 123, 114, 0.9); }
+  }
+
+  .git-status-label {
+    font-weight: var(--font-weight-semibold);
+    flex-shrink: 0;
+  }
+
+  .git-status-value {
+    user-select: text;
+    word-break: break-all;
+  }
+}
+
+.custom-integration-form-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  gap: var(--spacing-half);
+
+  .custom-integration-form-path-container {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--spacing);
+  }
+}
+
+.custom-theme-selector {
+  .custom-theme-selecter-header {
+    display: flex;
+    width: 375px;
+    button {
+      margin-left: auto;
+    }
+    h2 {
+      margin-bottom: 0;
+    }
+  }
+
+  .swatch-box {
+    width: 31%;
+    float: left;
+    background-color: rgb(228, 228, 228);
+    border: 1px solid black;
+    color: black;
+    text-align: center;
+    margin: 1%;
+    padding: 1px;
+    border-radius: 5px;
+  }
+
+  .theme-option-swatch {
+    display: inline-block;
+    border-radius: 5px;
+    border: 1px solid black;
+    width: 100%;
+    height: 50px;
+    &:hover {
+      border-width: 2px;
+      outline: 1px solid rgb(228, 228, 228);
+    }
+    margin: auto;
+  }
+
+  .color-picker-container {
+    position: absolute;
+    width: 100px;
+  }
+}
+
+// Multi-account switcher in the fork's Extensions tab.
+.extensions-section {
+  margin-bottom: var(--spacing-double);
+
+  .extensions-account-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-half);
+    margin-bottom: var(--spacing);
+  }
+
+  .extensions-account {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing);
+    padding: var(--spacing-half) var(--spacing);
+    border: var(--base-border);
+    border-radius: var(--border-radius);
+
+    &.is-active {
+      border-color: var(--focus-color);
+      background: var(--box-selected-background-color);
+    }
+
+    .extensions-account-avatar {
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .extensions-account-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex-grow: 1;
+    }
+
+    .extensions-account-login {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-half);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .extensions-account-badge {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-normal);
+      padding: 0 var(--spacing-half);
+      border-radius: var(--border-radius);
+      background: var(--focus-color);
+      color: var(--background-color);
+    }
+
+    .extensions-account-host {
+      color: var(--text-secondary-color);
+      font-size: var(--font-size-sm);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .extensions-account-actions {
+      display: flex;
+      gap: var(--spacing-half);
+      flex-shrink: 0;
+    }
+  }
+
+  .extensions-account-add {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-half);
+  }
+}
